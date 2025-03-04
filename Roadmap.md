@@ -16,6 +16,9 @@ It should enable traders to view, simulate and execute trades with pre-calculate
 The sub-objectives are to attract more traders onchain (because liquidity will be easier to read and execute) and to encourage greater liquidity onchain by increasing volumes/revenues.
 The aim is also to unify the fragmented liquidity between protocols, pools and chains, while saving simulation and execution time, even for thousands of pools.
 
+- Why do I want to implement TAP-2
+  
+
 -------
 
 ## Implementation

@@ -12,7 +12,6 @@ use tycho_simulation::{
     models::Token,
     protocol::models::BlockUpdate,
     tycho_client::feed::component_tracker::ComponentFilter,
-    tycho_core::dto::Chain,
     utils::load_all_tokens,
 };
 
@@ -26,10 +25,20 @@ async fn main() {
     let tvl_threshold = 10_000.0;
     let tvl_filter = ComponentFilter::with_tvl_range(tvl_threshold, tvl_threshold);
 
-    let all_tokens = load_all_tokens(tycho_url.as_str(), false, Some(tycho_api_key.as_str())).await;
-    let mut pairs: HashMap<String, Vec<Token>> = HashMap::new();
+    // pub async fn load_all_tokens(
+    //     tycho_url: &str,
+    //     no_tls: bool,
+    //     auth_key: Option<&str>,
+    //     chain: Chain,
+    //     min_quality: Option<i32>,
+    //     max_days_since_last_trade: Option<u64>,
+    // ) -> HashMap<Bytes, Token> {
 
-    let mut protocol_stream = ProtocolStreamBuilder::new(&tycho_url, Chain::Ethereum)
+    let chain = tycho_simulation::tycho_core::dto::Chain::Ethereum.into();
+
+    let all_tokens = load_all_tokens(tycho_url.as_str(), false, Some(tycho_api_key.as_str()), chain, None, None).await;
+    let mut pairs: HashMap<String, Vec<Token>> = HashMap::new();
+    let mut protocol_stream = ProtocolStreamBuilder::new(&tycho_url, tycho_simulation::tycho_core::dto::Chain::Ethereum.into())
         .exchange::<UniswapV2State>("uniswap_v2", tvl_filter.clone(), None)
         .exchange::<EVMPoolState<PreCachedDB>>("vm:balancer_v2", tvl_filter.clone(), Some(balancer_pool_filter))
         .auth_key(Some(tycho_api_key.clone()))
@@ -59,7 +68,11 @@ fn print_calculations(message: BlockUpdate, pairs: &mut HashMap<String, Vec<Toke
         if let Some(tokens) = pairs.get(id) {
             let formatted_token_str = format!("{:}/{:}", &tokens[0].symbol, &tokens[1].symbol);
             println!("Calculations for pool {:?} with tokens {:?}", id, formatted_token_str);
-            state.spot_price(&tokens[0], &tokens[1]).map(|price| println!("Spot price {:?}: {:?}", formatted_token_str, price)).map_err(|e| eprintln!("Error calculating spot price for Pool {:?}: {:?}", id, e)).ok();
+            state
+                .spot_price(&tokens[0], &tokens[1])
+                .map(|price| println!("Spot price {:?}: {:?}", formatted_token_str, price))
+                .map_err(|e| eprintln!("Error calculating spot price for Pool {:?}: {:?}", id, e))
+                .ok();
             let amount_in = BigUint::from(1u32) * BigUint::from(10u32).pow(tokens[0].decimals as u32);
             state
                 .get_amount_out(amount_in, &tokens[0], &tokens[1])

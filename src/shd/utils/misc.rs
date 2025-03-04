@@ -16,14 +16,25 @@ pub mod log {
      * Initialize the logger
      */
     pub fn new(prog: String) {
-        let colors = ColoredLevelConfig { trace: Color::Cyan, debug: Color::Magenta, info: Color::Green, warn: Color::Red, error: Color::BrightRed, ..ColoredLevelConfig::new() };
+        let colors = ColoredLevelConfig {
+            trace: Color::Cyan,
+            debug: Color::Magenta,
+            info: Color::Green,
+            warn: Color::Red,
+            error: Color::BrightRed,
+            ..ColoredLevelConfig::new()
+        };
 
         fern::Dispatch::new()
             .format(move |out, message, record| {
                 out.finish(format_args!(
                     "{:.23} [{:-<35}:{:<3}] {} {}",
                     chrono::Local::now().to_rfc3339(), // => {:.23} = 2024-08-29T11:53:54.675
-                    if record.file().unwrap_or("unknown").len() > 35 { &record.file().unwrap_or("unknown")[record.file().unwrap_or("unknown").len() - 35..] } else { record.file().unwrap_or("unknown") },
+                    if record.file().unwrap_or("unknown").len() > 35 {
+                        &record.file().unwrap_or("unknown")[record.file().unwrap_or("unknown").len() - 35..]
+                    } else {
+                        record.file().unwrap_or("unknown")
+                    },
                     // record.file().unwrap_or("unknown"),
                     record.line().unwrap_or(0),
                     colors.color(record.level()),
@@ -31,7 +42,7 @@ pub mod log {
                 ))
             })
             .chain(std::io::stdout())
-            .level(log::LevelFilter::Info)
+            .level(LevelFilter::Off) // Disable all logging from crates
             .level_for(prog.clone(), LevelFilter::Info)
             .apply()
             .unwrap();
@@ -52,7 +63,11 @@ impl EnvConfig {
      * Create a new EnvConfig
      */
     pub fn new() -> Self {
-        EnvConfig { testing: get("TESTING") == "true", tycho_url: get("TYCHO_URL"), tycho_api_key: get("TYCHO_API_KEY") }
+        EnvConfig {
+            testing: get("TESTING") == "true",
+            tycho_url: get("TYCHO_URL"),
+            tycho_api_key: get("TYCHO_API_KEY"),
+        }
     }
 }
 

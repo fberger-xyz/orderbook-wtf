@@ -1,6 +1,5 @@
 use tycho_client::rpc::HttpRPCClient;
 use tycho_client::rpc::RPCClient;
-use tycho_client::{feed::component_tracker::ComponentFilter, stream::TychoStreamBuilder};
 use tycho_core::dto::Chain;
 
 #[tokio::main]

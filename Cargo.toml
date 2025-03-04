@@ -14,16 +14,16 @@ num-bigint = "0.4.6"
 tracing-subscriber = { version = "0.3.17", default-features = false, features = ["env-filter", "fmt"] }
 
 # tycho-core: defines the core structs and traits used throughout the Tycho system. More detailed docs here.
-tycho-core = { git = "https://github.com/propeller-heads/tycho-indexer.git", package = "tycho-core", tag = "0.46.0" }
-tycho-client = { git = "https://github.com/propeller-heads/tycho-indexer.git", package = "tycho-client", tag = "0.46.0" }
-tycho-simulation = { git = "https://github.com/propeller-heads/tycho-simulation.git", package = "tycho-simulation", tag = "0.68.0" }
+# tycho-core = { git = "https://github.com/propeller-heads/tycho-indexer.git", package = "tycho-core", tag = "0.46.0" }
+# tycho-client = { git = "https://github.com/propeller-heads/tycho-indexer.git", package = "tycho-client", tag = "0.46.0" }
+# tycho-simulation = { git = "https://github.com/propeller-heads/tycho-simulation.git", package = "tycho-simulation", tag = "0.68.0" }
 
 # tycho-indexer: contains the main logic used to process incoming data and propogate the relevant information to clients and storage. Includes the RPC service
 
-# tycho-simulation = { git = "https://github.com/propeller-heads/tycho-simulation.git", package = "tycho-simulation", features = ["evm"] }
-# tycho-execution = { git = "https://github.com/propeller-heads/tycho-execution.git", package = "tycho-execution", features = ["evm"] }
-# tycho-core = { git = "https://github.com/propeller-heads/tycho-indexer.git", package = "tycho-core" }
-# tycho-client = { git = "https://github.com/propeller-heads/tycho-indexer.git", package = "tycho-client" }
+tycho-simulation = { git = "https://github.com/propeller-heads/tycho-simulation.git", package = "tycho-simulation", features = ["evm"] }
+tycho-core = { git = "https://github.com/propeller-heads/tycho-indexer.git", package = "tycho-core" }
+tycho-client = { git = "https://github.com/propeller-heads/tycho-indexer.git", package = "tycho-client" }
+tycho-execution = { git = "https://github.com/propeller-heads/tycho-execution.git", package = "tycho-execution", features = ["evm"] }
 
 toml = "0.8.12"
 serde = { version = "1.0.104", features = ["derive"] }
