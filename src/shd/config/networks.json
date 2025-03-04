@@ -1,0 +1,26 @@
+[
+    {
+        "name": "ethereum",
+        "chainid": 1,
+        "eth": "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+        "usdc": "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48",
+        "rpc": "https://rpc.payload.de",
+        "exp": "https://etherscan.io/"
+    },
+    {
+        "name": "arbitrum",
+        "chainid": 42161,
+        "eth": "0x82af49447d8a07e3bd95bd0d56f35241523fbab1",
+        "usdc": "0xaf88d065e77c8cc2239327c5edb3a432268e5831",
+        "rpc": "https://arb1.arbitrum.io/rpc",
+        "exp": "https://arbiscan.io/"
+    },
+    {
+        "name": "base",
+        "chainid": 8453,
+        "eth": "0x4200000000000000000000000000000000000006",
+        "usdc": "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+        "rpc": "https://mainnet.base.org",
+        "exp": "https://basescan.io/"
+    }
+]
