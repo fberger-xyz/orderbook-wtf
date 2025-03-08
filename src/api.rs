@@ -63,8 +63,7 @@ async fn pairs(Extension(network): Extension<Network>) -> impl IntoResponse {
     }
 }
 
-// GET /components => Get all existing components
-async fn components(Extension(network): Extension<Network>) -> impl IntoResponse {
+async fn _components(network: Network) -> impl IntoResponse {
     let key = shd::r#static::data::keys::stream::components(network.name.clone());
     match shd::data::redis::get::<Vec<SrzProtocolComponent>>(key.as_str()).await {
         Some(cps) => Json(json!({ "components": cps })),
@@ -72,13 +71,12 @@ async fn components(Extension(network): Extension<Network>) -> impl IntoResponse
     }
 }
 
-// GET /simulate =>
-async fn simulate(Extension(shtss): Extension<SharedTychoStreamState>, Extension(network): Extension<Network>) -> impl IntoResponse {
-    log::info!("Simulating on network {}", network.name);
+// GET /components => Get all existing components
+async fn components(Extension(network): Extension<Network>) -> impl IntoResponse {
+    _components(network).await
 }
 
-// GET /component/{id} => Get the component for the given pool (by id)
-async fn pool(Extension(network): Extension<Network>, Path(id): Path<String>) -> impl IntoResponse {
+async fn _pool(network: Network, id: String) -> impl IntoResponse {
     let key = shd::r#static::data::keys::stream::component(network.name.clone(), id.clone());
     match shd::data::redis::get::<SrzProtocolComponent>(key.as_str()).await {
         Some(comp) => {
@@ -110,6 +108,16 @@ async fn pool(Extension(network): Extension<Network>, Path(id): Path<String>) ->
     }
 }
 
+// GET /component/{id} => Get the component for the given pool (by id)
+async fn pool(Extension(network): Extension<Network>, Path(id): Path<String>) -> impl IntoResponse {
+    _pool(network, id).await
+}
+
+// GET /simulate =>
+async fn simulate(Extension(shtss): Extension<SharedTychoStreamState>, Extension(network): Extension<Network>) -> impl IntoResponse {
+    log::info!("Simulating on network {}", network.name);
+}
+
 #[derive(Debug, Deserialize)]
 struct PairQuery {
     tag: String,
@@ -118,7 +126,9 @@ struct PairQuery {
 
 // GET /pair/{0xt0-0xt1} => Get all component & state (= /pool) for a given pair of token
 // It must be t0-t1 for tokenFrom-tokenTo, but if zeroToOne is false, computed data will be t1-t0
-async fn pair(Extension(network): Extension<Network>, Query(params): Query<PairQuery>) -> impl IntoResponse {}
+async fn pair(Extension(network): Extension<Network>, Query(params): Query<PairQuery>) -> impl IntoResponse {
+    let components = _components(network).await;
+}
 
 pub async fn start(n: Network, shared: SharedTychoStreamState, config: EnvConfig) {
     log::info!("👾 Launching API for '{}' network | 🧪 Testing mode: {:?} | Port: {}", n.name, config.testing, n.port);
@@ -140,7 +150,7 @@ pub async fn start(n: Network, shared: SharedTychoStreamState, config: EnvConfig
         .layer(Extension(n.clone()))
         .layer(Extension(shared.clone())); // Shared state
 
-    match tokio::net::TcpListener::bind(format!("127.0.0.1:{}", n.port)).await {
+    match tokio::net::TcpListener::bind(format!("0.0.0.0:{}", n.port)).await {
         Ok(listener) => match axum::serve(listener, app).await {
             Ok(_) => {
                 log::info!("API for '{}' network is running on port {}", n.name, n.port);

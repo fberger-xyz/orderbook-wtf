@@ -31,7 +31,7 @@ services:
       - "42001:42001"
     volumes:
       - ../:/app
-    command: cargo watch -x "run --bin stream"
+    command: cargo watch -w /src -x "run --bin stream"
     depends_on:
       redis:
         condition: service_healthy
@@ -46,3 +46,9 @@ services:
     restart: always
     networks:
       - tycho
+
+  # base:
+  # arbitrum:
+  # starknet:
+  # web:
+
