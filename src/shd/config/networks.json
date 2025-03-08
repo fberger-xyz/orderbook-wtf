@@ -8,7 +8,8 @@
         "rpc": "https://rpc.payload.de",
         "exp": "https://etherscan.io/",
         "tycho": "https://tycho-beta.propellerheads.xyz",
-        "enabled": true
+        "enabled": true,
+        "port": 42001
     },
     {
         "name": "arbitrum",
@@ -19,7 +20,8 @@
         "rpc": "https://arb1.arbitrum.io/rpc",
         "exp": "https://arbiscan.io/",
         "tycho": "",
-        "enabled": false
+        "enabled": false,
+        "port": 42002
     },
     {
         "name": "base",
@@ -30,6 +32,7 @@
         "tycho": "https://tycho-base-beta.propellerheads.xyz",
         "rpc": "https://mainnet.base.org",
         "exp": "https://basescan.io/",
-        "enabled": false
+        "enabled": false,
+        "port": 42003
     }
 ]

@@ -6,7 +6,6 @@ pub struct EnvConfig {
     pub testing: bool,
     pub tycho_url: String,
     pub tycho_api_key: String,
-    pub port: u64,
     pub network: String,
 }
 
@@ -21,6 +20,7 @@ pub struct Network {
     pub exp: String,
     pub enabled: bool,
     pub tycho: String,
+    pub port: u64,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -126,4 +126,18 @@ pub struct TychoStreamState {
     // Maps a network name to its new ProtocolComponent.
     // pub components: HashMap<String, ProtocolComponent>,
     pub components: HashMap<String, String>,
+}
+
+pub type ChainCore = tycho_core::dto::Chain;
+pub type ChainSimu = tycho_simulation::evm::tycho_models::Chain;
+
+pub fn chain(name: String) -> Option<(ChainCore, ChainSimu)> {
+    match name.as_str() {
+        "ethereum" => Some((ChainCore::Ethereum, ChainSimu::Ethereum)),
+        "arbitrum" => Some((ChainCore::Arbitrum, ChainSimu::Arbitrum)),
+        "starknet" => Some((ChainCore::Starknet, ChainSimu::Starknet)),
+        "zksync" => Some((ChainCore::ZkSync, ChainSimu::ZkSync)),
+        "base" => Some((ChainCore::Base, ChainSimu::Base)),
+        _ => None,
+    }
 }

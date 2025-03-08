@@ -7,6 +7,7 @@ use num_bigint::BigUint;
 use tap2::shd;
 use tap2::shd::data::fmt::SrzEVMPoolState;
 use tap2::shd::data::fmt::SrzProtocolComponent;
+use tap2::shd::data::fmt::SrzToken;
 use tap2::shd::data::fmt::SrzUniswapV2State;
 use tap2::shd::data::fmt::SrzUniswapV3State;
 use tap2::shd::data::fmt::SrzUniswapV4State;
@@ -41,26 +42,12 @@ use tycho_simulation::{
 
 use tycho_simulation::protocol::models::ProtocolComponent;
 
-type ChainCore = tycho_core::dto::Chain;
-type ChainSimu = tycho_simulation::evm::tycho_models::Chain;
-
-pub fn chain(name: String) -> Option<(ChainCore, ChainSimu)> {
-    match name.as_str() {
-        "ethereum" => Some((ChainCore::Ethereum, ChainSimu::Ethereum)),
-        "arbitrum" => Some((ChainCore::Arbitrum, ChainSimu::Arbitrum)),
-        "starknet" => Some((ChainCore::Starknet, ChainSimu::Starknet)),
-        "zksync" => Some((ChainCore::ZkSync, ChainSimu::ZkSync)),
-        "base" => Some((ChainCore::Base, ChainSimu::Base)),
-        _ => None,
-    }
-}
-
-async fn stream(network: Network, tokens: Vec<Token>, config: EnvConfig) {
+async fn stream(network: Network, shdstate: SharedTychoStreamState, tokens: Vec<Token>, config: EnvConfig) {
     let u4 = uniswap_v4_pool_with_hook_filter;
     let balancer = balancer_pool_filter;
     let curve = curve_pool_filter;
-    let (_, chain) = chain(network.name.clone()).expect("Invalid chain");
-    let filter = ComponentFilter::with_tvl_range(1.0, 100.0);
+    let (_, chain) = shd::types::chain(network.name.clone()).expect("Invalid chain");
+    let filter = ComponentFilter::with_tvl_range(1.0, 50.0);
     let mut hmt = HashMap::new();
     tokens.iter().for_each(|t| {
         hmt.insert(t.address.clone(), t.clone());
@@ -98,6 +85,13 @@ async fn stream(network: Network, tokens: Vec<Token>, config: EnvConfig) {
                         shd::data::redis::set(keys::stream::status(network.name.clone()).as_str(), SyncState::Syncing as u128).await;
                         shd::data::redis::set(keys::stream::latest(network.name.clone()).as_str(), msg.block_number).await;
 
+                        log::info!("🔔 Writing on shared state...");
+                        let mut state = shdstate.write().await;
+                        state.states.insert(network.name.clone(), msg.block_number.to_string());
+                        state.components.insert(network.name.clone(), msg.block_number.to_string());
+                        log::info!("Shared state updated but not droped");
+                        drop(state);
+
                         let updating = !msg.states.is_empty();
 
                         // The stream created emits BlockUpdate messages which consist of:
@@ -124,21 +118,17 @@ async fn stream(network: Network, tokens: Vec<Token>, config: EnvConfig) {
                             }
                         }
 
-                        let mut updates = HashMap::new();
-                        if updating {
-                            for up in msg.states.iter() {
-                                // log::info!("- Updating state for {}", up.0);
-
-                                // ProtoSim
-                                let x = up.1.clone_box();
-
-                                let key1 = keys::stream::component(up.0.to_string().to_lowercase());
-                                if let Some(cp) = shd::data::redis::get::<SrzProtocolComponent>(key1.as_str()).await {
-                                    updates.insert(up.0.clone(), ProtocolComponent::from(cp));
-                                }
-                                // Get the Redis key for the component
-                            }
-                        }
+                        // let mut updates = HashMap::new();
+                        // if updating {
+                        //     for up in msg.states.iter() {
+                        //         log::info!("- Updating state for {}", up.0);
+                        //         let x = up.1.clone_box();
+                        //         let key1 = keys::stream::component(up.0.to_string().to_lowercase());
+                        //         if let Some(cp) = shd::data::redis::get::<SrzProtocolComponent>(key1.as_str()).await {
+                        //             updates.insert(up.0.clone(), ProtocolComponent::from(cp));
+                        //         }
+                        //     }
+                        // }
 
                         // Tmp !
                         let mut targets = vec![];
@@ -151,6 +141,12 @@ async fn stream(network: Network, tokens: Vec<Token>, config: EnvConfig) {
                                 targets.push(comp.id.to_string().to_lowercase());
                             }
                         }
+
+                        let mut srzcomponents = vec![];
+                        let mut srzstates_u2 = vec![];
+                        let mut srzstates_u3 = vec![];
+                        let mut srzstates_u4 = vec![];
+                        let mut srzstates_balancer = vec![];
 
                         log::info!("--------- States on network: {} --------- ", network.name);
                         for m in targets.clone() {
@@ -173,12 +169,14 @@ async fn stream(network: Network, tokens: Vec<Token>, config: EnvConfig) {
                                             log::info!(" - reserve1: {}", state.reserve1.to_string());
                                             // Store the comp in Redis
                                             let pc = SrzProtocolComponent::from(comp.clone());
+                                            srzcomponents.push(pc.clone());
                                             let key1 = keys::stream::component(comp.id.to_string().to_lowercase());
                                             shd::data::redis::set(key1.as_str(), pc.clone()).await;
                                             // Store the state
                                             let key2 = keys::stream::state(comp.id.to_string().to_lowercase());
-                                            let srz = SrzUniswapV2State::from(state.clone());
+                                            let srz = SrzUniswapV2State::from((state.clone(), comp.id.to_string()));
                                             shd::data::redis::set(key2.as_str(), srz.clone()).await;
+                                            srzstates_u2.push(srz.clone());
                                         } else {
                                             log::info!("Downcast to 'UniswapV2State' failed on proto '{}'", comp.protocol_type_name);
                                         }
@@ -192,11 +190,13 @@ async fn stream(network: Network, tokens: Vec<Token>, config: EnvConfig) {
                                             // Store the comp in Redis
                                             let key1 = keys::stream::component(comp.id.to_string().to_lowercase());
                                             let pc = SrzProtocolComponent::from(comp.clone());
+                                            srzcomponents.push(pc.clone());
                                             shd::data::redis::set(key1.as_str(), pc.clone()).await;
                                             // Store the state
                                             let key2 = keys::stream::state(comp.id.to_string().to_lowercase());
-                                            let srz = SrzUniswapV3State::from(state.clone());
+                                            let srz = SrzUniswapV3State::from((state.clone(), comp.id.to_string()));
                                             shd::data::redis::set(key2.as_str(), srz.clone()).await;
+                                            srzstates_u3.push(srz.clone());
 
                                             log::info!(" - (srz state) liquidity   : {} ", srz.liquidity);
                                             log::info!(" - (srz state) sqrt_price  : {} ", srz.sqrt_price.to_string());
@@ -217,10 +217,12 @@ async fn stream(network: Network, tokens: Vec<Token>, config: EnvConfig) {
                                             // Store the comp in Redis
                                             let key1 = keys::stream::component(comp.id.to_string().to_lowercase());
                                             let pc = SrzProtocolComponent::from(comp.clone());
+                                            srzcomponents.push(pc.clone());
                                             shd::data::redis::set(key1.as_str(), pc.clone()).await;
                                             // Store the state
                                             let key2 = keys::stream::state(comp.id.to_string().to_lowercase());
-                                            let srz = SrzUniswapV4State::from(state.clone());
+                                            let srz = SrzUniswapV4State::from((state.clone(), comp.id.to_string()));
+                                            srzstates_u4.push(srz.clone());
                                             shd::data::redis::set(key2.as_str(), srz.clone()).await;
                                             log::info!(" - (srz state) liquidity   : {} ", srz.liquidity);
                                             log::info!(" - (srz state) sqrt_price  : {:?} ", srz.sqrt_price);
@@ -240,6 +242,7 @@ async fn stream(network: Network, tokens: Vec<Token>, config: EnvConfig) {
                                             // Store the comp in Redis
                                             let key1 = keys::stream::component(comp.id.to_string().to_lowercase());
                                             let pc = SrzProtocolComponent::from(comp.clone());
+                                            srzcomponents.push(pc.clone());
                                             shd::data::redis::set(key1.as_str(), pc.clone()).await;
                                             // Store the state
                                             let key2 = keys::stream::state(comp.id.to_string().to_lowercase());
@@ -250,6 +253,8 @@ async fn stream(network: Network, tokens: Vec<Token>, config: EnvConfig) {
                                                 block: state.block.number,
                                                 balances: state.balances.iter().map(|(k, v)| (k.to_string(), *v)).collect(),
                                             };
+                                            srzstates_balancer.push(srz.clone());
+
                                             log::info!(" - (srz state) id        : {} ", srz.id);
                                             log::info!(" - (srz state) tokens    : {:?} ", srz.tokens);
                                             log::info!(" - (srz state) block     : {} ", srz.block);
@@ -262,10 +267,20 @@ async fn stream(network: Network, tokens: Vec<Token>, config: EnvConfig) {
                                     }
                                 }
 
-                                let key1 = keys::stream::component(comp.id.to_string().to_lowercase());
-                                if let Some(cp) = shd::data::redis::get::<SrzProtocolComponent>(key1.as_str()).await {
-                                    log::info!(" - SrzProtocolComponent: {:?}", cp);
-                                }
+                                let srztokens = tokens.iter().map(|t| SrzToken::from(t.clone())).collect::<Vec<SrzToken>>();
+                                let path = format!("misc/data/tokens.ethereum.json");
+                                let json = serde_json::to_string_pretty(&srztokens).unwrap();
+                                let mut file = std::fs::File::create(path).expect("Unable to create file");
+                                std::io::Write::write_all(&mut file, json.as_bytes()).expect("Unable to write data");
+                                let path = format!("misc/data/components.ethereum.json");
+                                let json = serde_json::to_string_pretty(&srzcomponents).unwrap();
+                                let mut file = std::fs::File::create(path).expect("Unable to create file");
+                                std::io::Write::write_all(&mut file, json.as_bytes()).expect("Unable to write data");
+
+                                shd::utils::misc::save(srzstates_u2.clone(), format!("misc/data/states.uniswapv2.{}.json", network.name.clone()).as_str());
+                                shd::utils::misc::save(srzstates_u3.clone(), format!("misc/data/states.uniswapv3.{}.json", network.name.clone()).as_str());
+                                shd::utils::misc::save(srzstates_u4.clone(), format!("misc/data/states.uniswapv4.{}.json", network.name.clone()).as_str());
+                                shd::utils::misc::save(srzstates_balancer.clone(), format!("misc/data/states.balancer.{}.json", network.name.clone()).as_str());
                             }
                             log::info!("\n\n");
                         }
@@ -286,15 +301,17 @@ async fn stream(network: Network, tokens: Vec<Token>, config: EnvConfig) {
     }
 }
 
+pub mod server;
+
 /**
  * Stream the entire state from each AMMs, with TychoStreamBuilder.
  */
 #[tokio::main]
 async fn main() {
     shd::utils::misc::log::new("stream".to_string());
-    dotenv::from_filename(".env.prod").ok();
+    dotenv::from_filename(".env.ex").ok();
     let config = EnvConfig::new();
-    log::info!("Launching Stream | 🧪 Testing {:?}", config.testing);
+    log::info!("Launching Stream | 🧪 Testing mode: {:?}", config.testing);
     let path = "src/shd/config/networks.json".to_string();
     let networks: Vec<Network> = shd::utils::misc::read(&path);
     let network = networks.clone().into_iter().filter(|x| x.enabled).find(|x| x.name == config.network).expect("Network not found or not enabled");
@@ -303,31 +320,33 @@ async fn main() {
     shd::data::redis::set(keys::stream::latest(network.name.clone().to_string()).as_str(), 0).await;
     shd::data::redis::ping().await;
 
+    // Shared state
     let stss: SharedTychoStreamState = Arc::new(RwLock::new(TychoStreamState {
         states: HashMap::new(),
         components: HashMap::new(),
     }));
+    let readable = Arc::clone(&stss);
+    let writeable = Arc::clone(&stss);
 
-    let rstate = Arc::clone(&stss);
+    // Start the server, only reading from the shared state
+    // let dupn = network.clone();
+    // let dupc = config.clone();
+    // tokio::spawn(async move {
+    //     loop {
+    //         server::start(dupn.clone(), Arc::clone(&readable), dupc.clone()).await;
+    //         tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
+    //     }
+    // });
+
+    // Start the stream, writing to the shared state
     tokio::spawn(async move {
         loop {
-            {
-                let state = rstate.read().await;
-                log::info!("API Task: states = {:?}", state.states.keys());
-                log::info!("API Task: components = {:?}", state.components.keys());
-            }
-            tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
-        }
-    });
-
-    let wstate = Arc::clone(&stss);
-    tokio::spawn(async move {
-        loop {
+            let config = config.clone();
             let network = network.clone();
             match HttpRPCClient::new(&network.tycho, Some(&config.tycho_api_key)) {
                 Ok(client) => {
                     let time = std::time::SystemTime::now();
-                    let (chain, _) = chain(network.name.clone()).expect("Invalid chain");
+                    let (chain, _) = shd::types::chain(network.name.clone()).expect("Invalid chain");
                     match client.get_all_tokens(chain, Some(100), Some(1), 3000).await {
                         Ok(result) => {
                             let mut tokens = vec![];
@@ -341,10 +360,7 @@ async fn main() {
                             }
                             let elasped = time.elapsed().unwrap().as_millis();
                             log::info!("Took {:?} ms to get {} tokens on {}", elasped, tokens.len(), network.name);
-                            // stream(network.clone(), tokens.clone(), config.clone()).await;
-                            let mut state = wstate.write().await;
-                            state.states.insert(network.name.clone(), "shared!".to_string());
-                            state.components.insert(network.name.clone(), "shared!".to_string());
+                            stream(network.clone(), Arc::clone(&writeable), tokens.clone(), config.clone()).await;
                         }
                         Err(e) => {
                             log::error!("Failed to get tokens: {:?}", e.to_string());
@@ -360,5 +376,5 @@ async fn main() {
         }
     });
     futures::future::pending::<()>().await;
-    log::info!("Program over");
+    log::info!("Stream program terminated");
 }

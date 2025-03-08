@@ -111,13 +111,15 @@ impl From<SrzProtocolComponent> for ProtocolComponent {
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct SrzUniswapV2State {
+    pub id: String,
     pub reserve0: u128,
     pub reserve1: u128,
 }
 
-impl From<UniswapV2State> for SrzUniswapV2State {
-    fn from(state: UniswapV2State) -> Self {
+impl From<(UniswapV2State, String)> for SrzUniswapV2State {
+    fn from((state, id): (UniswapV2State, String)) -> Self {
         SrzUniswapV2State {
+            id,
             reserve0: state.reserve0.to_string().parse().expect("UniswapV2State: Failed to parse u128"),
             reserve1: state.reserve1.to_string().parse().expect("UniswapV2State: Failed to parse u128"),
         }
@@ -128,6 +130,7 @@ impl From<UniswapV2State> for SrzUniswapV2State {
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct SrzUniswapV3State {
+    pub id: String,
     pub liquidity: u128,
     pub sqrt_price: U256,
     pub fee: i32,
@@ -135,9 +138,10 @@ pub struct SrzUniswapV3State {
     pub ticks: SrzTickList,
 }
 
-impl From<UniswapV3State> for SrzUniswapV3State {
-    fn from(state: UniswapV3State) -> Self {
+impl From<(UniswapV3State, String)> for SrzUniswapV3State {
+    fn from((state, id): (UniswapV3State, String)) -> Self {
         SrzUniswapV3State {
+            id,
             liquidity: state.liquidity.to_string().parse().expect("UniswapV3State: Failed to parse u128"),
             sqrt_price: state.sqrt_price,
             fee: state.fee as i32,
@@ -151,6 +155,7 @@ impl From<UniswapV3State> for SrzUniswapV3State {
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
 pub struct SrzUniswapV4State {
+    pub id: String,
     pub liquidity: u128,
     pub sqrt_price: U256,
     pub fees: SrzUniswapV4Fees,
@@ -165,9 +170,10 @@ pub struct SrzUniswapV4Fees {
     pub lp_fee: u32,       // Liquidity providers fees
 }
 
-impl From<UniswapV4State> for SrzUniswapV4State {
-    fn from(state: UniswapV4State) -> Self {
+impl From<(UniswapV4State, String)> for SrzUniswapV4State {
+    fn from((state, id): (UniswapV4State, String)) -> Self {
         SrzUniswapV4State {
+            id,
             liquidity: state.liquidity.to_string().parse().expect("UniswapV4State: Failed to parse u128"),
             sqrt_price: state.sqrt_price,
             fees: SrzUniswapV4Fees {

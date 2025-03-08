@@ -34,6 +34,10 @@ pub mod data {
                 format!("stream:latest:{}", network.to_lowercase())
             }
 
+            pub fn tokens(network: String) -> String {
+                format!("stream:tokens:{}", network.to_lowercase())
+            }
+
             // stream:component:<id> => Component (serialized)
             pub fn component(id: String) -> String {
                 format!("stream:component:{}", id.to_lowercase())

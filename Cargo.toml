@@ -66,11 +66,6 @@ path = "src/lib.rs"
 name = "stream"
 path = "src/stream.rs"
 
-[[bin]]
-name = "api"
-path = "src/api.rs"
-
-
 # === DRAFTS ===
 
 [[bin]]
