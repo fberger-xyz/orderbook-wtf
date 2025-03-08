@@ -1,0 +1,29 @@
+RED='\033[0;31m'
+NC='\033[0m' # No Color
+NETWORK="ethereum"
+RPC="https://rpc.payload.de"
+
+function start() {
+
+    # ------------- Redis -------------
+    rm -rf dump.rdb
+    ps -ef | grep redis-server | grep -v grep | awk '{print $2}' | xargs kill 2>/dev/null
+    redis-server --port 7777 --bind 127.0.0.1 2>&1 >/dev/null &
+    # redis-server src/shared/config/redis.conf --bind 127.0.0.1 2>&1 >/dev/null &
+    echo "Redis ready #$(ps -ef | grep redis-server | grep -v grep | awk '{print $2}')"
+    sleep 1
+    # ------------- Execute -------------
+    echo "Building ..."
+    cargo build --bin stream -q 2>/dev/null
+    echo "Build successful. Executing..."
+    cargo run --bin stream -q # 2>/dev/null
+    status+=($?)
+    if [ $status -ne 0 ]; then
+        echo "Error: $status on program ${RED}${program}${NC}"
+        exit 1
+    fi
+    ps -ef | grep redis-server | grep -v grep | awk '{print $2}' | xargs kill 2>/dev/null
+    rm -rf dump.rdb
+}
+
+start

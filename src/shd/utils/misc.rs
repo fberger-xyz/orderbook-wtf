@@ -44,6 +44,7 @@ pub mod log {
             .chain(std::io::stdout())
             .level(LevelFilter::Off) // Disable all logging from crates
             .level_for(prog.clone(), LevelFilter::Info)
+            .level_for("shd", LevelFilter::Info)
             .apply()
             .unwrap();
     }
@@ -67,6 +68,7 @@ impl EnvConfig {
             testing: get("TESTING") == "true",
             tycho_url: get("TYCHO_URL"),
             tycho_api_key: get("TYCHO_API_KEY"),
+            port: get("PORT").parse().unwrap(),
         }
     }
 }

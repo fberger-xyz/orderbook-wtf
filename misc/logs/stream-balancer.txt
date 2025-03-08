@@ -1,0 +1,62 @@
+[ETH-USDC] Proto: balancer_v2_pool
+2025-03-06T22:53:12.908 [src/drafts/agglqdty.rs-------------:203] INFO  - Attribute: manual_updates: Bytes(0x01)
+2025-03-06T22:53:12.908 [src/drafts/agglqdty.rs-------------:203] INFO  - Attribute: pool_type: Bytes(0x5765696768746564506f6f6c32546f6b656e73466163746f7279)
+2025-03-06T22:53:12.908 [src/drafts/agglqdty.rs-------------:203] INFO  - Attribute: fee: Bytes(0x1c6bf526340000)
+2025-03-06T22:53:12.908 [src/drafts/agglqdty.rs-------------:203] INFO  - Attribute: weights: Bytes(0x5b22307830366630356235396433623230303030222c22307830366630356235396433623230303030225d)
+[src/drafts/agglqdty.rs:208:29] protosim = EVMPoolState {
+    id: "0x96646936b91d6b9d7d0c47c496afbf3d6ec7b6f8000200000000000000000019",
+    tokens: [
+        Bytes(0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48),
+        Bytes(0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2),
+    ],
+    block: BlockHeader {
+        number: 21990653,
+        hash: 0x802849af6a303e9933f5064dd7f0fb6fc0a0333f91ef4c13e77608ebcb0a09aa,
+        timestamp: 1741297992,
+    },
+    balances: {
+        0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48: 608881925253,
+        0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2: 43096388370790806886,
+    },
+    balance_owner: Some(
+        0xba12222222228d8ba445958a75a0704d566bf2c8,
+    ),
+    spot_prices: {
+        (
+            0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2,
+            0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48,
+        ): 2190.4019084186925,
+        (
+            0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48,
+            0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2,
+        ): 0.00045109959278683725,
+    },
+    capabilities: {
+        BuySide,
+        SellSide,
+        PriceFunction,
+        HardLimits,
+    },
+    block_lasting_overwrites: {},
+    involved_contracts: {
+        0x96646936b91d6b9d7d0c47c496afbf3d6ec7b6f8,
+        0xba12222222228d8ba445958a75a0704d566bf2c8,
+    },
+    token_storage_slots: {},
+    manual_updates: true,
+    adapter_contract: TychoSimulationContract {
+        address: 0x00000000000000000062616c616e6365725f7632,
+        engine: SimulationEngine {
+            state: PreCachedDB {
+                inner: RwLock {
+                    data: PreCachedDBInner {
+                        accounts: AccountStorage {
+                            accounts: {
+                                0x167478921b907422f8e88b43c4af2b8bea278d3a: Account {
+                                    info: AccountInfo {
+                                        balance: 0,
+                                        nonce: 0,
+                                        code_hash: 0xce59ce57a04e53deb8154740b8e2a85e1ec50b196629dae2d7a1b2c9410bf817,
+                                        code: Some(
+                                            LegacyRaw(
+                                                0x5f3560e01c6005600 [[................]]

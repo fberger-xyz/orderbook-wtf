@@ -20,10 +20,12 @@ tracing-subscriber = { version = "0.3.17", default-features = false, features = 
 
 # tycho-indexer: contains the main logic used to process incoming data and propogate the relevant information to clients and storage. Includes the RPC service
 
-tycho-simulation = { git = "https://github.com/propeller-heads/tycho-simulation.git", package = "tycho-simulation", features = ["evm"] }
+# tycho-simulation = { git = "https://github.com/propeller-heads/tycho-simulation.git", package = "tycho-simulation", features = ["evm"] }
 tycho-core = { git = "https://github.com/propeller-heads/tycho-indexer.git", package = "tycho-core" }
 tycho-client = { git = "https://github.com/propeller-heads/tycho-indexer.git", package = "tycho-client" }
 tycho-execution = { git = "https://github.com/propeller-heads/tycho-execution.git", package = "tycho-execution", features = ["evm"] }
+
+tycho-simulation = { git = "https://github.com/0xMerso/tycho-simulation.git", branch = "protocol-state-pub-fields", features = ["evm"]  }
 
 toml = "0.8.12"
 serde = { version = "1.0.104", features = ["derive"] }
@@ -45,27 +47,43 @@ dotenv_codegen = "0.15.0"
 reqwest = "0.12.4"
 redis = { version = "0.26.1", features = ["tokio-comp"] }
 alloy = { version = "0.3.1", features = ["full", "node-bindings", "json-rpc", "rpc-client"] }
+num-traits = "0.2.19"
+alloy-chains = "0.1.63"
+axum = "0.8.1"
+
+# hyper = { version = "1", features = ["full"] }
+# http-body-util = "0.1"
+# hyper-util = { version = "0.1", features = ["full"] }
 
 # ======================================================================================================================================================================================================
 
 [lib]
 path = "src/lib.rs"
 
-[[bin]]
-name = "draft"
-path = "src/draft.rs"
+# === MAIN ===
 
 [[bin]]
 name = "stream"
-path = "src/tmp/stream.rs"
+path = "src/stream.rs"
 
 [[bin]]
-name = "client"
-path = "src/tmp/client.rs"
+name = "api"
+path = "src/api.rs"
+
+
+# === DRAFTS ===
 
 [[bin]]
-name = "simu"
-path = "src/tmp/simu.rs"
+name = "stream1"
+path = "src/drafts/stream1.rs"
+
+[[bin]]
+name = "stream2"
+path = "src/drafts/stream2.rs"
+
+[[bin]]
+name = "agglqdty"
+path = "src/drafts/agglqdty.rs"
 
 
 # ======================================================================================================================================================================================================
