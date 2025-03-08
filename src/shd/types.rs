@@ -1,4 +1,5 @@
 use serde::{Deserialize, Serialize};
+use tokio::sync::RwLock;
 
 #[derive(Debug, Clone)]
 pub struct EnvConfig {
@@ -84,7 +85,11 @@ impl From<&str> for AmmType {
         }
     }
 }
-use std::fmt::{self, Display};
+use std::{
+    collections::HashMap,
+    fmt::{self, Display},
+    sync::Arc,
+};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub enum SyncState {
@@ -105,4 +110,17 @@ impl Display for SyncState {
             SyncState::Error => write!(f, "Error"),
         }
     }
+}
+
+// ======== Shared Data per tasks ========
+
+use tycho_simulation::protocol::{models::ProtocolComponent, state::ProtocolSim};
+
+pub type SharedTychoStreamState = Arc<RwLock<TychoStreamState>>;
+
+pub struct TychoStreamState {
+    // Maps a network name to its ProtocolSim instance.
+    pub states: HashMap<String, Box<dyn ProtocolSim + Send + Sync>>,
+    // Maps a network name to its new ProtocolComponent.
+    pub components: HashMap<String, ProtocolComponent>,
 }
