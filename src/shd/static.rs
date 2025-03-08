@@ -34,24 +34,34 @@ pub mod data {
                 format!("stream:latest:{}", network.to_lowercase())
             }
 
+            // stream:tokens:<network> => array of tokens
             pub fn tokens(network: String) -> String {
                 format!("stream:tokens:{}", network.to_lowercase())
             }
 
+            // stream:pairs:<network> => array of pairs
+            pub fn pairs(network: String) -> String {
+                format!("stream:pairs:{}", network.to_lowercase())
+            }
+
+            // stream:component:id => one component
+            pub fn component(network: String, id: String) -> String {
+                format!("stream:{}:component:{}", network, id.to_lowercase())
+            }
+
+            // stream:state:id => one state
+            pub fn state(network: String, id: String) -> String {
+                format!("stream:{}:state:{}", network, id.to_lowercase())
+            }
+
             // stream:component:<id> => Component (serialized)
-            pub fn component(id: String) -> String {
-                format!("stream:component:{}", id.to_lowercase())
+            pub fn components(network: String) -> String {
+                format!("stream:components:{}", network.to_lowercase())
             }
 
             // stream:component:<id> => ProtocolState (serialized)
-            pub fn state(id: String) -> String {
-                format!("stream:state:{}", id.to_lowercase())
-            }
-
-            // stream:components:<token0-token1> => array of components
-            // A dash between the addresses, a dash '-' ! And Token0 < Token1
-            pub fn components(token0: &String, token1: String) -> String {
-                format!("stream:components:{}-{}", token0.to_lowercase(), token1.to_lowercase())
+            pub fn states(network: String) -> String {
+                format!("stream:state:{}", network.to_lowercase())
             }
         }
     }

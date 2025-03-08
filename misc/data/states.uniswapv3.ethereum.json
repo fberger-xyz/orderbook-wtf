@@ -1,10 +1,652 @@
 [
     {
+        "id": "0x7bea39867e4169dbe237d55c8242a8f2fcdcc387",
+        "liquidity": 16906662454909168,
+        "sqrt_price": "0x53c07c7d38304c73ddc4336cee91",
+        "fee": 10000,
+        "tick": 199470,
+        "ticks": {
+            "tick_spacing": 200,
+            "ticks": [
+                {
+                    "index": -887200,
+                    "net_liquidity": 4965509092918,
+                    "sqrt_price": "0x100eed0b4"
+                },
+                {
+                    "index": 0,
+                    "net_liquidity": 65351550522830937,
+                    "sqrt_price": "0x1000000000000000000000000"
+                },
+                {
+                    "index": 200,
+                    "net_liquidity": -65351550522830937,
+                    "sqrt_price": "0x102929d5a0656650806703cf3"
+                },
+                {
+                    "index": 46000,
+                    "net_liquidity": 1737235296,
+                    "sqrt_price": "0x9f918dbded6b2ae08fdf3f759"
+                },
+                {
+                    "index": 69000,
+                    "net_liquidity": 75309804597,
+                    "sqrt_price": "0x1f7eb5a774527d3b095390b757"
+                },
+                {
+                    "index": 71000,
+                    "net_liquidity": 17530700195,
+                    "sqrt_price": "0x22cea0aac10ce57f3d1a0f7d94"
+                },
+                {
+                    "index": 108800,
+                    "net_liquidity": 43797964213,
+                    "sqrt_price": "0xe66127f4061259d6215ada1322"
+                },
+                {
+                    "index": 137400,
+                    "net_liquidity": 27936496229,
+                    "sqrt_price": "0x3c29e2cd9146d54ec5bda626f5a"
+                },
+                {
+                    "index": 138200,
+                    "net_liquidity": 1087280626676,
+                    "sqrt_price": "0x3e9e6ab219a3c470b5fe6329511"
+                },
+                {
+                    "index": 161600,
+                    "net_liquidity": 1777898330031,
+                    "sqrt_price": "0xc9bedd16d30f992af2e0b4464d9"
+                },
+                {
+                    "index": 164400,
+                    "net_liquidity": 14898698312,
+                    "sqrt_price": "0xe80f9e424c5e7b0ab3b4b38dbac"
+                },
+                {
+                    "index": 166200,
+                    "net_liquidity": 2340563592193,
+                    "sqrt_price": "0xfde9fedf9c580d626bd7321bf62"
+                },
+                {
+                    "index": 168200,
+                    "net_liquidity": -1861360270717,
+                    "sqrt_price": "0x1189df4bb8c2511b727e77a5ac76"
+                },
+                {
+                    "index": 169000,
+                    "net_liquidity": 33142195446,
+                    "sqrt_price": "0x1241191adc3094c6c1bce4b5d6b5"
+                },
+                {
+                    "index": 182000,
+                    "net_liquidity": 187629148718840,
+                    "sqrt_price": "0x22f738205a03bb6e0ef6fcf02ec8"
+                },
+                {
+                    "index": 182400,
+                    "net_liquidity": 11576479136439404,
+                    "sqrt_price": "0x23ac09678499f920c7d95a638896"
+                },
+                {
+                    "index": 184000,
+                    "net_liquidity": 66968443593,
+                    "sqrt_price": "0x26a493e617ab2292706332b8e1fb"
+                },
+                {
+                    "index": 184200,
+                    "net_liquidity": 101557184644782,
+                    "sqrt_price": "0x2707feaac298f9dacb77319935c3"
+                },
+                {
+                    "index": 184400,
+                    "net_liquidity": -99585553503024,
+                    "sqrt_price": "0x276c6934f676c47c297ac5c81d99"
+                },
+                {
+                    "index": 186000,
+                    "net_liquidity": 354192222622,
+                    "sqrt_price": "0x2ab4ef3eb34dca937a9d66d0a033"
+                },
+                {
+                    "index": 187400,
+                    "net_liquidity": 30671781192,
+                    "sqrt_price": "0x2dcd9ee7147932ed4977690c7b06"
+                },
+                {
+                    "index": 188200,
+                    "net_liquidity": 80663538323,
+                    "sqrt_price": "0x2fac20c26216a4e9a8b1ac6c0d16"
+                },
+                {
+                    "index": 188400,
+                    "net_liquidity": 49882829911075,
+                    "sqrt_price": "0x3026c67be97f9d03df78ad5ecc6f"
+                },
+                {
+                    "index": 189000,
+                    "net_liquidity": 30474594962,
+                    "sqrt_price": "0x319e2997e5ef26592b741cd5963f"
+                },
+                {
+                    "index": 189400,
+                    "net_liquidity": 237643127327,
+                    "sqrt_price": "0x329ec00e601fb136df17d8f2fa04"
+                },
+                {
+                    "index": 190000,
+                    "net_liquidity": 2188733680202,
+                    "sqrt_price": "0x3429620505f3f5390a69d77ee653"
+                },
+                {
+                    "index": 190400,
+                    "net_liquidity": 662861536,
+                    "sqrt_price": "0x3537202073abb30725a0005c3592"
+                },
+                {
+                    "index": 191000,
+                    "net_liquidity": 4439553377121,
+                    "sqrt_price": "0x36d5fd8961a40e22ed26fc39c366"
+                },
+                {
+                    "index": 191200,
+                    "net_liquidity": 21226173463345,
+                    "sqrt_price": "0x3763114391d4ee75bccdc206f7b2"
+                },
+                {
+                    "index": 191400,
+                    "net_liquidity": 3983849866314,
+                    "sqrt_price": "0x37f18ff12d4b497eb6f1ddc5890a"
+                },
+                {
+                    "index": 191600,
+                    "net_liquidity": 143031254530,
+                    "sqrt_price": "0x38817d37f8c7c32cc80275fc42c5"
+                },
+                {
+                    "index": 192000,
+                    "net_liquidity": 1466940682,
+                    "sqrt_price": "0x39a5b25736926a968bd26221ea6f"
+                },
+                {
+                    "index": 192200,
+                    "net_liquidity": 35918734488653,
+                    "sqrt_price": "0x3a3a01aa7eca34a5a02e78e5af5c"
+                },
+                {
+                    "index": 192400,
+                    "net_liquidity": 1284971094660,
+                    "sqrt_price": "0x3acfce8cd3df4094cb72cf9a1120"
+                },
+                {
+                    "index": 192600,
+                    "net_liquidity": 158419610583416,
+                    "sqrt_price": "0x3b671cd3da0787b7b5bac60b9c7f"
+                },
+                {
+                    "index": 192800,
+                    "net_liquidity": 6041582694118,
+                    "sqrt_price": "0x3bfff05f12f47506022b9e6dd2b1"
+                },
+                {
+                    "index": 193200,
+                    "net_liquidity": 11298368320192,
+                    "sqrt_price": "0x3d3636f20fd47f8d674fe49698d9"
+                },
+                {
+                    "index": 193400,
+                    "net_liquidity": 1653800953219,
+                    "sqrt_price": "0x3dd3b1eb1046e234944b9fc6662d"
+                },
+                {
+                    "index": 193800,
+                    "net_liquidity": 87385760785769,
+                    "sqrt_price": "0x3f136b64078b31089e11c9a888cc"
+                },
+                {
+                    "index": 194000,
+                    "net_liquidity": 20198342467285,
+                    "sqrt_price": "0x3fb5b21325e66c86b9915363d6a0"
+                },
+                {
+                    "index": 194200,
+                    "net_liquidity": 8841407624079,
+                    "sqrt_price": "0x40599a3fb0c7f21e4346836d963e"
+                },
+                {
+                    "index": 194400,
+                    "net_liquidity": 586850915457630,
+                    "sqrt_price": "0x40ff281bbd2d6ef608a77248ba81"
+                },
+                {
+                    "index": 194600,
+                    "net_liquidity": -706990113170348,
+                    "sqrt_price": "0x41a65fe42b62b4d1703ee0e3b3e2"
+                },
+                {
+                    "index": 194800,
+                    "net_liquidity": 94519272096278,
+                    "sqrt_price": "0x424f45e0c2c6eb653e82fc493de2"
+                },
+                {
+                    "index": 195000,
+                    "net_liquidity": -73099046126320,
+                    "sqrt_price": "0x42f9de644dd93396d9d264354cd7"
+                },
+                {
+                    "index": 195200,
+                    "net_liquidity": -101809808480732,
+                    "sqrt_price": "0x43a62dccb68d7474c44ee6192ad3"
+                },
+                {
+                    "index": 195400,
+                    "net_liquidity": 3956764695846,
+                    "sqrt_price": "0x4454388322ea0b8fe4996ae3474b"
+                },
+                {
+                    "index": 195600,
+                    "net_liquidity": -373710645014,
+                    "sqrt_price": "0x450402fc11ef1c3ad956f335771c"
+                },
+                {
+                    "index": 195800,
+                    "net_liquidity": 1716536270221469,
+                    "sqrt_price": "0x45b591b778c83b17031d1edfa8eb"
+                },
+                {
+                    "index": 196000,
+                    "net_liquidity": 54774819912,
+                    "sqrt_price": "0x4668e940e049353e39470934d1b3"
+                },
+                {
+                    "index": 196200,
+                    "net_liquidity": 45883064560234,
+                    "sqrt_price": "0x471e0e2f82b6b4444cba6947530d"
+                },
+                {
+                    "index": 196400,
+                    "net_liquidity": 390561261444668,
+                    "sqrt_price": "0x47d5052669db823c9c6a278d5410"
+                },
+                {
+                    "index": 196600,
+                    "net_liquidity": 38142505262818,
+                    "sqrt_price": "0x488dd2d48d6b32e61f20a7d056f3"
+                },
+                {
+                    "index": 196800,
+                    "net_liquidity": 1848566216487,
+                    "sqrt_price": "0x49487bf4f1b2f91b71ab49a51681"
+                },
+                {
+                    "index": 197000,
+                    "net_liquidity": -65240094339074,
+                    "sqrt_price": "0x4a05054ec69971a4bcdd974e4f47"
+                },
+                {
+                    "index": 197200,
+                    "net_liquidity": 4016161318634,
+                    "sqrt_price": "0x4ac373b586ee2e8eb12a2593ce2a"
+                },
+                {
+                    "index": 197400,
+                    "net_liquidity": -25623009163836,
+                    "sqrt_price": "0x4b83cc091809d03472ffe5c24135"
+                },
+                {
+                    "index": 197600,
+                    "net_liquidity": 67201046175106802,
+                    "sqrt_price": "0x4c461335e9bf7b3a31154fd3ec83"
+                },
+                {
+                    "index": 197800,
+                    "net_liquidity": -395452733898969,
+                    "sqrt_price": "0x4d0a4e3516a07ccb49d2728d70b9"
+                },
+                {
+                    "index": 198000,
+                    "net_liquidity": -6053034553465,
+                    "sqrt_price": "0x4dd0820c8492f0896cc582518312"
+                },
+                {
+                    "index": 198200,
+                    "net_liquidity": -65931055809891654,
+                    "sqrt_price": "0x4e98b3cf05bc3dba1643ea7dce4e"
+                },
+                {
+                    "index": 198400,
+                    "net_liquidity": -22439372150425,
+                    "sqrt_price": "0x4f62e89c79c043652bf8a4485c58"
+                },
+                {
+                    "index": 199000,
+                    "net_liquidity": -10541383546042,
+                    "sqrt_price": "0x51cdcd4bd14cd9c22d004197e54d"
+                },
+                {
+                    "index": 199200,
+                    "net_liquidity": 21960844737007,
+                    "sqrt_price": "0x52a0428d7974eb891984b14e6915"
+                },
+                {
+                    "index": 199400,
+                    "net_liquidity": 1951650340097656,
+                    "sqrt_price": "0x5374d541e04ae749652d96b31358"
+                },
+                {
+                    "index": 199600,
+                    "net_liquidity": -21960844737007,
+                    "sqrt_price": "0x544b8ada038aaeb58f470ed84506"
+                },
+                {
+                    "index": 199800,
+                    "net_liquidity": -69504544320,
+                    "sqrt_price": "0x552468d4e0b485e21d6d9d739e6d"
+                },
+                {
+                    "index": 200200,
+                    "net_liquidity": -47240342582189,
+                    "sqrt_price": "0x56dcb435961211732ec87ef3dc4e"
+                },
+                {
+                    "index": 200600,
+                    "net_liquidity": -66099825946,
+                    "sqrt_price": "0x589de47949697d752c94615665c5"
+                },
+                {
+                    "index": 200800,
+                    "net_liquidity": -3213974145452575,
+                    "sqrt_price": "0x5981e0c687fa7ea1cf8c9beadfd6"
+                },
+                {
+                    "index": 201000,
+                    "net_liquidity": 2259732389007,
+                    "sqrt_price": "0x5a68279e66fe07e4ef0d04de860e"
+                },
+                {
+                    "index": 201400,
+                    "net_liquidity": -61819624767675,
+                    "sqrt_price": "0x5c3bac9133ef14392fde829a8ef6"
+                },
+                {
+                    "index": 201600,
+                    "net_liquidity": -14898698312,
+                    "sqrt_price": "0x5d28f6a3c93ecf1edb934be9f1bc"
+                },
+                {
+                    "index": 202600,
+                    "net_liquidity": -3910091825504,
+                    "sqrt_price": "0x61efa9cbb2f04894974e97fc95bb"
+                },
+                {
+                    "index": 202800,
+                    "net_liquidity": -30474594962,
+                    "sqrt_price": "0x62eba0008c527faddac91d8ff5c2"
+                },
+                {
+                    "index": 203000,
+                    "net_liquidity": -273471727600,
+                    "sqrt_price": "0x63ea1e6f1824a9ebc86727431d3a"
+                },
+                {
+                    "index": 203200,
+                    "net_liquidity": -75309804597,
+                    "sqrt_price": "0x64eb2b9b0922c1d0d542a26b14d2"
+                },
+                {
+                    "index": 203800,
+                    "net_liquidity": -480718333277,
+                    "sqrt_price": "0x67fdedb09f45c36d87edd076213e"
+                },
+                {
+                    "index": 204200,
+                    "net_liquidity": -662861536,
+                    "sqrt_price": "0x6a17b32fc5d4d48f7124aa2fdba0"
+                },
+                {
+                    "index": 204800,
+                    "net_liquidity": 2914244466170,
+                    "sqrt_price": "0x6d52cb41e9c6eb187897fbf33dc4"
+                },
+                {
+                    "index": 205000,
+                    "net_liquidity": -3559449237319,
+                    "sqrt_price": "0x6e6c0d4291a983a4d6c107cc489a"
+                },
+                {
+                    "index": 205200,
+                    "net_liquidity": -73758040810,
+                    "sqrt_price": "0x6f8822dbbf9e32457aeeeb0e16f2"
+                },
+                {
+                    "index": 205800,
+                    "net_liquidity": -1990429922674,
+                    "sqrt_price": "0x72eda25034df0f78bb7463ecb4eb"
+                },
+                {
+                    "index": 206200,
+                    "net_liquidity": -188723325502308,
+                    "sqrt_price": "0x753ff5e06c96a1d7b08a499de17d"
+                },
+                {
+                    "index": 206400,
+                    "net_liquidity": -46813663813,
+                    "sqrt_price": "0x766d9c57dc9be20800085e1130e0"
+                },
+                {
+                    "index": 206600,
+                    "net_liquidity": 265236832912896,
+                    "sqrt_price": "0x779e4ade94ca4d1baacaa0ab0bf1"
+                },
+                {
+                    "index": 206800,
+                    "net_liquidity": -269031181518868,
+                    "sqrt_price": "0x78d20941296ba4b9ce11b9ddcee8"
+                },
+                {
+                    "index": 207200,
+                    "net_liquidity": -11566792204309647,
+                    "sqrt_price": "0x7b42d530bfeef6c84ca32f6118a4"
+                },
+                {
+                    "index": 207600,
+                    "net_liquidity": -41956410132587,
+                    "sqrt_price": "0x7dc0402033cd2f4faaa64568c625"
+                },
+                {
+                    "index": 207800,
+                    "net_liquidity": -94104302784,
+                    "sqrt_price": "0x7f03c590269991816811f1798d02"
+                },
+                {
+                    "index": 208000,
+                    "net_liquidity": -6121562304323,
+                    "sqrt_price": "0x804a8b53edbe98995e7f572a9e48"
+                },
+                {
+                    "index": 208200,
+                    "net_liquidity": -240597475740,
+                    "sqrt_price": "0x819499c8e04c2bbd4596baca79b9"
+                },
+                {
+                    "index": 208600,
+                    "net_liquidity": -8284124859,
+                    "sqrt_price": "0x8432b2a774839a422528f98f6b66"
+                },
+                {
+                    "index": 209000,
+                    "net_liquidity": -10714967253478,
+                    "sqrt_price": "0x86de54c8e94ac0e89b9bcc5289e6"
+                },
+                {
+                    "index": 209200,
+                    "net_liquidity": -1682645076,
+                    "sqrt_price": "0x88394f249d3222a870d29d4cc49d"
+                },
+                {
+                    "index": 209800,
+                    "net_liquidity": -1719123120374311,
+                    "sqrt_price": "0x8c5f4e3dd003ac750b4e776dc999"
+                },
+                {
+                    "index": 210200,
+                    "net_liquidity": -4066192417465,
+                    "sqrt_price": "0x8f3535d6370793aa4800496a891d"
+                },
+                {
+                    "index": 211400,
+                    "net_liquidity": -11215950702,
+                    "sqrt_price": "0x9810189df6febd649399c5c7e184"
+                },
+                {
+                    "index": 211800,
+                    "net_liquidity": -1220165766137,
+                    "sqrt_price": "0x9b2274c69deafbd6200cec270a79"
+                },
+                {
+                    "index": 212000,
+                    "net_liquidity": -94269383413,
+                    "sqrt_price": "0x9cb192b173fee80764f38c665dc1"
+                },
+                {
+                    "index": 212200,
+                    "net_liquidity": -68245763137,
+                    "sqrt_price": "0x9e44b36c81607eac4c9187b7e741"
+                },
+                {
+                    "index": 212400,
+                    "net_liquidity": -102271758339,
+                    "sqrt_price": "0x9fdbe1497860adee6f70ad11cb48"
+                },
+                {
+                    "index": 212600,
+                    "net_liquidity": -56480262564,
+                    "sqrt_price": "0xa17726b497a47351453a75bb339a"
+                },
+                {
+                    "index": 214200,
+                    "net_liquidity": -32352325465,
+                    "sqrt_price": "0xaee9a7d74aee163da9da1527eee1"
+                },
+                {
+                    "index": 215200,
+                    "net_liquidity": -89396173136,
+                    "sqrt_price": "0xb7e156632714e7861a66a87bc2b4"
+                },
+                {
+                    "index": 215400,
+                    "net_liquidity": -117096948056,
+                    "sqrt_price": "0xb9ba68990dafdf5fc3667e09b0aa"
+                },
+                {
+                    "index": 216400,
+                    "net_liquidity": -27936496229,
+                    "sqrt_price": "0xc3400a45fc65a20027f741f869b5"
+                },
+                {
+                    "index": 230200,
+                    "net_liquidity": -479203321476,
+                    "sqrt_price": "0x1854284fa9f30ab96a178e6694749"
+                },
+                {
+                    "index": 234400,
+                    "net_liquidity": -80663538323,
+                    "sqrt_price": "0x1e0375e676d05aea4a32f8fdbf36f"
+                },
+                {
+                    "index": 241000,
+                    "net_liquidity": 5947655008927,
+                    "sqrt_price": "0x29bf45bc933dca899341df5182f76"
+                },
+                {
+                    "index": 253200,
+                    "net_liquidity": 63138507698394,
+                    "sqrt_price": "0x4cd4978349e5d946d430174b4a81d"
+                },
+                {
+                    "index": 275000,
+                    "net_liquidity": 2836067082383,
+                    "sqrt_price": "0xe4809847281206ddd2d414fee60a6"
+                },
+                {
+                    "index": 276200,
+                    "net_liquidity": 3011430642825,
+                    "sqrt_price": "0xf2a1a2cb692f24f50cf5e10e0271d"
+                },
+                {
+                    "index": 276400,
+                    "net_liquidity": -2234507281670,
+                    "sqrt_price": "0xf511db624baf2705c43c69febf44a"
+                },
+                {
+                    "index": 277400,
+                    "net_liquidity": -1173778640,
+                    "sqrt_price": "0x101a254af9cf8fdb5a296dc11211fe"
+                },
+                {
+                    "index": 283200,
+                    "net_liquidity": -443046987358,
+                    "sqrt_price": "0x1584de714b9ba7c25f0c1d4b8355fd"
+                },
+                {
+                    "index": 293000,
+                    "net_liquidity": -43797964213,
+                    "sqrt_price": "0x231ffeec55e0e7125c720f28592921"
+                },
+                {
+                    "index": 322800,
+                    "net_liquidity": -5947655008927,
+                    "sqrt_price": "0x9bd75f439a8e3c52d724cdd751e50c"
+                },
+                {
+                    "index": 343600,
+                    "net_liquidity": 6714459982170506,
+                    "sqrt_price": "0x1b8e2cbf983662160cec6f16a131eab"
+                },
+                {
+                    "index": 345400,
+                    "net_liquidity": -6714459982170506,
+                    "sqrt_price": "0x1e267640cfa9219429653982f6d2809"
+                },
+                {
+                    "index": 367200,
+                    "net_liquidity": -2836067082383,
+                    "sqrt_price": "0x59ab91f5ea3508da63e967ffbeef2d2"
+                },
+                {
+                    "index": 368400,
+                    "net_liquidity": -67163938964834,
+                    "sqrt_price": "0x5f36fd7f1f88c8ceadbaa116996fa91"
+                },
+                {
+                    "index": 413600,
+                    "net_liquidity": -1745984845620,
+                    "sqrt_price": "0x390595004612848812f91233704116ad"
+                },
+                {
+                    "index": 414400,
+                    "net_liquidity": -1735000539027,
+                    "sqrt_price": "0x3b594a4f771cc107e918a19eb76fcf7a"
+                },
+                {
+                    "index": 460600,
+                    "net_liquidity": -50672895641,
+                    "sqrt_price": "0x255d5fb42908f1248f2b90f76d210283a"
+                },
+                {
+                    "index": 887200,
+                    "net_liquidity": -4965509092918,
+                    "sqrt_price": "0xff120d460d67f1db5b71087bd404babb342b5987"
+                }
+            ]
+        }
+    },
+    {
         "id": "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640",
-        "liquidity": 12101802204324962968,
-        "sqrt_price": "0x5388a35ac1a4a14e6b146e3f001f",
+        "liquidity": 12102209303779728541,
+        "sqrt_price": "0x538b85b16b14a6a6b298ef8bdff2",
         "fee": 500,
-        "tick": 199418,
+        "tick": 199421,
         "ticks": {
             "tick_spacing": 10,
             "ticks": [
@@ -1305,7 +1947,7 @@
                 },
                 {
                     "index": 193890,
-                    "net_liquidity": 4850009914754583161,
+                    "net_liquidity": 4850025070502397140,
                     "sqrt_price": "0x3f5c3e33638d98c4ba00ac171439"
                 },
                 {
@@ -3155,7 +3797,7 @@
                 },
                 {
                     "index": 197820,
-                    "net_liquidity": 8851541789387316,
+                    "net_liquidity": 8855382568356087,
                     "sqrt_price": "0x4d1e0963e41c86eda3306121bd8d"
                 },
                 {
@@ -3240,7 +3882,7 @@
                 },
                 {
                     "index": 197990,
-                    "net_liquidity": 3380994887742178,
+                    "net_liquidity": 267669732541,
                     "sqrt_price": "0x4dc68cfd17ad2f406b01c924bb04"
                 },
                 {
@@ -3340,7 +3982,7 @@
                 },
                 {
                     "index": 198200,
-                    "net_liquidity": -25841804958477712,
+                    "net_liquidity": -26216641049831449,
                     "sqrt_price": "0x4e98b3cf05bc3dba1643ea7dce4e"
                 },
                 {
@@ -3795,7 +4437,7 @@
                 },
                 {
                     "index": 199140,
-                    "net_liquidity": 6561368440285006,
+                    "net_liquidity": 10330198586277467,
                     "sqrt_price": "0x5260e6c51101a7836089bbc9555a"
                 },
                 {
@@ -3825,7 +4467,7 @@
                 },
                 {
                     "index": 199200,
-                    "net_liquidity": 30212477443096292,
+                    "net_liquidity": 30587313534450029,
                     "sqrt_price": "0x52a0428d7974eb891984b14e6915"
                 },
                 {
@@ -4070,7 +4712,7 @@
                 },
                 {
                     "index": 199710,
-                    "net_liquidity": -1539371177524128,
+                    "net_liquidity": -5308201323516589,
                     "sqrt_price": "0x54c28d077a3e6bef6074b383c9fb"
                 },
                 {
@@ -4130,7 +4772,7 @@
                 },
                 {
                     "index": 199830,
-                    "net_liquidity": -34500331026071735,
+                    "net_liquidity": -34504171805040506,
                     "sqrt_price": "0x55452083a3a12fbfbca00f5e701d"
                 },
                 {
@@ -4210,7 +4852,7 @@
                 },
                 {
                     "index": 199990,
-                    "net_liquidity": -25637953711527053,
+                    "net_liquidity": -22257226493517416,
                     "sqrt_price": "0x55f4739d811e539b64ee28db903d"
                 },
                 {
@@ -5150,7 +5792,7 @@
                 },
                 {
                     "index": 201930,
-                    "net_liquidity": -1876289776048345,
+                    "net_liquidity": -1891445523862324,
                     "sqrt_price": "0x5eb5b73835f68bb9b6dc81370a06"
                 },
                 {
@@ -6952,653 +7594,11 @@
         }
     },
     {
-        "id": "0x7bea39867e4169dbe237d55c8242a8f2fcdcc387",
-        "liquidity": 16906662454909168,
-        "sqrt_price": "0x53c07c7d38304c73ddc4336cee91",
-        "fee": 10000,
-        "tick": 199470,
-        "ticks": {
-            "tick_spacing": 200,
-            "ticks": [
-                {
-                    "index": -887200,
-                    "net_liquidity": 4965509092918,
-                    "sqrt_price": "0x100eed0b4"
-                },
-                {
-                    "index": 0,
-                    "net_liquidity": 65351550522830937,
-                    "sqrt_price": "0x1000000000000000000000000"
-                },
-                {
-                    "index": 200,
-                    "net_liquidity": -65351550522830937,
-                    "sqrt_price": "0x102929d5a0656650806703cf3"
-                },
-                {
-                    "index": 46000,
-                    "net_liquidity": 1737235296,
-                    "sqrt_price": "0x9f918dbded6b2ae08fdf3f759"
-                },
-                {
-                    "index": 69000,
-                    "net_liquidity": 75309804597,
-                    "sqrt_price": "0x1f7eb5a774527d3b095390b757"
-                },
-                {
-                    "index": 71000,
-                    "net_liquidity": 17530700195,
-                    "sqrt_price": "0x22cea0aac10ce57f3d1a0f7d94"
-                },
-                {
-                    "index": 108800,
-                    "net_liquidity": 43797964213,
-                    "sqrt_price": "0xe66127f4061259d6215ada1322"
-                },
-                {
-                    "index": 137400,
-                    "net_liquidity": 27936496229,
-                    "sqrt_price": "0x3c29e2cd9146d54ec5bda626f5a"
-                },
-                {
-                    "index": 138200,
-                    "net_liquidity": 1087280626676,
-                    "sqrt_price": "0x3e9e6ab219a3c470b5fe6329511"
-                },
-                {
-                    "index": 161600,
-                    "net_liquidity": 1777898330031,
-                    "sqrt_price": "0xc9bedd16d30f992af2e0b4464d9"
-                },
-                {
-                    "index": 164400,
-                    "net_liquidity": 14898698312,
-                    "sqrt_price": "0xe80f9e424c5e7b0ab3b4b38dbac"
-                },
-                {
-                    "index": 166200,
-                    "net_liquidity": 2340563592193,
-                    "sqrt_price": "0xfde9fedf9c580d626bd7321bf62"
-                },
-                {
-                    "index": 168200,
-                    "net_liquidity": -1861360270717,
-                    "sqrt_price": "0x1189df4bb8c2511b727e77a5ac76"
-                },
-                {
-                    "index": 169000,
-                    "net_liquidity": 33142195446,
-                    "sqrt_price": "0x1241191adc3094c6c1bce4b5d6b5"
-                },
-                {
-                    "index": 182000,
-                    "net_liquidity": 187629148718840,
-                    "sqrt_price": "0x22f738205a03bb6e0ef6fcf02ec8"
-                },
-                {
-                    "index": 182400,
-                    "net_liquidity": 11576479136439404,
-                    "sqrt_price": "0x23ac09678499f920c7d95a638896"
-                },
-                {
-                    "index": 184000,
-                    "net_liquidity": 66968443593,
-                    "sqrt_price": "0x26a493e617ab2292706332b8e1fb"
-                },
-                {
-                    "index": 184200,
-                    "net_liquidity": 101557184644782,
-                    "sqrt_price": "0x2707feaac298f9dacb77319935c3"
-                },
-                {
-                    "index": 184400,
-                    "net_liquidity": -99585553503024,
-                    "sqrt_price": "0x276c6934f676c47c297ac5c81d99"
-                },
-                {
-                    "index": 186000,
-                    "net_liquidity": 354192222622,
-                    "sqrt_price": "0x2ab4ef3eb34dca937a9d66d0a033"
-                },
-                {
-                    "index": 187400,
-                    "net_liquidity": 30671781192,
-                    "sqrt_price": "0x2dcd9ee7147932ed4977690c7b06"
-                },
-                {
-                    "index": 188200,
-                    "net_liquidity": 80663538323,
-                    "sqrt_price": "0x2fac20c26216a4e9a8b1ac6c0d16"
-                },
-                {
-                    "index": 188400,
-                    "net_liquidity": 49882829911075,
-                    "sqrt_price": "0x3026c67be97f9d03df78ad5ecc6f"
-                },
-                {
-                    "index": 189000,
-                    "net_liquidity": 30474594962,
-                    "sqrt_price": "0x319e2997e5ef26592b741cd5963f"
-                },
-                {
-                    "index": 189400,
-                    "net_liquidity": 237643127327,
-                    "sqrt_price": "0x329ec00e601fb136df17d8f2fa04"
-                },
-                {
-                    "index": 190000,
-                    "net_liquidity": 2188733680202,
-                    "sqrt_price": "0x3429620505f3f5390a69d77ee653"
-                },
-                {
-                    "index": 190400,
-                    "net_liquidity": 662861536,
-                    "sqrt_price": "0x3537202073abb30725a0005c3592"
-                },
-                {
-                    "index": 191000,
-                    "net_liquidity": 4439553377121,
-                    "sqrt_price": "0x36d5fd8961a40e22ed26fc39c366"
-                },
-                {
-                    "index": 191200,
-                    "net_liquidity": 21226173463345,
-                    "sqrt_price": "0x3763114391d4ee75bccdc206f7b2"
-                },
-                {
-                    "index": 191400,
-                    "net_liquidity": 3983849866314,
-                    "sqrt_price": "0x37f18ff12d4b497eb6f1ddc5890a"
-                },
-                {
-                    "index": 191600,
-                    "net_liquidity": 143031254530,
-                    "sqrt_price": "0x38817d37f8c7c32cc80275fc42c5"
-                },
-                {
-                    "index": 192000,
-                    "net_liquidity": 1466940682,
-                    "sqrt_price": "0x39a5b25736926a968bd26221ea6f"
-                },
-                {
-                    "index": 192200,
-                    "net_liquidity": 35918734488653,
-                    "sqrt_price": "0x3a3a01aa7eca34a5a02e78e5af5c"
-                },
-                {
-                    "index": 192400,
-                    "net_liquidity": 1284971094660,
-                    "sqrt_price": "0x3acfce8cd3df4094cb72cf9a1120"
-                },
-                {
-                    "index": 192600,
-                    "net_liquidity": 158419610583416,
-                    "sqrt_price": "0x3b671cd3da0787b7b5bac60b9c7f"
-                },
-                {
-                    "index": 192800,
-                    "net_liquidity": 6041582694118,
-                    "sqrt_price": "0x3bfff05f12f47506022b9e6dd2b1"
-                },
-                {
-                    "index": 193200,
-                    "net_liquidity": 11298368320192,
-                    "sqrt_price": "0x3d3636f20fd47f8d674fe49698d9"
-                },
-                {
-                    "index": 193400,
-                    "net_liquidity": 1653800953219,
-                    "sqrt_price": "0x3dd3b1eb1046e234944b9fc6662d"
-                },
-                {
-                    "index": 193800,
-                    "net_liquidity": 87385760785769,
-                    "sqrt_price": "0x3f136b64078b31089e11c9a888cc"
-                },
-                {
-                    "index": 194000,
-                    "net_liquidity": 20198342467285,
-                    "sqrt_price": "0x3fb5b21325e66c86b9915363d6a0"
-                },
-                {
-                    "index": 194200,
-                    "net_liquidity": 8841407624079,
-                    "sqrt_price": "0x40599a3fb0c7f21e4346836d963e"
-                },
-                {
-                    "index": 194400,
-                    "net_liquidity": 586850915457630,
-                    "sqrt_price": "0x40ff281bbd2d6ef608a77248ba81"
-                },
-                {
-                    "index": 194600,
-                    "net_liquidity": -706990113170348,
-                    "sqrt_price": "0x41a65fe42b62b4d1703ee0e3b3e2"
-                },
-                {
-                    "index": 194800,
-                    "net_liquidity": 94519272096278,
-                    "sqrt_price": "0x424f45e0c2c6eb653e82fc493de2"
-                },
-                {
-                    "index": 195000,
-                    "net_liquidity": -73099046126320,
-                    "sqrt_price": "0x42f9de644dd93396d9d264354cd7"
-                },
-                {
-                    "index": 195200,
-                    "net_liquidity": -101809808480732,
-                    "sqrt_price": "0x43a62dccb68d7474c44ee6192ad3"
-                },
-                {
-                    "index": 195400,
-                    "net_liquidity": 3956764695846,
-                    "sqrt_price": "0x4454388322ea0b8fe4996ae3474b"
-                },
-                {
-                    "index": 195600,
-                    "net_liquidity": -373710645014,
-                    "sqrt_price": "0x450402fc11ef1c3ad956f335771c"
-                },
-                {
-                    "index": 195800,
-                    "net_liquidity": 1716536270221469,
-                    "sqrt_price": "0x45b591b778c83b17031d1edfa8eb"
-                },
-                {
-                    "index": 196000,
-                    "net_liquidity": 54774819912,
-                    "sqrt_price": "0x4668e940e049353e39470934d1b3"
-                },
-                {
-                    "index": 196200,
-                    "net_liquidity": 45883064560234,
-                    "sqrt_price": "0x471e0e2f82b6b4444cba6947530d"
-                },
-                {
-                    "index": 196400,
-                    "net_liquidity": 390561261444668,
-                    "sqrt_price": "0x47d5052669db823c9c6a278d5410"
-                },
-                {
-                    "index": 196600,
-                    "net_liquidity": 38142505262818,
-                    "sqrt_price": "0x488dd2d48d6b32e61f20a7d056f3"
-                },
-                {
-                    "index": 196800,
-                    "net_liquidity": 1848566216487,
-                    "sqrt_price": "0x49487bf4f1b2f91b71ab49a51681"
-                },
-                {
-                    "index": 197000,
-                    "net_liquidity": -65240094339074,
-                    "sqrt_price": "0x4a05054ec69971a4bcdd974e4f47"
-                },
-                {
-                    "index": 197200,
-                    "net_liquidity": 4016161318634,
-                    "sqrt_price": "0x4ac373b586ee2e8eb12a2593ce2a"
-                },
-                {
-                    "index": 197400,
-                    "net_liquidity": -25623009163836,
-                    "sqrt_price": "0x4b83cc091809d03472ffe5c24135"
-                },
-                {
-                    "index": 197600,
-                    "net_liquidity": 67201046175106802,
-                    "sqrt_price": "0x4c461335e9bf7b3a31154fd3ec83"
-                },
-                {
-                    "index": 197800,
-                    "net_liquidity": -395452733898969,
-                    "sqrt_price": "0x4d0a4e3516a07ccb49d2728d70b9"
-                },
-                {
-                    "index": 198000,
-                    "net_liquidity": -6053034553465,
-                    "sqrt_price": "0x4dd0820c8492f0896cc582518312"
-                },
-                {
-                    "index": 198200,
-                    "net_liquidity": -65931055809891654,
-                    "sqrt_price": "0x4e98b3cf05bc3dba1643ea7dce4e"
-                },
-                {
-                    "index": 198400,
-                    "net_liquidity": -22439372150425,
-                    "sqrt_price": "0x4f62e89c79c043652bf8a4485c58"
-                },
-                {
-                    "index": 199000,
-                    "net_liquidity": -10541383546042,
-                    "sqrt_price": "0x51cdcd4bd14cd9c22d004197e54d"
-                },
-                {
-                    "index": 199200,
-                    "net_liquidity": 21960844737007,
-                    "sqrt_price": "0x52a0428d7974eb891984b14e6915"
-                },
-                {
-                    "index": 199400,
-                    "net_liquidity": 1951650340097656,
-                    "sqrt_price": "0x5374d541e04ae749652d96b31358"
-                },
-                {
-                    "index": 199600,
-                    "net_liquidity": -21960844737007,
-                    "sqrt_price": "0x544b8ada038aaeb58f470ed84506"
-                },
-                {
-                    "index": 199800,
-                    "net_liquidity": -69504544320,
-                    "sqrt_price": "0x552468d4e0b485e21d6d9d739e6d"
-                },
-                {
-                    "index": 200200,
-                    "net_liquidity": -47240342582189,
-                    "sqrt_price": "0x56dcb435961211732ec87ef3dc4e"
-                },
-                {
-                    "index": 200600,
-                    "net_liquidity": -66099825946,
-                    "sqrt_price": "0x589de47949697d752c94615665c5"
-                },
-                {
-                    "index": 200800,
-                    "net_liquidity": -3213974145452575,
-                    "sqrt_price": "0x5981e0c687fa7ea1cf8c9beadfd6"
-                },
-                {
-                    "index": 201000,
-                    "net_liquidity": 2259732389007,
-                    "sqrt_price": "0x5a68279e66fe07e4ef0d04de860e"
-                },
-                {
-                    "index": 201400,
-                    "net_liquidity": -61819624767675,
-                    "sqrt_price": "0x5c3bac9133ef14392fde829a8ef6"
-                },
-                {
-                    "index": 201600,
-                    "net_liquidity": -14898698312,
-                    "sqrt_price": "0x5d28f6a3c93ecf1edb934be9f1bc"
-                },
-                {
-                    "index": 202600,
-                    "net_liquidity": -3910091825504,
-                    "sqrt_price": "0x61efa9cbb2f04894974e97fc95bb"
-                },
-                {
-                    "index": 202800,
-                    "net_liquidity": -30474594962,
-                    "sqrt_price": "0x62eba0008c527faddac91d8ff5c2"
-                },
-                {
-                    "index": 203000,
-                    "net_liquidity": -273471727600,
-                    "sqrt_price": "0x63ea1e6f1824a9ebc86727431d3a"
-                },
-                {
-                    "index": 203200,
-                    "net_liquidity": -75309804597,
-                    "sqrt_price": "0x64eb2b9b0922c1d0d542a26b14d2"
-                },
-                {
-                    "index": 203800,
-                    "net_liquidity": -480718333277,
-                    "sqrt_price": "0x67fdedb09f45c36d87edd076213e"
-                },
-                {
-                    "index": 204200,
-                    "net_liquidity": -662861536,
-                    "sqrt_price": "0x6a17b32fc5d4d48f7124aa2fdba0"
-                },
-                {
-                    "index": 204800,
-                    "net_liquidity": 2914244466170,
-                    "sqrt_price": "0x6d52cb41e9c6eb187897fbf33dc4"
-                },
-                {
-                    "index": 205000,
-                    "net_liquidity": -3559449237319,
-                    "sqrt_price": "0x6e6c0d4291a983a4d6c107cc489a"
-                },
-                {
-                    "index": 205200,
-                    "net_liquidity": -73758040810,
-                    "sqrt_price": "0x6f8822dbbf9e32457aeeeb0e16f2"
-                },
-                {
-                    "index": 205800,
-                    "net_liquidity": -1990429922674,
-                    "sqrt_price": "0x72eda25034df0f78bb7463ecb4eb"
-                },
-                {
-                    "index": 206200,
-                    "net_liquidity": -188723325502308,
-                    "sqrt_price": "0x753ff5e06c96a1d7b08a499de17d"
-                },
-                {
-                    "index": 206400,
-                    "net_liquidity": -46813663813,
-                    "sqrt_price": "0x766d9c57dc9be20800085e1130e0"
-                },
-                {
-                    "index": 206600,
-                    "net_liquidity": 265236832912896,
-                    "sqrt_price": "0x779e4ade94ca4d1baacaa0ab0bf1"
-                },
-                {
-                    "index": 206800,
-                    "net_liquidity": -269031181518868,
-                    "sqrt_price": "0x78d20941296ba4b9ce11b9ddcee8"
-                },
-                {
-                    "index": 207200,
-                    "net_liquidity": -11566792204309647,
-                    "sqrt_price": "0x7b42d530bfeef6c84ca32f6118a4"
-                },
-                {
-                    "index": 207600,
-                    "net_liquidity": -41956410132587,
-                    "sqrt_price": "0x7dc0402033cd2f4faaa64568c625"
-                },
-                {
-                    "index": 207800,
-                    "net_liquidity": -94104302784,
-                    "sqrt_price": "0x7f03c590269991816811f1798d02"
-                },
-                {
-                    "index": 208000,
-                    "net_liquidity": -6121562304323,
-                    "sqrt_price": "0x804a8b53edbe98995e7f572a9e48"
-                },
-                {
-                    "index": 208200,
-                    "net_liquidity": -240597475740,
-                    "sqrt_price": "0x819499c8e04c2bbd4596baca79b9"
-                },
-                {
-                    "index": 208600,
-                    "net_liquidity": -8284124859,
-                    "sqrt_price": "0x8432b2a774839a422528f98f6b66"
-                },
-                {
-                    "index": 209000,
-                    "net_liquidity": -10714967253478,
-                    "sqrt_price": "0x86de54c8e94ac0e89b9bcc5289e6"
-                },
-                {
-                    "index": 209200,
-                    "net_liquidity": -1682645076,
-                    "sqrt_price": "0x88394f249d3222a870d29d4cc49d"
-                },
-                {
-                    "index": 209800,
-                    "net_liquidity": -1719123120374311,
-                    "sqrt_price": "0x8c5f4e3dd003ac750b4e776dc999"
-                },
-                {
-                    "index": 210200,
-                    "net_liquidity": -4066192417465,
-                    "sqrt_price": "0x8f3535d6370793aa4800496a891d"
-                },
-                {
-                    "index": 211400,
-                    "net_liquidity": -11215950702,
-                    "sqrt_price": "0x9810189df6febd649399c5c7e184"
-                },
-                {
-                    "index": 211800,
-                    "net_liquidity": -1220165766137,
-                    "sqrt_price": "0x9b2274c69deafbd6200cec270a79"
-                },
-                {
-                    "index": 212000,
-                    "net_liquidity": -94269383413,
-                    "sqrt_price": "0x9cb192b173fee80764f38c665dc1"
-                },
-                {
-                    "index": 212200,
-                    "net_liquidity": -68245763137,
-                    "sqrt_price": "0x9e44b36c81607eac4c9187b7e741"
-                },
-                {
-                    "index": 212400,
-                    "net_liquidity": -102271758339,
-                    "sqrt_price": "0x9fdbe1497860adee6f70ad11cb48"
-                },
-                {
-                    "index": 212600,
-                    "net_liquidity": -56480262564,
-                    "sqrt_price": "0xa17726b497a47351453a75bb339a"
-                },
-                {
-                    "index": 214200,
-                    "net_liquidity": -32352325465,
-                    "sqrt_price": "0xaee9a7d74aee163da9da1527eee1"
-                },
-                {
-                    "index": 215200,
-                    "net_liquidity": -89396173136,
-                    "sqrt_price": "0xb7e156632714e7861a66a87bc2b4"
-                },
-                {
-                    "index": 215400,
-                    "net_liquidity": -117096948056,
-                    "sqrt_price": "0xb9ba68990dafdf5fc3667e09b0aa"
-                },
-                {
-                    "index": 216400,
-                    "net_liquidity": -27936496229,
-                    "sqrt_price": "0xc3400a45fc65a20027f741f869b5"
-                },
-                {
-                    "index": 230200,
-                    "net_liquidity": -479203321476,
-                    "sqrt_price": "0x1854284fa9f30ab96a178e6694749"
-                },
-                {
-                    "index": 234400,
-                    "net_liquidity": -80663538323,
-                    "sqrt_price": "0x1e0375e676d05aea4a32f8fdbf36f"
-                },
-                {
-                    "index": 241000,
-                    "net_liquidity": 5947655008927,
-                    "sqrt_price": "0x29bf45bc933dca899341df5182f76"
-                },
-                {
-                    "index": 253200,
-                    "net_liquidity": 63138507698394,
-                    "sqrt_price": "0x4cd4978349e5d946d430174b4a81d"
-                },
-                {
-                    "index": 275000,
-                    "net_liquidity": 2836067082383,
-                    "sqrt_price": "0xe4809847281206ddd2d414fee60a6"
-                },
-                {
-                    "index": 276200,
-                    "net_liquidity": 3011430642825,
-                    "sqrt_price": "0xf2a1a2cb692f24f50cf5e10e0271d"
-                },
-                {
-                    "index": 276400,
-                    "net_liquidity": -2234507281670,
-                    "sqrt_price": "0xf511db624baf2705c43c69febf44a"
-                },
-                {
-                    "index": 277400,
-                    "net_liquidity": -1173778640,
-                    "sqrt_price": "0x101a254af9cf8fdb5a296dc11211fe"
-                },
-                {
-                    "index": 283200,
-                    "net_liquidity": -443046987358,
-                    "sqrt_price": "0x1584de714b9ba7c25f0c1d4b8355fd"
-                },
-                {
-                    "index": 293000,
-                    "net_liquidity": -43797964213,
-                    "sqrt_price": "0x231ffeec55e0e7125c720f28592921"
-                },
-                {
-                    "index": 322800,
-                    "net_liquidity": -5947655008927,
-                    "sqrt_price": "0x9bd75f439a8e3c52d724cdd751e50c"
-                },
-                {
-                    "index": 343600,
-                    "net_liquidity": 6714459982170506,
-                    "sqrt_price": "0x1b8e2cbf983662160cec6f16a131eab"
-                },
-                {
-                    "index": 345400,
-                    "net_liquidity": -6714459982170506,
-                    "sqrt_price": "0x1e267640cfa9219429653982f6d2809"
-                },
-                {
-                    "index": 367200,
-                    "net_liquidity": -2836067082383,
-                    "sqrt_price": "0x59ab91f5ea3508da63e967ffbeef2d2"
-                },
-                {
-                    "index": 368400,
-                    "net_liquidity": -67163938964834,
-                    "sqrt_price": "0x5f36fd7f1f88c8ceadbaa116996fa91"
-                },
-                {
-                    "index": 413600,
-                    "net_liquidity": -1745984845620,
-                    "sqrt_price": "0x390595004612848812f91233704116ad"
-                },
-                {
-                    "index": 414400,
-                    "net_liquidity": -1735000539027,
-                    "sqrt_price": "0x3b594a4f771cc107e918a19eb76fcf7a"
-                },
-                {
-                    "index": 460600,
-                    "net_liquidity": -50672895641,
-                    "sqrt_price": "0x255d5fb42908f1248f2b90f76d210283a"
-                },
-                {
-                    "index": 887200,
-                    "net_liquidity": -4965509092918,
-                    "sqrt_price": "0xff120d460d67f1db5b71087bd404babb342b5987"
-                }
-            ]
-        }
-    },
-    {
         "id": "0x8ad599c3a0ff1de082011efddc58f1908eb6e6d8",
-        "liquidity": 5737803387072165000,
-        "sqrt_price": "0x53953d27a5526f44b6f708264d15",
+        "liquidity": 5721069517594862694,
+        "sqrt_price": "0x53a6ddd3fa53c286bd7117d87658",
         "fee": 3000,
-        "tick": 199430,
+        "tick": 199446,
         "ticks": {
             "tick_spacing": 60,
             "ticks": [
@@ -8359,7 +8359,7 @@
                 },
                 {
                     "index": 189360,
-                    "net_liquidity": 2876845811250918,
+                    "net_liquidity": 3231652468667578,
                     "sqrt_price": "0x3284dc233723dbaf7fbdc2f858f3"
                 },
                 {
@@ -8854,7 +8854,7 @@
                 },
                 {
                     "index": 195300,
-                    "net_liquidity": 13100203486010487,
+                    "net_liquidity": 12870308816001906,
                     "sqrt_price": "0x43fcfb7728c3c54048a9b24a6e43"
                 },
                 {
@@ -8879,7 +8879,7 @@
                 },
                 {
                     "index": 195600,
-                    "net_liquidity": -162760909831514960,
+                    "net_liquidity": -162642918504749273,
                     "sqrt_price": "0x450402fc11ef1c3ad956f335771c"
                 },
                 {
@@ -9079,7 +9079,7 @@
                 },
                 {
                     "index": 198000,
-                    "net_liquidity": -781810333384206,
+                    "net_liquidity": -899801660149893,
                     "sqrt_price": "0x4dd0820c8492f0896cc582518312"
                 },
                 {
@@ -9199,7 +9199,7 @@
                 },
                 {
                     "index": 199440,
-                    "net_liquidity": -17482728936233186,
+                    "net_liquidity": -16858781464710385,
                     "sqrt_price": "0x539f9a732effaaef30da39a85c92"
                 },
                 {
@@ -9409,7 +9409,7 @@
                 },
                 {
                     "index": 201960,
-                    "net_liquidity": -7244335643558147,
+                    "net_liquidity": -7868283115080948,
                     "sqrt_price": "0x5eda1c182f969c3ab79c1a1f205f"
                 },
                 {
@@ -9704,7 +9704,7 @@
                 },
                 {
                     "index": 205500,
-                    "net_liquidity": -1088579699103412,
+                    "net_liquidity": -1443386356520072,
                     "sqrt_price": "0x71379fecded4b74a24cdf581ee1e"
                 },
                 {
@@ -9734,7 +9734,7 @@
                 },
                 {
                     "index": 205860,
-                    "net_liquidity": -1514666820544218,
+                    "net_liquidity": -1284772150535637,
                     "sqrt_price": "0x734606ec3b38da06b9aff22c0ea7"
                 },
                 {
@@ -11107,10 +11107,10 @@
     },
     {
         "id": "0xe0554a476a092703abdb3ef35c80e0d76d32939f",
-        "liquidity": 280156584522022386,
-        "sqrt_price": "0x538b6eace17dc04090af1e5949a1",
+        "liquidity": 281102821552628888,
+        "sqrt_price": "0x538d66526ccecad8a8b6c0d9352e",
         "fee": 100,
-        "tick": 199421,
+        "tick": 199422,
         "ticks": {
             "tick_spacing": 1,
             "ticks": [
@@ -11211,7 +11211,7 @@
                 },
                 {
                     "index": 192201,
-                    "net_liquidity": 17780334868371507,
+                    "net_liquidity": 17835843635307919,
                     "sqrt_price": "0x3a3ac07546bf712f8e84e5c110f3"
                 },
                 {
@@ -11615,11 +11615,6 @@
                     "sqrt_price": "0x47eb195d75b91b9eee428829e2d0"
                 },
                 {
-                    "index": 196431,
-                    "net_liquidity": 766091365088896,
-                    "sqrt_price": "0x47f18b34ad570ba59491cbb7187d"
-                },
-                {
                     "index": 196438,
                     "net_liquidity": 343678235136732,
                     "sqrt_price": "0x47f7fd9fbd12d04cdc9526b62c76"
@@ -11660,13 +11655,18 @@
                     "sqrt_price": "0x484a27f2fcdf82df0a1eb63dd4d8"
                 },
                 {
+                    "index": 196576,
+                    "net_liquidity": 206103452668808,
+                    "sqrt_price": "0x48778ca8a5a44a33b24ae9b00b70"
+                },
+                {
                     "index": 196588,
                     "net_liquidity": 941008824796687,
                     "sqrt_price": "0x4882aee3a5b52c869e78c0ee44c0"
                 },
                 {
                     "index": 196595,
-                    "net_liquidity": 11019123144264018,
+                    "net_liquidity": 11681145292728672,
                     "sqrt_price": "0x48892e50462f42ad6b7bcaa2a063"
                 },
                 {
@@ -11990,6 +11990,11 @@
                     "sqrt_price": "0x4fef9d53190a2698dce7b88e4614"
                 },
                 {
+                    "index": 198540,
+                    "net_liquidity": 22602662536628,
+                    "sqrt_price": "0x4ff1a931712ed62a70968a77f6fb"
+                },
+                {
                     "index": 198571,
                     "net_liquidity": -1015827184788864,
                     "sqrt_price": "0x501167db8b4b2ee3075568c01717"
@@ -12060,11 +12065,6 @@
                     "sqrt_price": "0x527d63a6ad21ffdeef6b21ec71b2"
                 },
                 {
-                    "index": 199176,
-                    "net_liquidity": -766091365088896,
-                    "sqrt_price": "0x5286e4ccd2539a2dc654a5e2b87c"
-                },
-                {
                     "index": 199287,
                     "net_liquidity": -854669044567825,
                     "sqrt_price": "0x52fc77d55703e9ff43239a43ac7f"
@@ -12100,9 +12100,19 @@
                     "sqrt_price": "0x546bef32f0f67b580c630506fd80"
                 },
                 {
+                    "index": 199680,
+                    "net_liquidity": -662022148464654,
+                    "sqrt_price": "0x54a207729b73378216d831908b98"
+                },
+                {
                     "index": 199728,
                     "net_liquidity": -33848933470674,
                     "sqrt_price": "0x54d61660236b5de38101c9e0d01f"
+                },
+                {
+                    "index": 199802,
+                    "net_liquidity": -206103452668808,
+                    "sqrt_price": "0x552696d1d3b90bf03124a3f1b5dd"
                 },
                 {
                     "index": 199809,
@@ -12220,6 +12230,11 @@
                     "sqrt_price": "0x5850e52fcadc420f6b59a6c850b0"
                 },
                 {
+                    "index": 200547,
+                    "net_liquidity": -22602662536628,
+                    "sqrt_price": "0x5861db8171288b44800198d58a0f"
+                },
+                {
                     "index": 200563,
                     "net_liquidity": -60509674822068362,
                     "sqrt_price": "0x5873f6e74420762f1bfa0e1b5427"
@@ -12261,7 +12276,7 @@
                 },
                 {
                     "index": 201333,
-                    "net_liquidity": -3456626324581381,
+                    "net_liquidity": -3512135091517793,
                     "sqrt_price": "0x5becb615992b485816b47f1f7998"
                 },
                 {

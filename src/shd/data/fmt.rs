@@ -71,8 +71,8 @@ pub struct SrzProtocolComponent {
 impl From<ProtocolComponent> for SrzProtocolComponent {
     fn from(pc: ProtocolComponent) -> Self {
         SrzProtocolComponent {
-            address: pc.id.to_string(),
-            id: pc.id.to_string(),
+            address: pc.id.to_string().to_lowercase(),
+            id: pc.id.to_string().to_lowercase(),
             tokens: pc.tokens.into_iter().map(SrzToken::from).collect(),
             protocol_system: pc.protocol_system,
             protocol_type_name: pc.protocol_type_name,

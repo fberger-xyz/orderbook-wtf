@@ -342,12 +342,6 @@
     "gas": "0"
   },
   {
-    "address": "0x37236cd05b34cc79d3715af2383e96dd7443dcf1",
-    "decimals": 0,
-    "symbol": "SLP",
-    "gas": "0"
-  },
-  {
     "address": "0x04fa0d235c4abf4bcf4787af4cf447de572ef828",
     "decimals": 18,
     "symbol": "UMA",
@@ -408,15 +402,15 @@
     "gas": "0"
   },
   {
-    "address": "0x7c5a0ce9267ed19b22f8cae653f198e3e8daf098",
-    "decimals": 18,
-    "symbol": "SAN",
-    "gas": "0"
-  },
-  {
     "address": "0xdb25f211ab05b1c97d595516f45794528a807ad8",
     "decimals": 2,
     "symbol": "EURS",
+    "gas": "0"
+  },
+  {
+    "address": "0x09fe5f0236f0ea5d930197dce254d77b04128075",
+    "decimals": 18,
+    "symbol": "WCK",
     "gas": "0"
   },
   {
@@ -522,12 +516,6 @@
     "gas": "0"
   },
   {
-    "address": "0x035df12e0f3ac6671126525f1015e47d79dfeddf",
-    "decimals": 18,
-    "symbol": "0xMR",
-    "gas": "0"
-  },
-  {
     "address": "0xdb7eb3ede973665b1bb9f3016861e3255062e4ed",
     "decimals": 4,
     "symbol": "MNFT",
@@ -609,12 +597,6 @@
     "address": "0x4f9254c83eb525f9fcf346490bbb3ed28a81c667",
     "decimals": 18,
     "symbol": "CELR",
-    "gas": "0"
-  },
-  {
-    "address": "0x763fa6806e1acf68130d2d0f0df754c93cc546b2",
-    "decimals": 18,
-    "symbol": "LIT",
     "gas": "0"
   },
   {
@@ -717,6 +699,12 @@
     "address": "0x419c4db4b9e25d6db2ad9691ccb832c8d9fda05e",
     "decimals": 18,
     "symbol": "DRGN",
+    "gas": "0"
+  },
+  {
+    "address": "0xaaaf91d9b90df800df4f55c205fd6989c977e73a",
+    "decimals": 8,
+    "symbol": "TKN",
     "gas": "0"
   },
   {
@@ -954,6 +942,12 @@
     "gas": "0"
   },
   {
+    "address": "0x6524b87960c2d573ae514fd4181777e7842435d4",
+    "decimals": 18,
+    "symbol": "BZN",
+    "gas": "0"
+  },
+  {
     "address": "0x846c66cf71c43f80403b51fe3906b3599d63336f",
     "decimals": 18,
     "symbol": "PMA",
@@ -1068,6 +1062,12 @@
     "gas": "0"
   },
   {
+    "address": "0x177d39ac676ed1c67a2b268ad7f1e58826e5b0af",
+    "decimals": 18,
+    "symbol": "CDT",
+    "gas": "0"
+  },
+  {
     "address": "0xdf801468a808a32656d2ed2d2d80b72a129739f4",
     "decimals": 8,
     "symbol": "CUBE",
@@ -1143,12 +1143,6 @@
     "address": "0xf83301c5cd1ccbb86f466a6b3c53316ed2f8465a",
     "decimals": 6,
     "symbol": "CMS",
-    "gas": "0"
-  },
-  {
-    "address": "0xbe9375c6a420d2eeb258962efb95551a5b722803",
-    "decimals": 18,
-    "symbol": "STMX",
     "gas": "0"
   },
   {
@@ -1488,15 +1482,15 @@
     "gas": "0"
   },
   {
-    "address": "0x5d858bcd53e085920620549214a8b27ce2f04670",
-    "decimals": 18,
-    "symbol": "POP",
-    "gas": "0"
-  },
-  {
     "address": "0x3d658390460295fb963f54dc0899cfb1c30776df",
     "decimals": 8,
     "symbol": "Coval",
+    "gas": "0"
+  },
+  {
+    "address": "0x6704b673c70de9bf74c8fba4b4bd748f0e2190e1",
+    "decimals": 18,
+    "symbol": "UBEX",
     "gas": "0"
   },
   {
@@ -1560,6 +1554,12 @@
     "gas": "0"
   },
   {
+    "address": "0xba21ef4c9f433ede00badefcc2754b8e74bd538a",
+    "decimals": 18,
+    "symbol": "SWFL",
+    "gas": "0"
+  },
+  {
     "address": "0x6a126b1a4d6a66370930eca642eff93d8e1be321",
     "decimals": 12,
     "symbol": "SXHC",
@@ -1593,6 +1593,12 @@
     "address": "0x1e18821e69b9faa8e6e75dffe54e7e25754beda0",
     "decimals": 18,
     "symbol": "KIMCHI",
+    "gas": "0"
+  },
+  {
+    "address": "0xd6c67b93a7b248df608a653d82a100556144c5da",
+    "decimals": 16,
+    "symbol": "EXNT",
     "gas": "0"
   },
   {
@@ -1641,6 +1647,12 @@
     "address": "0x177ba0cac51bfc7ea24bad39d81dcefd59d74faa",
     "decimals": 18,
     "symbol": "KIF",
+    "gas": "0"
+  },
+  {
+    "address": "0xaa19961b6b858d9f18a115f25aa1d98abc1fdba8",
+    "decimals": 18,
+    "symbol": "LCS",
     "gas": "0"
   },
   {
@@ -1800,9 +1812,9 @@
     "gas": "0"
   },
   {
-    "address": "0x7240ac91f01233baaf8b064248e80feaa5912ba3",
+    "address": "0x8ef47555856f6ce2e0cd7c36aef4fab317d2e2e2",
     "decimals": 18,
-    "symbol": "OCTO",
+    "symbol": "PAYT",
     "gas": "0"
   },
   {
@@ -1950,6 +1962,12 @@
     "gas": "0"
   },
   {
+    "address": "0x042afd3869a47e2d5d42cc787d5c9e19df32185f",
+    "decimals": 18,
+    "symbol": "POT",
+    "gas": "0"
+  },
+  {
     "address": "0xe63684bcf2987892cefb4caa79bd21b34e98a291",
     "decimals": 18,
     "symbol": "KFC",
@@ -2043,6 +2061,12 @@
     "address": "0x25e1474170c4c0aa64fa98123bdc8db49d7802fa",
     "decimals": 18,
     "symbol": "BID",
+    "gas": "0"
+  },
+  {
+    "address": "0xc57d533c50bc22247d49a368880fb49a1caa39f7",
+    "decimals": 18,
+    "symbol": "PTF",
     "gas": "0"
   },
   {
@@ -2160,12 +2184,6 @@
     "gas": "0"
   },
   {
-    "address": "0x8a3d77e9d6968b780564936d15b09805827c21fa",
-    "decimals": 18,
-    "symbol": "UCO",
-    "gas": "0"
-  },
-  {
     "address": "0x9c2dc0c3cc2badde84b0025cf4df1c5af288d835",
     "decimals": 18,
     "symbol": "COR",
@@ -2208,6 +2226,12 @@
     "gas": "0"
   },
   {
+    "address": "0xa7925aa2a6e4575ab0c74d169f3bc3e03d4c319a",
+    "decimals": 4,
+    "symbol": "BETTER",
+    "gas": "0"
+  },
+  {
     "address": "0x674c6ad92fd080e4004b2312b45f796a192d27a0",
     "decimals": 18,
     "symbol": "USDN",
@@ -2241,6 +2265,12 @@
     "address": "0x667102bd3413bfeaa3dffb48fa8288819e480a88",
     "decimals": 8,
     "symbol": "TKX",
+    "gas": "0"
+  },
+  {
+    "address": "0x1c48f86ae57291f7686349f12601910bd8d470bb",
+    "decimals": 18,
+    "symbol": "USDK",
     "gas": "0"
   },
   {
@@ -2289,6 +2319,12 @@
     "address": "0x20f7a3ddf244dc9299975b4da1c39f8d5d75f05a",
     "decimals": 6,
     "symbol": "SPN",
+    "gas": "0"
+  },
+  {
+    "address": "0xa13f0743951b4f6e3e3aa039f682e17279f52bc3",
+    "decimals": 18,
+    "symbol": "SENC",
     "gas": "0"
   },
   {
@@ -2409,6 +2445,12 @@
     "address": "0x4fe83213d56308330ec302a8bd641f1d0113a4cc",
     "decimals": 18,
     "symbol": "NU",
+    "gas": "0"
+  },
+  {
+    "address": "0xadb2437e6f65682b85f814fbc12fec0508a7b1d0",
+    "decimals": 18,
+    "symbol": "UNCX",
     "gas": "0"
   },
   {
@@ -2562,6 +2604,12 @@
     "gas": "0"
   },
   {
+    "address": "0xeca0e47d704872fb813582cdae870f5b3b154527",
+    "decimals": 18,
+    "symbol": "BOOBS",
+    "gas": "0"
+  },
+  {
     "address": "0xa117000000f279d81a1d3cc75430faa017fa5a2e",
     "decimals": 18,
     "symbol": "ANT",
@@ -2619,12 +2667,6 @@
     "address": "0xfa5047c9c78b8877af97bdcb85db743fd7313d4a",
     "decimals": 18,
     "symbol": "ROOK",
-    "gas": "0"
-  },
-  {
-    "address": "0xdacd69347de42babfaecd09dc88958378780fb62",
-    "decimals": 0,
-    "symbol": "ATRI",
     "gas": "0"
   },
   {
@@ -2790,6 +2832,12 @@
     "gas": "0"
   },
   {
+    "address": "0x5dc02ea99285e17656b8350722694c35154db1e8",
+    "decimals": 8,
+    "symbol": "BOND",
+    "gas": "0"
+  },
+  {
     "address": "0x515d7e9d75e2b76db60f8a051cd890eba23286bc",
     "decimals": 18,
     "symbol": "GDAO",
@@ -2901,12 +2949,6 @@
     "address": "0xa7ed29b253d8b4e3109ce07c80fc570f81b63696",
     "decimals": 18,
     "symbol": "BAS",
-    "gas": "0"
-  },
-  {
-    "address": "0xa0afaa285ce85974c3c881256cb7f225e3a1178a",
-    "decimals": 18,
-    "symbol": "wCRES",
     "gas": "0"
   },
   {
@@ -3156,12 +3198,6 @@
     "gas": "0"
   },
   {
-    "address": "0xcae72a7a0fd9046cf6b165ca54c9e3a3872109e0",
-    "decimals": 18,
-    "symbol": "$ANRX",
-    "gas": "0"
-  },
-  {
     "address": "0xae7ab96520de3a18e5e111b5eaab095312d7fe84",
     "decimals": 18,
     "symbol": "stETH",
@@ -3246,6 +3282,12 @@
     "gas": "0"
   },
   {
+    "address": "0x9048c33c7bae0bbe9ad702b17b4453a83900d154",
+    "decimals": 18,
+    "symbol": "ELX",
+    "gas": "0"
+  },
+  {
     "address": "0x5f0e628b693018f639d10e4a4f59bd4d8b2b6b44",
     "decimals": 18,
     "symbol": "WHITE",
@@ -3285,6 +3327,12 @@
     "address": "0xcc3b966336382e90d7f852f0d6857c1d2c12f31c",
     "decimals": 18,
     "symbol": "VMSD",
+    "gas": "0"
+  },
+  {
+    "address": "0x8bbe1a2961b41340468d0548c2cd5b7dfa9b684c",
+    "decimals": 18,
+    "symbol": "HANDY",
     "gas": "0"
   },
   {
@@ -4050,12 +4098,6 @@
     "gas": "0"
   },
   {
-    "address": "0xcd2828fc4d8e8a0ede91bb38cf64b1a81de65bf6",
-    "decimals": 18,
-    "symbol": "ODDZ",
-    "gas": "0"
-  },
-  {
     "address": "0xc08512927d12348f6620a698105e1baac6ecd911",
     "decimals": 6,
     "symbol": "GYEN",
@@ -4476,6 +4518,12 @@
     "gas": "0"
   },
   {
+    "address": "0xbb1ee07d6c7baeb702949904080eb61f5d5e7732",
+    "decimals": 18,
+    "symbol": "DINU",
+    "gas": "0"
+  },
+  {
     "address": "0x903904cb39bac33d4983ead3b3f573d720c7965e",
     "decimals": 18,
     "symbol": "DOGUS",
@@ -4503,6 +4551,12 @@
     "address": "0x43a96962254855f16b925556f9e97be436a43448",
     "decimals": 18,
     "symbol": "HORD",
+    "gas": "0"
+  },
+  {
+    "address": "0xf1a91c7d44768070f711c68f33a7ca25c8d30268",
+    "decimals": 18,
+    "symbol": "C3",
     "gas": "0"
   },
   {
@@ -4734,6 +4788,12 @@
     "gas": "0"
   },
   {
+    "address": "0x3f5dd1a1538a4f9f82e543098f01f22480b0a3a8",
+    "decimals": 18,
+    "symbol": "dKUMA",
+    "gas": "0"
+  },
+  {
     "address": "0xde30da39c46104798bb5aa3fe8b9e0e1f348163f",
     "decimals": 18,
     "symbol": "GTC",
@@ -4950,15 +5010,33 @@
     "gas": "0"
   },
   {
+    "address": "0xeec2be5c91ae7f8a338e1e5f3b5de49d07afdc81",
+    "decimals": 18,
+    "symbol": "DPX",
+    "gas": "0"
+  },
+  {
     "address": "0x4bf9f81efed4163b184568b296674dad0ae51420",
     "decimals": 18,
     "symbol": "FLOKI",
     "gas": "0"
   },
   {
+    "address": "0x82bd290afa5cc1b75f46822fec415e2be51d7d46",
+    "decimals": 18,
+    "symbol": "TOMATO",
+    "gas": "0"
+  },
+  {
     "address": "0xc382e04099a435439725bb40647e2b32dc136806",
     "decimals": 18,
     "symbol": "COGE",
+    "gas": "0"
+  },
+  {
+    "address": "0x0b63128c40737b13647552e0c926bcfeccc35f93",
+    "decimals": 18,
+    "symbol": "wLITI",
     "gas": "0"
   },
   {
@@ -4983,6 +5061,12 @@
     "address": "0x6b4c7a5e3f0b99fcd83e9c089bddd6c7fce5c611",
     "decimals": 18,
     "symbol": "MM",
+    "gas": "0"
+  },
+  {
+    "address": "0x38a94e92a19e970c144ded0b2dd47278ca11cc1f",
+    "decimals": 9,
+    "symbol": "F9",
     "gas": "0"
   },
   {
@@ -5112,6 +5196,12 @@
     "gas": "0"
   },
   {
+    "address": "0x8d7a9452361b465247ec613ac8cc20758ceae06f",
+    "decimals": 18,
+    "symbol": "EDA",
+    "gas": "0"
+  },
+  {
     "address": "0xb17548c7b510427baac4e267bea62e800b247173",
     "decimals": 18,
     "symbol": "SMT",
@@ -5220,6 +5310,12 @@
     "gas": "0"
   },
   {
+    "address": "0xc6d1f1d5a46de07e73091f1c8793293b203f01a1",
+    "decimals": 18,
+    "symbol": "HELIOS",
+    "gas": "0"
+  },
+  {
     "address": "0x8ca9a0fbd8db501f013f2e9e33a1b9dc129a48e0",
     "decimals": 18,
     "symbol": "DDDD",
@@ -5253,12 +5349,6 @@
     "address": "0xa1a36d3537bbe375cc9694795f663ddc8d516db9",
     "decimals": 18,
     "symbol": "POLI",
-    "gas": "0"
-  },
-  {
-    "address": "0x7ae1d57b58fa6411f32948314badd83583ee0e8c",
-    "decimals": 18,
-    "symbol": "PAPER",
     "gas": "0"
   },
   {
@@ -5490,6 +5580,12 @@
     "gas": "0"
   },
   {
+    "address": "0x0fd67b4ceb9b607ef206904ec73459c4880132c9",
+    "decimals": 18,
+    "symbol": "SHOE",
+    "gas": "0"
+  },
+  {
     "address": "0x090185f2135308bad17527004364ebcc2d37e5f6",
     "decimals": 18,
     "symbol": "SPELL",
@@ -5598,6 +5694,12 @@
     "gas": "0"
   },
   {
+    "address": "0x9e8bfe46f9af27c5ea5c9c72b86d71bb86953a0c",
+    "decimals": 18,
+    "symbol": "EZX",
+    "gas": "0"
+  },
+  {
     "address": "0x1a7e4e63778b4f12a199c062f3efdd288afcbce8",
     "decimals": 18,
     "symbol": "EURA",
@@ -5619,12 +5721,6 @@
     "address": "0x3af33bef05c2dcb3c7288b77fe1c8d2aeba4d789",
     "decimals": 18,
     "symbol": "KROM",
-    "gas": "0"
-  },
-  {
-    "address": "0xbc19712feb3a26080ebf6f2f7849b417fdd792ca",
-    "decimals": 18,
-    "symbol": "BORING",
     "gas": "0"
   },
   {
@@ -5946,12 +6042,6 @@
     "gas": "0"
   },
   {
-    "address": "0x470ebf5f030ed85fc1ed4c2d36b9dd02e77cf1b7",
-    "decimals": 18,
-    "symbol": "TEMPLE",
-    "gas": "0"
-  },
-  {
     "address": "0x0c90c57aaf95a3a87eadda6ec3974c99d786511f",
     "decimals": 18,
     "symbol": "HAN",
@@ -5991,12 +6081,6 @@
     "address": "0xd2d8d78087d0e43bc4804b6f946674b2ee406b80",
     "decimals": 18,
     "symbol": "✺RUG",
-    "gas": "0"
-  },
-  {
-    "address": "0xa6586e19ef681b1ac0ed3d46413d199a555dbb95",
-    "decimals": 18,
-    "symbol": "LETSGO",
     "gas": "0"
   },
   {
@@ -6108,6 +6192,12 @@
     "gas": "0"
   },
   {
+    "address": "0x54a7cee7b02976ace1bdd4afad87273251ed34cf",
+    "decimals": 18,
+    "symbol": "Rainbows",
+    "gas": "0"
+  },
+  {
     "address": "0x081131434f93063751813c619ecca9c4dc7862a3",
     "decimals": 6,
     "symbol": "DAR",
@@ -6153,12 +6243,6 @@
     "address": "0x01597e397605bf280674bf292623460b4204c375",
     "decimals": 18,
     "symbol": "BENT",
-    "gas": "0"
-  },
-  {
-    "address": "0x9c4a4204b79dd291d6b6571c5be8bbcd0622f050",
-    "decimals": 18,
-    "symbol": "TCR",
     "gas": "0"
   },
   {
@@ -6504,6 +6588,12 @@
     "gas": "0"
   },
   {
+    "address": "0x2559813bbb508c4c79e9ccce4703bcb1f149edd7",
+    "decimals": 9,
+    "symbol": "WAIT",
+    "gas": "0"
+  },
+  {
     "address": "0xbe9895146f7af43049ca1c1ae358b0541ea49704",
     "decimals": 18,
     "symbol": "cbETH",
@@ -6567,12 +6657,6 @@
     "address": "0x4bdcb66b968060d9390c1d12bd29734496205581",
     "decimals": 18,
     "symbol": "ACQ",
-    "gas": "0"
-  },
-  {
-    "address": "0x9625ce7753ace1fa1865a47aae2c5c2ce4418569",
-    "decimals": 18,
-    "symbol": "KAP",
     "gas": "0"
   },
   {
@@ -6732,6 +6816,12 @@
     "gas": "0"
   },
   {
+    "address": "0x8aa9381b2544b48c26f3b850f6e07e2c5161eb3e",
+    "decimals": 8,
+    "symbol": "WDOGE",
+    "gas": "0"
+  },
+  {
     "address": "0x5ee84583f67d5ecea5420dbb42b462896e7f8d06",
     "decimals": 12,
     "symbol": "PLSB",
@@ -6789,6 +6879,12 @@
     "address": "0x2d886570a0da04885bfd6eb48ed8b8ff01a0eb7e",
     "decimals": 9,
     "symbol": "BCB",
+    "gas": "0"
+  },
+  {
+    "address": "0x148c031fe810e63dbdcf45db669b9b06a5bd29ef",
+    "decimals": 18,
+    "symbol": "Eye-AI",
     "gas": "0"
   },
   {
@@ -6903,6 +6999,12 @@
     "address": "0x45a2f5d4ab4ccb8d4e3c006774ace22860c77338",
     "decimals": 18,
     "symbol": "SHIBA",
+    "gas": "0"
+  },
+  {
+    "address": "0x8c4e7f814d40f8929f9112c5d09016f923d34472",
+    "decimals": 18,
+    "symbol": "XLAB",
     "gas": "0"
   },
   {
@@ -7032,12 +7134,6 @@
     "gas": "0"
   },
   {
-    "address": "0x6bf765c43030387a983f429c1438e9d2025b7e12",
-    "decimals": 18,
-    "symbol": "PEPES",
-    "gas": "0"
-  },
-  {
     "address": "0xb23d80f5fefcddaa212212f028021b41ded428cf",
     "decimals": 18,
     "symbol": "PRIME",
@@ -7149,12 +7245,6 @@
     "address": "0xa876f27f13a9eb6e621202cefdd5afc4a90e6457",
     "decimals": 9,
     "symbol": "IC",
-    "gas": "0"
-  },
-  {
-    "address": "0xe64f803d795fe6e5a0c3178aa92cc62006da3aff",
-    "decimals": 8,
-    "symbol": "KHANIFF",
     "gas": "0"
   },
   {
@@ -7308,21 +7398,21 @@
     "gas": "0"
   },
   {
-    "address": "0x20cdecbf5d56870b4068a255580a58d068446c92",
-    "decimals": 9,
-    "symbol": "MONKEYS",
-    "gas": "0"
-  },
-  {
-    "address": "0x0db5cf386a9fe104fe3597f013db71bfae89416c",
-    "decimals": 9,
-    "symbol": "HARRY",
+    "address": "0xd0d16d264c69a377b0834d788fb86db043eea751",
+    "decimals": 18,
+    "symbol": "GEORGE",
     "gas": "0"
   },
   {
     "address": "0x416143b1bf019c909dbdefabaa90eeca20c7c76d",
     "decimals": 9,
     "symbol": "Bōlz",
+    "gas": "0"
+  },
+  {
+    "address": "0xa5870e60c6ba8f6f0a281d9bae858fd6f348c1e4",
+    "decimals": 18,
+    "symbol": "Gravitas",
     "gas": "0"
   },
   {
@@ -7455,6 +7545,12 @@
     "address": "0x082646b22a3960da69ef7a778c16dd6fb85dd999",
     "decimals": 18,
     "symbol": "FKPEPE",
+    "gas": "0"
+  },
+  {
+    "address": "0xbf18e270b0469844c9d26736c3054e2762dda2c5",
+    "decimals": 18,
+    "symbol": "VAPOR",
     "gas": "0"
   },
   {
@@ -7602,6 +7698,12 @@
     "gas": "0"
   },
   {
+    "address": "0x23fdf332be2c220444a83c220a39aeff623d3426",
+    "decimals": 9,
+    "symbol": "YE",
+    "gas": "0"
+  },
+  {
     "address": "0x7f9a251572aaf0866011c10f28455da2400a25c1",
     "decimals": 9,
     "symbol": "SpongeBob",
@@ -7647,6 +7749,12 @@
     "address": "0x335f4e66b9b61cee5ceade4e727fcec20156b2f0",
     "decimals": 18,
     "symbol": "ELMO",
+    "gas": "0"
+  },
+  {
+    "address": "0x561906967a5918465b09b5628a14a5791dee7f88",
+    "decimals": 9,
+    "symbol": "MRSBOB",
     "gas": "0"
   },
   {
@@ -7698,6 +7806,12 @@
     "gas": "0"
   },
   {
+    "address": "0xa1974e043bb6d31e87cd64dc02acad153f5d53cf",
+    "decimals": 9,
+    "symbol": "PIGLET",
+    "gas": "0"
+  },
+  {
     "address": "0x02e6382ac0c074839c0f339d61b0a43d0a077d86",
     "decimals": 9,
     "symbol": "Discord",
@@ -7725,6 +7839,12 @@
     "address": "0x1032abe2902a23ddcbab085c20e0e69c33ceb8fa",
     "decimals": 18,
     "symbol": "SNAKE",
+    "gas": "0"
+  },
+  {
+    "address": "0x36a57ad8bb5e7ffd25ff0018388ddf7172bcb3ba",
+    "decimals": 18,
+    "symbol": "LUNCH",
     "gas": "0"
   },
   {
@@ -7836,12 +7956,6 @@
     "gas": "0"
   },
   {
-    "address": "0xc58a9c076b45d219fa6632882f708de090178897",
-    "decimals": 18,
-    "symbol": "TIGGER",
-    "gas": "0"
-  },
-  {
     "address": "0x31555696dd1242b2ab67b9a53b6465c814502f2c",
     "decimals": 18,
     "symbol": "KEVIN",
@@ -7890,12 +8004,6 @@
     "gas": "0"
   },
   {
-    "address": "0x9db0fb0aebe6a925b7838d16e3993a3976a64aab",
-    "decimals": 18,
-    "symbol": "BAM",
-    "gas": "0"
-  },
-  {
     "address": "0xf03d5fc6e08de6ad886fca34abf9a59ef633b78a",
     "decimals": 18,
     "symbol": "CAPY",
@@ -7926,9 +8034,21 @@
     "gas": "0"
   },
   {
+    "address": "0xe2ac4d20862eabe623e9ee07ae854d7cb9d3fd6d",
+    "decimals": 18,
+    "symbol": "ZOE",
+    "gas": "0"
+  },
+  {
     "address": "0x72e4f9f808c49a2a61de9c5896298920dc4eeea9",
     "decimals": 8,
     "symbol": "BITCOIN",
+    "gas": "0"
+  },
+  {
+    "address": "0xdaff38af699e6ca6dd9f53c92f09a074decd62ec",
+    "decimals": 18,
+    "symbol": "WAWU",
     "gas": "0"
   },
   {
@@ -7998,6 +8118,12 @@
     "gas": "0"
   },
   {
+    "address": "0xcae3faa4b6cf660aef18474074949ba0948bc025",
+    "decimals": 18,
+    "symbol": "GEN",
+    "gas": "0"
+  },
+  {
     "address": "0xfe1ef2b469846d1832b25095ff51b004f090e0c6",
     "decimals": 18,
     "symbol": "PEPE",
@@ -8025,6 +8151,12 @@
     "address": "0x628a3b2e302c7e896acc432d2d0dd22b6cb9bc88",
     "decimals": 18,
     "symbol": "LMWR",
+    "gas": "0"
+  },
+  {
+    "address": "0x70867288a47045e156c5fe2370c33a8900ebea59",
+    "decimals": 18,
+    "symbol": "$SLUTS",
     "gas": "0"
   },
   {
@@ -8082,6 +8214,12 @@
     "gas": "0"
   },
   {
+    "address": "0x3007083eaa95497cd6b2b809fb97b6a30bdf53d3",
+    "decimals": 18,
+    "symbol": "PSYOP",
+    "gas": "0"
+  },
+  {
     "address": "0x745407c86df8db893011912d3ab28e68b62e49b0",
     "decimals": 18,
     "symbol": "MAHA",
@@ -8106,12 +8244,6 @@
     "gas": "0"
   },
   {
-    "address": "0x00c5ca160a968f47e7272a0cfcda36428f386cb6",
-    "decimals": 18,
-    "symbol": "USDEBT",
-    "gas": "0"
-  },
-  {
     "address": "0xcba78d126f0b1feda0c538bcaf4c852a7a171099",
     "decimals": 18,
     "symbol": "MOE",
@@ -8127,6 +8259,12 @@
     "address": "0x955d5c14c8d4944da1ea7836bd44d54a8ec35ba1",
     "decimals": 18,
     "symbol": "RFD",
+    "gas": "0"
+  },
+  {
+    "address": "0x61a35258107563f6b6f102ae25490901c8760b12",
+    "decimals": 18,
+    "symbol": "kitty",
     "gas": "0"
   },
   {
@@ -8166,12 +8304,6 @@
     "gas": "0"
   },
   {
-    "address": "0x64546432fa6c13d98b2713c8f1754733ad25e25a",
-    "decimals": 18,
-    "symbol": "NOMAD",
-    "gas": "0"
-  },
-  {
     "address": "0x5b2e491082493ac11c9dcbe0be2135d7a902aa57",
     "decimals": 18,
     "symbol": "Wildfire",
@@ -8199,6 +8331,18 @@
     "address": "0x5052fa4a2a147eaaa4c0242e9cc54a10a4f42070",
     "decimals": 18,
     "symbol": "HANeP",
+    "gas": "0"
+  },
+  {
+    "address": "0x00282fd551d03dc033256c4bf119532e8c735d8a",
+    "decimals": 2,
+    "symbol": "BIAO",
+    "gas": "0"
+  },
+  {
+    "address": "0xfa46b726733559c3cbf27a54435a579db91cd7bf",
+    "decimals": 9,
+    "symbol": "DON",
     "gas": "0"
   },
   {
@@ -8280,12 +8424,6 @@
     "gas": "0"
   },
   {
-    "address": "0x8f45250b9d43e213da5bac058f2396e3c836023b",
-    "decimals": 9,
-    "symbol": "Bart",
-    "gas": "0"
-  },
-  {
     "address": "0x7f4c5447af6a96d8eeaee1d932338cfc57890dbd",
     "decimals": 18,
     "symbol": "DAVE",
@@ -8301,12 +8439,6 @@
     "address": "0x6c249b6f6492864d914361308601a7abb32e68f8",
     "decimals": 18,
     "symbol": "DUA",
-    "gas": "0"
-  },
-  {
-    "address": "0xa8c14e4f318a3b6f0b006b1c7781c84217f55bb9",
-    "decimals": 18,
-    "symbol": "Hunter",
     "gas": "0"
   },
   {
@@ -8385,6 +8517,12 @@
     "address": "0x4ac429a7cdf2b533e2c0cff1b017f2c344e864e2",
     "decimals": 18,
     "symbol": "PLSX",
+    "gas": "0"
+  },
+  {
+    "address": "0x048e2df866258e8e20411903950c421643ef609c",
+    "decimals": 18,
+    "symbol": "RONALDO",
     "gas": "0"
   },
   {
@@ -8526,12 +8664,6 @@
     "gas": "0"
   },
   {
-    "address": "0x5ad45404b0cda6ff4d1ca774af43836bb3045898",
-    "decimals": 9,
-    "symbol": "FP",
-    "gas": "0"
-  },
-  {
     "address": "0x88417754ff7062c10f4e3a4ab7e9f9d9cbda6023",
     "decimals": 18,
     "symbol": "PEEPA",
@@ -8586,6 +8718,12 @@
     "gas": "0"
   },
   {
+    "address": "0xd82bc9f7691f26c17fba5ace2863ad85f14c4765",
+    "decimals": 9,
+    "symbol": "POPO",
+    "gas": "0"
+  },
+  {
     "address": "0xc0c172dd361c665d864ed316ab321cec6b91f6c0",
     "decimals": 18,
     "symbol": "PEJEET",
@@ -8619,6 +8757,12 @@
     "address": "0xd61e1cafd50e570356dd5f6d679a7bd0535a7fcf",
     "decimals": 9,
     "symbol": "XRP 2.0",
+    "gas": "0"
+  },
+  {
+    "address": "0xa499648fd0e80fd911972bbeb069e4c20e68bf22",
+    "decimals": 18,
+    "symbol": "uJENNY",
     "gas": "0"
   },
   {
@@ -8718,6 +8862,12 @@
     "gas": "0"
   },
   {
+    "address": "0xa9d0146388bdc91a252f39f309690633a242c0cf",
+    "decimals": 18,
+    "symbol": "PEPAY",
+    "gas": "0"
+  },
+  {
     "address": "0x3d806324b6df5af3c1a81acba14a8a62fe6d643f",
     "decimals": 18,
     "symbol": "SOLANA",
@@ -8739,12 +8889,6 @@
     "address": "0x8ed97a637a790be1feff5e888d43629dc05408f6",
     "decimals": 18,
     "symbol": "NPC",
-    "gas": "0"
-  },
-  {
-    "address": "0x696e108fd69ec5ea929b3586f001ddfea02b3008",
-    "decimals": 18,
-    "symbol": "CHAD",
     "gas": "0"
   },
   {
@@ -8868,27 +9012,15 @@
     "gas": "0"
   },
   {
-    "address": "0xc6a2a3412ecfca5ed11dc9494d8d41bf165e514f",
-    "decimals": 9,
-    "symbol": "NASDAQ",
+    "address": "0x070e984fda37dd942f5c953f6b2375339adac308",
+    "decimals": 18,
+    "symbol": "AXE",
     "gas": "0"
   },
   {
     "address": "0xe0f63a424a4439cbe457d80e4f4b51ad25b2c56c",
     "decimals": 8,
     "symbol": "SPX",
-    "gas": "0"
-  },
-  {
-    "address": "0x73c6a7491d0db90bdb0060308cde0f49dfd1d0b0",
-    "decimals": 18,
-    "symbol": "DOBO",
-    "gas": "0"
-  },
-  {
-    "address": "0x5582a479f0c403e207d2578963ccef5d03ba636f",
-    "decimals": 18,
-    "symbol": "SALD",
     "gas": "0"
   },
   {
@@ -9012,9 +9144,9 @@
     "gas": "0"
   },
   {
-    "address": "0x582282be57204601602e4f03109ea12d759d42db",
-    "decimals": 18,
-    "symbol": "FKBOOST",
+    "address": "0xe07c41e9cdf7e0a7800e4bbf90d414654fd6413d",
+    "decimals": 9,
+    "symbol": "CBDC",
     "gas": "0"
   },
   {
@@ -9156,12 +9288,6 @@
     "gas": "0"
   },
   {
-    "address": "0x9ce07410673206c693bcec9b07710767637a564c",
-    "decimals": 9,
-    "symbol": "MONKEYS",
-    "gas": "0"
-  },
-  {
     "address": "0x8d99569ef5febb19989892eee7f81f8f909d07f3",
     "decimals": 4,
     "symbol": "KEL",
@@ -9228,6 +9354,12 @@
     "gas": "0"
   },
   {
+    "address": "0xbf64ea1c2652a21fa6e939d957758294cbee4ad7",
+    "decimals": 9,
+    "symbol": "Monkeballs4",
+    "gas": "0"
+  },
+  {
     "address": "0xcbf4d5efa82e32a9187385480a7c74cb062b956c",
     "decimals": 9,
     "symbol": "SATOSHI",
@@ -9276,12 +9408,6 @@
     "gas": "0"
   },
   {
-    "address": "0xe9514a6eba63a0bbbe2faea919e773ebe0f527c1",
-    "decimals": 18,
-    "symbol": "KEK",
-    "gas": "0"
-  },
-  {
     "address": "0x5bbe23d5540b64a5e2b6fd72b40245d08c1cbf58",
     "decimals": 9,
     "symbol": "FAFO",
@@ -9297,6 +9423,12 @@
     "address": "0x67f4c72a50f8df6487720261e188f2abe83f57d7",
     "decimals": 6,
     "symbol": "wPOKT",
+    "gas": "0"
+  },
+  {
+    "address": "0x3c4167f683a30220ed0eb55a4e51c068f4b253cd",
+    "decimals": 8,
+    "symbol": "RAGNAR",
     "gas": "0"
   },
   {
@@ -9372,6 +9504,12 @@
     "gas": "0"
   },
   {
+    "address": "0x38d914b3705c279bf012443dbc093ffdffe523aa",
+    "decimals": 9,
+    "symbol": "LUPE",
+    "gas": "0"
+  },
+  {
     "address": "0x283d480dfd6921055e9c335fc177bf8cb9c94184",
     "decimals": 8,
     "symbol": "VIX",
@@ -9399,6 +9537,12 @@
     "address": "0xaf05ce8a2cef336006e933c02fc89887f5b3c726",
     "decimals": 18,
     "symbol": "LMI",
+    "gas": "0"
+  },
+  {
+    "address": "0x0b5a91a43cb798c45fd56bfb5d41c13c42a7afa8",
+    "decimals": 18,
+    "symbol": "APU",
     "gas": "0"
   },
   {
@@ -9540,21 +9684,9 @@
     "gas": "0"
   },
   {
-    "address": "0x1a2eb478fa07125c9935a77b3c03a82470801e30",
-    "decimals": 18,
-    "symbol": "AMO",
-    "gas": "0"
-  },
-  {
     "address": "0x1e971b5b21367888239f00da16f0a6b0effecb03",
     "decimals": 18,
     "symbol": "LEEROY",
-    "gas": "0"
-  },
-  {
-    "address": "0xe253be149830bce1a6af3be399f3a952eabe127e",
-    "decimals": 18,
-    "symbol": "SAFEMOON",
     "gas": "0"
   },
   {
@@ -9606,6 +9738,12 @@
     "gas": "0"
   },
   {
+    "address": "0xf3e66b03d098d0482be9cb3d6999787231a93ed9",
+    "decimals": 9,
+    "symbol": "PROMPTIDE",
+    "gas": "0"
+  },
+  {
     "address": "0xb61ebb6bceb7635ecd7e59884ee2e2bcdfd810ba",
     "decimals": 9,
     "symbol": "XSHIB",
@@ -9639,6 +9777,12 @@
     "address": "0xbddc20ed7978b7d59ef190962f441cd18c14e19f",
     "decimals": 18,
     "symbol": "CAGA",
+    "gas": "0"
+  },
+  {
+    "address": "0x1566bfb122456903a97c63e3b6360db999dfb48e",
+    "decimals": 8,
+    "symbol": "OPENSEA",
     "gas": "0"
   },
   {
@@ -9696,12 +9840,6 @@
     "gas": "0"
   },
   {
-    "address": "0x5bb15141bb6def6d2bafeed8ff84bf889c0c573b",
-    "decimals": 18,
-    "symbol": "LVM",
-    "gas": "0"
-  },
-  {
     "address": "0x6b985d38b1fc891bb57bff59573626b1896d4aa1",
     "decimals": 9,
     "symbol": "FIDO",
@@ -9729,6 +9867,12 @@
     "address": "0xa06eb3e52dabf9aa7ff8ad1428b548c9a420aa20",
     "decimals": 9,
     "symbol": "STARBASE",
+    "gas": "0"
+  },
+  {
+    "address": "0x42b1eb55a9416add379dc61ac62f132779def35e",
+    "decimals": 9,
+    "symbol": "SOLCT",
     "gas": "0"
   },
   {
@@ -9774,6 +9918,12 @@
     "gas": "0"
   },
   {
+    "address": "0x817d88bb33c41f4d9b6c47069b49799cf6258b79",
+    "decimals": 9,
+    "symbol": "dhhdhhddhdhhxhdjdbdhxeuhehwgsbzzjsnbsbzjzieibshdjsizhzbsjwuwjxhhsuwshhxusus",
+    "gas": "0"
+  },
+  {
     "address": "0x9bcda9bd845e4bfa7e6a4c012b93f8ba821ac618",
     "decimals": 9,
     "symbol": "DOGEFATHER",
@@ -9792,9 +9942,21 @@
     "gas": "0"
   },
   {
+    "address": "0xda169ce4c000ec32d13fd78b504940c605645c43",
+    "decimals": 9,
+    "symbol": "MOONDOGE",
+    "gas": "0"
+  },
+  {
     "address": "0x90b07b2ad96eb39653d776fba703602c8b15730a",
     "decimals": 9,
     "symbol": "GrokCoin",
+    "gas": "0"
+  },
+  {
+    "address": "0x206668b92818fa63c7d99e025b21b625455a551e",
+    "decimals": 9,
+    "symbol": "SQUID2",
     "gas": "0"
   },
   {
@@ -9870,12 +10032,6 @@
     "gas": "0"
   },
   {
-    "address": "0xc3960227e41c3f54e9b399ce216149dea5315c34",
-    "decimals": 9,
-    "symbol": "CZ",
-    "gas": "0"
-  },
-  {
     "address": "0xe963263489b958c84b765b2b2613a76f7b7ad4db",
     "decimals": 9,
     "symbol": "MCGA",
@@ -9924,12 +10080,6 @@
     "gas": "0"
   },
   {
-    "address": "0x0a608946c0ddc8ecb0473236c902c7962b9d6f5d",
-    "decimals": 18,
-    "symbol": "p3",
-    "gas": "0"
-  },
-  {
     "address": "0x3d330b8d4eb25b0933e564d7284d462346d453ef",
     "decimals": 9,
     "symbol": "GROQ",
@@ -9957,6 +10107,12 @@
     "address": "0x81db1949d0e888557bc632f7c0f6698b1f8c9106",
     "decimals": 9,
     "symbol": "D/ACC",
+    "gas": "0"
+  },
+  {
+    "address": "0x3c8871bae1498b9a1bf691e8971c71f20ca75726",
+    "decimals": 9,
+    "symbol": "X/ACC",
     "gas": "0"
   },
   {
@@ -10242,12 +10398,6 @@
     "gas": "0"
   },
   {
-    "address": "0xe6828d65bf5023ae1851d90d8783cc821ba7eee1",
-    "decimals": 18,
-    "symbol": "ABOND",
-    "gas": "0"
-  },
-  {
     "address": "0xf407a19a989d26102d1fc02a1b040a324f20dbcd",
     "decimals": 18,
     "symbol": "ASSET",
@@ -10287,6 +10437,12 @@
     "address": "0x515e7fd1c29263dff8d987f15fa00c12cd10a49b",
     "decimals": 18,
     "symbol": "ppPP",
+    "gas": "0"
+  },
+  {
+    "address": "0x967df633033eb02c6cba10b07ac392d2525ac3a2",
+    "decimals": 9,
+    "symbol": "YE",
     "gas": "0"
   },
   {
@@ -10389,12 +10545,6 @@
     "address": "0x85d19fb57ca7da715695fcf347ca2169144523a7",
     "decimals": 9,
     "symbol": "CONAN",
-    "gas": "0"
-  },
-  {
-    "address": "0xbf33948eeda047a1d44d6174b084c12ef28bbdf7",
-    "decimals": 9,
-    "symbol": "Schrödinger",
     "gas": "0"
   },
   {
@@ -10503,12 +10653,6 @@
     "address": "0x6d68723a62447e48b9150982e0c95143a04018d3",
     "decimals": 9,
     "symbol": "HTE",
-    "gas": "0"
-  },
-  {
-    "address": "0x6f6382f241e3c6ee0e9bee2390d91a73adc0afff",
-    "decimals": 18,
-    "symbol": "TMNT",
     "gas": "0"
   },
   {
@@ -10623,6 +10767,12 @@
     "address": "0xbd6323a83b613f668687014e8a5852079494fb68",
     "decimals": 18,
     "symbol": "BTC",
+    "gas": "0"
+  },
+  {
+    "address": "0xbbbbbbbb46a1da0f0c3f64522c275baa4c332636",
+    "decimals": 18,
+    "symbol": "ZKB",
     "gas": "0"
   },
   {
@@ -10800,6 +10950,12 @@
     "gas": "0"
   },
   {
+    "address": "0xce722f60f35c37ab295adc4e6ba45bcc7ca89dd6",
+    "decimals": 18,
+    "symbol": "JPGD",
+    "gas": "0"
+  },
+  {
     "address": "0xe6187721750016be0785178d7e2003f99cfd7177",
     "decimals": 9,
     "symbol": "DORK",
@@ -10839,6 +10995,12 @@
     "address": "0x8aec4bbdcfb451aa289bfbd3c2f4e34a44ada1be",
     "decimals": 9,
     "symbol": "dogwifhat",
+    "gas": "0"
+  },
+  {
+    "address": "0xe33b9b01356756d560850bd8467b60faa094b518",
+    "decimals": 9,
+    "symbol": "pepewifhat",
     "gas": "0"
   },
   {
@@ -10884,6 +11046,12 @@
     "gas": "0"
   },
   {
+    "address": "0x1d303dc78f9d90e4fff9325696275d9e603e5cf3",
+    "decimals": 9,
+    "symbol": "𝕏TV",
+    "gas": "0"
+  },
+  {
     "address": "0xbf5495efe5db9ce00f80364c8b423567e58d2110",
     "decimals": 18,
     "symbol": "ezETH",
@@ -10893,6 +11061,12 @@
     "address": "0xd555498a524612c67f286df0e0a9a64a73a7cdc7",
     "decimals": 18,
     "symbol": "DEFROGS",
+    "gas": "0"
+  },
+  {
+    "address": "0xd17d6dcbd1619b979fe5275dad2ee16f8e180a2f",
+    "decimals": 9,
+    "symbol": "TRUMP2024",
     "gas": "0"
   },
   {
@@ -10923,12 +11097,6 @@
     "address": "0x4ddb9aefe2a5cbd28b64819e02187ee409b7b9ba",
     "decimals": 9,
     "symbol": "新年快乐",
-    "gas": "0"
-  },
-  {
-    "address": "0x6ae2a128cd07d672164ca9f2712ea737d198dd41",
-    "decimals": 18,
-    "symbol": "GOAT",
     "gas": "0"
   },
   {
@@ -11013,12 +11181,6 @@
     "address": "0x9a96ec9b57fb64fbc60b423d1f4da7691bd35079",
     "decimals": 18,
     "symbol": "AJNA",
-    "gas": "0"
-  },
-  {
-    "address": "0x1b3918c058a3325ee0441a6f32535484db4feb91",
-    "decimals": 9,
-    "symbol": "KIMI",
     "gas": "0"
   },
   {
@@ -11124,9 +11286,9 @@
     "gas": "0"
   },
   {
-    "address": "0xe485e2f1bab389c08721b291f6b59780fec83fd7",
-    "decimals": 18,
-    "symbol": "SHU",
+    "address": "0x4aa63e23be28df6009c456389e5cea14e63d9f2f",
+    "decimals": 9,
+    "symbol": "LARGE",
     "gas": "0"
   },
   {
@@ -11178,12 +11340,6 @@
     "gas": "0"
   },
   {
-    "address": "0x5572daa4a57952f14c4dfbd4be23f64dd6c8b611",
-    "decimals": 9,
-    "symbol": "NewSCUM",
-    "gas": "0"
-  },
-  {
     "address": "0xe2512a2f19f0388ad3d7a5263eaa82acd564827b",
     "decimals": 18,
     "symbol": "SHIDO",
@@ -11220,6 +11376,12 @@
     "gas": "0"
   },
   {
+    "address": "0x4e18c5639261b62ba100fa66f1f0d2b5e0892c7d",
+    "decimals": 9,
+    "symbol": "NODETOPIA",
+    "gas": "0"
+  },
+  {
     "address": "0x1cc7047e15825f639e0752eb1b89e4225f5327f2",
     "decimals": 18,
     "symbol": "PLX",
@@ -11253,6 +11415,12 @@
     "address": "0x21e60db1a07f0a9f688d321fd7682c6fff734e47",
     "decimals": 18,
     "symbol": "SORAI",
+    "gas": "0"
+  },
+  {
+    "address": "0xedf4bdedbfd9f5be32090c3c1eedff0e091eb5a4",
+    "decimals": 9,
+    "symbol": "WIF",
     "gas": "0"
   },
   {
@@ -11355,12 +11523,6 @@
     "address": "0xf8173a39c56a554837c4c7f104153a005d284d11",
     "decimals": 18,
     "symbol": "EDU",
-    "gas": "0"
-  },
-  {
-    "address": "0xbc188b5dbb155b6ea693d46d98bf60b8482939b9",
-    "decimals": 18,
-    "symbol": "FTW",
     "gas": "0"
   },
   {
@@ -11517,12 +11679,6 @@
     "address": "0x73d30d822d4ba42f8042e12aab7175bf616792a5",
     "decimals": 9,
     "symbol": "EGG",
-    "gas": "0"
-  },
-  {
-    "address": "0x76bc677d444f1e9d57daf5187ee2b7dc852745ae",
-    "decimals": 18,
-    "symbol": "XFT",
     "gas": "0"
   },
   {
@@ -11736,6 +11892,12 @@
     "gas": "0"
   },
   {
+    "address": "0xcf19c5f56753e4456005d2e11bc97d9eb9fec22d",
+    "decimals": 9,
+    "symbol": "PANDY",
+    "gas": "0"
+  },
+  {
     "address": "0x69457a1c9ec492419344da01daf0df0e0369d5d0",
     "decimals": 18,
     "symbol": "FJO",
@@ -11829,6 +11991,12 @@
     "address": "0x6940914b5d38610aa55d676e8124900caacc1ddd",
     "decimals": 18,
     "symbol": "VITALIK",
+    "gas": "0"
+  },
+  {
+    "address": "0xbc8646007fb67cd69d2e423a9a0bc0804314f33a",
+    "decimals": 9,
+    "symbol": "WTF",
     "gas": "0"
   },
   {
@@ -11940,9 +12108,27 @@
     "gas": "0"
   },
   {
+    "address": "0x1971628beffc84be31bc44e7a06faf2f520115ca",
+    "decimals": 9,
+    "symbol": "MUSK",
+    "gas": "0"
+  },
+  {
     "address": "0xf5d791eebfc229c4fe976e8328ed2c261690cb34",
     "decimals": 9,
     "symbol": "BOOB",
+    "gas": "0"
+  },
+  {
+    "address": "0x9727eaf447203be268e5d471b6503bf47a71ea72",
+    "decimals": 9,
+    "symbol": "ARKY",
+    "gas": "0"
+  },
+  {
+    "address": "0x00000079da2db53cb2f0e510da384de9b1130ced",
+    "decimals": 9,
+    "symbol": "MICHI",
     "gas": "0"
   },
   {
@@ -11952,27 +12138,15 @@
     "gas": "0"
   },
   {
-    "address": "0xf9e0bea01f128fdb036461e410a17f36767f8f58",
+    "address": "0xccc80ce58995baae4e5867e5cde3bd9f8b242376",
     "decimals": 9,
-    "symbol": "SENSE",
+    "symbol": "GOE",
     "gas": "0"
   },
   {
     "address": "0xfdbfff54e445a9595609f443070cae10f25df549",
     "decimals": 18,
     "symbol": "CHUNK",
-    "gas": "0"
-  },
-  {
-    "address": "0xcaeb21ac46d1288eca2559084262be662979dd75",
-    "decimals": 9,
-    "symbol": "SETH",
-    "gas": "0"
-  },
-  {
-    "address": "0xa35bd2246978dfbb1980dff8ff0f5834335dfdbc",
-    "decimals": 18,
-    "symbol": "REMIO",
     "gas": "0"
   },
   {
@@ -12042,6 +12216,12 @@
     "gas": "0"
   },
   {
+    "address": "0x46bf95205a3168751f23b0d754c06c3982463e03",
+    "decimals": 9,
+    "symbol": "TIGER",
+    "gas": "0"
+  },
+  {
     "address": "0x69fad3b2e4f04d30ab963bfcb3e3c20c26fa5814",
     "decimals": 9,
     "symbol": "WINTER",
@@ -12057,6 +12237,12 @@
     "address": "0xc56c7a0eaa804f854b536a5f3d5f49d2ec4b12b8",
     "decimals": 9,
     "symbol": "GME",
+    "gas": "0"
+  },
+  {
+    "address": "0x946679f7f53d82b89671b61cb88c8d74cab6b5d1",
+    "decimals": 9,
+    "symbol": "DFV",
     "gas": "0"
   },
   {
@@ -12102,12 +12288,6 @@
     "gas": "0"
   },
   {
-    "address": "0xdbcd57cc74b180f928258f7b1a32f6f7e64bf12e",
-    "decimals": 18,
-    "symbol": "BEPE",
-    "gas": "0"
-  },
-  {
     "address": "0xdc7ac5d5d4a9c3b5d8f3183058a92776dc12f4f3",
     "decimals": 9,
     "symbol": "MONKAS",
@@ -12123,6 +12303,12 @@
     "address": "0x4229725d41e2233d75b47675b55c6781df0b56a7",
     "decimals": 18,
     "symbol": "wCADAI",
+    "gas": "0"
+  },
+  {
+    "address": "0xbebedf3f3ff4348cc2a85e7375c390502698aeb7",
+    "decimals": 9,
+    "symbol": "BEBE",
     "gas": "0"
   },
   {
@@ -12183,6 +12369,12 @@
     "address": "0x470c8950c0c3aa4b09654bc73b004615119a44b5",
     "decimals": 18,
     "symbol": "KIZUNA",
+    "gas": "0"
+  },
+  {
+    "address": "0x9909e6b9b8c05636617763e5bb78c75e0ec45a85",
+    "decimals": 18,
+    "symbol": "KERMIT",
     "gas": "0"
   },
   {
@@ -12270,9 +12462,21 @@
     "gas": "0"
   },
   {
+    "address": "0xce05f358f293913efb36c6de3f295cbe28a275c7",
+    "decimals": 9,
+    "symbol": "spepe",
+    "gas": "0"
+  },
+  {
     "address": "0xdbb7a34bf10169d6d2d0d02a6cbb436cf4381bfa",
     "decimals": 18,
     "symbol": "ZENT",
+    "gas": "0"
+  },
+  {
+    "address": "0xf1c507fe4a4da386038c7691a6a3b40e9277b280",
+    "decimals": 9,
+    "symbol": "BULLRUN",
     "gas": "0"
   },
   {
@@ -12291,6 +12495,12 @@
     "address": "0x3927fb89f34bbee63351a6340558eebf51a19fb8",
     "decimals": 18,
     "symbol": "SPURDO",
+    "gas": "0"
+  },
+  {
+    "address": "0x6ed6dab7a36a48b689aff1e86c28d7149ca0731c",
+    "decimals": 18,
+    "symbol": "RATDEN",
     "gas": "0"
   },
   {
@@ -12318,12 +12528,6 @@
     "gas": "0"
   },
   {
-    "address": "0xb82faff6121c4cb6800d1c294998d61607e61f12",
-    "decimals": 9,
-    "symbol": "PINU",
-    "gas": "0"
-  },
-  {
     "address": "0xceb67a66c2c8a90980da3a50a3f96c07525a26cb",
     "decimals": 9,
     "symbol": "KABOSU",
@@ -12333,6 +12537,12 @@
     "address": "0xa1d23bbef17f88fefc2ada631738e4c42e906a2e",
     "decimals": 9,
     "symbol": "EGOD",
+    "gas": "0"
+  },
+  {
+    "address": "0x02bdd48accd5e5051d906848c0d1877d9b7c181d",
+    "decimals": 8,
+    "symbol": "WOTRUMP",
     "gas": "0"
   },
   {
@@ -12396,9 +12606,9 @@
     "gas": "0"
   },
   {
-    "address": "0xb6529f2600a4058ebbc190b24140e3d059a8f41c",
+    "address": "0xbb274c69c7114917d7f022c4ee90c1bd1f12884c",
     "decimals": 9,
-    "symbol": "BWOJAK",
+    "symbol": "PEEPEE",
     "gas": "0"
   },
   {
@@ -12429,12 +12639,6 @@
     "address": "0x3bb1be077f3f96722ae92ec985ab37fd0a0c4c51",
     "decimals": 18,
     "symbol": "MARV",
-    "gas": "0"
-  },
-  {
-    "address": "0x482702745260ffd69fc19943f70cffe2cacd70e9",
-    "decimals": 18,
-    "symbol": "$Jenner",
     "gas": "0"
   },
   {
@@ -12684,6 +12888,12 @@
     "gas": "0"
   },
   {
+    "address": "0x9ebb0895bd9c7c9dfab0d8d877c66ba613ac98ea",
+    "decimals": 18,
+    "symbol": "MAGAA",
+    "gas": "0"
+  },
+  {
     "address": "0xdf4ac52ef799d79b29fd4045ff9eda85335b0325",
     "decimals": 9,
     "symbol": "POG",
@@ -12759,12 +12969,6 @@
     "address": "0x1fa27ef94fd0bafb0fdc067193d3c2a8ec16d877",
     "decimals": 9,
     "symbol": "TRUMP",
-    "gas": "0"
-  },
-  {
-    "address": "0x276105758dfb270f5cd845aa04a6ba09c88699ca",
-    "decimals": 9,
-    "symbol": "G",
     "gas": "0"
   },
   {
@@ -12876,12 +13080,6 @@
     "gas": "0"
   },
   {
-    "address": "0xd1a6616f56221a9f27eb9476867b5bdb2b2d101d",
-    "decimals": 18,
-    "symbol": "AGI",
-    "gas": "0"
-  },
-  {
     "address": "0x455e53cbb86018ac2b8092fdcd39d8444affc3f6",
     "decimals": 18,
     "symbol": "POL",
@@ -12891,12 +13089,6 @@
     "address": "0x3103f431d44e3df9cf97b666142103bdcec6eea0",
     "decimals": 18,
     "symbol": "BlockDAG",
-    "gas": "0"
-  },
-  {
-    "address": "0x0ed1bed69fff82f2cc05e073be6c88120aa344ab",
-    "decimals": 8,
-    "symbol": "MCGA",
     "gas": "0"
   },
   {
@@ -12960,9 +13152,21 @@
     "gas": "0"
   },
   {
-    "address": "0x73d4aafff4f35c65d759937a76c9ca28d26ff0d1",
+    "address": "0x91c905e5d14d0f145f0264a0ee4bf1ebe64e9650",
     "decimals": 9,
-    "symbol": "XIPEIPEI",
+    "symbol": "gude",
+    "gas": "0"
+  },
+  {
+    "address": "0x66bff0d18513c648690edcdf5993c9da8c632ec8",
+    "decimals": 9,
+    "symbol": "BRETTWU",
+    "gas": "0"
+  },
+  {
+    "address": "0x187df9748016da82578c83a61c3b3093ac6b8669",
+    "decimals": 18,
+    "symbol": "KRAZY",
     "gas": "0"
   },
   {
@@ -12975,12 +13179,6 @@
     "address": "0xae8034f86710f9874fe436449defa95d8a555317",
     "decimals": 9,
     "symbol": "HUSKY",
-    "gas": "0"
-  },
-  {
-    "address": "0x57274697d3752ac113a53d91dc284e20c0c71cc1",
-    "decimals": 18,
-    "symbol": "POPCAT",
     "gas": "0"
   },
   {
@@ -13020,9 +13218,27 @@
     "gas": "0"
   },
   {
+    "address": "0x888888ae2c4a298efd66d162ffc53b3f2a869888",
+    "decimals": 9,
+    "symbol": "OMOCHI",
+    "gas": "0"
+  },
+  {
     "address": "0x32b29705bb44c57f6a3dcca047fd55b460977c25",
     "decimals": 8,
     "symbol": "HYBX",
+    "gas": "0"
+  },
+  {
+    "address": "0x67babe278f23253c210b659426debfd306d8cc03",
+    "decimals": 9,
+    "symbol": "BABYWOLF",
+    "gas": "0"
+  },
+  {
+    "address": "0x64babea366d476e844876d79f910bcc17d802ccb",
+    "decimals": 9,
+    "symbol": "BHOPPY",
     "gas": "0"
   },
   {
@@ -13149,6 +13365,12 @@
     "address": "0x2b7c0fa747611d4412b54076c62119926474edb3",
     "decimals": 9,
     "symbol": "NCAT",
+    "gas": "0"
+  },
+  {
+    "address": "0x286675fed193e3cfb20bfa3ba12db56e9231a0f7",
+    "decimals": 9,
+    "symbol": "MOKA",
     "gas": "0"
   },
   {
@@ -13290,6 +13512,12 @@
     "gas": "0"
   },
   {
+    "address": "0x420b879b0d18cc182e7e82ad16a13877c3a88420",
+    "decimals": 9,
+    "symbol": "BUD",
+    "gas": "0"
+  },
+  {
     "address": "0x68ad75469db9181a1144e769c16adf47f2f32cae",
     "decimals": 18,
     "symbol": "$MaxETH",
@@ -13299,12 +13527,6 @@
     "address": "0xda987c655ebc38c801db64a8608bc1aa56cd9a31",
     "decimals": 18,
     "symbol": "SYNT",
-    "gas": "0"
-  },
-  {
-    "address": "0x073a3b3e890a3aaeb061e50e92fffdd31197870b",
-    "decimals": 18,
-    "symbol": "JEFFRY",
     "gas": "0"
   },
   {
@@ -13416,9 +13638,15 @@
     "gas": "0"
   },
   {
-    "address": "0xc8df87b2434b1f0b9e56469546eba49b4320684a",
-    "decimals": 18,
-    "symbol": "PEON",
+    "address": "0x07040971246a73ebda9cf29ea1306bb47c7c4e76",
+    "decimals": 9,
+    "symbol": "USPEPE",
+    "gas": "0"
+  },
+  {
+    "address": "0x070401b53ba716684d79e62daa4ac478004f6776",
+    "decimals": 9,
+    "symbol": "USANDY",
     "gas": "0"
   },
   {
@@ -13434,9 +13662,9 @@
     "gas": "0"
   },
   {
-    "address": "0x89fd2d8fd8d937f55c89b7da3ceed44fa27e4a81",
-    "decimals": 9,
-    "symbol": "BUG",
+    "address": "0x407b574d34d1b967d1a6c927c58b6b76b7f9202f",
+    "decimals": 18,
+    "symbol": "FROG",
     "gas": "0"
   },
   {
@@ -13488,12 +13716,6 @@
     "gas": "0"
   },
   {
-    "address": "0x000000000d00353e0116ba046ef3dd854ed06f07",
-    "decimals": 9,
-    "symbol": "PLAYTIME",
-    "gas": "0"
-  },
-  {
     "address": "0xad451b32d89423a2ce6dbdb48243d5eecf5db1e5",
     "decimals": 18,
     "symbol": "Key",
@@ -13527,6 +13749,12 @@
     "address": "0x0000e3705d8735ee724a76f3440c0a7ea721ed00",
     "decimals": 9,
     "symbol": "SAITAMA",
+    "gas": "0"
+  },
+  {
+    "address": "0x6542006e6b512c62bf043444cc0126f876af78c7",
+    "decimals": 8,
+    "symbol": "GRINKLE",
     "gas": "0"
   },
   {
@@ -13710,6 +13938,12 @@
     "gas": "0"
   },
   {
+    "address": "0x7f983be5b42a1a31bfc4df9b8e8c8aafc550c1eb",
+    "decimals": 18,
+    "symbol": "PIPPY",
+    "gas": "0"
+  },
+  {
     "address": "0x6135177a17e02658df99a07a2841464deb5b8589",
     "decimals": 9,
     "symbol": "FEARNOT",
@@ -13719,12 +13953,6 @@
     "address": "0x9f4ac5ea89b1623e35328904d7d61b08b55daa50",
     "decimals": 9,
     "symbol": "MAGOA",
-    "gas": "0"
-  },
-  {
-    "address": "0x699c3d8ca65f78f18ad683535ee7caa84ef5bb69",
-    "decimals": 9,
-    "symbol": "MMGA",
     "gas": "0"
   },
   {
@@ -13818,9 +14046,9 @@
     "gas": "0"
   },
   {
-    "address": "0xf3591425505f49e19bca25a708df0ae0887c253a",
+    "address": "0x482bea02a28ce36afad7a9cdb3093b3f14e8e431",
     "decimals": 9,
-    "symbol": "TIGRA",
+    "symbol": " GATSBY ",
     "gas": "0"
   },
   {
@@ -13869,6 +14097,12 @@
     "address": "0x8916c176546607ebe7904e0f8e33b6d884d5cb1e",
     "decimals": 18,
     "symbol": "MASYA",
+    "gas": "0"
+  },
+  {
+    "address": "0xfadedc056eb97f45823dd56e8310f81b012d58e0",
+    "decimals": 18,
+    "symbol": "LASER",
     "gas": "0"
   },
   {
@@ -13956,9 +14190,9 @@
     "gas": "0"
   },
   {
-    "address": "0xfd2c55619dd30cb600514e53e1374de272d50486",
-    "decimals": 9,
-    "symbol": "BOLYMPICS",
+    "address": "0xe657d49abae3ea21618bb481f1dab4322855f60e",
+    "decimals": 18,
+    "symbol": "RAINBOW",
     "gas": "0"
   },
   {
@@ -14061,12 +14295,6 @@
     "address": "0x69420b83b6189f954268f1167ca7c7f3b21711d2",
     "decimals": 9,
     "symbol": "RATDOG",
-    "gas": "0"
-  },
-  {
-    "address": "0x8581998b905070b8984d99dc9af2c6800d97dce1",
-    "decimals": 18,
-    "symbol": "BABYNEIRO",
     "gas": "0"
   },
   {
@@ -14184,12 +14412,6 @@
     "gas": "0"
   },
   {
-    "address": "0xb4d4f31d58c99170e95e14e22a216bf858a948da",
-    "decimals": 9,
-    "symbol": "CHACHA",
-    "gas": "0"
-  },
-  {
     "address": "0x7316d973b0269863bbfed87302e11334e25ea565",
     "decimals": 9,
     "symbol": "KEN",
@@ -14250,12 +14472,6 @@
     "gas": "0"
   },
   {
-    "address": "0xa3c5f50deb5b23267e7752fcafaa04f42fb0eea4",
-    "decimals": 9,
-    "symbol": "ASTRA",
-    "gas": "0"
-  },
-  {
     "address": "0xde7d1492a9e22ce27c689d10caff5fea945d5b3a",
     "decimals": 9,
     "symbol": "IZUMI",
@@ -14283,6 +14499,12 @@
     "address": "0x1111b1ea9129f312aea5ea13a496d1839809f974",
     "decimals": 18,
     "symbol": "PBAR",
+    "gas": "0"
+  },
+  {
+    "address": "0x77791a1f85b8c67f17c43ba4a324f9bcd6e83113",
+    "decimals": 18,
+    "symbol": "WAGMI",
     "gas": "0"
   },
   {
@@ -14379,6 +14601,12 @@
     "address": "0x96a5399d07896f757bd4c6ef56461f58db951862",
     "decimals": 18,
     "symbol": "DRAGONX",
+    "gas": "0"
+  },
+  {
+    "address": "0x48b10c4bf0e9c8f8c6032623fea00258383838ee",
+    "decimals": 9,
+    "symbol": "DOGS",
     "gas": "0"
   },
   {
@@ -14604,15 +14832,15 @@
     "gas": "0"
   },
   {
-    "address": "0x1a1cb479f0be2da6fdf8a812f0a3c683f9e34212",
+    "address": "0x7e6e4a3798bc63ae69daadc611391ea592a28924",
     "decimals": 18,
-    "symbol": "Mechazilla",
+    "symbol": "$AUD",
     "gas": "0"
   },
   {
-    "address": "0x1be362f422a862055dcff627d33f9bd478e6c7d7",
+    "address": "0x1a1cb479f0be2da6fdf8a812f0a3c683f9e34212",
     "decimals": 18,
-    "symbol": "wXCH",
+    "symbol": "Mechazilla",
     "gas": "0"
   },
   {
@@ -14625,6 +14853,12 @@
     "address": "0xa37b60b872d3bb34da661df0a9929f0f2d819229",
     "decimals": 9,
     "symbol": "SONY",
+    "gas": "0"
+  },
+  {
+    "address": "0x870e184b7fb15a902dc9a93beb03c15a65977918",
+    "decimals": 9,
+    "symbol": "LESLIE",
     "gas": "0"
   },
   {
@@ -15024,9 +15258,9 @@
     "gas": "0"
   },
   {
-    "address": "0xf41a7b7c79840775f70a085c1fc5a762bbc6b180",
+    "address": "0x2074c1d66cb56f8e891559bddd2dedcff4e19147",
     "decimals": 9,
-    "symbol": "MADA",
+    "symbol": "JOIN",
     "gas": "0"
   },
   {
@@ -15162,12 +15396,6 @@
     "gas": "0"
   },
   {
-    "address": "0x8d2fafd63084b52a6ba8b3f088950cfc56bb2a7a",
-    "decimals": 9,
-    "symbol": "FROGALORIAN",
-    "gas": "0"
-  },
-  {
     "address": "0xc9bd9b4f5e96644b9c5c525e99f655ff31ce5ce6",
     "decimals": 9,
     "symbol": "WLFI",
@@ -15294,9 +15522,21 @@
     "gas": "0"
   },
   {
+    "address": "0xa8c68877fc986db3ce58ff4d54a51686d5f04a1b",
+    "decimals": 18,
+    "symbol": "MICHI",
+    "gas": "0"
+  },
+  {
     "address": "0x69420ef35466fb606e4f38b6ecadfff85ba440a5",
     "decimals": 9,
     "symbol": "MARVIN",
+    "gas": "0"
+  },
+  {
+    "address": "0x4982f1ae44bc924f6ef827dae39fdc36956953c8",
+    "decimals": 18,
+    "symbol": "TIGRA",
     "gas": "0"
   },
   {
@@ -15321,6 +15561,12 @@
     "address": "0x240cd7b53d364a208ed41f8ced4965d11f571b7a",
     "decimals": 9,
     "symbol": "DOGGO",
+    "gas": "0"
+  },
+  {
+    "address": "0x3abe404faa776d2a833d554a068ef1a58193f080",
+    "decimals": 9,
+    "symbol": "KOZUE",
     "gas": "0"
   },
   {
@@ -15432,9 +15678,21 @@
     "gas": "0"
   },
   {
+    "address": "0x7a413844bb40c92efa9e62a9a99314e55f5e4382",
+    "decimals": 9,
+    "symbol": "NÜWA",
+    "gas": "0"
+  },
+  {
     "address": "0x2e8f3ebc2aacc6df50823da82fc63b253a2272d1",
     "decimals": 18,
     "symbol": "KERMIT",
+    "gas": "0"
+  },
+  {
+    "address": "0x8c013ea608c7853404eb8db78f2696f8b68e4ab5",
+    "decimals": 6,
+    "symbol": "WIT",
     "gas": "0"
   },
   {
@@ -15468,12 +15726,6 @@
     "gas": "0"
   },
   {
-    "address": "0xfd0aed966e1a04274908b625b71bdc3297f5f26f",
-    "decimals": 9,
-    "symbol": "DOGESNEAKERS",
-    "gas": "0"
-  },
-  {
     "address": "0xb8d6196d71cdd7d90a053a7769a077772aaac464",
     "decimals": 9,
     "symbol": "MARS",
@@ -15501,6 +15753,18 @@
     "address": "0x7de551b2eec992c30c0c1cd7a9b82771f72a62da",
     "decimals": 9,
     "symbol": "MarsX",
+    "gas": "0"
+  },
+  {
+    "address": "0x000003a80bcbb222ac0a2005c15ea4c1db0aade5",
+    "decimals": 18,
+    "symbol": "MOON",
+    "gas": "0"
+  },
+  {
+    "address": "0x8bd35250918ed056304fa8641e083be2c42308bb",
+    "decimals": 18,
+    "symbol": "Estee",
     "gas": "0"
   },
   {
@@ -15576,6 +15840,12 @@
     "gas": "0"
   },
   {
+    "address": "0x038480645079e61b2852c04e1465da01928a6a20",
+    "decimals": 9,
+    "symbol": "JOMA",
+    "gas": "0"
+  },
+  {
     "address": "0x634769eb87542eaf41c0008c05d5d8f5d8bec3a5",
     "decimals": 14,
     "symbol": "BOME",
@@ -15642,12 +15912,6 @@
     "gas": "0"
   },
   {
-    "address": "0xc289c2d57e2ba371f40d594705dbf9331a2da47d",
-    "decimals": 9,
-    "symbol": "LOLCAT",
-    "gas": "0"
-  },
-  {
     "address": "0x9a594f5ed8d119b73525dfe23adbceca77fd828d",
     "decimals": 18,
     "symbol": "triangle",
@@ -15690,9 +15954,9 @@
     "gas": "0"
   },
   {
-    "address": "0x5981e98440e41fa993b26912b080922b8ed023c3",
+    "address": "0x6969e5cfe7578ac5f06d313c1a25578927a5bbc9",
     "decimals": 18,
-    "symbol": "MIHARU",
+    "symbol": "MORTI",
     "gas": "0"
   },
   {
@@ -15729,12 +15993,6 @@
     "address": "0x2e88fa020201865884abe5a96c095a1af4d615ad",
     "decimals": 9,
     "symbol": "sELON",
-    "gas": "0"
-  },
-  {
-    "address": "0xabd61a7ce5d387dcb03fa61aeb533c5ade24cf24",
-    "decimals": 9,
-    "symbol": "QUANT",
     "gas": "0"
   },
   {
@@ -15798,12 +16056,6 @@
     "gas": "0"
   },
   {
-    "address": "0x5a12975bf0158c9c3b23622f44917d113f31842d",
-    "decimals": 9,
-    "symbol": "KOMA",
-    "gas": "0"
-  },
-  {
     "address": "0xd0d216e5df5fc0d2e32a92e96c4f834d0f1a60c7",
     "decimals": 18,
     "symbol": "SHAOBING",
@@ -15819,6 +16071,12 @@
     "address": "0x8b629a6821c2995c65c7a5ee49da246862ba66db",
     "decimals": 9,
     "symbol": "LEN",
+    "gas": "0"
+  },
+  {
+    "address": "0xfa9ee8454e8b31c0aaedb79387105b0320d201c9",
+    "decimals": 9,
+    "symbol": "AMERICA",
     "gas": "0"
   },
   {
@@ -15861,6 +16119,18 @@
     "address": "0x2597342ff387b63846eb456419590781c4bfcdaf",
     "decimals": 18,
     "symbol": "TAXI",
+    "gas": "0"
+  },
+  {
+    "address": "0x119800a925217ba9a2d656e868483a050c2f919f",
+    "decimals": 9,
+    "symbol": "ROBOTAXI",
+    "gas": "0"
+  },
+  {
+    "address": "0xb78398125f15227d977d78c094a872eb1a53de7a",
+    "decimals": 9,
+    "symbol": "BabyMooDeng",
     "gas": "0"
   },
   {
@@ -15948,12 +16218,6 @@
     "gas": "0"
   },
   {
-    "address": "0xbb6a5db8d0ea0a3d5da7ca6a53f801e4698df8f6",
-    "decimals": 9,
-    "symbol": "SHOKO",
-    "gas": "0"
-  },
-  {
     "address": "0x413d0f3858a04583772bd6cb2b8ef50c89db4100",
     "decimals": 9,
     "symbol": "TODD",
@@ -16026,12 +16290,6 @@
     "gas": "0"
   },
   {
-    "address": "0xa5c45d48d36607741e90c0cca29545a46f5ee121",
-    "decimals": 9,
-    "symbol": "CHIB",
-    "gas": "0"
-  },
-  {
     "address": "0x4f126d88be58387fad7b8bdf75ce22a4cec943bb",
     "decimals": 9,
     "symbol": "BRAGON",
@@ -16059,12 +16317,6 @@
     "address": "0x6d98d875a3c66ecb5df6c9819f7587151238160c",
     "decimals": 9,
     "symbol": "$GOOGLE6900",
-    "gas": "0"
-  },
-  {
-    "address": "0x6900d8384076d3695517b3f310cc6b6507e55981",
-    "decimals": 9,
-    "symbol": "DJT",
     "gas": "0"
   },
   {
@@ -16218,12 +16470,6 @@
     "gas": "0"
   },
   {
-    "address": "0x2040aca8a128d3c4a750873575e5e7f074ffd32d",
-    "decimals": 9,
-    "symbol": "WLFI",
-    "gas": "0"
-  },
-  {
     "address": "0x66f85e3865d0cfdc009acf6280a8621f12e46ccf",
     "decimals": 9,
     "symbol": "WLFI",
@@ -16290,6 +16536,12 @@
     "gas": "0"
   },
   {
+    "address": "0x148ca309702c1c9b9ac23b8a3d2669ef8bc26ecb",
+    "decimals": 18,
+    "symbol": "BRX",
+    "gas": "0"
+  },
+  {
     "address": "0xffbbfd174643179e4dab15ab65f38de60482fb98",
     "decimals": 9,
     "symbol": "BAKSO",
@@ -16335,12 +16587,6 @@
     "address": "0x303c89f3a4a58872d8b6a3e64c14fdd9ec669c99",
     "decimals": 18,
     "symbol": "BabyNeiro",
-    "gas": "0"
-  },
-  {
-    "address": "0x4180bedcb0397935da5cb8c06d88229584233586",
-    "decimals": 9,
-    "symbol": "DOGE2.0",
     "gas": "0"
   },
   {
@@ -16467,6 +16713,12 @@
     "address": "0xa73b792906c79509d73fdfaaa78561e195010706",
     "decimals": 18,
     "symbol": "PIPO",
+    "gas": "0"
+  },
+  {
+    "address": "0x5fa5373783efa5e1e95f34cc37c3258824bb7775",
+    "decimals": 9,
+    "symbol": "KABOSU",
     "gas": "0"
   },
   {
@@ -16602,12 +16854,6 @@
     "gas": "0"
   },
   {
-    "address": "0x2f1f78214861bb9a7213e882b1c3e9559a37b322",
-    "decimals": 9,
-    "symbol": "MONONOKE",
-    "gas": "0"
-  },
-  {
     "address": "0x309726868aa9eed7e93defae8f02f22cceb669a1",
     "decimals": 9,
     "symbol": "SLIP",
@@ -16710,12 +16956,6 @@
     "gas": "0"
   },
   {
-    "address": "0x9dcb97df22556957a9048f8cc9acaed8e09459bf",
-    "decimals": 9,
-    "symbol": "MICMGA",
-    "gas": "0"
-  },
-  {
     "address": "0xf799fb149bc14798fba42d6589e105c798743b57",
     "decimals": 18,
     "symbol": "STEVE",
@@ -16785,6 +17025,12 @@
     "address": "0x698b1d54e936b9f772b8f58447194bbc82ec1933",
     "decimals": 9,
     "symbol": "PEEZY",
+    "gas": "0"
+  },
+  {
+    "address": "0xc234cb1b59d12c0c2f0e984ee9112a6311b86223",
+    "decimals": 9,
+    "symbol": "DJT",
     "gas": "0"
   },
   {
@@ -16860,6 +17106,12 @@
     "gas": "0"
   },
   {
+    "address": "0xbd9908b0cdd50386f92efcc8e1d71766c2782df0",
+    "decimals": 18,
+    "symbol": "RICE",
+    "gas": "0"
+  },
+  {
     "address": "0x677ddbd918637e5f2c79e164d402454de7da8619",
     "decimals": 18,
     "symbol": "VUSD",
@@ -16908,12 +17160,6 @@
     "gas": "0"
   },
   {
-    "address": "0x4e9a46ea6a22f3894abee2302ad42fd3b69e21e2",
-    "decimals": 8,
-    "symbol": "BSCGIRL",
-    "gas": "0"
-  },
-  {
     "address": "0x720cd16b011b987da3518fbf38c3071d4f0d1495",
     "decimals": 8,
     "symbol": "FLUX",
@@ -16959,6 +17205,18 @@
     "address": "0xc221b7e65ffc80de234bbb6667abdd46593d34f0",
     "decimals": 18,
     "symbol": "wCFG",
+    "gas": "0"
+  },
+  {
+    "address": "0x961dd84059505d59f82ce4fb87d3c09bec65301d",
+    "decimals": 8,
+    "symbol": "TXJP",
+    "gas": "0"
+  },
+  {
+    "address": "0x1f735f84b07cc20e9ac471c291a87b5a2428d518",
+    "decimals": 15,
+    "symbol": "DBC",
     "gas": "0"
   },
   {
@@ -17112,6 +17370,12 @@
     "gas": "0"
   },
   {
+    "address": "0x55af5865807b196bd0197e0902746f31fbccfa58",
+    "decimals": 18,
+    "symbol": "BOO",
+    "gas": "0"
+  },
+  {
     "address": "0x03d1e72765545729a035e909edd9371a405f77fb",
     "decimals": 18,
     "symbol": "NABOX",
@@ -17175,6 +17439,12 @@
     "address": "0xd3ba270f82cadabd0596d3d30233448621d561bb",
     "decimals": 18,
     "symbol": "BAE",
+    "gas": "0"
+  },
+  {
+    "address": "0x662b67d00a13faf93254714dd601f5ed49ef2f51",
+    "decimals": 18,
+    "symbol": "ORC",
     "gas": "0"
   },
   {
@@ -17322,12 +17592,6 @@
     "gas": "0"
   },
   {
-    "address": "0xd1420af453fd7bf940573431d416cace7ff8280c",
-    "decimals": 18,
-    "symbol": "AGOV",
-    "gas": "0"
-  },
-  {
     "address": "0x3ab6ed69ef663bd986ee59205ccad8a20f98b4c2",
     "decimals": 18,
     "symbol": "DREP",
@@ -17442,12 +17706,6 @@
     "gas": "0"
   },
   {
-    "address": "0x43d4a3cd90ddd2f8f4f693170c9c8098163502ad",
-    "decimals": 18,
-    "symbol": "D2D",
-    "gas": "0"
-  },
-  {
     "address": "0x8013266cb5c9dd48be3ad7d1ce832874d64b3ce1",
     "decimals": 18,
     "symbol": "BOOP",
@@ -17460,6 +17718,12 @@
     "gas": "0"
   },
   {
+    "address": "0x616e8bfa43f920657b3497dbf40d6b1a02d4608d",
+    "decimals": 18,
+    "symbol": "auraBAL",
+    "gas": "0"
+  },
+  {
     "address": "0x716af7f037191a9a2286e9d4849bd6eecec8ccef",
     "decimals": 18,
     "symbol": "LIBMEV",
@@ -17469,12 +17733,6 @@
     "address": "0xe0bceef36f3a6efdd5eebfacd591423f8549b9d5",
     "decimals": 18,
     "symbol": "FACTR",
-    "gas": "0"
-  },
-  {
-    "address": "0x6a445e9f40e0b97c92d0b8a3366cef1d67f700bf",
-    "decimals": 18,
-    "symbol": "FIDU",
     "gas": "0"
   },
   {
@@ -17553,6 +17811,12 @@
     "address": "0x0de21346d92c4019f7f6c8134ee8a738d4c755bc",
     "decimals": 9,
     "symbol": "47",
+    "gas": "0"
+  },
+  {
+    "address": "0xdf4ef6ee483953fe3b84abd08c6a060445c01170",
+    "decimals": 8,
+    "symbol": "WACME",
     "gas": "0"
   },
   {
@@ -17637,6 +17901,12 @@
     "address": "0x207e14389183a94343942de7afbc607f57460618",
     "decimals": 18,
     "symbol": "THOL",
+    "gas": "0"
+  },
+  {
+    "address": "0xb012be90957d70d9a070918027655f998c123a88",
+    "decimals": 18,
+    "symbol": "HMX",
     "gas": "0"
   },
   {
@@ -17838,12 +18108,6 @@
     "gas": "0"
   },
   {
-    "address": "0x148c7b609aabfb7d6b49f1beacacdf41e3f1dc7e",
-    "decimals": 18,
-    "symbol": "PURPLE",
-    "gas": "0"
-  },
-  {
     "address": "0xc353bf07405304aeab75f4c2fac7e88d6a68f98e",
     "decimals": 18,
     "symbol": "HOPE",
@@ -18042,6 +18306,12 @@
     "gas": "0"
   },
   {
+    "address": "0x476908d9f75687684ce3dbf6990e722129cdbcc6",
+    "decimals": 8,
+    "symbol": "WBTC",
+    "gas": "0"
+  },
+  {
     "address": "0x8af78f0c818302164f73b2365fe152c2d1fe80e1",
     "decimals": 18,
     "symbol": "FNCT",
@@ -18069,6 +18339,12 @@
     "address": "0x31e4efe290973ebe91b3a875a7994f650942d28f",
     "decimals": 18,
     "symbol": "SHRAP",
+    "gas": "0"
+  },
+  {
+    "address": "0xaea17c97311061504f3d58026decf0fb7320afc9",
+    "decimals": 18,
+    "symbol": "BOJACK",
     "gas": "0"
   },
   {
@@ -18111,6 +18387,12 @@
     "address": "0x9a78e6385f0136b797bc17dfcace04988d30fa37",
     "decimals": 18,
     "symbol": "FLAME",
+    "gas": "0"
+  },
+  {
+    "address": "0xbcd4d5ac29e06e4973a1ddcd782cd035d04bc0b7",
+    "decimals": 18,
+    "symbol": "QKNTL",
     "gas": "0"
   },
   {
@@ -18174,12 +18456,6 @@
     "gas": "0"
   },
   {
-    "address": "0x5074c4fa383d63d62d5f531d1cf92125fb39e859",
-    "decimals": 6,
-    "symbol": "xCORN",
-    "gas": "0"
-  },
-  {
     "address": "0x44ff8620b8ca30902395a7bd3f2407e1a091bf73",
     "decimals": 18,
     "symbol": "VIRTUAL",
@@ -18237,6 +18513,12 @@
     "address": "0xa1290d69c65a6fe4df752f95823fae25cb99e5a7",
     "decimals": 18,
     "symbol": "rsETH",
+    "gas": "0"
+  },
+  {
+    "address": "0x2822f6d1b2f41f93f33d937bc7d84a8dfa4f4c21",
+    "decimals": 18,
+    "symbol": "QQQ",
     "gas": "0"
   },
   {
@@ -18330,12 +18612,6 @@
     "gas": "0"
   },
   {
-    "address": "0xa2e3356610840701bdf5611a53974510ae27e2e1",
-    "decimals": 18,
-    "symbol": "wBETH",
-    "gas": "0"
-  },
-  {
     "address": "0x857de36f92330e1b9a21e8745c692f2ce13866cb",
     "decimals": 18,
     "symbol": "MEMAGX",
@@ -18351,12 +18627,6 @@
     "address": "0xa3b3beaf9c0a6160a8e47f000c094d34121f1a57",
     "decimals": 18,
     "symbol": "COFFEE",
-    "gas": "0"
-  },
-  {
-    "address": "0xb9f69c75a3b67425474f8bcab9a3626d8b8249e1",
-    "decimals": 18,
-    "symbol": "TOYBOX",
     "gas": "0"
   },
   {
@@ -18381,6 +18651,12 @@
     "address": "0xa0eb73ec6657acd06501e7ee59c042cf63a80897",
     "decimals": 18,
     "symbol": "SORA",
+    "gas": "0"
+  },
+  {
+    "address": "0x4581af35199bbde87a89941220e04e27ce4b0099",
+    "decimals": 18,
+    "symbol": "PARTY",
     "gas": "0"
   },
   {
@@ -18486,6 +18762,12 @@
     "gas": "0"
   },
   {
+    "address": "0x730bcbe5cdc1a3061dfe700774b7b8dd1d4173db",
+    "decimals": 18,
+    "symbol": "WTF",
+    "gas": "0"
+  },
+  {
     "address": "0x616300b0f9db555cb2c645a943104035b4dbb347",
     "decimals": 18,
     "symbol": "FREE",
@@ -18507,6 +18789,12 @@
     "address": "0xad913dcd987fe54ce823e4b755f90598cd62bb15",
     "decimals": 18,
     "symbol": "MFERS",
+    "gas": "0"
+  },
+  {
+    "address": "0xb299751b088336e165da313c33e3195b8c6663a6",
+    "decimals": 18,
+    "symbol": "STAR",
     "gas": "0"
   },
   {
@@ -18720,6 +19008,12 @@
     "gas": "0"
   },
   {
+    "address": "0x78da5799cf427fee11e9996982f4150ece7a99a7",
+    "decimals": 18,
+    "symbol": "rgUSD",
+    "gas": "0"
+  },
+  {
     "address": "0x2541a36be4cd39286ed61a3e6afc2307602489d6",
     "decimals": 18,
     "symbol": "DOGE20",
@@ -18801,6 +19095,12 @@
     "address": "0xadf7c35560035944e805d98ff17d58cde2449389",
     "decimals": 18,
     "symbol": "SPEC",
+    "gas": "0"
+  },
+  {
+    "address": "0xea1a6307d9b18f8d1cbf1c3dd6aad8416c06a221",
+    "decimals": 18,
+    "symbol": "LQIDETHFIV1",
     "gas": "0"
   },
   {
@@ -19272,6 +19572,12 @@
     "gas": "0"
   },
   {
+    "address": "0x0e16bd2cd962fadb4a23ec961bb170ffa25208a8",
+    "decimals": 18,
+    "symbol": "HONO",
+    "gas": "0"
+  },
+  {
     "address": "0x73a740d256188395d9af56db31ab1e9bb2f2978d",
     "decimals": 18,
     "symbol": "CUBE",
@@ -19281,12 +19587,6 @@
     "address": "0x9aed18f85ce5a992181a91e26ef39f7850a35052",
     "decimals": 18,
     "symbol": "BITCH",
-    "gas": "0"
-  },
-  {
-    "address": "0x7d12bcab2d53fae6d7e360acb71d9b55ecbd1ce3",
-    "decimals": 18,
-    "symbol": "LAC",
     "gas": "0"
   },
   {
@@ -19416,12 +19716,6 @@
     "gas": "0"
   },
   {
-    "address": "0x92f8a244ae2fc152b7d2ad1d18dea7ca56d9816c",
-    "decimals": 18,
-    "symbol": "MGMES",
-    "gas": "0"
-  },
-  {
     "address": "0x346b46280f559def274f80c5d16471b4b7ef2f14",
     "decimals": 18,
     "symbol": "WSTOR",
@@ -19470,12 +19764,6 @@
     "gas": "0"
   },
   {
-    "address": "0x1a688d3d294ee7bcc1f59011de93d608dc21c377",
-    "decimals": 8,
-    "symbol": "UCO",
-    "gas": "0"
-  },
-  {
     "address": "0x8be3460a480c80728a8c4d7a5d5303c85ba7b3b9",
     "decimals": 18,
     "symbol": "sENA",
@@ -19491,12 +19779,6 @@
     "address": "0xdbb5cf12408a3ac17d668037ce289f9ea75439d7",
     "decimals": 6,
     "symbol": "WMTX",
-    "gas": "0"
-  },
-  {
-    "address": "0x54707fe1d7f4cfb5dce68b56b53948db59fbbc48",
-    "decimals": 18,
-    "symbol": "PDOG",
     "gas": "0"
   },
   {
@@ -19686,6 +19968,12 @@
     "gas": "0"
   },
   {
+    "address": "0xc6f2146a9c980778811cf56f98ed37ddbad8631b",
+    "decimals": 9,
+    "symbol": "RIPSOL",
+    "gas": "0"
+  },
+  {
     "address": "0x128f3e482f5bd5f08fe1b216e60ec0a6013deab9",
     "decimals": 12,
     "symbol": "Daram",
@@ -19812,12 +20100,6 @@
     "gas": "0"
   },
   {
-    "address": "0xcb2b625d43b5187b50f8d22a257b0a7f42fc56a6",
-    "decimals": 9,
-    "symbol": "OBI",
-    "gas": "0"
-  },
-  {
     "address": "0xf1294e805b992320a3515682c6ab0fe6251067e5",
     "decimals": 6,
     "symbol": "eYyvUSDC-28JAN22",
@@ -19836,6 +20118,12 @@
     "gas": "0"
   },
   {
+    "address": "0x1200da7d19570e7474aab533abf0ae67f89b46ef",
+    "decimals": 18,
+    "symbol": "ELM",
+    "gas": "0"
+  },
+  {
     "address": "0xd6203889c22d9fe5e938a9200f50fdffe9dd8e02",
     "decimals": 9,
     "symbol": "SBR",
@@ -19851,12 +20139,6 @@
     "address": "0x39903a1a6f289a67e0de94096915c4ccd506ab2a",
     "decimals": 18,
     "symbol": "MAIV",
-    "gas": "0"
-  },
-  {
-    "address": "0x3a87e050f106a7260e82115f737732e53e57c67c",
-    "decimals": 18,
-    "symbol": "CCCP",
     "gas": "0"
   },
   {
@@ -19908,21 +20190,9 @@
     "gas": "0"
   },
   {
-    "address": "0x0375a6696db916fdab0e7512dc6552bac6a41ec2",
-    "decimals": 18,
-    "symbol": "PENUT",
-    "gas": "0"
-  },
-  {
     "address": "0xee4386076c45cd928de64d44074baa62b05eebad",
     "decimals": 9,
     "symbol": "$TRUMP47",
-    "gas": "0"
-  },
-  {
-    "address": "0x48b847cf774a5710f36f594b11fc10e2e59bba72",
-    "decimals": 18,
-    "symbol": "UNIT0",
     "gas": "0"
   },
   {
@@ -19977,6 +20247,12 @@
     "address": "0x6ee2f71049dde9a93b7c0ee1091b72acf9b46810",
     "decimals": 18,
     "symbol": "MERC",
+    "gas": "0"
+  },
+  {
+    "address": "0x4206951b757f4a444486cdc77918bbd4c53415f3",
+    "decimals": 9,
+    "symbol": "ETH",
     "gas": "0"
   },
   {
@@ -20076,6 +20352,12 @@
     "gas": "0"
   },
   {
+    "address": "0x48fd763d03a94b4a7d68a2400ce2146b18fb9b8d",
+    "decimals": 18,
+    "symbol": "BIU",
+    "gas": "0"
+  },
+  {
     "address": "0x19e1f2f837a3b90ebd0730cb6111189be0e1b6d6",
     "decimals": 18,
     "symbol": "LAIKA",
@@ -20154,6 +20436,12 @@
     "gas": "0"
   },
   {
+    "address": "0x54a6dd6037dad7f5953bcc8c14afa0138ac30c27",
+    "decimals": 18,
+    "symbol": "BadApe",
+    "gas": "0"
+  },
+  {
     "address": "0x7413fd6f413f9bd1733c598c96d9390a42894b23",
     "decimals": 9,
     "symbol": "SMR",
@@ -20199,12 +20487,6 @@
     "address": "0xef60013c4d1f46d9e8da64abaa503c175e58b4c5",
     "decimals": 9,
     "symbol": "Groink",
-    "gas": "0"
-  },
-  {
-    "address": "0xe9b85ca2f3a54828563f4929076c1ac23a4e6c6b",
-    "decimals": 9,
-    "symbol": "IRS",
     "gas": "0"
   },
   {
@@ -20406,6 +20688,12 @@
     "gas": "0"
   },
   {
+    "address": "0x06f114c92f34a7f65f7084e107ed3f98bdf84094",
+    "decimals": 9,
+    "symbol": "DEFAPE",
+    "gas": "0"
+  },
+  {
     "address": "0x70db9125e484f023588d733d22df3b6930577e66",
     "decimals": 9,
     "symbol": "ERIC",
@@ -20421,6 +20709,12 @@
     "address": "0xcfbca579d8f8e5281cd25cf0d9a8be7226764625",
     "decimals": 9,
     "symbol": "ELON",
+    "gas": "0"
+  },
+  {
+    "address": "0x85d23b97c6832df1bab40c0d15f18c994385c7f8",
+    "decimals": 18,
+    "symbol": "FLOPPY",
     "gas": "0"
   },
   {
@@ -20586,6 +20880,18 @@
     "gas": "0"
   },
   {
+    "address": "0xf0fe1a87abf12099b77352bdcc10f5a87067b290",
+    "decimals": 18,
+    "symbol": "BONSAI",
+    "gas": "0"
+  },
+  {
+    "address": "0xdcdc1c1cc33aa817cbdbe8f5e2390bf7cc43dc4b",
+    "decimals": 18,
+    "symbol": "AVASTR",
+    "gas": "0"
+  },
+  {
     "address": "0x87931e7ad81914e7898d07c68f145fc0a553d8fb",
     "decimals": 18,
     "symbol": "WIZARD",
@@ -20595,6 +20901,12 @@
     "address": "0xe7f4c89032a2488d327323548ab0459676269331",
     "decimals": 18,
     "symbol": "WAIFU",
+    "gas": "0"
+  },
+  {
+    "address": "0xffe136de12a2cd95f64cef9f36414c93e9003959",
+    "decimals": 18,
+    "symbol": "DUCK",
     "gas": "0"
   },
   {
@@ -20622,12 +20934,6 @@
     "gas": "0"
   },
   {
-    "address": "0x69696a99593a32722edcffab03e284c2a965edca",
-    "decimals": 9,
-    "symbol": "OP",
-    "gas": "0"
-  },
-  {
     "address": "0x85122dc2c0ac24e8aacaff4a4ccfcbdf36e80f60",
     "decimals": 9,
     "symbol": "DOPE",
@@ -20652,12 +20958,6 @@
     "gas": "0"
   },
   {
-    "address": "0xa3d970abc5d4e20a7fc08fe1f18af41058314a11",
-    "decimals": 18,
-    "symbol": "WIENER",
-    "gas": "0"
-  },
-  {
     "address": "0x6cb25129314123bcd5adcdc844ceaeead65a0896",
     "decimals": 9,
     "symbol": "CULTUR",
@@ -20667,6 +20967,12 @@
     "address": "0x09759d67441ffdc8f470f368776368715d32a261",
     "decimals": 18,
     "symbol": "DOPEST",
+    "gas": "0"
+  },
+  {
+    "address": "0xea7cc765ebc94c4805e3bff28d7e4ae48d06468a",
+    "decimals": 18,
+    "symbol": "PAD",
     "gas": "0"
   },
   {
@@ -20892,12 +21198,6 @@
     "gas": "0"
   },
   {
-    "address": "0x25bab2751a1975d003264969c0d9402c0ce8930c",
-    "decimals": 9,
-    "symbol": "BTCLEGO",
-    "gas": "0"
-  },
-  {
     "address": "0x44d34975bf7fe025007e236ce4e0b0395687773b",
     "decimals": 18,
     "symbol": "MONET",
@@ -20988,12 +21288,6 @@
     "gas": "0"
   },
   {
-    "address": "0x7548ee1f9aae88f198c76975fc0e1300a5f917b2",
-    "decimals": 9,
-    "symbol": "EPF",
-    "gas": "0"
-  },
-  {
     "address": "0x0138f5e99cfdffbacf36e543800c19ef16fa294b",
     "decimals": 18,
     "symbol": "PROPHT",
@@ -21018,9 +21312,9 @@
     "gas": "0"
   },
   {
-    "address": "0x698e222aaa7082bdae18cb4722bc5aebb31c2002",
+    "address": "0x11110230cde0d2f67149cfa9aa4363ef74b64b72",
     "decimals": 9,
-    "symbol": "GNOME",
+    "symbol": "$1",
     "gas": "0"
   },
   {
@@ -21144,6 +21438,12 @@
     "gas": "0"
   },
   {
+    "address": "0x48f4935bbf19c5ece398fd6b5befcf5a83a12f12",
+    "decimals": 18,
+    "symbol": "R316CC",
+    "gas": "0"
+  },
+  {
     "address": "0x910812c44ed2a3b611e4b051d9d83a88d652e2dd",
     "decimals": 18,
     "symbol": "PLEDGE",
@@ -21171,6 +21471,12 @@
     "address": "0x70d9e6df4ec90f9e73d51d4d61e93d62db035570",
     "decimals": 9,
     "symbol": "HONEY",
+    "gas": "0"
+  },
+  {
+    "address": "0x21ab3a492047611825c40088f9ae27b32202be2b",
+    "decimals": 18,
+    "symbol": "CYPH",
     "gas": "0"
   },
   {
@@ -21330,6 +21636,12 @@
     "gas": "0"
   },
   {
+    "address": "0x699959821b1eb77b8277fe794303bff9400edadc",
+    "decimals": 9,
+    "symbol": "WU",
+    "gas": "0"
+  },
+  {
     "address": "0x7ca3f20a5cac7e9aafdf9c571733356b824a296e",
     "decimals": 18,
     "symbol": "Doomer",
@@ -21357,12 +21669,6 @@
     "address": "0xf477ac7719e2e659001455cdda0cc8f3ad10b604",
     "decimals": 18,
     "symbol": "AUTOS",
-    "gas": "0"
-  },
-  {
-    "address": "0x11ebe21e9d7bf541a18e1e3ac94939018ce88f0b",
-    "decimals": 18,
-    "symbol": "pitchFXS",
     "gas": "0"
   },
   {
@@ -21420,12 +21726,6 @@
     "gas": "0"
   },
   {
-    "address": "0x558e7139800f8bc119f68d23a6126fffd43a66a6",
-    "decimals": 18,
-    "symbol": "U2U",
-    "gas": "0"
-  },
-  {
     "address": "0xadd39272e83895e7d3f244f696b7a25635f34234",
     "decimals": 18,
     "symbol": "PEPU",
@@ -21474,6 +21774,12 @@
     "gas": "0"
   },
   {
+    "address": "0x8e938f7c4481135cb82ba43908b670ac0eda93fc",
+    "decimals": 18,
+    "symbol": "LUIGI",
+    "gas": "0"
+  },
+  {
     "address": "0x2282c726f54c93193e6b8e5bf1b82303dc11d36e",
     "decimals": 6,
     "symbol": "DAY",
@@ -21501,12 +21807,6 @@
     "address": "0xb6c0189080a6441caf056b856dd4d795b909c460",
     "decimals": 18,
     "symbol": "MOON",
-    "gas": "0"
-  },
-  {
-    "address": "0x5c162ec1c1679c67728d824defc0b415a97539e5",
-    "decimals": 18,
-    "symbol": "CRAZE",
     "gas": "0"
   },
   {
@@ -21558,12 +21858,6 @@
     "gas": "0"
   },
   {
-    "address": "0x7296eaa225804451a91616b29d040cab05435f0d",
-    "decimals": 8,
-    "symbol": "WAVES",
-    "gas": "0"
-  },
-  {
     "address": "0x7ff7fa94b8b66ef313f7970d4eebd2cb3103a2c0",
     "decimals": 18,
     "symbol": "VANA",
@@ -21582,15 +21876,15 @@
     "gas": "0"
   },
   {
-    "address": "0x334bd3375fe5bb8aa003e0e6ce880abada57ac89",
-    "decimals": 18,
-    "symbol": "mBERRY",
+    "address": "0xe28fc00cdeeaa73be0a23f0ef32ed73006f99744",
+    "decimals": 9,
+    "symbol": "STEVE",
     "gas": "0"
   },
   {
-    "address": "0x1f4f317dff278f9f1d5904e494b6dc6bd215ea16",
-    "decimals": 9,
-    "symbol": "OIIA",
+    "address": "0x334bd3375fe5bb8aa003e0e6ce880abada57ac89",
+    "decimals": 18,
+    "symbol": "mBERRY",
     "gas": "0"
   },
   {
@@ -21702,12 +21996,6 @@
     "gas": "0"
   },
   {
-    "address": "0x4e6158e1c11907e4020fa8f18a6afd528a8d972c",
-    "decimals": 9,
-    "symbol": "USACOIN",
-    "gas": "0"
-  },
-  {
     "address": "0x5e3f09ab25548616b4b97f6163ff19cf6027930d",
     "decimals": 9,
     "symbol": "USACOIN",
@@ -21735,18 +22023,6 @@
     "address": "0xdb99b0477574ac0b2d9c8cec56b42277da3fdb82",
     "decimals": 18,
     "symbol": "DECT",
-    "gas": "0"
-  },
-  {
-    "address": "0x7202205a6a60f6165faac79a630594ad23ca5a1a",
-    "decimals": 18,
-    "symbol": "BELLS",
-    "gas": "0"
-  },
-  {
-    "address": "0x66f37dfaa00db7fc2239b14e83f566d7be84b838",
-    "decimals": 18,
-    "symbol": "CASINO",
     "gas": "0"
   },
   {
@@ -21822,12 +22098,6 @@
     "gas": "0"
   },
   {
-    "address": "0x7770a619228f8bac5ec72fd57d33fb98bc1e2777",
-    "decimals": 9,
-    "symbol": "GOKU",
-    "gas": "0"
-  },
-  {
     "address": "0x6e9937554245d3c7c130326b1398a16fb6b149fb",
     "decimals": 9,
     "symbol": "FOX",
@@ -21849,12 +22119,6 @@
     "address": "0x4eca7761a516f8300711cbf920c0b85555261993",
     "decimals": 18,
     "symbol": "GOATX",
-    "gas": "0"
-  },
-  {
-    "address": "0xc97acb4a857563f62865033c5766ad09a7b5c5c0",
-    "decimals": 9,
-    "symbol": "WAT",
     "gas": "0"
   },
   {
@@ -21903,12 +22167,6 @@
     "address": "0xcd57d7b11a1e8423955721b2ab6e08e994e203e7",
     "decimals": 9,
     "symbol": "SPQR",
-    "gas": "0"
-  },
-  {
-    "address": "0x956907257d3debaf93a75c75c3f824fc831efa4b",
-    "decimals": 9,
-    "symbol": "CYBERGAMER",
     "gas": "0"
   },
   {
@@ -21993,6 +22251,12 @@
     "address": "0xc673ef7791724f0dcca38adb47fbb3aef3db6c80",
     "decimals": 8,
     "symbol": "liquidBeraBTC",
+    "gas": "0"
+  },
+  {
+    "address": "0xa1f9b3ebbc484011c5753df9000699a9ae704145",
+    "decimals": 9,
+    "symbol": "OPERATOR",
     "gas": "0"
   },
   {
@@ -22116,15 +22380,9 @@
     "gas": "0"
   },
   {
-    "address": "0x076011c42636cadb0e5f30865649c91071f23c93",
+    "address": "0xab4a28211624496afa30138c39aa10f8aaa511ec",
     "decimals": 9,
-    "symbol": "XMoney",
-    "gas": "0"
-  },
-  {
-    "address": "0x631b7f194c502fd4ab0a38e82f461c61b7d2180b",
-    "decimals": 9,
-    "symbol": "THRALL",
+    "symbol": "GOA",
     "gas": "0"
   },
   {
@@ -22155,6 +22413,12 @@
     "address": "0xce695cf1c4638d1678377ba9dcf32345292048d4",
     "decimals": 18,
     "symbol": "SANAOL",
+    "gas": "0"
+  },
+  {
+    "address": "0x2410e78272bd623550e9a57f8bc1d2970142253c",
+    "decimals": 9,
+    "symbol": "SB325",
     "gas": "0"
   },
   {
@@ -22191,12 +22455,6 @@
     "address": "0x70001d8306850a0416095482886c9fc7f6eb6f78",
     "decimals": 9,
     "symbol": "MEGA",
-    "gas": "0"
-  },
-  {
-    "address": "0xcd0cd1df7c7f941a93fd0eb366f3b3d2b877c912",
-    "decimals": 9,
-    "symbol": "AMERICA",
     "gas": "0"
   },
   {
@@ -22239,12 +22497,6 @@
     "address": "0xc1b0273bdf269a0d61411052076e543ddcd7cd84",
     "decimals": 9,
     "symbol": "BBC",
-    "gas": "0"
-  },
-  {
-    "address": "0x4ddd382f73aa1d7c6fb3391e502f6c719ed320f8",
-    "decimals": 9,
-    "symbol": "WC",
     "gas": "0"
   },
   {
@@ -22488,12 +22740,6 @@
     "gas": "0"
   },
   {
-    "address": "0x3437b73c0b618b9a60b6a89244b393b9a865064f",
-    "decimals": 9,
-    "symbol": "BPP",
-    "gas": "0"
-  },
-  {
     "address": "0xb91ba132bc3d5993f73a37dde2eb9ea662dc6d3d",
     "decimals": 9,
     "symbol": "BITCOIN",
@@ -22536,6 +22782,12 @@
     "gas": "0"
   },
   {
+    "address": "0xa378e3d35f74020b0be55bf40ae7499fa8061c12",
+    "decimals": 9,
+    "symbol": "NINA",
+    "gas": "0"
+  },
+  {
     "address": "0x7ca5cb0fe0a5a56ece7767ac32d494683b251090",
     "decimals": 18,
     "symbol": "EITLER",
@@ -22554,12 +22806,6 @@
     "gas": "0"
   },
   {
-    "address": "0xb4363d7608631244db87a70bcfa7cae37be94625",
-    "decimals": 18,
-    "symbol": "USDS",
-    "gas": "0"
-  },
-  {
     "address": "0x9d05e5bafb721e6fb24d8ab8179209be70e4dda2",
     "decimals": 18,
     "symbol": "wWLFI",
@@ -22569,6 +22815,12 @@
     "address": "0x65c55f33f9493e8702feea89b4fa357283ed3841",
     "decimals": 18,
     "symbol": "BFX",
+    "gas": "0"
+  },
+  {
+    "address": "0xbd95cf04c53df35c3ab39e1446baed2b3369a3d1",
+    "decimals": 9,
+    "symbol": "TIFFANY",
     "gas": "0"
   },
   {
@@ -22626,6 +22878,12 @@
     "gas": "0"
   },
   {
+    "address": "0x94183222b8ad922d825e4159acd7497aa5f223b2",
+    "decimals": 9,
+    "symbol": "ROSS",
+    "gas": "0"
+  },
+  {
     "address": "0x6a8aa31cb435d84474c2f3a053cf5e388d78ba2b",
     "decimals": 18,
     "symbol": "LCAI",
@@ -22644,6 +22902,12 @@
     "gas": "0"
   },
   {
+    "address": "0x282a69142bac47855c3fbe1693fcc4ba3b4d5ed6",
+    "decimals": 18,
+    "symbol": "CARROT",
+    "gas": "0"
+  },
+  {
     "address": "0xea024703ea43cfa1a01838f8fdbc41919d62360c",
     "decimals": 9,
     "symbol": "SF",
@@ -22659,12 +22923,6 @@
     "address": "0xb131f337c45d386ceec234e194b2663d5c3d9dcf",
     "decimals": 18,
     "symbol": "ICOM",
-    "gas": "0"
-  },
-  {
-    "address": "0x441167b8516f2d2757bfc66f3a059cf02ddff8ed",
-    "decimals": 9,
-    "symbol": "STARGATE",
     "gas": "0"
   },
   {
@@ -22809,6 +23067,12 @@
     "address": "0x960fce8724aa127184b6d13af41a711755236c77",
     "decimals": 9,
     "symbol": "henlo",
+    "gas": "0"
+  },
+  {
+    "address": "0x175dd95287fb20b516df00161aa24b20dc00d70a",
+    "decimals": 9,
+    "symbol": "FAFO",
     "gas": "0"
   },
   {
@@ -22986,6 +23250,12 @@
     "gas": "0"
   },
   {
+    "address": "0x9dc37e4a901b1e21bd05e75c3b9a633a17001a39",
+    "decimals": 27,
+    "symbol": "ctUSDe",
+    "gas": "0"
+  },
+  {
     "address": "0x2fc00a8c0746c137f505c6ed46e0ec8e8835cf99",
     "decimals": 9,
     "symbol": "STRATEGY",
@@ -23148,6 +23418,12 @@
     "gas": "0"
   },
   {
+    "address": "0x9b390f6fb9b25c39bc93599b02374e299d1cd6b0",
+    "decimals": 9,
+    "symbol": "LELE",
+    "gas": "0"
+  },
+  {
     "address": "0x000008511556be7fa3133156df8967c88dc4a6a8",
     "decimals": 9,
     "symbol": "XGAMES",
@@ -23238,6 +23514,12 @@
     "gas": "0"
   },
   {
+    "address": "0x6775a76205050e793a8f6ce3367a84ca983aa6b3",
+    "decimals": 18,
+    "symbol": "DOGE",
+    "gas": "0"
+  },
+  {
     "address": "0xf80c6636f9597d6a7fc1e5182b168b71e98fd1cb",
     "decimals": 27,
     "symbol": "ctsUSDe",
@@ -23298,6 +23580,12 @@
     "gas": "0"
   },
   {
+    "address": "0x0e1a2ff57c87920b5c041c152bee58a11ad5ee15",
+    "decimals": 18,
+    "symbol": "NUKE",
+    "gas": "0"
+  },
+  {
     "address": "0xdae0fafd65385e7775cf75b1398735155ef6acd2",
     "decimals": 10,
     "symbol": "TRUU",
@@ -23316,9 +23604,21 @@
     "gas": "0"
   },
   {
+    "address": "0xa52eef5d6fe4efa0d9e3461ffc3c5df388a832e6",
+    "decimals": 9,
+    "symbol": "TROLZ",
+    "gas": "0"
+  },
+  {
     "address": "0xc5d4610be6aa150da49335550f20dd2c652119e6",
     "decimals": 18,
     "symbol": "RTX",
+    "gas": "0"
+  },
+  {
+    "address": "0x683177aaf4f1d8edd4fcd2eb222f7ca020e75df5",
+    "decimals": 18,
+    "symbol": "pfWETH-11",
     "gas": "0"
   },
   {
@@ -23364,6 +23664,12 @@
     "gas": "0"
   },
   {
+    "address": "0x36f15c5ac19a35e7398418c5bad8ac56a107c756",
+    "decimals": 9,
+    "symbol": "MISHA",
+    "gas": "0"
+  },
+  {
     "address": "0x0d64169e82f1a3517e04611952cc027900c6c795",
     "decimals": 18,
     "symbol": "BRLL",
@@ -23373,6 +23679,12 @@
     "address": "0x9908b053577df199fcd81ea54da3d53cc9ca1c07",
     "decimals": 9,
     "symbol": "DOGESTATE",
+    "gas": "0"
+  },
+  {
+    "address": "0x8949c05ecf751d17824353f44246f47a3e96b9d7",
+    "decimals": 9,
+    "symbol": "CATGIRL",
     "gas": "0"
   },
   {
@@ -23670,12 +23982,6 @@
     "gas": "0"
   },
   {
-    "address": "0x3948f9c3db8ab7c6865bdec1890847c18dcd003c",
-    "decimals": 18,
-    "symbol": "BID",
-    "gas": "0"
-  },
-  {
     "address": "0x11c31db1fb7807a8efa1cb36cc30b596b6493936",
     "decimals": 9,
     "symbol": "RETALIK",
@@ -23901,12 +24207,6 @@
     "address": "0x66eaf26fb6a13d20960362ad720905acd13e8d1a",
     "decimals": 9,
     "symbol": "IRIDIA",
-    "gas": "0"
-  },
-  {
-    "address": "0x20069fad147d569c0a271b4c0cee2d5c2b9389f1",
-    "decimals": 9,
-    "symbol": "DARKFATHER",
     "gas": "0"
   },
   {
@@ -24174,12 +24474,6 @@
     "gas": "0"
   },
   {
-    "address": "0x2114606f4da75173e40a6acc7183b50a98af4b5b",
-    "decimals": 9,
-    "symbol": "GIB",
-    "gas": "0"
-  },
-  {
     "address": "0xc744df3419a8c9bd4d6b9852a503eb1c5308a326",
     "decimals": 18,
     "symbol": "RED",
@@ -24195,12 +24489,6 @@
     "address": "0xaf4b7cdef6a0a0bae06e597d80d5685ab702d2ec",
     "decimals": 9,
     "symbol": "NebulaNugget",
-    "gas": "0"
-  },
-  {
-    "address": "0x1b8e8a2668d4028d2e86c77853a4207038b6e059",
-    "decimals": 18,
-    "symbol": "TWIN3AI",
     "gas": "0"
   },
   {
@@ -24252,12 +24540,6 @@
     "gas": "0"
   },
   {
-    "address": "0xb2ce99929fcac03000bb46046dbd12a286e49f1c",
-    "decimals": 18,
-    "symbol": "0xb2ce99929fcac03000bb46046dbd12a286e49f1c",
-    "gas": "0"
-  },
-  {
     "address": "0xf3529b52b546b26f1176786462a80abede052238",
     "decimals": 18,
     "symbol": "0xf3529b52b546b26f1176786462a80abede052238",
@@ -24276,21 +24558,9 @@
     "gas": "0"
   },
   {
-    "address": "0x857e2a02b67732a4881c818cd67a968d0cdb65a6",
-    "decimals": 18,
-    "symbol": "0x857e2a02b67732a4881c818cd67a968d0cdb65a6",
-    "gas": "0"
-  },
-  {
     "address": "0x89e6508b9c9186c811c88503e68cc10799c62cde",
     "decimals": 18,
     "symbol": "0x89e6508b9c9186c811c88503e68cc10799c62cde",
-    "gas": "0"
-  },
-  {
-    "address": "0x60c44a4f0c362c689c5ce21354af4c36188ceeb6",
-    "decimals": 18,
-    "symbol": "0x60c44a4f0c362c689c5ce21354af4c36188ceeb6",
     "gas": "0"
   },
   {
@@ -24300,33 +24570,9 @@
     "gas": "0"
   },
   {
-    "address": "0x9fd39cff21dbf19ed396d3c67972a20212dea5a9",
-    "decimals": 18,
-    "symbol": "0x9fd39cff21dbf19ed396d3c67972a20212dea5a9",
-    "gas": "0"
-  },
-  {
-    "address": "0x1ca77f409460ad1a9569702d75d66c69c8cd1de5",
-    "decimals": 18,
-    "symbol": "0x1ca77f409460ad1a9569702d75d66c69c8cd1de5",
-    "gas": "0"
-  },
-  {
     "address": "0xee7f1e922ce5410cd7afaa9d0a8b02c575dd9ecd",
     "decimals": 18,
     "symbol": "0xee7f1e922ce5410cd7afaa9d0a8b02c575dd9ecd",
-    "gas": "0"
-  },
-  {
-    "address": "0x00e76c43a29e2d5e8959fd26499aae93fd1792b7",
-    "decimals": 18,
-    "symbol": "0x00e76c43a29e2d5e8959fd26499aae93fd1792b7",
-    "gas": "0"
-  },
-  {
-    "address": "0x0ef386c596e8245f1b33b33da231ab549bdd7ee5",
-    "decimals": 18,
-    "symbol": "0x0ef386c596e8245f1b33b33da231ab549bdd7ee5",
     "gas": "0"
   },
   {
@@ -24339,30 +24585,6 @@
     "address": "0xd44d02bbc3583676e6381b32f258e3ea63b82e4b",
     "decimals": 18,
     "symbol": "0xd44d02bbc3583676e6381b32f258e3ea63b82e4b",
-    "gas": "0"
-  },
-  {
-    "address": "0x0fd93d3bc50ae533d44048f95e11b0f4d7502ad4",
-    "decimals": 18,
-    "symbol": "0x0fd93d3bc50ae533d44048f95e11b0f4d7502ad4",
-    "gas": "0"
-  },
-  {
-    "address": "0xadb58d38f4a27842715be181bcc35a2ef751d16f",
-    "decimals": 18,
-    "symbol": "0xadb58d38f4a27842715be181bcc35a2ef751d16f",
-    "gas": "0"
-  },
-  {
-    "address": "0xbff785b841672ae9940b082b1aba7d85007bc33b",
-    "decimals": 18,
-    "symbol": "0xbff785b841672ae9940b082b1aba7d85007bc33b",
-    "gas": "0"
-  },
-  {
-    "address": "0xa67754ef32ba6c0de079cab21b8f474c1c4f5e01",
-    "decimals": 18,
-    "symbol": "0xa67754ef32ba6c0de079cab21b8f474c1c4f5e01",
     "gas": "0"
   },
   {

@@ -2,6 +2,7 @@ use std::collections::HashMap;
 use std::str::FromStr;
 use std::sync::Arc;
 
+use alloy::primitives::map::HashSet;
 use futures::StreamExt;
 use num_bigint::BigUint;
 use tap2::shd;
@@ -43,26 +44,34 @@ use tycho_simulation::{
 use tycho_simulation::protocol::models::ProtocolComponent;
 
 async fn stream(network: Network, shdstate: SharedTychoStreamState, tokens: Vec<Token>, config: EnvConfig) {
+    // ===== Tycho Filters =====
     let u4 = uniswap_v4_pool_with_hook_filter;
     let balancer = balancer_pool_filter;
     let curve = curve_pool_filter;
     let (_, chain) = shd::types::chain(network.name.clone()).expect("Invalid chain");
     let filter = ComponentFilter::with_tvl_range(1.0, 50.0);
+
+    // ===== Tycho Tokens =====
     let mut hmt = HashMap::new();
     tokens.iter().for_each(|t| {
         hmt.insert(t.address.clone(), t.clone());
     });
+    let srztokens = tokens.iter().map(|t| SrzToken::from(t.clone())).collect::<Vec<SrzToken>>();
+    let key = keys::stream::tokens(network.name.clone());
+    shd::data::redis::set(key.as_str(), srztokens.clone()).await;
 
-    let mut targets = HashMap::new();
+    // ===== Test Mode Targets (WETH/USDC) =====
+    let mut toktag = HashMap::new();
     let weth = hmt.get(&Bytes::from_str(network.eth.as_str()).unwrap()).unwrap_or_else(|| panic!("WETH not found on {}", network.name));
     let usdc = hmt.get(&Bytes::from_str(network.usdc.as_str()).unwrap()).unwrap_or_else(|| panic!("USDC not found on {}", network.name));
-    // let dai = hmt.get(&Bytes::from_str("0x6b175474e89094c44da98b954eedeac495271d0f").unwrap()).expect("usdt not found");
+    toktag.insert(weth.clone().address, weth.clone());
+    toktag.insert(usdc.clone().address, usdc.clone());
+    // let dai = hmt.get(&Bytes::from_str("0x6b175474e89094c44da98b954eedeac495271d0f").unwrap()).expect("DAI not found");
     // let usdt = hmt.get(&Bytes::from_str("0xdac17f958d2ee523a2206206994597c13d831ec7").unwrap()).expect("USDT not found");
-    targets.insert(weth.clone().address, weth.clone());
-    targets.insert(usdc.clone().address, usdc.clone());
 
+    // ===== Tycho Stream Builder =====
     let endpoint = network.tycho.trim_start_matches("https://");
-    log::info!("Connecting to Tycho at {} on {:?}", endpoint, chain);
+    log::info!("Connecting to Tycho at {} on {:?} ...\n", endpoint, chain);
     match ProtocolStreamBuilder::new(endpoint, chain)
         .exchange::<UniswapV2State>("uniswap_v2", filter.clone(), None)
         .exchange::<UniswapV3State>("uniswap_v3", filter.clone(), None)
@@ -70,67 +79,49 @@ async fn stream(network: Network, shdstate: SharedTychoStreamState, tokens: Vec<
         .exchange::<EVMPoolState<PreCachedDB>>("vm:balancer_v2", filter.clone(), Some(balancer))
         .exchange::<EVMPoolState<PreCachedDB>>("vm:curve", filter.clone(), Some(curve))
         .auth_key(Some(config.tycho_api_key.clone()))
-        .skip_state_decode_failures(true)
-        .set_tokens(hmt.clone())
+        .skip_state_decode_failures(true) // ? To study !
+        .set_tokens(hmt.clone()) // ALL Tokens
         .await
         .build()
         .await
     {
         Ok(mut stream) => {
+            // The stream created emits BlockUpdate messages which consist of:
+            // - block number- the block this update message refers to
+            // - new_pairs- new components witnessed (either recently created or newly meeting filter criteria)
+            // - removed_pairs- components no longer tracked (either deleted due to a reorg or no longer meeting filter criteria)
+            // - states- the updated ProtocolSimstates for all components modified in this block
+            // The first message received will contain states for all protocol components registered to. Thereafter, further block updates will only contain data for updated or new components.
             while let Some(msg) = stream.next().await {
                 match msg {
                     Ok(msg) => {
-                        log::info!("🔸 Got new msg from ProtocolStreamBuilder at block # {} 🔸", msg.block_number);
-
-                        shd::data::redis::set(keys::stream::status(network.name.clone()).as_str(), SyncState::Syncing as u128).await;
+                        log::info!(
+                            "🔸 Got new msg from ProtocolStreamBuilder at block # {} 🔸 With {} state, {} new_pairs and {} removed_pairs",
+                            msg.block_number,
+                            msg.states.len(),
+                            msg.new_pairs.len(),
+                            msg.removed_pairs.len()
+                        );
                         shd::data::redis::set(keys::stream::latest(network.name.clone()).as_str(), msg.block_number).await;
 
-                        log::info!("🔔 Writing on shared state...");
-                        let mut state = shdstate.write().await;
-                        state.states.insert(network.name.clone(), msg.block_number.to_string());
-                        state.components.insert(network.name.clone(), msg.block_number.to_string());
-                        log::info!("Shared state updated but not droped");
-                        drop(state);
-
-                        let updating = !msg.states.is_empty();
-
-                        // The stream created emits BlockUpdate messages which consist of:
-                        // - block number- the block this update message refers to
-                        // - new_pairs- new components witnessed (either recently created or newly meeting filter criteria)
-                        // - removed_pairs- components no longer tracked (either deleted due to a reorg or no longer meeting filter criteria)
-                        // - states- the updated ProtocolSimstates for all components modified in this block
-                        // The first message received will contain states for all protocol components registered to. Thereafter, further block updates will only contain data for updated or new components.
-
-                        log::info!("Got {} state updates", msg.states.len());
-                        log::info!("Got {} new_pairs", msg.new_pairs.len());
-                        log::info!("Got {} removed_pairs", msg.removed_pairs.len());
-
-                        match shd::data::redis::get::<SyncState>(keys::stream::status(network.name.clone()).as_str()).await {
+                        // ===== Is it first sync ? =====
+                        let mut initialised = false;
+                        match shd::data::redis::get::<u128>(keys::stream::status(network.name.clone()).as_str()).await {
                             Some(state) => {
-                                log::info!("Sync state: {:?}", state);
-                                if msg.new_pairs.is_empty() {
-                                    log::info!("No new pairs. Continuing to next message...");
-                                    continue;
+                                log::info!("Current sync state on {} network => {:?}", network.name.clone(), state);
+                                if state == SyncState::Running as u128 {
+                                    initialised = true;
+                                } else {
+                                    shd::data::redis::set(keys::stream::status(network.name.clone()).as_str(), SyncState::Syncing as u128).await;
                                 }
                             }
                             None => {
-                                log::info!("Sync state not found");
+                                log::info!("No SyncState found on {} network in Redis. Anormal !", network.name.clone());
+                                // shd::data::redis::set(keys::stream::status(network.name.clone()).as_str(), SyncState::Error as u128).await;
                             }
                         }
 
-                        // let mut updates = HashMap::new();
-                        // if updating {
-                        //     for up in msg.states.iter() {
-                        //         log::info!("- Updating state for {}", up.0);
-                        //         let x = up.1.clone_box();
-                        //         let key1 = keys::stream::component(up.0.to_string().to_lowercase());
-                        //         if let Some(cp) = shd::data::redis::get::<SrzProtocolComponent>(key1.as_str()).await {
-                        //             updates.insert(up.0.clone(), ProtocolComponent::from(cp));
-                        //         }
-                        //     }
-                        // }
-
-                        // Tmp !
+                        // ===== Test Mode Targets (WETH/USDC) =====
                         let mut targets = vec![];
                         let mut pairs: HashMap<String, ProtocolComponent> = HashMap::new();
                         for (id, comp) in msg.new_pairs.iter() {
@@ -142,153 +133,167 @@ async fn stream(network: Network, shdstate: SharedTychoStreamState, tokens: Vec<
                             }
                         }
 
-                        let mut srzcomponents = vec![];
-                        let mut srzstates_u2 = vec![];
-                        let mut srzstates_u3 = vec![];
-                        let mut srzstates_u4 = vec![];
-                        let mut srzstates_balancer = vec![];
+                        if !initialised {
+                            // ===== Update Shared State at first sync only =====
+                            log::info!("First stream (= uninitialised). Writing the entire streamed into the TychoStreamState ArcMutex.");
+                            let mut mtx = shdstate.write().await;
+                            mtx.states = msg.states.clone();
+                            mtx.components = msg.new_pairs.clone();
+                            log::info!("Shared state updated and dropped");
+                            drop(mtx);
 
-                        log::info!("--------- States on network: {} --------- ", network.name);
-                        for m in targets.clone() {
-                            if let Some(proto) = msg.states.get(&m.to_string()) {
-                                let comp = msg.new_pairs.get(&m.to_string()).expect("New pair not found");
-                                log::info!("Match USDC|ETH at {:?} | Proto: {}", comp.id, comp.protocol_type_name);
-                                let stattribute = comp.static_attributes.clone();
-                                for (k, v) in stattribute.iter() {
-                                    log::info!(" >>> Static Attributes: {}: {:?}", k, v);
+                            let mut cbstates = vec![]; // Curve & Balancer
+                            let mut u2states = vec![];
+                            let mut u3states = vec![];
+                            let mut u4states = vec![];
+                            let mut components = vec![];
+
+                            log::info!("--------- States on network: {} --------- ", network.name);
+                            for m in targets.clone() {
+                                if let Some(proto) = msg.states.get(&m.to_string()) {
+                                    let comp = msg.new_pairs.get(&m.to_string()).expect("New pair not found");
+                                    log::info!("Match USDC|ETH at {:?} | Proto: {}", comp.id, comp.protocol_type_name);
+                                    let stattribute = comp.static_attributes.clone();
+                                    for (k, v) in stattribute.iter() {
+                                        log::info!(" >>> Static Attributes: {}: {:?}", k, v);
+                                    }
+                                    let base = comp.tokens.first().unwrap();
+                                    let quote = comp.tokens.get(1).unwrap();
+                                    log::info!(" - Base Token : {:?} | Spot Price base/quote = {:?}", base.symbol, proto.spot_price(base, quote));
+                                    log::info!(" - Quote Token: {:?} | Spot Price quote/base = {:?}", quote.symbol, proto.spot_price(quote, base));
+                                    match AmmType::from(comp.protocol_type_name.as_str()) {
+                                        AmmType::UniswapV2 => {
+                                            if let Some(state) = proto.as_any().downcast_ref::<UniswapV2State>() {
+                                                // log::info!("Good downcast to UniswapV2State");
+                                                log::info!(" - reserve0: {}", state.reserve0.to_string());
+                                                log::info!(" - reserve1: {}", state.reserve1.to_string());
+                                                // --- Component ---
+                                                let pc = SrzProtocolComponent::from(comp.clone());
+                                                components.push(pc.clone());
+                                                let key1 = keys::stream::component(network.name.clone(), comp.id.to_string().to_lowercase());
+                                                shd::data::redis::set(key1.as_str(), pc.clone()).await;
+                                                // --- State ---
+                                                let key2 = keys::stream::state(network.name.clone(), comp.id.to_string().to_lowercase());
+                                                let srz = SrzUniswapV2State::from((state.clone(), comp.id.to_string()));
+                                                shd::data::redis::set(key2.as_str(), srz.clone()).await;
+                                                u2states.push(srz.clone());
+                                            } else {
+                                                log::info!("Downcast to 'UniswapV2State' failed on proto '{}'", comp.protocol_type_name);
+                                            }
+                                        }
+                                        AmmType::UniswapV3 => {
+                                            if let Some(state) = proto.as_any().downcast_ref::<UniswapV3State>() {
+                                                log::info!(" - (comp) fee: {:?}", state.fee());
+                                                log::info!(" - (comp) spot_sprice: {:?}", state.spot_price(base, quote));
+                                                // --- Component ---
+                                                let key1 = keys::stream::component(network.name.clone(), comp.id.to_string().to_lowercase());
+                                                let pc = SrzProtocolComponent::from(comp.clone());
+                                                components.push(pc.clone());
+                                                shd::data::redis::set(key1.as_str(), pc.clone()).await;
+                                                // --- State ---
+                                                let key2 = keys::stream::state(network.name.clone(), comp.id.to_string().to_lowercase());
+                                                let srz = SrzUniswapV3State::from((state.clone(), comp.id.to_string()));
+                                                shd::data::redis::set(key2.as_str(), srz.clone()).await;
+                                                u3states.push(srz.clone());
+                                                log::info!(" - (srz state) liquidity   : {} ", srz.liquidity);
+                                                log::info!(" - (srz state) sqrt_price  : {} ", srz.sqrt_price.to_string());
+                                                log::info!(" - (srz state) fee         : {:?} ", srz.fee);
+                                                log::info!(" - (srz state) tick        : {} ", srz.tick);
+                                                log::info!(" - (srz state) tick_spacing: {} ", srz.ticks.tick_spacing);
+                                                log::info!(" - (srz state) ticks len   : {}", srz.ticks.ticks.len());
+                                            } else {
+                                                log::info!("Downcast to 'UniswapV3State' failed on proto '{}'", comp.protocol_type_name);
+                                            }
+                                        }
+                                        AmmType::UniswapV4 => {
+                                            if let Some(state) = proto.as_any().downcast_ref::<UniswapV4State>() {
+                                                log::info!(" - fee: {:?}", state.fee());
+                                                log::info!(" - spot_sprice: {:?}", state.spot_price(base, quote));
+                                                // --- Component ---
+                                                let key1 = keys::stream::component(network.name.clone(), comp.id.to_string().to_lowercase());
+                                                let pc = SrzProtocolComponent::from(comp.clone());
+                                                components.push(pc.clone());
+                                                shd::data::redis::set(key1.as_str(), pc.clone()).await;
+                                                // --- State ---
+                                                let key2 = keys::stream::state(network.name.clone(), comp.id.to_string().to_lowercase());
+                                                let srz = SrzUniswapV4State::from((state.clone(), comp.id.to_string()));
+                                                u4states.push(srz.clone());
+                                                shd::data::redis::set(key2.as_str(), srz.clone()).await;
+                                                log::info!(" - (srz state) liquidity   : {} ", srz.liquidity);
+                                                log::info!(" - (srz state) sqrt_price  : {:?} ", srz.sqrt_price);
+                                                log::info!(" - (srz state) fees        : {:?} ", srz.fees);
+                                                log::info!(" - (srz state) tick        : {} ", srz.tick);
+                                                log::info!(" - (srz state) tick_spacing: {} ", srz.ticks.tick_spacing);
+                                                log::info!(" - (srz state) ticks len   : {} ", srz.ticks.ticks.len());
+                                            } else {
+                                                log::info!("Downcast to 'UniswapV4State' failed on proto '{}'", comp.protocol_type_name);
+                                            }
+                                        }
+                                        AmmType::Balancer | AmmType::Curve => {
+                                            if let Some(state) = proto.as_any().downcast_ref::<EVMPoolState<PreCachedDB>>() {
+                                                // --- Component ---
+                                                let key1 = keys::stream::component(network.name.clone(), comp.id.to_string().to_lowercase());
+                                                let pc = SrzProtocolComponent::from(comp.clone());
+                                                components.push(pc.clone());
+                                                shd::data::redis::set(key1.as_str(), pc.clone()).await;
+                                                // --- State ---
+                                                let key2 = keys::stream::state(network.name.clone(), comp.id.to_string().to_lowercase());
+                                                let srz = SrzEVMPoolState {
+                                                    id: state.id.clone(),
+                                                    tokens: state.tokens.iter().map(|t| t.to_string().clone()).collect(),
+                                                    block: state.block.number,
+                                                    balances: state.balances.iter().map(|(k, v)| (k.to_string(), *v)).collect(),
+                                                };
+                                                cbstates.push(srz.clone());
+                                                log::info!(" - spot_sprice: {:?}", state.spot_price(base, quote));
+                                                log::info!(" - (srz state) id        : {} ", srz.id);
+                                                log::info!(" - (srz state) tokens    : {:?} ", srz.tokens);
+                                                log::info!(" - (srz state) block     : {} ", srz.block);
+                                                log::info!(" - (srz state) balances  : {:?} ", srz.balances);
+                                                shd::data::redis::set(key2.as_str(), srz.clone()).await;
+                                            } else {
+                                                log::info!("Downcast to 'EVMPoolState<PreCachedDB>' failed on proto '{}'", comp.protocol_type_name);
+                                            }
+                                        }
+                                    }
                                 }
-                                let base = comp.tokens.first().unwrap();
-                                let quote = comp.tokens.get(1).unwrap();
-                                log::info!(" - Base Token : {:?} | Spot Price base/quote = {:?}", base.symbol, proto.spot_price(base, quote));
-                                log::info!(" - Quote Token: {:?} | Spot Price quote/base = {:?}", quote.symbol, proto.spot_price(quote, base));
-                                match AmmType::from(comp.protocol_type_name.as_str()) {
-                                    AmmType::UniswapV2 => {
-                                        if let Some(state) = proto.as_any().downcast_ref::<UniswapV2State>() {
-                                            // log::info!("Good downcast to UniswapV2State");
-                                            log::info!(" - reserve0: {}", state.reserve0.to_string());
-                                            log::info!(" - reserve1: {}", state.reserve1.to_string());
-                                            // Store the comp in Redis
-                                            let pc = SrzProtocolComponent::from(comp.clone());
-                                            srzcomponents.push(pc.clone());
-                                            let key1 = keys::stream::component(comp.id.to_string().to_lowercase());
-                                            shd::data::redis::set(key1.as_str(), pc.clone()).await;
-                                            // Store the state
-                                            let key2 = keys::stream::state(comp.id.to_string().to_lowercase());
-                                            let srz = SrzUniswapV2State::from((state.clone(), comp.id.to_string()));
-                                            shd::data::redis::set(key2.as_str(), srz.clone()).await;
-                                            srzstates_u2.push(srz.clone());
-                                        } else {
-                                            log::info!("Downcast to 'UniswapV2State' failed on proto '{}'", comp.protocol_type_name);
-                                        }
-                                    }
-                                    AmmType::UniswapV3 => {
-                                        if let Some(state) = proto.as_any().downcast_ref::<UniswapV3State>() {
-                                            // log::info!("Good downcast to UniswapV3State");
-                                            log::info!(" - (comp) fee: {:?}", state.fee());
-                                            log::info!(" - (comp) spot_sprice: {:?}", state.spot_price(base, quote));
-
-                                            // Store the comp in Redis
-                                            let key1 = keys::stream::component(comp.id.to_string().to_lowercase());
-                                            let pc = SrzProtocolComponent::from(comp.clone());
-                                            srzcomponents.push(pc.clone());
-                                            shd::data::redis::set(key1.as_str(), pc.clone()).await;
-                                            // Store the state
-                                            let key2 = keys::stream::state(comp.id.to_string().to_lowercase());
-                                            let srz = SrzUniswapV3State::from((state.clone(), comp.id.to_string()));
-                                            shd::data::redis::set(key2.as_str(), srz.clone()).await;
-                                            srzstates_u3.push(srz.clone());
-
-                                            log::info!(" - (srz state) liquidity   : {} ", srz.liquidity);
-                                            log::info!(" - (srz state) sqrt_price  : {} ", srz.sqrt_price.to_string());
-                                            log::info!(" - (srz state) fee         : {:?} ", srz.fee);
-                                            log::info!(" - (srz state) tick        : {} ", srz.tick);
-                                            log::info!(" - (srz state) tick_spacing: {} ", srz.ticks.tick_spacing);
-                                            log::info!(" - (srz state) ticks len   : {}", srz.ticks.ticks.len());
-                                        } else {
-                                            log::info!("Downcast to 'UniswapV3State' failed on proto '{}'", comp.protocol_type_name);
-                                        }
-                                    }
-                                    AmmType::UniswapV4 => {
-                                        if let Some(state) = proto.as_any().downcast_ref::<UniswapV4State>() {
-                                            // log::info!("Good downcast to UniswapV4State");
-                                            log::info!(" - fee: {:?}", state.fee());
-                                            log::info!(" - spot_sprice: {:?}", state.spot_price(base, quote));
-
-                                            // Store the comp in Redis
-                                            let key1 = keys::stream::component(comp.id.to_string().to_lowercase());
-                                            let pc = SrzProtocolComponent::from(comp.clone());
-                                            srzcomponents.push(pc.clone());
-                                            shd::data::redis::set(key1.as_str(), pc.clone()).await;
-                                            // Store the state
-                                            let key2 = keys::stream::state(comp.id.to_string().to_lowercase());
-                                            let srz = SrzUniswapV4State::from((state.clone(), comp.id.to_string()));
-                                            srzstates_u4.push(srz.clone());
-                                            shd::data::redis::set(key2.as_str(), srz.clone()).await;
-                                            log::info!(" - (srz state) liquidity   : {} ", srz.liquidity);
-                                            log::info!(" - (srz state) sqrt_price  : {:?} ", srz.sqrt_price);
-                                            log::info!(" - (srz state) fees        : {:?} ", srz.fees);
-                                            log::info!(" - (srz state) tick        : {} ", srz.tick);
-                                            log::info!(" - (srz state) tick_spacing: {} ", srz.ticks.tick_spacing);
-                                            log::info!(" - (srz state) ticks len   : {} ", srz.ticks.ticks.len());
-                                        } else {
-                                            log::info!("Downcast to 'UniswapV4State' failed on proto '{}'", comp.protocol_type_name);
-                                        }
-                                    }
-                                    AmmType::Balancer | AmmType::Curve => {
-                                        if let Some(state) = proto.as_any().downcast_ref::<EVMPoolState<PreCachedDB>>() {
-                                            // log::info!("Good downcast to 'EVMPoolState<PreCachedDB>' | Protocol : {}", comp.protocol_type_name);
-                                            // log::info!(" - fee: {:?}", state.fee()); //! Not implemented
-                                            log::info!(" - spot_sprice: {:?}", state.spot_price(base, quote));
-                                            // Store the comp in Redis
-                                            let key1 = keys::stream::component(comp.id.to_string().to_lowercase());
-                                            let pc = SrzProtocolComponent::from(comp.clone());
-                                            srzcomponents.push(pc.clone());
-                                            shd::data::redis::set(key1.as_str(), pc.clone()).await;
-                                            // Store the state
-                                            let key2 = keys::stream::state(comp.id.to_string().to_lowercase());
-
-                                            let srz = SrzEVMPoolState {
-                                                id: state.id.clone(),
-                                                tokens: state.tokens.iter().map(|t| t.to_string().clone()).collect(),
-                                                block: state.block.number,
-                                                balances: state.balances.iter().map(|(k, v)| (k.to_string(), *v)).collect(),
-                                            };
-                                            srzstates_balancer.push(srz.clone());
-
-                                            log::info!(" - (srz state) id        : {} ", srz.id);
-                                            log::info!(" - (srz state) tokens    : {:?} ", srz.tokens);
-                                            log::info!(" - (srz state) block     : {} ", srz.block);
-                                            log::info!(" - (srz state) balances  : {:?} ", srz.balances);
-
-                                            shd::data::redis::set(key2.as_str(), srz.clone()).await;
-                                        } else {
-                                            log::info!("Downcast to 'EVMPoolState<PreCachedDB>' failed on proto '{}'", comp.protocol_type_name);
-                                        }
-                                    }
-                                }
-
-                                let srztokens = tokens.iter().map(|t| SrzToken::from(t.clone())).collect::<Vec<SrzToken>>();
-                                let path = format!("misc/data/tokens.ethereum.json");
-                                let json = serde_json::to_string_pretty(&srztokens).unwrap();
-                                let mut file = std::fs::File::create(path).expect("Unable to create file");
-                                std::io::Write::write_all(&mut file, json.as_bytes()).expect("Unable to write data");
-                                let path = format!("misc/data/components.ethereum.json");
-                                let json = serde_json::to_string_pretty(&srzcomponents).unwrap();
-                                let mut file = std::fs::File::create(path).expect("Unable to create file");
-                                std::io::Write::write_all(&mut file, json.as_bytes()).expect("Unable to write data");
-
-                                shd::utils::misc::save(srzstates_u2.clone(), format!("misc/data/states.uniswapv2.{}.json", network.name.clone()).as_str());
-                                shd::utils::misc::save(srzstates_u3.clone(), format!("misc/data/states.uniswapv3.{}.json", network.name.clone()).as_str());
-                                shd::utils::misc::save(srzstates_u4.clone(), format!("misc/data/states.uniswapv4.{}.json", network.name.clone()).as_str());
-                                shd::utils::misc::save(srzstates_balancer.clone(), format!("misc/data/states.balancer.{}.json", network.name.clone()).as_str());
+                                log::info!(" --- --- --- --- ---\n\n");
                             }
-                            log::info!("\n\n");
+
+                            // ===== Storing ALL pairs (token0-token1) based on components =====
+                            let mut hset = HashSet::new();
+                            for cp in components.clone() {
+                                let (t0, t1) = (cp.tokens.first(), cp.tokens.get(1));
+                                if let (Some(t0), Some(t1)) = (t0, t1) {
+                                    hset.insert(format!("{}-{}", t0.address.to_lowercase(), t1.address.to_lowercase()));
+                                }
+                            }
+                            log::info!("Setting {} pairs", hset.len());
+                            let key = keys::stream::pairs(network.name.clone());
+                            let vectorized = hset.iter().cloned().collect::<Vec<String>>();
+                            shd::data::redis::set(key.as_str(), vectorized.clone()).await;
+                            // ===== Storing ALL components =====
+                            let key = keys::stream::components(network.name.clone());
+                            shd::data::redis::set(key.as_str(), components.clone()).await;
+                            // ===== Set SyncState to up and running =====
+                            shd::data::redis::set(keys::stream::status(network.name.clone()).as_str(), SyncState::Running as u128).await;
+                        } else {
+                            // ===== Update Shared State =====
+                            log::info!("Stream already initialised. Updating the mutex-shared state with new data, and updating Redis.");
+                            if msg.states.len() > 0 {
+                                log::info!("New states. Need update.");
+                            }
+                            if msg.new_pairs.len() > 0 {
+                                log::info!("New pairs. Need update.");
+                            }
+                            if msg.removed_pairs.len() > 0 {
+                                log::info!("New removed pairs. Need update.");
+                            }
                         }
-                        shd::data::redis::set(keys::stream::status(network.name.clone()).as_str(), SyncState::Running as u128).await;
                         log::info!("--------- Done for {} --------- ", network.name.clone());
                     }
                     Err(e) => {
-                        eprintln!("Error: ProtocolStreamBuilder on {}: {:?}. Continuing.", network.name, e);
+                        log::info!("🔺 Error: ProtocolStreamBuilder on {}: {:?}. Continuing.", network.name, e);
                         shd::data::redis::set(keys::stream::status(network.name.clone()).as_str(), SyncState::Error as u128).await;
                         continue;
                     }
@@ -301,7 +306,7 @@ async fn stream(network: Network, shdstate: SharedTychoStreamState, tokens: Vec<
     }
 }
 
-pub mod server;
+pub mod api;
 
 /**
  * Stream the entire state from each AMMs, with TychoStreamBuilder.
@@ -329,14 +334,14 @@ async fn main() {
     let writeable = Arc::clone(&stss);
 
     // Start the server, only reading from the shared state
-    // let dupn = network.clone();
-    // let dupc = config.clone();
-    // tokio::spawn(async move {
-    //     loop {
-    //         server::start(dupn.clone(), Arc::clone(&readable), dupc.clone()).await;
-    //         tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
-    //     }
-    // });
+    let dupn = network.clone();
+    let dupc = config.clone();
+    tokio::spawn(async move {
+        loop {
+            api::start(dupn.clone(), Arc::clone(&readable), dupc.clone()).await;
+            tokio::time::sleep(tokio::time::Duration::from_secs(1)).await;
+        }
+    });
 
     // Start the stream, writing to the shared state
     tokio::spawn(async move {
@@ -359,7 +364,7 @@ async fn main() {
                                 });
                             }
                             let elasped = time.elapsed().unwrap().as_millis();
-                            log::info!("Took {:?} ms to get {} tokens on {}", elasped, tokens.len(), network.name);
+                            log::info!("Took {:?} ms to get {} tokens on {}. Saving on Redis", elasped, tokens.len(), network.name);
                             stream(network.clone(), Arc::clone(&writeable), tokens.clone(), config.clone()).await;
                         }
                         Err(e) => {

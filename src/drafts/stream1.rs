@@ -18,7 +18,6 @@ use tycho_core::dto::TokensRequestBody;
 use tycho_simulation::models::Token;
 use tycho_simulation::tycho_client::feed::component_tracker::ComponentFilter;
 
-
 use num_traits::cast::ToPrimitive;
 
 fn u3pricing(sqrt_price_x96: BigUint) -> f64 {

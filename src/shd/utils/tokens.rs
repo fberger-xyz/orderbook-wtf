@@ -1,5 +1,3 @@
-
-
 // pub async fn load_all_tokens(tycho_url: &str, no_tls: bool, auth_key: Option<&str>, chain: Chain, min_quality: Option<i32>, max_days_since_last_trade: Option<u64>) -> HashMap<Bytes, Token> {
 //     log::info!("Loading tokens from Tycho...");
 //     let rpc_url = if no_tls { format!("http://{tycho_url}") } else { format!("https://{tycho_url}") };

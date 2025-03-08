@@ -43,8 +43,9 @@ pub mod log {
             })
             .chain(std::io::stdout())
             .level(LevelFilter::Off) // Disable all logging from crates
-            .level_for(prog.clone(), LevelFilter::Info)
-            .level_for("shd", LevelFilter::Info)
+            .level_for(prog.clone(), LevelFilter::Info) // Launcher logging
+            .level_for("shd", LevelFilter::Info) // Library logging
+            .level_for("api", LevelFilter::Info) // API logging
             .apply()
             .unwrap();
     }

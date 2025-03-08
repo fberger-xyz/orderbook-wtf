@@ -121,11 +121,11 @@ pub type SharedTychoStreamState = Arc<RwLock<TychoStreamState>>;
 
 pub struct TychoStreamState {
     // Maps a network name to its ProtocolSim instance.
-    // pub states: HashMap<String, Box<dyn ProtocolSim + Send + Sync>>,
-    pub states: HashMap<String, String>,
+    pub states: HashMap<String, Box<dyn ProtocolSim>>,
+    // pub states: HashMap<String, String>,
     // Maps a network name to its new ProtocolComponent.
     // pub components: HashMap<String, ProtocolComponent>,
-    pub components: HashMap<String, String>,
+    pub components: HashMap<String, ProtocolComponent>,
 }
 
 pub type ChainCore = tycho_core::dto::Chain;

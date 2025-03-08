@@ -22,10 +22,7 @@ use tycho_simulation::evm::protocol::uniswap_v4::state::UniswapV4State;
 
 use tycho_simulation::models::Token;
 use tycho_simulation::{
-    evm::{
-        protocol::uniswap_v2::state::UniswapV2State,
-        stream::ProtocolStreamBuilder,
-    },
+    evm::{protocol::uniswap_v2::state::UniswapV2State, stream::ProtocolStreamBuilder},
     protocol::models::BlockUpdate,
     tycho_client::feed::component_tracker::ComponentFilter,
 };
