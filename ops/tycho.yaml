@@ -38,6 +38,7 @@ services:
     environment:
       - BUILD_TYPE=debug
       - REDIS_HOST=redis
+      - NETWORK=ethereum
       - TESTING=true
       - TYCHO_URL=https://tycho-beta.propellerheads.xyz
       - TYCHO_API_KEY=sampletoken

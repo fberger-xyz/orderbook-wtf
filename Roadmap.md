@@ -17,3 +17,18 @@ The aim is also to unify the fragmented liquidity between protocols, pools and c
 
 
  
+{
+    token_from: "",
+    token_to: "",
+    protocols: [
+        {
+            name: "u2",
+            tick: 199470,
+            bids: [], // expressed in token to
+            asks: [] // expressed in token from
+        }
+    ]
+}
+
+zeroToOne
+oneToZero
