@@ -68,17 +68,17 @@ path = "src/stream.rs"
 
 # === DRAFTS ===
 
-[[bin]]
-name = "stream1"
-path = "src/drafts/stream1.rs"
+# [[bin]]
+# name = "stream1"
+# path = "src/drafts/stream1.rs"
 
-[[bin]]
-name = "stream2"
-path = "src/drafts/stream2.rs"
+# [[bin]]
+# name = "stream2"
+# path = "src/drafts/stream2.rs"
 
-[[bin]]
-name = "agglqdty"
-path = "src/drafts/agglqdty.rs"
+# [[bin]]
+# name = "agglqdty"
+# path = "src/drafts/agglqdty.rs"
 
 
 # ======================================================================================================================================================================================================
