@@ -297,25 +297,22 @@ async fn main() {
     log::info!("Launching Stream | 🧪 Testing {:?}", config.testing);
     let path = "src/shd/config/networks.json".to_string();
     let networks: Vec<Network> = shd::utils::misc::read(&path);
-    let networks = networks.iter().filter(|x| x.enabled).cloned().collect::<Vec<Network>>();
+    let network = networks.clone().into_iter().filter(|x| x.enabled).find(|x| x.name == config.network).expect("Network not found or not enabled");
+    log::info!("Tycho Stream for '{}' network", network.name.clone());
+    shd::data::redis::set(keys::stream::status(network.name.clone()).as_str(), SyncState::Launching as u128).await;
+    shd::data::redis::set(keys::stream::latest(network.name.clone().to_string()).as_str(), 0).await;
     shd::data::redis::ping().await;
-
-    for network in networks.clone() {
-        log::info!("Adding network {} to the stream", network.name);
-        shd::data::redis::set(keys::stream::status(network.name.clone()).as_str(), SyncState::Launching as u128).await;
-        shd::data::redis::set(keys::stream::latest(network.name.clone().to_string()).as_str(), 0).await;
-    }
 
     let stss: SharedTychoStreamState = Arc::new(RwLock::new(TychoStreamState {
         states: HashMap::new(),
         components: HashMap::new(),
     }));
 
-    let server = Arc::clone(&stss);
+    let rstate = Arc::clone(&stss);
     tokio::spawn(async move {
         loop {
             {
-                let state = server.read().await;
+                let state = rstate.read().await;
                 log::info!("API Task: states = {:?}", state.states.keys());
                 log::info!("API Task: components = {:?}", state.components.keys());
             }
@@ -323,45 +320,45 @@ async fn main() {
         }
     });
 
-    let mut handles = Vec::new();
-    for network in networks.clone() {
-        let config = config.clone();
-        let handle = tokio::spawn(async move {
-            loop {
-                match HttpRPCClient::new(&network.tycho, Some(&config.tycho_api_key)) {
-                    Ok(client) => {
-                        let time = std::time::SystemTime::now();
-                        let (chain, _) = chain(network.name.clone()).expect("Invalid chain");
-                        match client.get_all_tokens(chain, Some(100), Some(1), 3000).await {
-                            Ok(result) => {
-                                let mut tokens = vec![];
-                                for t in result.iter() {
-                                    tokens.push(Token {
-                                        address: tycho_simulation::tycho_core::Bytes::from_str(t.address.clone().to_string().as_str()).unwrap(),
-                                        decimals: t.decimals as usize,
-                                        symbol: t.symbol.clone(),
-                                        gas: BigUint::ZERO, // !?
-                                    });
-                                }
-                                let elasped = time.elapsed().unwrap().as_millis();
-                                log::info!("Took {:?} ms to get {} tokens on {}", elasped, tokens.len(), network.name);
-                                // stream(network.clone(), tokens.clone(), config.clone()).await;
+    let wstate = Arc::clone(&stss);
+    tokio::spawn(async move {
+        loop {
+            let network = network.clone();
+            match HttpRPCClient::new(&network.tycho, Some(&config.tycho_api_key)) {
+                Ok(client) => {
+                    let time = std::time::SystemTime::now();
+                    let (chain, _) = chain(network.name.clone()).expect("Invalid chain");
+                    match client.get_all_tokens(chain, Some(100), Some(1), 3000).await {
+                        Ok(result) => {
+                            let mut tokens = vec![];
+                            for t in result.iter() {
+                                tokens.push(Token {
+                                    address: tycho_simulation::tycho_core::Bytes::from_str(t.address.clone().to_string().as_str()).unwrap(),
+                                    decimals: t.decimals as usize,
+                                    symbol: t.symbol.clone(),
+                                    gas: BigUint::ZERO, // !?
+                                });
                             }
-                            Err(e) => {
-                                log::error!("Failed to get tokens: {:?}", e.to_string());
-                            }
+                            let elasped = time.elapsed().unwrap().as_millis();
+                            log::info!("Took {:?} ms to get {} tokens on {}", elasped, tokens.len(), network.name);
+                            // stream(network.clone(), tokens.clone(), config.clone()).await;
+                            let mut state = wstate.write().await;
+                            state.states.insert(network.name.clone(), "shared!".to_string());
+                            state.components.insert(network.name.clone(), "shared!".to_string());
+                        }
+                        Err(e) => {
+                            log::error!("Failed to get tokens: {:?}", e.to_string());
                         }
                     }
-                    Err(e) => {
-                        log::error!("Failed to create client: {:?}", e.to_string());
-                    }
                 }
-                log::info!("Waiting 5 seconds before looping.");
-                tokio::time::sleep(tokio::time::Duration::from_secs(5)).await; // In case of error, wait 5 seconds before retrying
+                Err(e) => {
+                    log::error!("Failed to create client: {:?}", e.to_string());
+                }
             }
-        });
-        handles.push(handle);
-    }
-    futures::future::join_all(handles).await;
+            log::info!("Waiting 5 seconds before looping.");
+            tokio::time::sleep(tokio::time::Duration::from_secs(5)).await; // In case of error, wait 5 seconds before retrying
+        }
+    });
+    futures::future::pending::<()>().await;
     log::info!("Program over");
 }

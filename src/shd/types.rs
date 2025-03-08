@@ -7,6 +7,7 @@ pub struct EnvConfig {
     pub tycho_url: String,
     pub tycho_api_key: String,
     pub port: u64,
+    pub network: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -120,7 +121,9 @@ pub type SharedTychoStreamState = Arc<RwLock<TychoStreamState>>;
 
 pub struct TychoStreamState {
     // Maps a network name to its ProtocolSim instance.
-    pub states: HashMap<String, Box<dyn ProtocolSim + Send + Sync>>,
+    // pub states: HashMap<String, Box<dyn ProtocolSim + Send + Sync>>,
+    pub states: HashMap<String, String>,
     // Maps a network name to its new ProtocolComponent.
-    pub components: HashMap<String, ProtocolComponent>,
+    // pub components: HashMap<String, ProtocolComponent>,
+    pub components: HashMap<String, String>,
 }

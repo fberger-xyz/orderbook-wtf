@@ -69,6 +69,7 @@ impl EnvConfig {
             tycho_url: get("TYCHO_URL"),
             tycho_api_key: get("TYCHO_API_KEY"),
             port: get("PORT").parse().unwrap(),
+            network: get("NETWORK"),
         }
     }
 }
