@@ -280,13 +280,13 @@ async fn stream(network: Network, shdstate: SharedTychoStreamState, tokens: Vec<
                         } else {
                             // ===== Update Shared State =====
                             log::info!("Stream already initialised. Updating the mutex-shared state with new data, and updating Redis.");
-                            if msg.states.len() > 0 {
+                            if !msg.states.is_empty() {
                                 log::info!("New states. Need update.");
                             }
-                            if msg.new_pairs.len() > 0 {
+                            if !msg.new_pairs.is_empty() {
                                 log::info!("New pairs. Need update.");
                             }
-                            if msg.removed_pairs.len() > 0 {
+                            if !msg.removed_pairs.is_empty() {
                                 log::info!("New removed pairs. Need update.");
                             }
                         }
