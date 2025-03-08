@@ -16,11 +16,13 @@ set -e
 # Set the API host.
 # When running inside the Docker network, you can override API_HOST (e.g., API_HOST=ethereum)
 
-# ===> API_HOST=ethereum ./api.curl.sh
+# ===> API_HOST=ethereum ; sh tests/api.curl.sh
 
 API_HOST=${API_HOST:-127.0.0.1}
 PORT=42001
 API_URL="http://$API_HOST:$PORT"
+
+echo "Testing API at $API_URL"
 
 echo "Testing GET /"
 curl -s "$API_URL/" | jq .

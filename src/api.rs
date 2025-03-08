@@ -1,4 +1,9 @@
-use axum::{extract::Path, response::IntoResponse, routing::get, Extension, Json, Router};
+use axum::{
+    extract::{Path, Query},
+    response::IntoResponse,
+    routing::get,
+    Extension, Json, Router,
+};
 use redis::AsyncCommands;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
@@ -58,7 +63,7 @@ async fn pairs(Extension(network): Extension<Network>) -> impl IntoResponse {
     }
 }
 
-// GET /pairs => Get all existing pairs in the database (as a vector of strings like "0xToken0-0xToken1")
+// GET /components => Get all existing components
 async fn components(Extension(network): Extension<Network>) -> impl IntoResponse {
     let key = shd::r#static::data::keys::stream::components(network.name.clone());
     match shd::data::redis::get::<Vec<SrzProtocolComponent>>(key.as_str()).await {
@@ -104,6 +109,16 @@ async fn pool(Extension(network): Extension<Network>, Path(id): Path<String>) ->
         None => Json(json!({ "component": {}, "state": {}})),
     }
 }
+
+#[derive(Debug, Deserialize)]
+struct PairQuery {
+    tag: String,
+    zeroToOne: Option<bool>,
+}
+
+// GET /pair/{0xt0-0xt1} => Get all component & state (= /pool) for a given pair of token
+// It must be t0-t1 for tokenFrom-tokenTo, but if zeroToOne is false, computed data will be t1-t0
+async fn pair(Extension(network): Extension<Network>, Query(params): Query<PairQuery>) -> impl IntoResponse {}
 
 pub async fn start(n: Network, shared: SharedTychoStreamState, config: EnvConfig) {
     log::info!("👾 Launching API for '{}' network | 🧪 Testing mode: {:?} | Port: {}", n.name, config.testing, n.port);
