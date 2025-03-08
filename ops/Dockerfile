@@ -1,13 +1,6 @@
-# ops/Dockerfile
-FROM rust:latest
-WORKDIR /app
-# Copy the entire project into the container
-COPY . .
-ARG PROGRAM
-ENV PROGRAM=$PROGRAM
-# Install cargo-watch for live-reloading
+FROM rust:slim
 RUN cargo install cargo-watch
-# Expose the API port (if running the API)
-EXPOSE 3000
-# Use cargo-watch to re-run the chosen binary on code changes.
-CMD ["sh", "-c", "cargo watch -x \"run --bin ${PROGRAM}\""]
+WORKDIR /app
+COPY . .
+RUN cargo build --bin stream
+CMD ["cargo", "watch", "-x", "run"]

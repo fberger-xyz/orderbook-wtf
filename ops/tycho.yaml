@@ -1,17 +1,15 @@
-
 networks:
   tycho:
     external: true
 
 services:
-
   redis:
     image: redis:latest
     restart: always
     ports:
       - "7777:7777"
     environment:
-      - BUILD_TYPE=release
+      - BUILD_TYPE=debug
       - REDIS_HOST=redis
       - REDIS_PORT=7777
       - REDIS_ARGS="--loglevel verbose"
@@ -23,48 +21,27 @@ services:
     networks:
       - tycho
 
-  stream:
-      build: 
-       context: ..
-       dockerfile: ops/Dockerfile
-       args:
+  ethereum:
+    build: 
+      context: ..
+      dockerfile: ops/Dockerfile
+      args:
         - PROGRAM=stream
-      volumes:
-        - .:/app
-      depends_on:
-        redis:
-          condition: service_healthy
-      environment:
-        - BUILD_TYPE=release
-        - REDIS_HOST=redis
-        - TESTING=true
-        - TYCHO_URL=https://tycho-beta.propellerheads.xyz
-        - TYCHO_API_KEY=sampletoken
-        - HEARTBEAT=ToDo
-      restart: always
-      networks:
-        - tycho
-
-  api:
-      build: 
-       context: ..
-       dockerfile: ops/Dockerfile
-       args:
-        - PROGRAM=api
-      ports:
-        - "3000:3000"
-      volumes:
-        - .:/app
-      depends_on:
-        redis:
-          condition: service_healthy
-      environment:
-        - BUILD_TYPE=release
-        - REDIS_HOST=redis
-        - TESTING=true
-        - TYCHO_URL=https://tycho-beta.propellerheads.xyz
-        - TYCHO_API_KEY=sampletoken
-        - HEARTBEAT=ToDo
-      restart: always
-      networks:
-        - tycho
+    ports:
+      - "42001:42001"
+    volumes:
+      - ../:/app
+    command: cargo watch -x run
+    depends_on:
+      redis:
+        condition: service_healthy
+    environment:
+      - BUILD_TYPE=debug
+      - REDIS_HOST=redis
+      - TESTING=true
+      - TYCHO_URL=https://tycho-beta.propellerheads.xyz
+      - TYCHO_API_KEY=sampletoken
+      - HEARTBEAT=ToDo
+    restart: always
+    networks:
+      - tycho
