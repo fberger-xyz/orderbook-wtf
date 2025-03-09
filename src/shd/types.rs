@@ -141,3 +141,17 @@ pub fn chain(name: String) -> Option<(ChainCore, ChainSimu)> {
         _ => None,
     }
 }
+
+// ================================================================ API ================================================================
+
+#[derive(Clone, Debug, Deserialize)]
+pub struct PairQuery {
+    pub tag: String,
+    pub zero_to_one: bool,
+}
+
+#[derive(Debug, Deserialize)]
+pub struct PairResponse {
+    pub components: String,   // Must have same size
+    pub states: Option<bool>, // Must have same size
+}

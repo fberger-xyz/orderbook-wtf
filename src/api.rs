@@ -10,7 +10,7 @@ use serde_json::json;
 use tap2::shd::{
     self,
     data::fmt::{SrzEVMPoolState, SrzProtocolComponent, SrzToken, SrzUniswapV2State, SrzUniswapV3State, SrzUniswapV4State},
-    types::{AmmType, EnvConfig, Network, SharedTychoStreamState},
+    types::{AmmType, EnvConfig, Network, PairQuery, SharedTychoStreamState},
 };
 
 #[derive(Serialize, Deserialize)]
@@ -63,20 +63,23 @@ async fn pairs(Extension(network): Extension<Network>) -> impl IntoResponse {
     }
 }
 
-async fn _components(network: Network) -> impl IntoResponse {
+async fn _components(network: Network) -> Option<Vec<SrzProtocolComponent>> {
     let key = shd::r#static::data::keys::stream::components(network.name.clone());
     match shd::data::redis::get::<Vec<SrzProtocolComponent>>(key.as_str()).await {
-        Some(cps) => Json(json!({ "components": cps })),
-        _ => Json(json!({ "components": [] })),
+        Some(cps) => Some(cps),
+        _ => None,
     }
 }
 
 // GET /components => Get all existing components
 async fn components(Extension(network): Extension<Network>) -> impl IntoResponse {
-    _components(network).await
+    match _components(network).await {
+        Some(cps) => Json(json!({ "components": cps })),
+        _ => Json(json!({ "components": [] })),
+    }
 }
 
-async fn _pool(network: Network, id: String) -> impl IntoResponse {
+async fn _pool(network: Network, id: String) -> Json<serde_json::Value> {
     let key = shd::r#static::data::keys::stream::component(network.name.clone(), id.clone());
     match shd::data::redis::get::<SrzProtocolComponent>(key.as_str()).await {
         Some(comp) => {
@@ -118,16 +121,32 @@ async fn simulate(Extension(shtss): Extension<SharedTychoStreamState>, Extension
     log::info!("Simulating on network {}", network.name);
 }
 
-#[derive(Debug, Deserialize)]
-struct PairQuery {
-    tag: String,
-    zeroToOne: Option<bool>,
-}
-
 // GET /pair/{0xt0-0xt1} => Get all component & state (= /pool) for a given pair of token
 // It must be t0-t1 for tokenFrom-tokenTo, but if zeroToOne is false, computed data will be t1-t0
 async fn pair(Extension(network): Extension<Network>, Query(params): Query<PairQuery>) -> impl IntoResponse {
-    let components = _components(network).await;
+    match _components(network.clone()).await {
+        Some(cps) => {
+            let target = params.tag.clone();
+            let tokens = target.split("-").collect::<Vec<&str>>();
+            if tokens.len() == 2 {
+                let mut pcps = vec![];
+                for cp in cps.clone() {
+                    let tks = cp.tokens.clone();
+                    if tks.len() != 2 {
+                        log::error!("Component {} has {} tokens instead of 2. Component with >2 tokens are not handled yet.", cp.id, tks.len());
+                    }
+                    if tks[0].address.to_lowercase() == tokens[0].to_lowercase() && tks[1].address.to_lowercase() == tokens[1].to_lowercase() {
+                        pcps.push(cp);
+                    }
+                }
+                shd::core::pair::prepare(network.clone(), pcps.clone(), params.clone()).await;
+                return Json(json!({ "pair": [] })); // !
+            } else {
+                return Json(json!({ "pair": "Query param Tag must contain only 2 tokens separated by a dash '-'." }));
+            }
+        }
+        None => return Json(json!({ "pair": "Couldn't not read internal components" })),
+    }
 }
 
 pub async fn start(n: Network, shared: SharedTychoStreamState, config: EnvConfig) {

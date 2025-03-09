@@ -11,4 +11,4 @@ RUN cargo install cargo-watch
 WORKDIR /app
 COPY . .
 RUN cargo build --bin stream
-CMD ["cargo", "watch", "-w", "/src", "-x", "run --bin stream"]
+CMD ["cargo", "watch", "-w", "/app", "-x", "run --bin stream"]
