@@ -117,11 +117,13 @@ impl Display for SyncState {
 
 use tycho_simulation::protocol::{models::ProtocolComponent, state::ProtocolSim};
 
+use super::data::fmt::SrzProtocolComponent;
+
 pub type SharedTychoStreamState = Arc<RwLock<TychoStreamState>>;
 
 pub struct TychoStreamState {
     // Maps a network name to its ProtocolSim instance.
-    pub states: HashMap<String, Box<dyn ProtocolSim>>,
+    pub protosims: HashMap<String, Box<dyn ProtocolSim>>,
     // pub states: HashMap<String, String>,
     // Maps a network name to its new ProtocolComponent.
     // pub components: HashMap<String, ProtocolComponent>,
@@ -146,12 +148,42 @@ pub fn chain(name: String) -> Option<(ChainCore, ChainSimu)> {
 
 #[derive(Clone, Debug, Deserialize)]
 pub struct PairQuery {
-    pub tag: String,
-    pub zero_to_one: bool,
+    pub tag: String, // Pair uniq identifier: token0-token1
+    pub z0to1: bool, // Zero to One as Uniswap expresses it
 }
 
 #[derive(Debug, Deserialize)]
 pub struct PairResponse {
     pub components: String,   // Must have same size
     pub states: Option<bool>, // Must have same size
+}
+
+#[derive(Clone, Debug)]
+pub struct PoolComputeData {
+    pub component: SrzProtocolComponent,
+    pub protosim: Box<dyn ProtocolSim>,
+}
+
+#[derive(Default, Debug, Clone, Serialize, Deserialize)]
+pub struct PairOrderbook {
+    pub from: String,
+    pub to: String,
+    pub orderbooks: Vec<Orderbook>,
+    pub spacing: f64, // Price spacing = Tick spacing. Lowest common denominator across concentrated pools
+}
+
+/// Whatever the protocol is, it must comply with this struct
+#[derive(Default, Debug, Clone, Serialize, Deserialize)]
+pub struct Orderbook {
+    pub address: String,     // Proto/PooL address
+    pub protocol: String,    // Component Protocol name
+    pub z0to1: bool,         // Zero to One as Uniswap expresses it
+    pub concentrated: bool,  // Concentrated liquidity
+    pub fee: f64,            // Fee according to ProtoSim
+    pub price: f64,          // Price Spot (0 to 1 if z0to1 is true)
+    pub reserves: Vec<u128>, // reserves[0], reserves[1]
+    pub tick: u64,           // Current tick
+    pub spacing: u64,        // Tick spacing
+    pub bids: Vec<f64>,
+    pub asks: Vec<f64>,
 }

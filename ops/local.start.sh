@@ -19,10 +19,10 @@ function start() {
     export NETWORK=$NETWORK
     cargo build --bin stream -q 2>/dev/null
     echo "Build successful. Executing..."
-    # cargo run --bin stream -q # 2>/dev/null
     (
         trap - SIGINT
-        cargo watch -w src/ -x "run --bin stream" -q
+        cargo run --bin stream -q # 2>/dev/null
+        # cargo watch -w src/ -x "run --bin stream" -q
     )
     echo "Program has finished or was interrupted. Continuing with the rest of the shell script ..."
     status+=($?)

@@ -10,7 +10,7 @@ use serde_json::json;
 use tap2::shd::{
     self,
     data::fmt::{SrzEVMPoolState, SrzProtocolComponent, SrzToken, SrzUniswapV2State, SrzUniswapV3State, SrzUniswapV4State},
-    types::{AmmType, EnvConfig, Network, PairQuery, SharedTychoStreamState},
+    types::{AmmType, EnvConfig, Network, PairQuery, PoolComputeData, SharedTychoStreamState},
 };
 
 #[derive(Serialize, Deserialize)]
@@ -123,23 +123,27 @@ async fn simulate(Extension(shtss): Extension<SharedTychoStreamState>, Extension
 
 // GET /pair/{0xt0-0xt1} => Get all component & state (= /pool) for a given pair of token
 // It must be t0-t1 for tokenFrom-tokenTo, but if zeroToOne is false, computed data will be t1-t0
-async fn pair(Extension(network): Extension<Network>, Query(params): Query<PairQuery>) -> impl IntoResponse {
+async fn pair(Extension(shtss): Extension<SharedTychoStreamState>, Extension(network): Extension<Network>, Query(params): Query<PairQuery>) -> impl IntoResponse {
     match _components(network.clone()).await {
         Some(cps) => {
             let target = params.tag.clone();
-            let tokens = target.split("-").collect::<Vec<&str>>();
+            let tokens = target.split("-").into_iter().map(|x| x.to_string().to_lowercase()).collect::<Vec<String>>();
             if tokens.len() == 2 {
-                let mut pcps = vec![];
+                let mut datapools: Vec<PoolComputeData> = vec![];
                 for cp in cps.clone() {
                     let tks = cp.tokens.clone();
                     if tks.len() != 2 {
                         log::error!("Component {} has {} tokens instead of 2. Component with >2 tokens are not handled yet.", cp.id, tks.len());
-                    }
-                    if tks[0].address.to_lowercase() == tokens[0].to_lowercase() && tks[1].address.to_lowercase() == tokens[1].to_lowercase() {
-                        pcps.push(cp);
+                    } else if tks[0].address.to_lowercase() == tokens[0] && tks[1].address.to_lowercase() == tokens[1] {
+                        // let protosim
+                        let mtx = shtss.read().await;
+                        let protosim = mtx.protosims.get(&cp.id.to_lowercase()).unwrap().clone();
+                        log::info!("Shared state read & drop");
+                        drop(mtx);
+                        datapools.push(PoolComputeData { component: cp, protosim });
                     }
                 }
-                shd::core::pair::prepare(network.clone(), pcps.clone(), params.clone()).await;
+                shd::core::pair::prepare(network.clone(), datapools.clone(), tokens.clone(), params.clone());
                 return Json(json!({ "pair": [] })); // !
             } else {
                 return Json(json!({ "pair": "Query param Tag must contain only 2 tokens separated by a dash '-'." }));
@@ -152,8 +156,8 @@ async fn pair(Extension(network): Extension<Network>, Query(params): Query<PairQ
 pub async fn start(n: Network, shared: SharedTychoStreamState, config: EnvConfig) {
     log::info!("👾 Launching API for '{}' network | 🧪 Testing mode: {:?} | Port: {}", n.name, config.testing, n.port);
     let rstate = shared.read().await;
-    log::info!("Testing SharedTychoStreamState read = {:?} with {:?}", rstate.states.keys(), rstate.states.values());
-    log::info!(" => rstate.states.keys and rstate.states.values => {:?} with {:?}", rstate.states.keys(), rstate.states.values());
+    log::info!("Testing SharedTychoStreamState read = {:?} with {:?}", rstate.protosims.keys(), rstate.protosims.values());
+    log::info!(" => rstate.states.keys and rstate.states.values => {:?} with {:?}", rstate.protosims.keys(), rstate.protosims.values());
     log::info!(" => rstate.components.keys and rstate.components.values => {:?} with {:?}", rstate.components.keys(), rstate.components.values());
     drop(rstate);
     let app = Router::new()
@@ -165,7 +169,7 @@ pub async fn start(n: Network, shared: SharedTychoStreamState, config: EnvConfig
         .route("/pairs", get(pairs))
         .route("/components", get(components))
         .route("/pool/{id}", get(pool))
-        .route("/simulate", get(simulate))
+        .route("/pair", get(pair))
         .layer(Extension(n.clone()))
         .layer(Extension(shared.clone())); // Shared state
 

@@ -135,7 +135,7 @@ async fn stream(network: Network, shdstate: SharedTychoStreamState, tokens: Vec<
                             // ===== Update Shared State at first sync only =====
                             log::info!("First stream (= uninitialised). Writing the entire streamed into the TychoStreamState ArcMutex.");
                             let mut mtx = shdstate.write().await;
-                            mtx.states = msg.states.clone();
+                            mtx.protosims = msg.states.clone();
                             mtx.components = msg.new_pairs.clone();
                             log::info!("Shared state updated and dropped");
                             drop(mtx);
@@ -236,12 +236,14 @@ async fn stream(network: Network, shdstate: SharedTychoStreamState, tokens: Vec<
                                                 shd::data::redis::set(key1.as_str(), pc.clone()).await;
                                                 // --- State ---
                                                 let key2 = keys::stream::state(network.name.clone(), comp.id.to_string().to_lowercase());
-                                                let srz = SrzEVMPoolState {
-                                                    id: state.id.clone(),
-                                                    tokens: state.tokens.iter().map(|t| t.to_string().clone()).collect(),
-                                                    block: state.block.number,
-                                                    balances: state.balances.iter().map(|(k, v)| (k.to_string(), *v)).collect(),
-                                                };
+                                                // ! To update FROM
+                                                let srz = SrzEVMPoolState::from((state.clone(), comp.id.to_string()));
+                                                // let srz = SrzEVMPoolState {
+                                                //     id: state.id.clone(),
+                                                //     tokens: state.tokens.iter().map(|t| t.to_string().clone()).collect(),
+                                                //     block: state.block.number,
+                                                //     balances: state.balances.iter().map(|(k, v)| (k.to_string(), *v)).collect(),
+                                                // };
                                                 cbstates.push(srz.clone());
                                                 log::info!(" - spot_sprice: {:?}", state.spot_price(base, quote));
                                                 log::info!(" - (srz state) id        : {} ", srz.id);
@@ -325,7 +327,7 @@ async fn main() {
 
     // Shared state
     let stss: SharedTychoStreamState = Arc::new(RwLock::new(TychoStreamState {
-        states: HashMap::new(),
+        protosims: HashMap::new(),
         components: HashMap::new(),
     }));
     let readable = Arc::clone(&stss);

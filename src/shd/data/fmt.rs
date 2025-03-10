@@ -4,10 +4,12 @@ use alloy::primitives::ruint::aliases::U256;
 use chrono::NaiveDateTime;
 use num_bigint::BigUint;
 use serde::{Deserialize, Serialize};
+use tycho_simulation::evm::engine_db::tycho_db::PreCachedDB;
 use tycho_simulation::evm::protocol::uniswap_v2::state::UniswapV2State;
 use tycho_simulation::evm::protocol::uniswap_v3::state::UniswapV3State;
 use tycho_simulation::evm::protocol::uniswap_v4::state::UniswapV4State;
 use tycho_simulation::evm::protocol::utils::uniswap::tick_list::{TickInfo, TickList};
+use tycho_simulation::evm::protocol::vm::state::EVMPoolState;
 use tycho_simulation::evm::tycho_models::Chain;
 use tycho_simulation::models::Token;
 use tycho_simulation::protocol::models::ProtocolComponent;
@@ -146,7 +148,7 @@ impl From<(UniswapV3State, String)> for SrzUniswapV3State {
             sqrt_price: state.sqrt_price,
             fee: state.fee as i32,
             tick: state.tick,
-            ticks: SrzTickList::from(state.ticks),
+            ticks: SrzTickList::from(state.ticks), // ! TODO: sort by index
         }
     }
 }
@@ -182,7 +184,7 @@ impl From<(UniswapV4State, String)> for SrzUniswapV4State {
                 lp_fee: state.fees.lp_fee,
             },
             tick: state.tick,
-            ticks: SrzTickList::from(state.ticks),
+            ticks: SrzTickList::from(state.ticks), // ! TODO: sort by index
         }
     }
 }
@@ -199,7 +201,7 @@ pub struct SrzTickList {
 pub struct SrzTickInfo {
     pub index: i32,
     pub net_liquidity: i128,
-    pub sqrt_price: U256,
+    pub sqrt_price: U256, // ? Is it sqrt_price of tick_index or tick_index + tick_spacing ?
 }
 
 impl From<TickInfo> for SrzTickInfo {
@@ -233,3 +235,14 @@ pub struct SrzEVMPoolState {
 }
 
 // From EVMPoolState to SrzEVMPoolState done manually.
+
+impl From<(EVMPoolState<PreCachedDB>, String)> for SrzEVMPoolState {
+    fn from((state, id): (EVMPoolState<PreCachedDB>, String)) -> Self {
+        SrzEVMPoolState {
+            id,
+            tokens: state.tokens.iter().map(|t| t.to_string().to_lowercase()).collect(),
+            block: state.block.number,
+            balances: state.balances.iter().map(|(k, v)| (k.to_string().to_lowercase(), *v)).collect(),
+        }
+    }
+}
