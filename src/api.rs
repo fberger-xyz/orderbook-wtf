@@ -25,16 +25,19 @@ async fn root() -> impl IntoResponse {
 
 // GET /version => Get version of the API (for example, a commit hash)
 async fn version() -> impl IntoResponse {
+    log::info!("👾 API: GET /version");
     Json(APIVersion { version: "0.1.0".into() })
 }
 
 // GET /network => Get network object and its configuration
 async fn network(Extension(network): Extension<Network>) -> impl IntoResponse {
+    log::info!("👾 API: GET /network on {} network", network.name);
     Json(network)
 }
 
 // GET /status => Get network status + last block synced
 async fn status(Extension(network): Extension<Network>) -> impl IntoResponse {
+    log::info!("👾 API: GET /status on {} network", network.name);
     let key1 = shd::r#static::data::keys::stream::status(network.name.clone());
     let key2 = shd::r#static::data::keys::stream::latest(network.name.clone());
     let status = shd::data::redis::get::<u128>(key1.as_str()).await;
@@ -47,6 +50,7 @@ async fn status(Extension(network): Extension<Network>) -> impl IntoResponse {
 
 // GET /network => Get network object and its configuration
 async fn tokens(Extension(network): Extension<Network>) -> impl IntoResponse {
+    log::info!("👾 API: GET /tokens on {} network", network.name);
     let key = shd::r#static::data::keys::stream::tokens(network.name.clone());
     match shd::data::redis::get::<Vec<SrzToken>>(key.as_str()).await {
         Some(tokens) => Json(json!({ "tokens": tokens })),
@@ -56,6 +60,7 @@ async fn tokens(Extension(network): Extension<Network>) -> impl IntoResponse {
 
 // GET /pairs => Get all existing pairs in the database (as a vector of strings like "0xToken0-0xToken1")
 async fn pairs(Extension(network): Extension<Network>) -> impl IntoResponse {
+    log::info!("👾 API: GET /pairs on {} network", network.name);
     let key = shd::r#static::data::keys::stream::pairs(network.name.clone());
     match shd::data::redis::get::<Vec<String>>(key.as_str()).await {
         Some(pairs) => Json(json!({ "pairs": pairs })),
@@ -73,6 +78,7 @@ async fn _components(network: Network) -> Option<Vec<SrzProtocolComponent>> {
 
 // GET /components => Get all existing components
 async fn components(Extension(network): Extension<Network>) -> impl IntoResponse {
+    log::info!("👾 API: GET /components on {} network", network.name);
     match _components(network).await {
         Some(cps) => Json(json!({ "components": cps })),
         _ => Json(json!({ "components": [] })),
@@ -113,17 +119,19 @@ async fn _pool(network: Network, id: String) -> Json<serde_json::Value> {
 
 // GET /component/{id} => Get the component for the given pool (by id)
 async fn pool(Extension(network): Extension<Network>, Path(id): Path<String>) -> impl IntoResponse {
+    log::info!("👾 API: GET /pool on {} network", network.name);
     _pool(network, id).await
 }
 
 // GET /simulate =>
 async fn simulate(Extension(shtss): Extension<SharedTychoStreamState>, Extension(network): Extension<Network>) -> impl IntoResponse {
-    log::info!("Simulating on network {}", network.name);
+    log::info!("👾 API: GET /simulate on {} network", network.name);
 }
 
 // GET /pair/{0xt0-0xt1} => Get all component & state (= /pool) for a given pair of token
 // It must be t0-t1 for tokenFrom-tokenTo, but if zeroToOne is false, computed data will be t1-t0
 async fn pair(Extension(shtss): Extension<SharedTychoStreamState>, Extension(network): Extension<Network>, Query(params): Query<PairQuery>) -> impl IntoResponse {
+    log::info!("👾 API: Querying pair: {:?}", params.tag);
     match _components(network.clone()).await {
         Some(cps) => {
             let target = params.tag.clone();
@@ -143,7 +151,7 @@ async fn pair(Extension(shtss): Extension<SharedTychoStreamState>, Extension(net
                         datapools.push(PoolComputeData { component: cp, protosim });
                     }
                 }
-                shd::core::pair::prepare(network.clone(), datapools.clone(), tokens.clone(), params.clone());
+                shd::core::pair::prepare(network.clone(), datapools.clone(), tokens.clone(), params.clone()).await;
                 return Json(json!({ "pair": [] })); // !
             } else {
                 return Json(json!({ "pair": "Query param Tag must contain only 2 tokens separated by a dash '-'." }));
@@ -173,6 +181,7 @@ pub async fn start(n: Network, shared: SharedTychoStreamState, config: EnvConfig
         .layer(Extension(n.clone()))
         .layer(Extension(shared.clone())); // Shared state
 
+    // shd::utils::misc::log::logtest();
     match tokio::net::TcpListener::bind(format!("0.0.0.0:{}", n.port)).await {
         Ok(listener) => match axum::serve(listener, app).await {
             Ok(_) => {

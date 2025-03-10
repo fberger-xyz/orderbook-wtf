@@ -50,7 +50,7 @@ alloy = { version = "0.3.1", features = ["full", "node-bindings", "json-rpc", "r
 num-traits = "0.2.19"
 alloy-chains = "0.1.63"
 axum = "0.8.1"
-
+primitive-types = "0.10.1"
 # hyper = { version = "1", features = ["full"] }
 # http-body-util = "0.1"
 # hyper-util = { version = "0.1", features = ["full"] }

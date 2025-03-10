@@ -12,6 +12,10 @@ impl ToString for TychoDex {
     }
 }
 
+pub mod maths {
+    pub static UNISWAP_Q96: u128 = 1 << 96;
+}
+
 pub mod endpoints {
     pub static REDIS_LOCAL: &str = "127.0.0.1:7777";
 }

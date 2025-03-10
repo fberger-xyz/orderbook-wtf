@@ -313,7 +313,7 @@ pub mod api;
  */
 #[tokio::main]
 async fn main() {
-    shd::utils::misc::log::new("tap2".to_string());
+    shd::utils::misc::log::new("stream".to_string());
     dotenv::from_filename(".env.ex").ok();
     let config = EnvConfig::new();
     log::info!("Launching Stream | 🧪 Testing mode: {:?}", config.testing);

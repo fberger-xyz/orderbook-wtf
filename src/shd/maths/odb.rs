@@ -11,13 +11,14 @@ use crate::shd::{
         self,
         fmt::{SrzEVMPoolState, SrzProtocolComponent, SrzToken, SrzUniswapV2State, SrzUniswapV3State, SrzUniswapV4State},
     },
-    maths, r#static,
-    types::{AmmType, Network, PairQuery, PoolComputeData},
+    maths::{self},
+    r#static,
+    types::{AmmType, LiquidityTickDelta, Network, PairQuery, PoolComputeData, SummedLiquidity},
 };
 
 use crate::shd::types::Orderbook;
 
-use super::ticks::{derive_balances, find_current_tick};
+use super::ticks::find_current_tick;
 
 pub trait ToOrderbook {
     fn orderbook(&self, component: SrzProtocolComponent, tks: Vec<SrzToken>, query: PairQuery, fee: f64, price: f64) -> Orderbook;
@@ -65,7 +66,6 @@ impl ToOrderbook for SrzEVMPoolState {
 
 impl ToOrderbook for SrzUniswapV3State {
     fn orderbook(&self, component: SrzProtocolComponent, tks: Vec<SrzToken>, query: PairQuery, fee: f64, price: f64) -> Orderbook {
-        println!("orderbook-u3");
         let mut o = Orderbook::default();
         o.address = component.id.clone().to_lowercase();
         o.protocol = component.protocol_type_name.clone();
@@ -74,10 +74,87 @@ impl ToOrderbook for SrzUniswapV3State {
         o.fee = fee;
         o.price = price;
         // CCT
+        let spacing = self.ticks.tick_spacing as i32;
         let tick_data_range = maths::ticks::compute_tick_data(self.tick, self.ticks.tick_spacing as i32);
         log::info!("tick_data_range: {:?}", tick_data_range);
+        let (p0to1, p1to0) = maths::ticks::tick_to_prices(tick_data_range.tick_lower, tks[0].decimals as u8, tks[1].decimals as u8);
         let (p0to1, p1to0) = maths::ticks::tick_to_prices(self.tick, tks[0].decimals as u8, tks[1].decimals as u8);
-        log::info!("SrzUniswapV3State > Orderbook {}: tick: {} => p0to1 and p1to0 = {} and {}", self.id, self.tick, p0to1, p1to0);
+        let (p0to1, p1to0) = maths::ticks::tick_to_prices(tick_data_range.tick_upper, tks[0].decimals as u8, tks[1].decimals as u8);
+
+        // Keep, for current active tick.
+        log::info!("Analysing current tick ...");
+        let delta = maths::ticks::get_token_amounts(
+            self.liquidity as i128,
+            self.sqrt_price.to_string().parse::<f64>().unwrap(), // At current tick, not the boundaries !
+            tick_data_range.tick_lower,
+            tick_data_range.tick_upper,
+            tks[0].clone(),
+            tks[1].clone(),
+        );
+
+        log::info!("PooL: {} => current_tick: {:?}", o.address, delta);
+
+        log::info!("Analysing each tick individually ...");
+
+        let mut aggdelta = vec![];
+
+        let mut sorted_ticks = self.ticks.ticks.clone();
+        sorted_ticks.sort_by(|a, b| a.index.cmp(&b.index));
+        for t in sorted_ticks.clone() {
+            let tdr = maths::ticks::compute_tick_data(t.index, spacing);
+            if tdr.tick_upper == 0 || tdr.tick_lower == 0 || tdr.tick_lower >= 887160 || tdr.tick_lower <= -887160 {
+                log::info!("Skipping tick: {}", tdr.tick_lower);
+                continue;
+            }
+            let d1 = self.tick - t.index;
+            let d2 = t.index - self.tick;
+            if d1.abs() < (5 * spacing) && d2.abs() < (5 * spacing) {
+                let liq = maths::ticks::compute_cumulative_liquidity(self.liquidity as i128, self.tick, t.index, &self.ticks.clone());
+                let delta = maths::ticks::get_token_amounts(
+                    // t.net_liquidity,
+                    liq,
+                    self.sqrt_price.to_string().parse::<f64>().unwrap(), //t.sqrt_price.to_string().parse::<f64>().unwrap(),
+                    tdr.tick_lower,
+                    tdr.tick_upper,
+                    tks[0].clone(),
+                    tks[1].clone(),
+                );
+                aggdelta.push(delta.clone());
+            }
+        }
+
+        // remove first and last
+        // aggdelta.remove(0);
+        // aggdelta.pop();
+        // top1 tick
+        let mut top_amount0 = LiquidityTickDelta::default();
+        let mut top_amount1 = LiquidityTickDelta::default();
+
+        for d in aggdelta.iter() {
+            let tick = d.index;
+            if d.amount0 > top_amount0.amount0 {
+                top_amount0.amount0 = d.amount0;
+                top_amount0.amount1 = d.amount1;
+                top_amount0.index = tick;
+            }
+            if d.amount1 > top_amount1.amount1 {
+                top_amount1.amount0 = d.amount0;
+                top_amount1.amount1 = d.amount1;
+                top_amount1.index = tick;
+            }
+        }
+        log::info!("PooL: {} => top_amount0: {:?}", o.address, top_amount0);
+        log::info!("PooL: {} => top_amount1: {:?}", o.address, top_amount1);
+
+        let mut summed = SummedLiquidity::default();
+        summed.amount0 = aggdelta.iter().map(|x| if x.amount0 > 0. { x.amount0 } else { 0. }).sum();
+        summed.amount1 = aggdelta.iter().map(|x| if x.amount1 > 0. { x.amount1 } else { 0. }).sum();
+        log::info!("Summed liquidity: {:?}", summed);
+
+        // for t in self.ticks.ticks {
+        //     let tdr = maths::ticks::compute_tick_data(t.index, spacing);
+        // }
+
         // let (current, next) = find_current_and_next_tick(self.ticks.clone(), self.tick);
         // let sqrt_price = self.sqrt_price.to_string().parse::<u128>().unwrap();
         // let sqrt_price_lower = current.sqrt_price.to_string().parse::<u128>().unwrap();

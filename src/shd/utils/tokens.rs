@@ -21,3 +21,25 @@
 //         })
 //         .collect::<HashMap<_, Token>>()
 // }
+
+use std::sync::Arc;
+
+use alloy::{providers::RootProvider, transports::http::Http};
+use reqwest::Client;
+
+alloy::sol!(
+    #[allow(missing_docs)]
+    #[sol(rpc)]
+    IERC20,
+    "src/shd/utils/abis/IERC20.json"
+);
+
+/**
+ * Fetch the balance of an ERC20 token for a given user
+ */
+pub async fn get_balance(provider: &RootProvider<Http<Client>>, token: String, user: String) -> u128 {
+    let client = Arc::new(provider);
+    let contract = IERC20::new(token.parse().unwrap(), client);
+    let b = contract.balanceOf(user.parse().unwrap()).call().await.unwrap().balance.to_string().parse().unwrap();
+    b
+}

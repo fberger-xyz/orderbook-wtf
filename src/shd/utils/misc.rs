@@ -12,7 +12,7 @@ pub mod log {
     use fern::colors::{Color, ColoredLevelConfig};
     use log::LevelFilter;
 
-    pub fn test() {
+    pub fn logtest() {
         println!("Something 1");
         log::info!("Something 2");
         log::error!("Something 2");
@@ -51,8 +51,8 @@ pub mod log {
             })
             .chain(std::io::stdout())
             .level(LevelFilter::Off) // Disable all logging from crates
-            .level_for(prog.clone(), LevelFilter::Trace) // Launcher logging
-            // .level_for("tap2", LevelFilter::Info) // Library logging
+            .level_for(prog.clone(), LevelFilter::Info) // Launcher logging
+            .level_for("tap2", LevelFilter::Info) // Library logging
             .apply()
             .unwrap();
     }

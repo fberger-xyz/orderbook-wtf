@@ -195,3 +195,16 @@ pub struct TickDataRange {
     pub tick_upper: i32,
     pub sqrt_price_upper: u128,
 }
+
+#[derive(Default, Debug, Clone)]
+pub struct LiquidityTickDelta {
+    pub index: i32,
+    pub amount0: f64,
+    pub amount1: f64,
+}
+
+#[derive(Default, Debug, Clone)]
+pub struct SummedLiquidity {
+    pub amount0: f64,
+    pub amount1: f64,
+}
