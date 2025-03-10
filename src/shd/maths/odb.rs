@@ -11,13 +11,13 @@ use crate::shd::{
         self,
         fmt::{SrzEVMPoolState, SrzProtocolComponent, SrzToken, SrzUniswapV2State, SrzUniswapV3State, SrzUniswapV4State},
     },
-    r#static,
+    maths, r#static,
     types::{AmmType, Network, PairQuery, PoolComputeData},
 };
 
 use crate::shd::types::Orderbook;
 
-use super::ticks::{derive_balances, find_current_and_next_tick};
+use super::ticks::{derive_balances, find_current_tick};
 
 pub trait ToOrderbook {
     fn orderbook(&self, component: SrzProtocolComponent, tks: Vec<SrzToken>, query: PairQuery, fee: f64, price: f64) -> Orderbook;
@@ -74,13 +74,17 @@ impl ToOrderbook for SrzUniswapV3State {
         o.fee = fee;
         o.price = price;
         // CCT
-        let (current, next) = find_current_and_next_tick(self.ticks.clone(), self.tick);
-        let sqrt_price = self.sqrt_price.to_string().parse::<u128>().unwrap();
-        let sqrt_price_lower = current.sqrt_price.to_string().parse::<u128>().unwrap();
-        let sqrt_price_upper = next.sqrt_price.to_string().parse::<u128>().unwrap();
-        let (b0, b1) = derive_balances(self.liquidity, sqrt_price, sqrt_price_lower, sqrt_price_upper);
-        println!("UniswapV3: {}-{} | {}-{} | {}-{}", self.id, self.liquidity, sqrt_price, sqrt_price_lower, sqrt_price_upper, self.tick);
-        println!("UniswapV3: b0: {} | b1: {}", b0, b1);
+        let tick_data_range = maths::ticks::compute_tick_data(self.tick, self.ticks.tick_spacing as i32);
+        log::info!("tick_data_range: {:?}", tick_data_range);
+        let (p0to1, p1to0) = maths::ticks::tick_to_prices(self.tick, tks[0].decimals as u8, tks[1].decimals as u8);
+        log::info!("SrzUniswapV3State > Orderbook {}: tick: {} => p0to1 and p1to0 = {} and {}", self.id, self.tick, p0to1, p1to0);
+        // let (current, next) = find_current_and_next_tick(self.ticks.clone(), self.tick);
+        // let sqrt_price = self.sqrt_price.to_string().parse::<u128>().unwrap();
+        // let sqrt_price_lower = current.sqrt_price.to_string().parse::<u128>().unwrap();
+        // let sqrt_price_upper = next.sqrt_price.to_string().parse::<u128>().unwrap();
+        // let (b0, b1) = derive_balances(self.liquidity, sqrt_price, sqrt_price_lower, sqrt_price_upper);
+        // println!("UniswapV3: {}-{} | {}-{} | {}-{}", self.id, self.liquidity, sqrt_price, sqrt_price_lower, sqrt_price_upper, self.tick);
+        // println!("UniswapV3: b0: {} | b1: {}", b0, b1);
         o.reserves = vec![0, 0]; // self.reserve0.clone() as u128, self.reserve1.clone() as u128]; // ? Or use balanceOf
         o.bids = vec![];
         o.asks = vec![];

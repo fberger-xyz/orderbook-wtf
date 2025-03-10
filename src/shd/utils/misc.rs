@@ -12,6 +12,15 @@ pub mod log {
     use fern::colors::{Color, ColoredLevelConfig};
     use log::LevelFilter;
 
+    pub fn test() {
+        println!("Something 1");
+        log::info!("Something 2");
+        log::error!("Something 2");
+        log::warn!("Something 2");
+        log::trace!("Something 2");
+        log::debug!("Something 2");
+    }
+
     /**
      * Initialize the logger
      */
@@ -28,14 +37,13 @@ pub mod log {
         fern::Dispatch::new()
             .format(move |out, message, record| {
                 out.finish(format_args!(
-                    "{:.23} [{:-<35}:{:<3}] {} {}",
+                    "{:.23} [{:-<35}:{:<3}] {:<5} {}",
                     chrono::Local::now().to_rfc3339(), // => {:.23} = 2024-08-29T11:53:54.675
                     if record.file().unwrap_or("unknown").len() > 35 {
                         &record.file().unwrap_or("unknown")[record.file().unwrap_or("unknown").len() - 35..]
                     } else {
                         record.file().unwrap_or("unknown")
                     },
-                    // record.file().unwrap_or("unknown"),
                     record.line().unwrap_or(0),
                     colors.color(record.level()),
                     message
@@ -43,10 +51,8 @@ pub mod log {
             })
             .chain(std::io::stdout())
             .level(LevelFilter::Off) // Disable all logging from crates
-            .level_for(prog.clone(), LevelFilter::Info) // Launcher logging
-            .level_for("shd", LevelFilter::Info) // Library logging
-            .level_for("lib", LevelFilter::Info) // API logging
-            .level_for("api", LevelFilter::Info) // API logging
+            .level_for(prog.clone(), LevelFilter::Trace) // Launcher logging
+            // .level_for("tap2", LevelFilter::Info) // Library logging
             .apply()
             .unwrap();
     }

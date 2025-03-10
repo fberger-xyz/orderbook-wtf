@@ -24,7 +24,7 @@ pub fn prepare(network: Network, datapools: Vec<PoolComputeData>, tokens: Vec<St
     for pdata in datapools.clone() {
         let srzt0 = pdata.component.tokens.iter().find(|x| x.address.to_lowercase() == tokens[0].clone()).unwrap();
         let srzt1 = pdata.component.tokens.iter().find(|x| x.address.to_lowercase() == tokens[1].clone()).unwrap();
-        let srztks = vec![srzt0.clone(), srzt1.clone()];
+        let srztokens = vec![srzt0.clone(), srzt1.clone()];
         let t0 = Token::from(srzt0.clone());
         let t1 = Token::from(srzt1.clone());
         let (base, quote) = if query.z0to1 { (t0, t1) } else { (t1, t0) };
@@ -40,7 +40,7 @@ pub fn prepare(network: Network, datapools: Vec<PoolComputeData>, tokens: Vec<St
                     log::info!("Spot price for {}-{}: {}", base.symbol, quote.symbol, price);
                     let state = SrzUniswapV2State::from((state.clone(), pdata.component.id.clone()));
                     let fee = proto.fee();
-                    let book = state.clone().orderbook(pdata.component.clone(), srztks.clone(), query.clone(), fee, price);
+                    let book = state.clone().orderbook(pdata.component.clone(), srztokens.clone(), query.clone(), fee, price);
                 }
                 None => {}
             },
@@ -48,7 +48,7 @@ pub fn prepare(network: Network, datapools: Vec<PoolComputeData>, tokens: Vec<St
                 Some(state) => {
                     let state = SrzUniswapV3State::from((state.clone(), pdata.component.id.clone()));
                     let fee = proto.fee();
-                    let book = state.clone().orderbook(pdata.component.clone(), srztks.clone(), query.clone(), fee, price);
+                    let book = state.clone().orderbook(pdata.component.clone(), srztokens.clone(), query.clone(), fee, price);
                 }
                 None => {}
             },
@@ -56,7 +56,7 @@ pub fn prepare(network: Network, datapools: Vec<PoolComputeData>, tokens: Vec<St
                 Some(state) => {
                     let state = SrzUniswapV4State::from((state.clone(), pdata.component.id.clone()));
                     let fee = proto.fee();
-                    let book = state.clone().orderbook(pdata.component.clone(), srztks.clone(), query.clone(), fee, price);
+                    let book = state.clone().orderbook(pdata.component.clone(), srztokens.clone(), query.clone(), fee, price);
                 }
                 None => {}
             },
@@ -64,7 +64,7 @@ pub fn prepare(network: Network, datapools: Vec<PoolComputeData>, tokens: Vec<St
                 Some(state) => {
                     let state = SrzEVMPoolState::from((state.clone(), pdata.component.id.to_string()));
                     let fee = 0.0; // proto.fee(); // Tycho does not have a fee function implemented for EVMPoolState
-                    let book = state.clone().orderbook(pdata.component.clone(), srztks.clone(), query.clone(), fee, price);
+                    let book = state.clone().orderbook(pdata.component.clone(), srztokens.clone(), query.clone(), fee, price);
                 }
                 None => {}
             },

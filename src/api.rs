@@ -176,7 +176,7 @@ pub async fn start(n: Network, shared: SharedTychoStreamState, config: EnvConfig
     match tokio::net::TcpListener::bind(format!("0.0.0.0:{}", n.port)).await {
         Ok(listener) => match axum::serve(listener, app).await {
             Ok(_) => {
-                log::info!("API for '{}' network is running on port {}", n.name, n.port);
+                log::info!("(Logs never displayed in theory): API for '{}' network is running on port {}", n.name, n.port);
             }
             Err(e) => {
                 log::error!("Failed to start API for '{}' network: {}", n.name, e);

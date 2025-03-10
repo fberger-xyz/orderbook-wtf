@@ -1,4 +1,35 @@
-use crate::shd::data::fmt::{SrzTickInfo, SrzTickList};
+use crate::shd::{
+    data::fmt::{SrzTickInfo, SrzTickList},
+    types::TickDataRange,
+};
+
+// The allowed tick indexes range from -887,272 to 887,272
+// If the tick index is negative, this corresponds to a price less than 1, since  will be less than 1 if is negative.
+// If then the price is 1 (meaning the assets have equal value) because any value raised to 0 is 1.
+// If is greater than or equal to 1, then the price will be greater than one.
+// The value 1.0001 was chosen because “This has the desirable property of each tick being a .01% (1 basis point) price movement away from each of its neighboring ticks.”
+// The “current tick” is the current price rounded down to the nearest tick. If the price increases and crosses a tick, then the tick that was just crossed becomes the current tick. “Crossed” doesn’t require that the priced “passed over” the tick.
+// If the price stops on the tick, the tick is considered crossed.
+
+// How decimals affect price
+// The tick can be negative due to the difference in decimal places, as ETH has 18 decimals while USDC has only 6 decimals.
+
+// Assuming ETH is worth $1000, the smallest unit of ETH is worth (or ), while the smallest unit of USDC is worth
+// So, although we assume that 1 ETH is “worth” more than 1 USDC, considering its smallest unit, 1 smallest unit of USDC is worth more than 1 smallest unit of ETH.
+
+pub fn compute_tick_data(tick: i32, tick_spacing: i32) -> TickDataRange {
+    let delta = tick % tick_spacing;
+    let below = tick - delta;
+    let above = below + tick_spacing;
+    let sqrt_price_lower = 1.0001_f64.powi(below);
+    let sqrt_price_upper = 1.0001_f64.powi(above);
+    TickDataRange {
+        tick_lower: below,
+        sqrt_price_lower: sqrt_price_lower as u128,
+        tick_upper: above,
+        sqrt_price_upper: sqrt_price_upper as u128,
+    }
+}
 
 /**
  * Convert a tick to prices.
@@ -46,17 +77,22 @@ pub fn derive_balances(liquidity: u128, sqrt_price: u128, sqrt_price_lower: u128
  * Find the current tick in a list of ticks
  * The tick value don't necessarily match a tick index, we just search the tick on the good range, based on tick_spacing
  */
-pub fn find_current_and_next_tick(list: SrzTickList, target: i32) -> (SrzTickInfo, SrzTickInfo) {
-    // sort max by
-    let mut dup = list.ticks.clone();
-    dup.sort_by(|a, b| a.index.cmp(&b.index));
 
-    println!("Searching for tick {} on a list of {} ticks", target, list.ticks.len());
-    let pos = dup.iter().position(|tick| target >= tick.index && target < tick.index + list.tick_spacing as i32).unwrap();
-    let current = list.ticks[pos].clone();
-    let next = list.ticks.get(pos + 1).cloned().unwrap();
-    (current, next)
+pub fn find_current_tick(list: SrzTickList, target: i32) -> Option<SrzTickInfo> {
+    list.ticks.iter().find(|tick| target >= tick.index && target < tick.index + list.tick_spacing as i32).cloned()
 }
+
+// pub fn find_current_and_next_tick(list: SrzTickList, target: i32) -> (SrzTickInfo, SrzTickInfo) {
+//     // sort max by
+//     let mut dup = list.ticks.clone();
+//     dup.sort_by(|a, b| a.index.cmp(&b.index));
+
+//     println!("Searching for tick {} on a list of {} ticks", target, list.ticks.len());
+//     let pos = dup.iter().position(|tick| target >= tick.index && target < tick.index + list.tick_spacing as i32).unwrap();
+//     let current = list.ticks[pos].clone();
+//     let next = list.ticks.get(pos + 1).cloned().unwrap();
+//     (current, next)
+// }
 
 // Lowercase
 // 0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2 ETH Mainnet

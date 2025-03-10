@@ -187,3 +187,11 @@ pub struct Orderbook {
     pub bids: Vec<f64>,
     pub asks: Vec<f64>,
 }
+
+#[derive(Debug, Clone)]
+pub struct TickDataRange {
+    pub tick_lower: i32,
+    pub sqrt_price_lower: u128,
+    pub tick_upper: i32,
+    pub sqrt_price_upper: u128,
+}

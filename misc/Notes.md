@@ -14,6 +14,7 @@ Tycho is an open-source interface to on-chain liquidity. Tycho
 - https://www.propellerheads.xyz/blog/amm-liquidity-as-an-orderbook
 - https://www.rareskills.io/post/uniswap-v3-concentrated-liquidity
 - https://www.lvr.wtf/category
+- https://www.rareskills.io/post/uniswap-v3-ticks
 
 ### Keep in mind
 
