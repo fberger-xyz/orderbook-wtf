@@ -1,19 +1,10 @@
-use tycho_simulation::{
-    evm::{
-        engine_db::tycho_db::PreCachedDB,
-        protocol::{uniswap_v2::state::UniswapV2State, uniswap_v3::state::UniswapV3State, uniswap_v4::state::UniswapV4State, vm::state::EVMPoolState},
-    },
-    protocol::state::ProtocolSim,
-};
 
 use crate::shd::{
     data::{
-        self,
         fmt::{SrzEVMPoolState, SrzProtocolComponent, SrzToken, SrzUniswapV2State, SrzUniswapV3State, SrzUniswapV4State},
     },
     maths::{self},
-    r#static,
-    types::{AmmType, Network, PairQuery, PoolComputeData, SummedLiquidity},
+    types::PairQuery,
 };
 
 use crate::shd::types::Orderbook;
@@ -105,7 +96,7 @@ impl ToOrderbook for SrzUniswapV3State {
             reserves: vec![poolb0, poolb1],
             bids: bids.clone(),
             asks: asks.clone(),
-            tick: self.tick as i32,
+            tick: self.tick,
             spacing: self.ticks.tick_spacing as u64,
         }
     }
@@ -123,7 +114,7 @@ impl ToOrderbook for SrzUniswapV4State {
             reserves: vec![poolb0, poolb1],
             bids: vec![], //bids.clone(),
             asks: vec![], //asks.clone(),
-            tick: self.tick as i32,
+            tick: self.tick,
             spacing: self.ticks.tick_spacing as u64,
         }
     }

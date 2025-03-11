@@ -44,6 +44,6 @@ pub async fn get_balance_all(provider: &RootProvider<Http<Client>>, token: Strin
 pub async fn get_balance(provider: &RootProvider<Http<Client>>, token: String, user: String) -> u128 {
     let client = Arc::new(provider);
     let contract = IERC20::new(token.parse().unwrap(), client);
-    let b = contract.balanceOf(user.parse().unwrap()).call().await.unwrap().balance.to_string().parse().unwrap();
-    b
+    
+    contract.balanceOf(user.parse().unwrap()).call().await.unwrap().balance.to_string().parse().unwrap()
 }

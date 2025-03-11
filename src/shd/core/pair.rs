@@ -10,10 +10,8 @@ use tycho_simulation::{
 
 use crate::shd::{
     data::{
-        self,
-        fmt::{SrzEVMPoolState, SrzProtocolComponent, SrzToken, SrzUniswapV2State, SrzUniswapV3State, SrzUniswapV4State},
+        fmt::{SrzEVMPoolState, SrzToken, SrzUniswapV2State, SrzUniswapV3State, SrzUniswapV4State},
     },
-    r#static,
     types::{AmmType, Network, PairOrderbook, PairQuery, PoolComputeData},
     utils::tokens::get_balance,
 };
@@ -54,40 +52,28 @@ pub async fn prepare(network: Network, datapools: Vec<PoolComputeData>, tokens: 
         let price = proto.spot_price(&base, &quote).unwrap_or_default();
         log::info!("Spot price for {}-{} => {}", base.symbol, quote.symbol, price);
         match AmmType::from(pdata.component.protocol_type_name.clone().as_str()) {
-            AmmType::UniswapV2 => match proto.as_any().downcast_ref::<UniswapV2State>() {
-                Some(state) => {
-                    let state = SrzUniswapV2State::from((state.clone(), pdata.component.id.clone()));
-                    let fee = proto.fee();
-                    let book = state.clone().orderbook(pdata.component.clone(), srztokens.clone(), query.clone(), fee, price, poolb0, poolb1);
-                    dbg!("uniswap v2 book", book.clone());
-                    odbs.push(book);
-                }
-                None => {}
+            AmmType::UniswapV2 => if let Some(state) = proto.as_any().downcast_ref::<UniswapV2State>() {
+                let state = SrzUniswapV2State::from((state.clone(), pdata.component.id.clone()));
+                let fee = proto.fee();
+                let book = state.clone().orderbook(pdata.component.clone(), srztokens.clone(), query.clone(), fee, price, poolb0, poolb1);
+                dbg!("uniswap v2 book", book.clone());
+                odbs.push(book);
             },
-            AmmType::UniswapV3 => match proto.as_any().downcast_ref::<UniswapV3State>() {
-                Some(state) => {
-                    let state = SrzUniswapV3State::from((state.clone(), pdata.component.id.clone()));
-                    let fee = proto.fee();
-                    let book = state.clone().orderbook(pdata.component.clone(), srztokens.clone(), query.clone(), fee, price, poolb0, poolb1);
-                    odbs.push(book);
-                }
-                None => {}
+            AmmType::UniswapV3 => if let Some(state) = proto.as_any().downcast_ref::<UniswapV3State>() {
+                let state = SrzUniswapV3State::from((state.clone(), pdata.component.id.clone()));
+                let fee = proto.fee();
+                let book = state.clone().orderbook(pdata.component.clone(), srztokens.clone(), query.clone(), fee, price, poolb0, poolb1);
+                odbs.push(book);
             },
-            AmmType::UniswapV4 => match proto.as_any().downcast_ref::<UniswapV4State>() {
-                Some(state) => {
-                    let state = SrzUniswapV4State::from((state.clone(), pdata.component.id.clone()));
-                    let fee = proto.fee();
-                    let book = state.clone().orderbook(pdata.component.clone(), srztokens.clone(), query.clone(), fee, price, poolb0, poolb1);
-                }
-                None => {}
+            AmmType::UniswapV4 => if let Some(state) = proto.as_any().downcast_ref::<UniswapV4State>() {
+                let state = SrzUniswapV4State::from((state.clone(), pdata.component.id.clone()));
+                let fee = proto.fee();
+                let book = state.clone().orderbook(pdata.component.clone(), srztokens.clone(), query.clone(), fee, price, poolb0, poolb1);
             },
-            AmmType::Curve | AmmType::Balancer => match proto.as_any().downcast_ref::<EVMPoolState<PreCachedDB>>() {
-                Some(state) => {
-                    let state = SrzEVMPoolState::from((state.clone(), pdata.component.id.to_string()));
-                    let fee = 0.0; // proto.fee(); // Tycho does not have a fee function implemented for EVMPoolState
-                    let book = state.clone().orderbook(pdata.component.clone(), srztokens.clone(), query.clone(), fee, price, poolb0, poolb1);
-                }
-                None => {}
+            AmmType::Curve | AmmType::Balancer => if let Some(state) = proto.as_any().downcast_ref::<EVMPoolState<PreCachedDB>>() {
+                let state = SrzEVMPoolState::from((state.clone(), pdata.component.id.to_string()));
+                let fee = 0.0; // proto.fee(); // Tycho does not have a fee function implemented for EVMPoolState
+                let book = state.clone().orderbook(pdata.component.clone(), srztokens.clone(), query.clone(), fee, price, poolb0, poolb1);
             },
         }
         log::info!("\n");

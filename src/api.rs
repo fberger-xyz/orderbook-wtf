@@ -75,10 +75,7 @@ async fn pairs(Extension(network): Extension<Network>) -> impl IntoResponse {
 
 async fn _components(network: Network) -> Option<Vec<SrzProtocolComponent>> {
     let key = shd::r#static::data::keys::stream::components(network.name.clone());
-    match shd::data::redis::get::<Vec<SrzProtocolComponent>>(key.as_str()).await {
-        Some(cps) => Some(cps),
-        _ => None,
-    }
+    shd::data::redis::get::<Vec<SrzProtocolComponent>>(key.as_str()).await
 }
 
 // GET /components => Get all existing components
@@ -141,7 +138,7 @@ async fn pair(Extension(shtss): Extension<SharedTychoStreamState>, Extension(net
     match _components(network.clone()).await {
         Some(cps) => {
             let target = params.tag.clone();
-            let tokens = target.split("-").into_iter().map(|x| x.to_string().to_lowercase()).collect::<Vec<String>>();
+            let tokens = target.split("-").map(|x| x.to_string().to_lowercase()).collect::<Vec<String>>();
             let srzt0 = alltokens.iter().find(|x| x.address.to_lowercase() == tokens[0].clone()).unwrap();
             let srzt1 = alltokens.iter().find(|x| x.address.to_lowercase() == tokens[1].clone()).unwrap();
             let tokens = vec![srzt0.clone(), srzt1.clone()];
@@ -161,12 +158,12 @@ async fn pair(Extension(shtss): Extension<SharedTychoStreamState>, Extension(net
                     }
                 }
                 shd::core::pair::prepare(network.clone(), datapools.clone(), tokens.clone(), params.clone()).await;
-                return Json(json!({ "pair": [] })); // !
+                Json(json!({ "pair": [] }))// !
             } else {
-                return Json(json!({ "pair": "Query param Tag must contain only 2 tokens separated by a dash '-'." }));
+                Json(json!({ "pair": "Query param Tag must contain only 2 tokens separated by a dash '-'." }))
             }
         }
-        None => return Json(json!({ "pair": "Couldn't not read internal components" })),
+        None => Json(json!({ "pair": "Couldn't not read internal components" })),
     }
 }
 

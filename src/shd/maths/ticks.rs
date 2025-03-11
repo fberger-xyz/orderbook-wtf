@@ -1,5 +1,5 @@
 use crate::shd::{
-    data::fmt::{SrzTickInfo, SrzTickList, SrzToken},
+    data::fmt::{SrzTickList, SrzToken},
     r#static::maths::UNISWAP_Q96,
     types::{LiquidityTickAmounts, TickDataRange},
 };
@@ -160,7 +160,7 @@ pub fn ticks_liquidity(active: i128, current_tick: i32, tick_spacing: i32, tick_
             (low, high, mid)
         } else {
             // For current tick, use the actual pool's sqrt price from the tick info.
-            (current_tick, current_tick, tick.sqrt_price.to_string().parse::<f64>().unwrap() as f64)
+            (current_tick, current_tick, tick.sqrt_price.to_string().parse::<f64>().unwrap())
         };
         // Enable verbose logging if target_tick is within ±10×tick_spacing of current_tick.
         let verbose = (target_tick - current_tick).abs() <= 5 * tick_spacing;
