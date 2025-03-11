@@ -11,25 +11,31 @@ use tycho_simulation::{
 use crate::shd::{
     data::{
         self,
-        fmt::{SrzEVMPoolState, SrzProtocolComponent, SrzUniswapV2State, SrzUniswapV3State, SrzUniswapV4State},
+        fmt::{SrzEVMPoolState, SrzProtocolComponent, SrzToken, SrzUniswapV2State, SrzUniswapV3State, SrzUniswapV4State},
     },
     r#static,
-    types::{AmmType, Network, PairQuery, PoolComputeData},
+    types::{AmmType, Network, PairOrderbook, PairQuery, PoolComputeData},
     utils::tokens::get_balance,
 };
 
 use crate::shd::maths::odb::ToOrderbook;
 
 /// @notice Reading 'state' from Redis DB while using TychoStreamState state and functions to compute/simulate might create a inconsistency
-pub async fn prepare(network: Network, datapools: Vec<PoolComputeData>, tokens: Vec<String>, query: PairQuery) {
+pub async fn prepare(network: Network, datapools: Vec<PoolComputeData>, tokens: Vec<SrzToken>, query: PairQuery) -> PairOrderbook {
     log::info!("Got {} pools to compute for pair: '{}'", datapools.len(), query.tag);
+    let mut odbs = Vec::new();
     for pdata in datapools.clone() {
-        let srzt0 = pdata.component.tokens.iter().find(|x| x.address.to_lowercase() == tokens[0].clone()).unwrap();
-        let srzt1 = pdata.component.tokens.iter().find(|x| x.address.to_lowercase() == tokens[1].clone()).unwrap();
+        log::info!("Preparing pool: {} | Type: {}", pdata.component.id, pdata.component.protocol_type_name);
+        let srzt0 = tokens[0].clone();
+        let srzt1 = tokens[1].clone();
         let srztokens = vec![srzt0.clone(), srzt1.clone()];
+        // if pdata.component.id.to_lowercase() != "0x8ad599c3a0ff1de082011efddc58f1908eb6e6d8" {
+        //     log::info!("Skipping pool: {}", pdata.component.id);
+        //     continue;
+        // }
 
-        if pdata.component.id.to_lowercase() != "0x8ad599c3a0ff1de082011efddc58f1908eb6e6d8" {
-            log::info!("Skipping pool: {}", pdata.component.id);
+        if pdata.component.protocol_type_name.to_lowercase() == "uniswap_v4_pool" || pdata.component.protocol_type_name.to_lowercase() == "balancer_v2_pool" {
+            log::info!("Skipping pool {} because it's {}", pdata.component.id, pdata.component.protocol_type_name.to_lowercase());
             continue;
         }
 
@@ -38,9 +44,9 @@ pub async fn prepare(network: Network, datapools: Vec<PoolComputeData>, tokens: 
 
         let provider = ProviderBuilder::new().with_chain(alloy_chains::NamedChain::Mainnet).on_http(network.rpc.clone().parse().unwrap());
         let poolb0 = get_balance(&provider, srzt0.address.to_string(), pdata.component.id.clone()).await;
-        let poolb0 = poolb0 / 10u128.pow(t0.decimals as u32);
+        let poolb0 = poolb0 as f64 / 10f64.powi(t0.decimals as i32);
         let poolb1 = get_balance(&provider, srzt1.address.to_string(), pdata.component.id.clone()).await;
-        let poolb1 = poolb1 / 10u128.pow(t1.decimals as u32);
+        let poolb1 = poolb1 as f64 / 10f64.powi(t1.decimals as i32);
         log::info!("Pool balances: {}-{} => {} and {}", t0.symbol, t1.symbol, poolb0, poolb1);
 
         let (base, quote) = if query.z0to1 { (t0, t1) } else { (t1, t0) };
@@ -52,7 +58,9 @@ pub async fn prepare(network: Network, datapools: Vec<PoolComputeData>, tokens: 
                 Some(state) => {
                     let state = SrzUniswapV2State::from((state.clone(), pdata.component.id.clone()));
                     let fee = proto.fee();
-                    let book = state.clone().orderbook(pdata.component.clone(), srztokens.clone(), query.clone(), fee, price);
+                    let book = state.clone().orderbook(pdata.component.clone(), srztokens.clone(), query.clone(), fee, price, poolb0, poolb1);
+                    dbg!("uniswap v2 book", book.clone());
+                    odbs.push(book);
                 }
                 None => {}
             },
@@ -60,7 +68,8 @@ pub async fn prepare(network: Network, datapools: Vec<PoolComputeData>, tokens: 
                 Some(state) => {
                     let state = SrzUniswapV3State::from((state.clone(), pdata.component.id.clone()));
                     let fee = proto.fee();
-                    let book = state.clone().orderbook(pdata.component.clone(), srztokens.clone(), query.clone(), fee, price);
+                    let book = state.clone().orderbook(pdata.component.clone(), srztokens.clone(), query.clone(), fee, price, poolb0, poolb1);
+                    odbs.push(book);
                 }
                 None => {}
             },
@@ -68,7 +77,7 @@ pub async fn prepare(network: Network, datapools: Vec<PoolComputeData>, tokens: 
                 Some(state) => {
                     let state = SrzUniswapV4State::from((state.clone(), pdata.component.id.clone()));
                     let fee = proto.fee();
-                    let book = state.clone().orderbook(pdata.component.clone(), srztokens.clone(), query.clone(), fee, price);
+                    let book = state.clone().orderbook(pdata.component.clone(), srztokens.clone(), query.clone(), fee, price, poolb0, poolb1);
                 }
                 None => {}
             },
@@ -76,11 +85,20 @@ pub async fn prepare(network: Network, datapools: Vec<PoolComputeData>, tokens: 
                 Some(state) => {
                     let state = SrzEVMPoolState::from((state.clone(), pdata.component.id.to_string()));
                     let fee = 0.0; // proto.fee(); // Tycho does not have a fee function implemented for EVMPoolState
-                    let book = state.clone().orderbook(pdata.component.clone(), srztokens.clone(), query.clone(), fee, price);
+                    let book = state.clone().orderbook(pdata.component.clone(), srztokens.clone(), query.clone(), fee, price, poolb0, poolb1);
                 }
                 None => {}
             },
         }
         log::info!("\n");
     }
+
+    let output = PairOrderbook {
+        from: tokens[0].clone(),
+        to: tokens[1].clone(),
+        orderbooks: odbs.clone(),
+    };
+    let path = format!("misc/data/{}.eth-usdc.pair-orderbook.json", network.name);
+    crate::shd::utils::misc::save1(output.clone(), path.as_str());
+    output
 }

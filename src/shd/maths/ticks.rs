@@ -1,36 +1,8 @@
 use crate::shd::{
     data::fmt::{SrzTickInfo, SrzTickList, SrzToken},
     r#static::maths::UNISWAP_Q96,
-    types::{LiquidityTickDelta, TickDataRange},
+    types::{LiquidityTickAmounts, TickDataRange},
 };
-
-// The allowed tick indexes range from -887,272 to 887,272
-// If the tick index is negative, this corresponds to a price less than 1, since  will be less than 1 if is negative.
-// If then the price is 1 (meaning the assets have equal value) because any value raised to 0 is 1.
-// If is greater than or equal to 1, then the price will be greater than one.
-// The value 1.0001 was chosen because “This has the desirable property of each tick being a .01% (1 basis point) price movement away from each of its neighboring ticks.”
-// The “current tick” is the current price rounded down to the nearest tick. If the price increases and crosses a tick, then the tick that was just crossed becomes the current tick. “Crossed” doesn’t require that the priced “passed over” the tick.
-// If the price stops on the tick, the tick is considered crossed.
-
-// How decimals affect price
-// The tick can be negative due to the difference in decimal places, as ETH has 18 decimals while USDC has only 6 decimals.
-
-// Assuming ETH is worth $1000, the smallest unit of ETH is worth (or ), while the smallest unit of USDC is worth
-// So, although we assume that 1 ETH is “worth” more than 1 USDC, considering its smallest unit, 1 smallest unit of USDC is worth more than 1 smallest unit of ETH.
-
-// pub fn compute_tick_data(tick: i32, tick_spacing: i32) -> TickDataRange {
-//     let delta = tick % tick_spacing;
-//     let below = tick - delta;
-//     let above = below + tick_spacing;
-//     let sqrt_price_lower = 1.0001_f64.powi(below);
-//     let sqrt_price_upper = 1.0001_f64.powi(above);
-//     TickDataRange {
-//         tick_lower: below,
-//         sqrt_price_lower: sqrt_price_lower as u128,
-//         tick_upper: above,
-//         sqrt_price_upper: sqrt_price_upper as u128,
-//     }
-// }
 
 pub fn compute_tick_data(tick: i32, tick_spacing: i32) -> TickDataRange {
     // Ensure a nonnegative remainder (works correctly for negative ticks, too)
@@ -52,156 +24,192 @@ pub fn compute_tick_data(tick: i32, tick_spacing: i32) -> TickDataRange {
 }
 
 /**
- * Convert a tick to prices.
+ * Convert a tick to prices
  */
 pub fn tick_to_prices(tick: i32, decimals_token0: u8, decimals_token1: u8) -> (f64, f64) {
-    // Compute the raw price from the tick using Uniswap V3's formula.
     let raw_price = 1.0001_f64.powi(tick);
-    // Adjust for token decimals.
-    // For example, if token0 is WETH (18) and token1 is USDC (6), then djustment = 10^(18 - 6) = 10^12.
     let adjustment = 10_f64.powi((decimals_token0 as i32) - (decimals_token1 as i32));
-    // Compute price0to1 as defined:
     let price0to1 = 1.0 / (raw_price * adjustment);
-    // The reciprocal gives price1to0
     let price1to0 = 1.0 / price0to1;
-    // log::info!("tick_to_prices: computing prices at tick: {} => p0to1 = {} and p1to0 {}", tick, price0to1, price1to0);
     (price0to1, price1to0)
 }
 
 /**
- * Find the current tick in a list of ticks
- * The tick value don't necessarily match a tick index, we just search the tick on the good range, based on tick_spacing
+ * Get the tick at the square root price
+ * ! Unsure about float precision
  */
-
-pub fn find_current_tick(list: SrzTickList, target: i32) -> Option<SrzTickInfo> {
-    list.ticks.iter().find(|tick| target >= tick.index && target < tick.index + list.tick_spacing as i32).cloned()
-}
-
-// pub fn find_current_and_next_tick(list: SrzTickList, target: i32) -> (SrzTickInfo, SrzTickInfo) {
-//     // sort max by
-//     let mut dup = list.ticks.clone();
-//     dup.sort_by(|a, b| a.index.cmp(&b.index));
-
-//     println!("Searching for tick {} on a list of {} ticks", target, list.ticks.len());
-//     let pos = dup.iter().position(|tick| target >= tick.index && target < tick.index + list.tick_spacing as i32).unwrap();
-//     let current = list.ticks[pos].clone();
-//     let next = list.ticks.get(pos + 1).cloned().unwrap();
-//     (current, next)
-// }
-
-/// Computes the tick corresponding to a given sqrtPriceX96.
-/// The tick is calculated by:
-///     tick = floor( ln((sqrtPriceX96 / Q96)^2) / ln(1.0001) )
-///
-/// Here, sqrt_price_x96 is passed as an f64.
-/// Returns the tick corresponding to a given sqrtPriceX96 (in Q64.96 fixed‑point).
-/// tick = floor( ln((sqrtPriceX96 / Q96)^2) / ln(1.0001) )
 fn get_tick_at_sqrt_price(sqrt_price_x96: u128) -> i32 {
+    // Here, sqrt_price_x96 is already the raw Q64.96 number.
     let sqrt_price = sqrt_price_x96 as f64 / UNISWAP_Q96 as f64;
     let tick = ((sqrt_price * sqrt_price).ln() / 1.0001_f64.ln()).floor();
     tick as i32
 }
-/// Computes the cumulative liquidity at a given target tick, starting from the active liquidity at the current tick.
-///
-/// # Arguments
-/// - `active_liquidity`: The liquidity currently active at the pool’s current tick.
-/// - `current_tick`: The current tick (the tick in which the price currently lies).
-/// - `target_tick`: The tick at which you want to know the liquidity.
-/// - `tick_list`: A list of ticks (with their net liquidity delta) for the pool.
-///
-/// # Returns
-/// The liquidity that would be active if the price moved to `target_tick`.
-pub fn compute_cumulative_liquidity(active_liquidity: i128, current_tick: i32, target_tick: i32, tick_list: &SrzTickList) -> i128 {
-    let mut liquidity = active_liquidity;
 
-    if target_tick > current_tick {
-        // When moving upward (price increasing): add the net liquidity from ticks above current_tick
-        for tick_info in tick_list.ticks.iter() {
-            if tick_info.index > current_tick && tick_info.index <= target_tick {
-                liquidity += tick_info.net_liquidity;
-            }
-        }
-    } else if target_tick < current_tick {
-        // When moving downward (price decreasing): subtract the net liquidity from ticks below current_tick
-        // (Alternatively, add the negative net liquidity values.)
-        for tick_info in tick_list.ticks.iter() {
-            if tick_info.index <= current_tick && tick_info.index > target_tick {
-                liquidity -= tick_info.net_liquidity;
-            }
-        }
-    }
-    // If target_tick == current_tick, liquidity remains the active liquidity.
-    // log::info!(" > tick # {:<7} | Cumulative liquidity at tick # {:<7} = {:<15}", current_tick, target_tick, liquidity);
-    liquidity
-}
-/// Computes the amounts of token0 and token1 given:
-/// - `liquidity`: The pool liquidity (which can be negative, representing removed liquidity).
-/// - `sqrt_price_x96`: The current square-root price scaled by Q96, provided as an f64.
-/// - `tick_low` and `tick_high`: The lower and upper tick bounds defining the price range.
-/// - `t0` and `t1`: Token metadata (symbol and decimals).
-///
-/// The math follows:
-///  - If the current tick is below tick_low: all liquidity is considered as token0.
-///    amount0 = floor(liquidity * ((sqrtRatioB - sqrtRatioA) / (sqrtRatioA * sqrtRatioB)))
-///  - If the current tick is above or equal tick_high: all liquidity is in token1.
-///    amount1 = floor(liquidity * (sqrtRatioB - sqrtRatioA))
-///  - Otherwise (current tick in range), liquidity is split:
-///    amount0 = floor(liquidity * ((sqrtRatioB - sqrtPrice) / (sqrtPrice * sqrtRatioB)))
-///    amount1 = floor(liquidity * (sqrtPrice - sqrtRatioA))
-///
-/// Negative liquidity (and thus negative amounts) indicate removed liquidity.
-/// Computes token amounts (in human-readable units) from liquidity given the current √price and tick range.
-///
-/// **Important:** Use the actual current sqrt_price_x96 (from pool state), not one computed from a tick boundary.
-pub fn get_token_amounts(
+/**
+ * Computes token amounts (in human-readable units) from liquidity given the current √price and tick range.
+ * IMPORTANT: The function expects sqrt_price_x96 as f64 representing the raw Q64.96 value (i.e. the on-chain value)
+ * and NOT a value computed on a tick boundary. This ensures the current price lies between the boundaries.
+ *
+ * ! The function might not working as expected
+ */
+pub fn derive(
     liquidity: i128,
-    sqrt_price_x96: f64, // current √price in Q64.96, as f64 (from pool state)
+    x96: f64, // the raw Q64.96 value as f64
     tick_low: i32,
     tick_high: i32,
     t0: SrzToken,
     t1: SrzToken,
-) -> LiquidityTickDelta {
-    // Log input for debugging.
-    println!(
-        "[INPUT] tick_low: {} liquidity: {} sqrt_price_x96: {} tick_low: {} tick_high: {}",
-        tick_low, liquidity, sqrt_price_x96, tick_low, tick_high
-    );
-
-    // Compute sqrt ratios at the boundaries.
-    // Uniswap V3 defines: sqrtRatio = 1.0001^(tick/2)
+    v: bool,
+) -> LiquidityTickAmounts {
+    // Compute the sqrt ratios at the boundaries: sqrt_ratio = 1.0001^(tick/2)
     let sqrt_ratio_a = 1.0001_f64.powf(tick_low as f64 / 2.0);
     let sqrt_ratio_b = 1.0001_f64.powf(tick_high as f64 / 2.0);
-
-    // Determine the current tick from the actual pool sqrt price.
-    let current_tick = get_tick_at_sqrt_price((sqrt_price_x96 * (UNISWAP_Q96 as f64)) as u128);
-    // Convert the current sqrt price to a fraction (divide by Q96).
-    let sqrt_price = sqrt_price_x96 / (UNISWAP_Q96 as f64);
-
-    let (mut amount0, mut amount1) = (0_f64, 0_f64);
-    if current_tick < tick_low {
-        // Price is below the range: all liquidity is token0.
-        amount0 = (liquidity as f64 * ((sqrt_ratio_b - sqrt_ratio_a) / (sqrt_ratio_a * sqrt_ratio_b))).floor();
+    // Compute current_tick directly from x96, since it's already Q64.96.
+    let current_tick = get_tick_at_sqrt_price(x96 as u128); // ! This might not work as expected
+    let sqrt_price = x96 / (UNISWAP_Q96 as f64); // Convert the raw Q64.96 number to a fraction.
+    let adjustment = 10_f64.powi((t0.decimals as i32) - (t1.decimals as i32));
+    let unadjusted_price = sqrt_price * sqrt_price;
+    // Following the tick_to_prices convention, we assume:
+    // - The raw price (from tick) is token1/token0.
+    // - To get price0to1 (token0 per token1), take the reciprocal and apply the adjustment.
+    let price0to1 = if unadjusted_price != 0.0 { 1.0 / (unadjusted_price * adjustment) } else { 0.0 };
+    let price1to0 = if price0to1 != 0.0 { 1.0 / price0to1 } else { 0.0 };
+    let mut _prefix = "";
+    let (amount0, amount1) = if current_tick < tick_low {
+        // Price is below the range: all liquidity is in token0.
+        let amt0 = (liquidity as f64 * ((sqrt_ratio_b - sqrt_ratio_a) / (sqrt_ratio_a * sqrt_ratio_b))).floor();
+        _prefix = "current_tick < tick_low, so amount0 computed:";
+        (amt0, 0.0)
     } else if current_tick >= tick_high {
-        // Price is above the range: all liquidity is token1.
-        amount1 = (liquidity as f64 * (sqrt_ratio_b - sqrt_ratio_a)).floor();
+        // Price is above the range: all liquidity is in token1.
+        let amt1 = (liquidity as f64 * (sqrt_ratio_b - sqrt_ratio_a)).floor();
+        _prefix = "current_tick >= tick_high, so amount1 computed:";
+        (0.0, amt1)
     } else {
         // Price is within the range: liquidity is split.
-        amount0 = (liquidity as f64 * ((sqrt_ratio_b - sqrt_price) / (sqrt_price * sqrt_ratio_b))).floor();
-        amount1 = (liquidity as f64 * (sqrt_price - sqrt_ratio_a)).floor();
+        let amt0 = (liquidity as f64 * ((sqrt_ratio_b - sqrt_price) / (sqrt_price * sqrt_ratio_b))).floor();
+        let amt1 = (liquidity as f64 * (sqrt_price - sqrt_ratio_a)).floor();
+        _prefix = "In-range: amount0 and amount1 computed:";
+        (amt0, amt1)
+    };
+
+    let amount0div = amount0 / 10_f64.powi(t0.decimals as i32);
+    let amount1div = amount1 / 10_f64.powi(t1.decimals as i32);
+    if v {
+        log::info!("Inputs: tick_low: {} | tick_high: {} | liquidity: {} | x96: {}", tick_low, tick_high, liquidity, x96);
+        log::info!(" - current_tick: {} | Boundaries: sqrt_low: {:.8}, sqrt_high: {:.8}, actual: {:.8}", current_tick, sqrt_ratio_a, sqrt_ratio_b, sqrt_price);
+        log::info!(" - Price0to1: {:.8} | Price1to0: {:.8}", price0to1, price1to0);
+        log::info!(" - {} amount0 {:.8} | amount1 {:.8}", _prefix, amount0, amount1);
+        log::info!(" - tick: {} | lqdty: {} | {}: {:.6} | {}: {:.6}\n", current_tick, liquidity, t0.symbol, amount0div, t1.symbol, amount1div);
     }
 
-    // Convert amounts from smallest units to human-readable values.
-    let amount0_human = amount0 / 10_f64.powi(t0.decimals as i32);
-    let amount1_human = amount1 / 10_f64.powi(t1.decimals as i32);
-
-    println!(
-        "[OUTPUT] current_tick: {} liquidity: {} | {}: {:.6} | {}: {:.6}",
-        current_tick, liquidity, t0.symbol, amount0_human, t1.symbol, amount1_human
-    );
-
-    LiquidityTickDelta {
+    LiquidityTickAmounts {
         index: tick_low,
-        amount0: amount0_human,
-        amount1: amount1_human,
+        amount0: amount0div,
+        amount1: amount1div,
+        p0to1: price0to1,
+        p1to0: price1to0,
     }
+}
+
+/// Computes the cumulative liquidity at a target tick by accumulating net liquidity deltas.
+/// If target_tick > current_tick, adds net liquidity; if target_tick < current_tick, subtracts net liquidity.
+pub fn compute_cumulative_liquidity(active_liquidity: i128, current_tick: i32, target_tick: i32, tick_list: &SrzTickList) -> i128 {
+    let mut liquidity = active_liquidity;
+    if target_tick > current_tick {
+        for tick in tick_list.ticks.iter() {
+            if tick.index > current_tick && tick.index <= target_tick {
+                liquidity += tick.net_liquidity;
+            }
+        }
+    } else if target_tick < current_tick {
+        for tick in tick_list.ticks.iter() {
+            if tick.index <= current_tick && tick.index > target_tick {
+                liquidity -= tick.net_liquidity;
+            }
+        }
+    }
+    liquidity
+}
+
+/// Simulates available token amounts for each tick in the tick list in both directions (bid/ask).
+/// For each tick, it calculates cumulative liquidity and then computes token amounts using derive().
+pub fn ticks_liquidity(active: i128, current_tick: i32, tick_spacing: i32, tick_list: &SrzTickList, t0: SrzToken, t1: SrzToken) -> Vec<LiquidityTickAmounts> {
+    log::info!("--- Computing liquidity across ticks ---");
+    let mut output = vec![];
+    for tick in tick_list.ticks.iter() {
+        let target_tick = tick.index;
+        // Compute cumulative liquidity at target_tick.
+        let cum_liq = compute_cumulative_liquidity(active, current_tick, target_tick, tick_list);
+        // Determine the range boundaries and simulate an "active" sqrt price.
+        let (range_low, range_high, simulated_sqrt_price_x96): (i32, i32, f64) = if target_tick < current_tick {
+            let low = target_tick;
+            let high = target_tick + tick_spacing;
+            let _sqrt_low = 1.0001_f64.powf(low as f64 / 2.0) * (UNISWAP_Q96 as f64);
+            let sqrt_high = 1.0001_f64.powf(high as f64 / 2.0) * (UNISWAP_Q96 as f64);
+            // let mid = (sqrt_low + sqrt_high) / 2.0;
+            let mid = sqrt_high; // ! This might not work as expected. Use this if you want 0 on the token outside
+            (low, high, mid)
+        } else if target_tick > current_tick {
+            let low = target_tick - tick_spacing;
+            let high = target_tick;
+            let sqrt_low = 1.0001_f64.powf(low as f64 / 2.0) * (UNISWAP_Q96 as f64);
+            let _sqrt_high = 1.0001_f64.powf(high as f64 / 2.0) * (UNISWAP_Q96 as f64);
+            // let mid = (sqrt_low + sqrt_high) / 2.0;
+            let mid = sqrt_low; // ! This might not work as expected. Use this if you want 0 on the token outside
+            (low, high, mid)
+        } else {
+            // For current tick, use the actual pool's sqrt price from the tick info.
+            (current_tick, current_tick, tick.sqrt_price.to_string().parse::<f64>().unwrap() as f64)
+        };
+        // Enable verbose logging if target_tick is within ±10×tick_spacing of current_tick.
+        let verbose = (target_tick - current_tick).abs() <= 5 * tick_spacing;
+        let (p0to1, p1to0) = tick_to_prices(target_tick, t0.decimals as u8, t1.decimals as u8);
+        // Compute token amounts using the simulated sqrt price.
+        let tick_amounts = derive(cum_liq, simulated_sqrt_price_x96, range_low, range_high, t0.clone(), t1.clone(), verbose);
+        output.push(tick_amounts.clone());
+        log::info!(
+            "Tick {} within [{}, {}] | {}: {:.6}, {}: {:.6} | p0to1 = {:.6}, p1to0 = {:.6}",
+            target_tick,
+            range_low,
+            range_high,
+            t0.symbol,
+            tick_amounts.amount0,
+            t1.symbol,
+            tick_amounts.amount1,
+            p0to1,
+            p1to0
+        );
+    }
+    output
+}
+
+/**
+ * Filter and classify liquidity ticks
+ */
+pub fn filter_and_classify_ticks(ticks: Vec<LiquidityTickAmounts>, current_tick: i32, current_tick_lower: i32, current_price0to1: f64, current_price1to0: f64) -> (Vec<LiquidityTickAmounts>, Vec<LiquidityTickAmounts>) {
+    let mut bids = Vec::new();
+    let mut asks = Vec::new();
+
+    for tick in ticks {
+        if tick.index > 870_000 || tick.index < -870_000 {
+            continue;
+        }
+        if tick.p0to1 > current_price0to1 * 100.0 || tick.p0to1 < current_price0to1 / 100.0 {
+            continue;
+        }
+        if tick.p1to0 > current_price1to0 * 100.0 || tick.p1to0 < current_price1to0 / 100.0 {
+            continue;
+        }
+        if tick.index == current_tick_lower {
+            continue;
+        }
+        if tick.index <= current_tick {
+            bids.push(tick);
+        } else {
+            asks.push(tick);
+        }
+    }
+
+    (bids, asks)
 }

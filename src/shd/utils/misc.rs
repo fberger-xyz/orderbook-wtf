@@ -115,3 +115,15 @@ pub fn save<T: Serialize>(output: Vec<T>, file: &str) {
     file.write_all(b"\n").expect("Failed to write newline to file");
     file.flush().expect("Failed to flush file");
 }
+
+/**
+ * Write output to file
+ */
+pub fn save1<T: Serialize>(output: T, file: &str) {
+    // log::info!("Saving to file: {}", file);
+    let mut file = OpenOptions::new().create(true).write(true).truncate(true).open(file).expect("Failed to open or create file");
+    let json = serde_json::to_string(&output).expect("Failed to serialize JSON");
+    file.write_all(json.as_bytes()).expect("Failed to write to file");
+    file.write_all(b"\n").expect("Failed to write newline to file");
+    file.flush().expect("Failed to flush file");
+}

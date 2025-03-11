@@ -48,11 +48,16 @@ async fn status(Extension(network): Extension<Network>) -> impl IntoResponse {
     }
 }
 
+async fn _tokens(network: Network) -> Option<Vec<SrzToken>> {
+    let key = shd::r#static::data::keys::stream::tokens(network.name.clone());
+    shd::data::redis::get::<Vec<SrzToken>>(key.as_str()).await
+}
+
 // GET /network => Get network object and its configuration
 async fn tokens(Extension(network): Extension<Network>) -> impl IntoResponse {
     log::info!("👾 API: GET /tokens on {} network", network.name);
     let key = shd::r#static::data::keys::stream::tokens(network.name.clone());
-    match shd::data::redis::get::<Vec<SrzToken>>(key.as_str()).await {
+    match _tokens(network.clone()).await {
         Some(tokens) => Json(json!({ "tokens": tokens })),
         _ => Json(json!({ "tokens": [] })),
     }
@@ -132,17 +137,21 @@ async fn simulate(Extension(shtss): Extension<SharedTychoStreamState>, Extension
 // It must be t0-t1 for tokenFrom-tokenTo, but if zeroToOne is false, computed data will be t1-t0
 async fn pair(Extension(shtss): Extension<SharedTychoStreamState>, Extension(network): Extension<Network>, Query(params): Query<PairQuery>) -> impl IntoResponse {
     log::info!("👾 API: Querying pair: {:?}", params.tag);
+    let alltokens = _tokens(network.clone()).await.unwrap();
     match _components(network.clone()).await {
         Some(cps) => {
             let target = params.tag.clone();
             let tokens = target.split("-").into_iter().map(|x| x.to_string().to_lowercase()).collect::<Vec<String>>();
+            let srzt0 = alltokens.iter().find(|x| x.address.to_lowercase() == tokens[0].clone()).unwrap();
+            let srzt1 = alltokens.iter().find(|x| x.address.to_lowercase() == tokens[1].clone()).unwrap();
+            let tokens = vec![srzt0.clone(), srzt1.clone()];
             if tokens.len() == 2 {
                 let mut datapools: Vec<PoolComputeData> = vec![];
                 for cp in cps.clone() {
                     let tks = cp.tokens.clone();
                     if tks.len() != 2 {
                         log::error!("Component {} has {} tokens instead of 2. Component with >2 tokens are not handled yet.", cp.id, tks.len());
-                    } else if tks[0].address.to_lowercase() == tokens[0] && tks[1].address.to_lowercase() == tokens[1] {
+                    } else if tks[0].address.to_lowercase() == tokens[0].address.to_lowercase() && tks[1].address.to_lowercase() == tokens[1].address.to_lowercase() {
                         // let protosim
                         let mtx = shtss.read().await;
                         let protosim = mtx.protosims.get(&cp.id.to_lowercase()).unwrap().clone();

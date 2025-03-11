@@ -13,175 +13,118 @@ use crate::shd::{
     },
     maths::{self},
     r#static,
-    types::{AmmType, LiquidityTickDelta, Network, PairQuery, PoolComputeData, SummedLiquidity},
+    types::{AmmType, Network, PairQuery, PoolComputeData, SummedLiquidity},
 };
 
 use crate::shd::types::Orderbook;
 
-use super::ticks::find_current_tick;
-
 pub trait ToOrderbook {
-    fn orderbook(&self, component: SrzProtocolComponent, tks: Vec<SrzToken>, query: PairQuery, fee: f64, price: f64) -> Orderbook;
+    fn orderbook(&self, component: SrzProtocolComponent, tks: Vec<SrzToken>, query: PairQuery, fee: f64, price: f64, poolb0: f64, poolb1: f64) -> Orderbook;
 }
 
 // ============================================== NOT CONCENTRATED ==============================================================
 
 impl ToOrderbook for SrzUniswapV2State {
-    fn orderbook(&self, component: SrzProtocolComponent, _tks: Vec<SrzToken>, query: PairQuery, fee: f64, price: f64) -> Orderbook {
-        let mut o = Orderbook::default();
-        o.address = component.id.clone().to_lowercase();
-        o.protocol = component.protocol_type_name.clone();
-        o.z0to1 = query.z0to1; // ?
-        o.concentrated = false;
-        o.fee = fee;
-        o.price = price;
-        o.reserves = vec![self.reserve0.clone() as u128, self.reserve1.clone() as u128];
-        o.bids = vec![];
-        o.asks = vec![];
-        o
+    fn orderbook(&self, component: SrzProtocolComponent, tks: Vec<SrzToken>, query: PairQuery, fee: f64, price: f64, poolb0: f64, poolb1: f64) -> Orderbook {
+        Orderbook {
+            address: component.id.clone().to_lowercase(),
+            protocol: component.protocol_type_name.clone(),
+            z0to1: query.z0to1,
+            concentrated: false,
+            fee,
+            price,
+            reserves: vec![poolb0, poolb1],
+            bids: vec![],
+            asks: vec![],
+            tick: 0,
+            spacing: 0,
+        }
     }
 }
 
 impl ToOrderbook for SrzEVMPoolState {
-    fn orderbook(&self, component: SrzProtocolComponent, tks: Vec<SrzToken>, query: PairQuery, fee: f64, price: f64) -> Orderbook {
-        let mut o = Orderbook::default();
-        let t0 = tks.get(0).unwrap();
-        let t1 = tks.get(1).unwrap();
-        let b0 = self.balances.get(t0.address.to_lowercase().as_str()).unwrap().to_string().parse::<u128>().unwrap();
-        let b1 = self.balances.get(t1.address.to_lowercase().as_str()).unwrap().to_string().parse::<u128>().unwrap();
-        o.address = component.id.clone().to_lowercase();
-        o.protocol = component.protocol_type_name.clone();
-        o.z0to1 = query.z0to1; // ?
-        o.concentrated = false;
-        o.fee = fee;
-        o.price = price;
-        o.reserves = vec![b0, b1];
-        o.bids = vec![];
-        o.asks = vec![];
-        o
+    fn orderbook(&self, component: SrzProtocolComponent, tks: Vec<SrzToken>, query: PairQuery, fee: f64, price: f64, poolb0: f64, poolb1: f64) -> Orderbook {
+        Orderbook {
+            address: component.id.clone().to_lowercase(),
+            protocol: component.protocol_type_name.clone(),
+            z0to1: query.z0to1,
+            concentrated: false,
+            fee,
+            price,
+            reserves: vec![poolb0, poolb1],
+            bids: vec![],
+            asks: vec![],
+            tick: 0,
+            spacing: 0,
+        }
     }
 }
 
 // ============================================== CONCENTRATED ==================================================================
 
 impl ToOrderbook for SrzUniswapV3State {
-    fn orderbook(&self, component: SrzProtocolComponent, tks: Vec<SrzToken>, query: PairQuery, fee: f64, price: f64) -> Orderbook {
-        let mut o = Orderbook::default();
-        o.address = component.id.clone().to_lowercase();
-        o.protocol = component.protocol_type_name.clone();
-        o.z0to1 = query.z0to1; // ?
-        o.concentrated = true;
-        o.fee = fee;
-        o.price = price;
+    fn orderbook(&self, component: SrzProtocolComponent, tks: Vec<SrzToken>, query: PairQuery, fee: f64, price: f64, poolb0: f64, poolb1: f64) -> Orderbook {
         // CCT
         let spacing = self.ticks.tick_spacing as i32;
+        maths::ticks::ticks_liquidity(self.liquidity as i128, self.tick, spacing, &self.ticks.clone(), tks[0].clone(), tks[1].clone());
         let tick_data_range = maths::ticks::compute_tick_data(self.tick, self.ticks.tick_spacing as i32);
-        log::info!("tick_data_range: {:?}", tick_data_range);
-        let (p0to1, p1to0) = maths::ticks::tick_to_prices(tick_data_range.tick_lower, tks[0].decimals as u8, tks[1].decimals as u8);
+        // let (p0to1, p1to0) = maths::ticks::tick_to_prices(tick_data_range.tick_lower, tks[0].decimals as u8, tks[1].decimals as u8);
         let (p0to1, p1to0) = maths::ticks::tick_to_prices(self.tick, tks[0].decimals as u8, tks[1].decimals as u8);
-        let (p0to1, p1to0) = maths::ticks::tick_to_prices(tick_data_range.tick_upper, tks[0].decimals as u8, tks[1].decimals as u8);
-
-        // Keep, for current active tick.
-        log::info!("Analysing current tick ...");
-        let delta = maths::ticks::get_token_amounts(
+        // let (p0to1, p1to0) = maths::ticks::tick_to_prices(tick_data_range.tick_upper, tks[0].decimals as u8, tks[1].decimals as u8);
+        log::info!("SrzUniswapV3State: Analysing current tick ...");
+        let current_tick_amounts = maths::ticks::derive(
             self.liquidity as i128,
             self.sqrt_price.to_string().parse::<f64>().unwrap(), // At current tick, not the boundaries !
             tick_data_range.tick_lower,
             tick_data_range.tick_upper,
             tks[0].clone(),
             tks[1].clone(),
+            true,
         );
-
-        log::info!("PooL: {} => current_tick: {:?}", o.address, delta);
-
-        log::info!("Analysing each tick individually ...");
-
-        let mut aggdelta = vec![];
-
-        let mut sorted_ticks = self.ticks.ticks.clone();
-        sorted_ticks.sort_by(|a, b| a.index.cmp(&b.index));
-        for t in sorted_ticks.clone() {
-            let tdr = maths::ticks::compute_tick_data(t.index, spacing);
-            if tdr.tick_upper == 0 || tdr.tick_lower == 0 || tdr.tick_lower >= 887160 || tdr.tick_lower <= -887160 {
-                log::info!("Skipping tick: {}", tdr.tick_lower);
-                continue;
-            }
-            let d1 = self.tick - t.index;
-            let d2 = t.index - self.tick;
-            if d1.abs() < (5 * spacing) && d2.abs() < (5 * spacing) {
-                let liq = maths::ticks::compute_cumulative_liquidity(self.liquidity as i128, self.tick, t.index, &self.ticks.clone());
-                let delta = maths::ticks::get_token_amounts(
-                    // t.net_liquidity,
-                    liq,
-                    self.sqrt_price.to_string().parse::<f64>().unwrap(), //t.sqrt_price.to_string().parse::<f64>().unwrap(),
-                    tdr.tick_lower,
-                    tdr.tick_upper,
-                    tks[0].clone(),
-                    tks[1].clone(),
-                );
-                aggdelta.push(delta.clone());
-            }
-        }
-
-        // remove first and last
-        // aggdelta.remove(0);
-        // aggdelta.pop();
-        // top1 tick
-        let mut top_amount0 = LiquidityTickDelta::default();
-        let mut top_amount1 = LiquidityTickDelta::default();
-
-        for d in aggdelta.iter() {
-            let tick = d.index;
-            if d.amount0 > top_amount0.amount0 {
-                top_amount0.amount0 = d.amount0;
-                top_amount0.amount1 = d.amount1;
-                top_amount0.index = tick;
-            }
-            if d.amount1 > top_amount1.amount1 {
-                top_amount1.amount0 = d.amount0;
-                top_amount1.amount1 = d.amount1;
-                top_amount1.index = tick;
-            }
-        }
-        log::info!("PooL: {} => top_amount0: {:?}", o.address, top_amount0);
-        log::info!("PooL: {} => top_amount1: {:?}", o.address, top_amount1);
-
-        let mut summed = SummedLiquidity::default();
-        summed.amount0 = aggdelta.iter().map(|x| if x.amount0 > 0. { x.amount0 } else { 0. }).sum();
-        summed.amount1 = aggdelta.iter().map(|x| if x.amount1 > 0. { x.amount1 } else { 0. }).sum();
-        log::info!("Summed liquidity: {:?}", summed);
-
-        // for t in self.ticks.ticks {
-        //     let tdr = maths::ticks::compute_tick_data(t.index, spacing);
+        dbg!(current_tick_amounts.clone());
+        log::info!("SrzUniswapV3State: Analysing each tick individually ...");
+        let mut ticks_list = self.ticks.clone();
+        ticks_list.ticks.sort_by(|a, b| a.index.cmp(&b.index));
+        let ticks_amounts = maths::ticks::ticks_liquidity(self.liquidity as i128, self.tick, spacing, &ticks_list.clone(), tks[0].clone(), tks[1].clone());
+        let (mut bids, asks) = maths::ticks::filter_and_classify_ticks(ticks_amounts, self.tick, tick_data_range.tick_lower, p0to1, p1to0);
+        bids.push(current_tick_amounts.clone());
+        // Logs bids/asks
+        // for bid in bids {
+        //     log::info!("Bid: tick#{} => {} {} | {} {} | p0to1 {} and p1to0 {}", bid.index, bid.amount0, tks[0].symbol, bid.amount1, tks[1].symbol, bid.p0to1, bid.p1to0);
         // }
-
-        // let (current, next) = find_current_and_next_tick(self.ticks.clone(), self.tick);
-        // let sqrt_price = self.sqrt_price.to_string().parse::<u128>().unwrap();
-        // let sqrt_price_lower = current.sqrt_price.to_string().parse::<u128>().unwrap();
-        // let sqrt_price_upper = next.sqrt_price.to_string().parse::<u128>().unwrap();
-        // let (b0, b1) = derive_balances(self.liquidity, sqrt_price, sqrt_price_lower, sqrt_price_upper);
-        // println!("UniswapV3: {}-{} | {}-{} | {}-{}", self.id, self.liquidity, sqrt_price, sqrt_price_lower, sqrt_price_upper, self.tick);
-        // println!("UniswapV3: b0: {} | b1: {}", b0, b1);
-        o.reserves = vec![0, 0]; // self.reserve0.clone() as u128, self.reserve1.clone() as u128]; // ? Or use balanceOf
-        o.bids = vec![];
-        o.asks = vec![];
-        o
+        // for ask in asks {
+        //     log::info!("Ask: tick#{} => {} {} | {} {} | p0to1 {} and p1to0 {}", ask.index, ask.amount0, tks[0].symbol, ask.amount1, tks[1].symbol, ask.p0to1, ask.p1to0);
+        // }
+        Orderbook {
+            address: component.id.clone().to_lowercase(),
+            protocol: component.protocol_type_name.clone(),
+            z0to1: query.z0to1,
+            concentrated: true,
+            fee,
+            price,
+            reserves: vec![poolb0, poolb1],
+            bids: bids.clone(),
+            asks: asks.clone(),
+            tick: self.tick as i32,
+            spacing: self.ticks.tick_spacing as u64,
+        }
     }
 }
 
 impl ToOrderbook for SrzUniswapV4State {
-    fn orderbook(&self, component: SrzProtocolComponent, tks: Vec<SrzToken>, query: PairQuery, fee: f64, price: f64) -> Orderbook {
-        let mut o = Orderbook::default();
-        o.address = component.id.clone().to_lowercase();
-        o.protocol = component.protocol_type_name.clone();
-        o.concentrated = true;
-        o.z0to1 = query.z0to1; // ?
-        o.fee = fee;
-        o.price = price;
-        // CCT
-        o.reserves = vec![0, 0]; // self.reserve0.clone() as u128, self.reserve1.clone() as u128]; // ? Or use balanceOf
-        o.bids = vec![];
-        o.asks = vec![];
-        o
+    fn orderbook(&self, component: SrzProtocolComponent, tks: Vec<SrzToken>, query: PairQuery, fee: f64, price: f64, poolb0: f64, poolb1: f64) -> Orderbook {
+        Orderbook {
+            address: component.id.clone().to_lowercase(),
+            protocol: component.protocol_type_name.clone(),
+            z0to1: query.z0to1,
+            concentrated: true,
+            fee,
+            price,
+            reserves: vec![poolb0, poolb1],
+            bids: vec![], //bids.clone(),
+            asks: vec![], //asks.clone(),
+            tick: self.tick as i32,
+            spacing: self.ticks.tick_spacing as u64,
+        }
     }
 }

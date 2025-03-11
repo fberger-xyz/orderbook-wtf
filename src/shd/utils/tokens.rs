@@ -34,6 +34,10 @@ alloy::sol!(
     "src/shd/utils/abis/IERC20.json"
 );
 
+pub async fn get_balance_all(provider: &RootProvider<Http<Client>>, token: String, user: String) -> u128 {
+    get_balance(provider, token, user).await
+}
+
 /**
  * Fetch the balance of an ERC20 token for a given user
  */

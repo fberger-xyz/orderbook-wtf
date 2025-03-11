@@ -117,7 +117,7 @@ impl Display for SyncState {
 
 use tycho_simulation::protocol::{models::ProtocolComponent, state::ProtocolSim};
 
-use super::data::fmt::SrzProtocolComponent;
+use super::data::fmt::{SrzProtocolComponent, SrzToken};
 
 pub type SharedTychoStreamState = Arc<RwLock<TychoStreamState>>;
 
@@ -164,28 +164,27 @@ pub struct PoolComputeData {
     pub protosim: Box<dyn ProtocolSim>,
 }
 
-#[derive(Default, Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PairOrderbook {
-    pub from: String,
-    pub to: String,
+    pub from: SrzToken,
+    pub to: SrzToken,
     pub orderbooks: Vec<Orderbook>,
-    pub spacing: f64, // Price spacing = Tick spacing. Lowest common denominator across concentrated pools
 }
 
 /// Whatever the protocol is, it must comply with this struct
 #[derive(Default, Debug, Clone, Serialize, Deserialize)]
 pub struct Orderbook {
-    pub address: String,     // Proto/PooL address
-    pub protocol: String,    // Component Protocol name
-    pub z0to1: bool,         // Zero to One as Uniswap expresses it
-    pub concentrated: bool,  // Concentrated liquidity
-    pub fee: f64,            // Fee according to ProtoSim
-    pub price: f64,          // Price Spot (0 to 1 if z0to1 is true)
-    pub reserves: Vec<u128>, // reserves[0], reserves[1]
-    pub tick: u64,           // Current tick
-    pub spacing: u64,        // Tick spacing
-    pub bids: Vec<f64>,
-    pub asks: Vec<f64>,
+    pub address: String,    // Proto/PooL address
+    pub protocol: String,   // Component Protocol name
+    pub z0to1: bool,        // Zero to One as Uniswap expresses it
+    pub concentrated: bool, // Concentrated liquidity
+    pub fee: f64,           // Fee according to ProtoSim
+    pub price: f64,         // Price Spot (0 to 1 if z0to1 is true)
+    pub reserves: Vec<f64>, // reserves[0], reserves[1]
+    pub tick: i32,          // Current tick
+    pub spacing: u64,       // Tick spacing
+    pub bids: Vec<LiquidityTickAmounts>,
+    pub asks: Vec<LiquidityTickAmounts>,
 }
 
 #[derive(Debug, Clone)]
@@ -196,11 +195,13 @@ pub struct TickDataRange {
     pub sqrt_price_upper: u128,
 }
 
-#[derive(Default, Debug, Clone)]
-pub struct LiquidityTickDelta {
+#[derive(Default, Debug, Clone, Serialize, Deserialize)]
+pub struct LiquidityTickAmounts {
     pub index: i32,
     pub amount0: f64,
     pub amount1: f64,
+    pub p0to1: f64,
+    pub p1to0: f64,
 }
 
 #[derive(Default, Debug, Clone)]
