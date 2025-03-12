@@ -1,14 +1,11 @@
 use num_bigint::BigUint;
 use num_traits::{One, Pow, Zero};
 use std::time::Instant;
-use tycho_simulation::{
-    models::Token,
-    protocol::state::ProtocolSim,
-};
+use tycho_simulation::{models::Token, protocol::state::ProtocolSim};
 
 use crate::shd::{
     data::fmt::SrzToken,
-    types::{Network, PairQuery, PairSimulatedOrderbook, PoolComputeData, TradeResult},
+    types::{Network, PairQuery, PairSimulatedOrderbook, ProtoTychoState, TradeResult},
 };
 
 /**
@@ -74,7 +71,7 @@ fn get_multiplier_bg(token: &SrzToken) -> BigUint {
  */
 pub fn optimize(
     total_input: BigUint, // human–readable input (e.g. 100 meaning 100 ETH)
-    pools: &Vec<PoolComputeData>,
+    pools: &Vec<ProtoTychoState>,
     token_in: SrzToken,
     token_out: SrzToken,
 ) -> TradeResult {
@@ -153,7 +150,7 @@ pub fn optimize(
  * The function generates a set of test amounts for ETH and USDC, then runs the optimizer for each amount.
  * The optimizer uses a simple gradient-based approach to move a fixed fraction of the allocation from the pool with the lowest marginal return to the one with the highest.
  */
-pub async fn optimization(network: Network, pcsdata: Vec<PoolComputeData>, tokens: Vec<SrzToken>, query: PairQuery) -> PairSimulatedOrderbook {
+pub async fn optimization(network: Network, pcsdata: Vec<ProtoTychoState>, tokens: Vec<SrzToken>, query: PairQuery) -> PairSimulatedOrderbook {
     log::info!("Network: {} | Got {} pools to optimize for pair: '{}'", network.name, pcsdata.len(), query.tag);
     let usdc = tokens[0].clone();
     let weth = tokens[1].clone();

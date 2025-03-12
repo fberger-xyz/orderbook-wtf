@@ -159,21 +159,21 @@ pub struct PairResponse {
 }
 
 #[derive(Clone, Debug)]
-pub struct PoolComputeData {
+pub struct ProtoTychoState {
     pub component: SrzProtocolComponent,
     pub protosim: Box<dyn ProtocolSim>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct PairOrderbook {
+pub struct PairLiquidityBook {
     pub from: SrzToken,
     pub to: SrzToken,
-    pub orderbooks: Vec<Orderbook>,
+    pub orderbooks: Vec<LiquidityPoolBook>,
 }
 
 /// Whatever the protocol is, it must comply with this struct
 #[derive(Default, Debug, Clone, Serialize, Deserialize)]
-pub struct Orderbook {
+pub struct LiquidityPoolBook {
     pub address: String,    // Proto/PooL address
     pub protocol: String,   // Component Protocol name
     pub z0to1: bool,        // Zero to One as Uniswap expresses it

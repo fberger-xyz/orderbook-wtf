@@ -10,7 +10,7 @@ use serde_json::json;
 use tap2::shd::{
     self,
     data::fmt::{SrzEVMPoolState, SrzProtocolComponent, SrzToken, SrzUniswapV2State, SrzUniswapV3State, SrzUniswapV4State},
-    types::{AmmType, EnvConfig, Network, PairQuery, PoolComputeData, SharedTychoStreamState},
+    types::{AmmType, EnvConfig, Network, PairQuery, ProtoTychoState, SharedTychoStreamState},
 };
 
 #[derive(Serialize, Deserialize)]
@@ -125,46 +125,80 @@ async fn pool(Extension(network): Extension<Network>, Path(id): Path<String>) ->
     _pool(network, id).await
 }
 
-// GET /simulate =>
-async fn simulate(Extension(shtss): Extension<SharedTychoStreamState>, Extension(network): Extension<Network>) -> impl IntoResponse {
-    log::info!("👾 API: GET /simulate on {} network", network.name);
-}
-
-// GET /pair/{0xt0-0xt1} => Get all component & state (= /pool) for a given pair of token
-// It must be t0-t1 for tokenFrom-tokenTo, but if zeroToOne is false, computed data will be t1-t0
-async fn pair(Extension(shtss): Extension<SharedTychoStreamState>, Extension(network): Extension<Network>, Query(params): Query<PairQuery>) -> impl IntoResponse {
-    log::info!("👾 API: Querying pair: {:?}", params.tag);
-    let alltokens = _tokens(network.clone()).await.unwrap();
+// GET /orderbook/{0xt0-0xt1} => Get all component & state for a given pair of token, and simulate the orderbook
+async fn orderbook(Extension(shtss): Extension<SharedTychoStreamState>, Extension(network): Extension<Network>, Query(params): Query<PairQuery>) -> impl IntoResponse {
+    log::info!("👾 API: Querying orderbook endpoint: {:?}", params.tag);
+    let atks = _tokens(network.clone()).await.unwrap();
     match _components(network.clone()).await {
         Some(cps) => {
             let target = params.tag.clone();
             let tokens = target.split("-").map(|x| x.to_string().to_lowercase()).collect::<Vec<String>>();
-            let srzt0 = alltokens.iter().find(|x| x.address.to_lowercase() == tokens[0].clone()).unwrap();
-            let srzt1 = alltokens.iter().find(|x| x.address.to_lowercase() == tokens[1].clone()).unwrap();
+            let srzt0 = atks.iter().find(|x| x.address.to_lowercase() == tokens[0].clone()).unwrap();
+            let srzt1 = atks.iter().find(|x| x.address.to_lowercase() == tokens[1].clone()).unwrap();
             let tokens = vec![srzt0.clone(), srzt1.clone()];
             if tokens.len() == 2 {
-                let mut datapools: Vec<PoolComputeData> = vec![];
+                let mut datapools: Vec<ProtoTychoState> = vec![];
                 for cp in cps.clone() {
-                    let tks = cp.tokens.clone();
-                    if tks.len() != 2 {
-                        log::error!("Component {} has {} tokens instead of 2. Component with >2 tokens are not handled yet.", cp.id, tks.len());
-                    } else if tks[0].address.to_lowercase() == tokens[0].address.to_lowercase() && tks[1].address.to_lowercase() == tokens[1].address.to_lowercase() {
-                        // let protosim
+                    let cptks = cp.tokens.clone();
+                    if cptks.len() != 2 {
+                        log::warn!("Component {} has {} tokens instead of 2. Component with >2 tokens are not handled yet.", cp.id, cptks.len());
+                    } else if cptks[0].address.to_lowercase() == tokens[0].address.to_lowercase() && cptks[1].address.to_lowercase() == tokens[1].address.to_lowercase() {
                         let mtx = shtss.read().await;
                         let protosim = mtx.protosims.get(&cp.id.to_lowercase()).unwrap().clone();
-                        log::info!("Shared state read & drop");
                         drop(mtx);
-                        datapools.push(PoolComputeData { component: cp, protosim });
+                        datapools.push(ProtoTychoState { component: cp, protosim });
                     }
                 }
                 // shd::core::pair::prepare(network.clone(), datapools.clone(), tokens.clone(), params.clone()).await;
-                shd::core::pair::simulate(network.clone(), datapools.clone(), tokens.clone(), params.clone()).await;
-                Json(json!({ "pair": [] })) // !
+                shd::core::orderbook::build(network.clone(), datapools.clone(), tokens.clone(), params.clone()).await;
+                Json(json!({ "orderbook": [] })) // !
             } else {
-                Json(json!({ "pair": "Query param Tag must contain only 2 tokens separated by a dash '-'." }))
+                log::error!("Query param Tag must contain only 2 tokens separated by a dash '-'");
+                Json(json!({ "orderbook": "Query param Tag must contain only 2 tokens separated by a dash '-'." }))
             }
         }
-        None => Json(json!({ "pair": "Couldn't not read internal components" })),
+        None => {
+            log::error!("Couldn't not read internal components");
+            Json(json!({ "orderbook": "Couldn't not read internal components" }))
+        }
+    }
+}
+
+// GET /liquidity/{0xt0-0xt1} => Get all component & state (= /pool) for a given pair of token, and organize the liquidity across n pools of n AMMs
+async fn liquidity(Extension(shtss): Extension<SharedTychoStreamState>, Extension(network): Extension<Network>, Query(params): Query<PairQuery>) -> impl IntoResponse {
+    log::info!("👾 API: Querying liquidity endpoint: {:?}", params.tag);
+    let atks = _tokens(network.clone()).await.unwrap();
+    match _components(network.clone()).await {
+        Some(cps) => {
+            let target = params.tag.clone();
+            let tokens = target.split("-").map(|x| x.to_string().to_lowercase()).collect::<Vec<String>>();
+            let srzt0 = atks.iter().find(|x| x.address.to_lowercase() == tokens[0].clone()).unwrap();
+            let srzt1 = atks.iter().find(|x| x.address.to_lowercase() == tokens[1].clone()).unwrap();
+            let tokens = vec![srzt0.clone(), srzt1.clone()];
+            if tokens.len() == 2 {
+                let mut datapools: Vec<ProtoTychoState> = vec![];
+                for cp in cps.clone() {
+                    let cptks = cp.tokens.clone();
+                    if cptks.len() != 2 {
+                        log::warn!("Component {} has {} tokens instead of 2. Component with >2 tokens are not handled yet.", cp.id, cptks.len());
+                    } else if cptks[0].address.to_lowercase() == tokens[0].address.to_lowercase() && cptks[1].address.to_lowercase() == tokens[1].address.to_lowercase() {
+                        let mtx = shtss.read().await;
+                        let protosim = mtx.protosims.get(&cp.id.to_lowercase()).unwrap().clone();
+                        drop(mtx);
+                        datapools.push(ProtoTychoState { component: cp, protosim });
+                    }
+                }
+                shd::core::liquidity::build(network.clone(), datapools.clone(), tokens.clone(), params.clone()).await;
+                Json(json!({ "liquidity": [] })) // !
+            } else {
+                log::error!("Query param Tag must contain only 2 tokens separated by a dash '-'");
+                Json(json!({ "liquidity": "Query param Tag must contain only 2 tokens separated by a dash '-'." }))
+            }
+        }
+        None => {
+            log::error!("Couldn't not read internal components");
+            Json(json!({ "liquidity": "Couldn't not read internal components" }))
+        }
     }
 }
 
@@ -184,7 +218,8 @@ pub async fn start(n: Network, shared: SharedTychoStreamState, config: EnvConfig
         .route("/pairs", get(pairs))
         .route("/components", get(components))
         .route("/pool/{id}", get(pool))
-        .route("/pair", get(pair))
+        .route("/orderbook", get(orderbook))
+        .route("/liquidity", get(liquidity))
         .layer(Extension(n.clone()))
         .layer(Extension(shared.clone())); // Shared state
 

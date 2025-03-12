@@ -16,7 +16,9 @@ Tycho is an open-source interface to on-chain liquidity. Tycho
 - https://www.lvr.wtf/category
 - https://www.rareskills.io/post/uniswap-v3-ticks
 - https://www.highcharts.com/demo/stock/depth-chart
-
+- https://grafana.propellerheads.xyz/public-dashboards/518dd877a470434383caf9fc5845652e?orgId=1&refresh=5s
+- https://docs.google.com/spreadsheets/d/1vDl57BthpeJ9WDqmCVXFdLLvmsm-_SwhSjVzobXJZ04/edit?gid=0#gid=0
+  
 ### Keep in mind
 
 There are two types of implementations:
