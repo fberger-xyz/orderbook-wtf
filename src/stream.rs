@@ -356,7 +356,6 @@ async fn main() {
                         Ok(result) => {
                             let mut tokens = vec![];
                             for t in result.iter() {
-                                log::info!("Token: {:?}", t);
                                 let g = t.gas.get(0).unwrap_or(&Some(0u64)).unwrap_or_default();
                                 tokens.push(Token {
                                     address: tycho_simulation::tycho_core::Bytes::from_str(t.address.clone().to_string().as_str()).unwrap(),

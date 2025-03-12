@@ -1,5 +1,5 @@
 use crate::shd::{
-    core::amms::component_liquidity,
+    core::amms::get_pool_balances,
     data::fmt::{SrzEVMPoolState, SrzProtocolComponent, SrzToken, SrzUniswapV2State, SrzUniswapV3State, SrzUniswapV4State},
     maths::{self},
     types::PairQuery,
@@ -130,7 +130,7 @@ impl ToLiquidityBook for SrzUniswapV4State {
 /// @notice This function is used to compute the liquidity on multiple pools from differents AMM, and return a unified liquidity structure
 pub async fn build(network: Network, datapools: Vec<ProtoTychoState>, tokens: Vec<SrzToken>, query: PairQuery) -> PairLiquidityBook {
     log::info!("Got {} pools to compute for pair: '{}'", datapools.len(), query.tag);
-    let mut odbs = Vec::new();
+    let mut orderbooks = Vec::new();
     for pdata in datapools.clone() {
         log::info!("Preparing pool: {} | Type: {}", pdata.component.id, pdata.component.protocol_type_name);
         let srzt0 = tokens[0].clone();
@@ -147,9 +147,9 @@ pub async fn build(network: Network, datapools: Vec<ProtoTychoState>, tokens: Ve
         let t0 = Token::from(srzt0.clone());
         let t1 = Token::from(srzt1.clone());
         let provider = ProviderBuilder::new().with_chain(alloy_chains::NamedChain::Mainnet).on_http(network.rpc.clone().parse().unwrap());
-        let balances = component_liquidity(&provider, pdata.component.clone()).await;
-        let (poolb0, poolb1) = (balances[0], balances[1]);
-        log::info!("Pool balances: {}-{} => {} and {}", t0.symbol, t1.symbol, poolb0, poolb1);
+        let cpbs = get_pool_balances(network.clone(), &provider, pdata.component.clone()).await;
+        let (poolb0, poolb1) = (cpbs[0], cpbs[1]);
+        log::info!("Pool cpbs: {}-{} => {} and {}", t0.symbol, t1.symbol, poolb0, poolb1);
         let (base, quote) = if query.z0to1 { (t0, t1) } else { (t1, t0) };
         let proto = pdata.protosim.clone();
         let price = proto.spot_price(&base, &quote).unwrap_or_default();
@@ -160,7 +160,7 @@ pub async fn build(network: Network, datapools: Vec<ProtoTychoState>, tokens: Ve
                     let state = SrzUniswapV2State::from((state.clone(), pdata.component.id.clone()));
                     let fee = proto.fee();
                     let book = state.clone().structurate(pdata.component.clone(), srztokens.clone(), query.clone(), fee, price, poolb0, poolb1);
-                    odbs.push(book);
+                    orderbooks.push(book);
                 }
             }
             AmmType::UniswapV3 => {
@@ -168,7 +168,7 @@ pub async fn build(network: Network, datapools: Vec<ProtoTychoState>, tokens: Ve
                     let state = SrzUniswapV3State::from((state.clone(), pdata.component.id.clone()));
                     let fee = proto.fee();
                     let book = state.clone().structurate(pdata.component.clone(), srztokens.clone(), query.clone(), fee, price, poolb0, poolb1);
-                    odbs.push(book);
+                    orderbooks.push(book);
                 }
             }
             AmmType::UniswapV4 => {
@@ -176,7 +176,7 @@ pub async fn build(network: Network, datapools: Vec<ProtoTychoState>, tokens: Ve
                     let state = SrzUniswapV4State::from((state.clone(), pdata.component.id.clone()));
                     let fee = proto.fee();
                     let book = state.clone().structurate(pdata.component.clone(), srztokens.clone(), query.clone(), fee, price, poolb0, poolb1);
-                    odbs.push(book);
+                    orderbooks.push(book);
                 }
             }
             AmmType::Curve | AmmType::Balancer => {
@@ -184,7 +184,7 @@ pub async fn build(network: Network, datapools: Vec<ProtoTychoState>, tokens: Ve
                     let state = SrzEVMPoolState::from((state.clone(), pdata.component.id.to_string()));
                     let fee = 0.0; // proto.fee(); // Tycho does not have a fee function implemented for EVMPoolState
                     let book = state.clone().structurate(pdata.component.clone(), srztokens.clone(), query.clone(), fee, price, poolb0, poolb1);
-                    odbs.push(book);
+                    orderbooks.push(book);
                 }
             }
         }
@@ -196,6 +196,6 @@ pub async fn build(network: Network, datapools: Vec<ProtoTychoState>, tokens: Ve
     PairLiquidityBook {
         from: tokens[0].clone(),
         to: tokens[1].clone(),
-        orderbooks: odbs.clone(),
+        orderbooks: orderbooks.clone(),
     }
 }

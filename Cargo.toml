@@ -25,7 +25,9 @@ tycho-core = { git = "https://github.com/propeller-heads/tycho-indexer.git", pac
 tycho-client = { git = "https://github.com/propeller-heads/tycho-indexer.git", package = "tycho-client" }
 tycho-execution = { git = "https://github.com/propeller-heads/tycho-execution.git", package = "tycho-execution", features = ["evm"] }
 
-tycho-simulation = { git = "https://github.com/0xMerso/tycho-simulation.git", branch = "protocol-state-pub-fields", features = ["evm"]  }
+# tycho-simulation = { git = "https://github.com/0xMerso/TychoSimu.git", branch = "protocol-state-pub-fields", features = ["evm"]  }
+tycho-simulation = { git = "https://github.com/0xMerso/TychoSimu.git", branch = "protocol-state-pub-fields", features = ["evm"]  }
+
 
 toml = "0.8.12"
 serde = { version = "1.0.104", features = ["derive"] }

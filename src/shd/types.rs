@@ -21,6 +21,7 @@ pub struct Network {
     pub enabled: bool,
     pub tycho: String,
     pub port: u64,
+    pub balance_v2_vault: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
