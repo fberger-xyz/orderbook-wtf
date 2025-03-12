@@ -9,9 +9,9 @@ use tycho_simulation::{
 };
 
 use crate::shd::{
-    core::sim::{self, optimization},
+    core::sim::{optimization},
     data::fmt::{SrzEVMPoolState, SrzToken, SrzUniswapV2State, SrzUniswapV3State, SrzUniswapV4State},
-    types::{AmmType, Network, PairOrderbook, PairQuery, PairSimulatedOrderbook, PoolComputeData, TradeResult},
+    types::{AmmType, Network, PairOrderbook, PairQuery, PairSimulatedOrderbook, PoolComputeData},
     utils::tokens::get_balance,
 };
 

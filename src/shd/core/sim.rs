@@ -1,19 +1,13 @@
-use alloy::providers::ProviderBuilder;
-use chrono::Duration;
 use num_bigint::BigUint;
 use num_traits::{One, Pow, Zero};
-use std::{cmp, time::Instant};
+use std::time::Instant;
 use tycho_simulation::{
-    evm::{
-        engine_db::tycho_db::PreCachedDB,
-        protocol::{uniswap_v2::state::UniswapV2State, uniswap_v3::state::UniswapV3State, uniswap_v4::state::UniswapV4State, vm::state::EVMPoolState},
-    },
     models::Token,
     protocol::state::ProtocolSim,
 };
 
 use crate::shd::{
-    data::fmt::{SrzProtocolComponent, SrzToken},
+    data::fmt::SrzToken,
     types::{Network, PairQuery, PairSimulatedOrderbook, PoolComputeData, TradeResult},
 };
 
@@ -29,7 +23,7 @@ fn generate_eth_steps() -> Vec<BigUint> {
     // First segment: 1 to 100 by 5.
     let step1 = BigUint::from(1u32);
     let mut x = BigUint::from(1u32);
-    while &x < &BigUint::from(100u32) {
+    while x < BigUint::from(100u32) {
         steps.push(x.clone());
         x = &x + &step1;
     }
@@ -37,7 +31,7 @@ fn generate_eth_steps() -> Vec<BigUint> {
     // Second segment: 100 to 1000 by 25.
     let step2 = BigUint::from(25u32);
     let mut x = BigUint::from(100u32);
-    while &x < &BigUint::from(1000u32) {
+    while x < BigUint::from(1000u32) {
         steps.push(x.clone());
         x = &x + &step2;
     }
@@ -45,7 +39,7 @@ fn generate_eth_steps() -> Vec<BigUint> {
     // Third segment: 1000 to 25000 by 500.
     let step3 = BigUint::from(1000u32);
     let mut x = BigUint::from(1000u32);
-    while &x < &BigUint::from(25000u32) {
+    while x < BigUint::from(25000u32) {
         steps.push(x.clone());
         x = &x + &step3;
     }
@@ -166,7 +160,7 @@ pub async fn optimization(network: Network, pcsdata: Vec<PoolComputeData>, token
     let mut pools = Vec::new();
     for pcdata in pcsdata.iter() {
         log::info!("pcdata: {} | Type: {}", pcdata.component.id, pcdata.component.protocol_type_name);
-        pools.push(SrzProtocolComponent::from(pcdata.component.clone()));
+        pools.push(pcdata.component.clone());
     }
     // Generate test amounts for ETH (human–readable) based on our three segments. Alternatively, for USDC you could use generate_usdc_steps()
     let increments = generate_eth_steps();
