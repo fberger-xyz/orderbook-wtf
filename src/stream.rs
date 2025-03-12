@@ -356,11 +356,13 @@ async fn main() {
                         Ok(result) => {
                             let mut tokens = vec![];
                             for t in result.iter() {
+                                log::info!("Token: {:?}", t);
+                                let g = t.gas.get(0).unwrap_or(&Some(0u64)).unwrap_or_default();
                                 tokens.push(Token {
                                     address: tycho_simulation::tycho_core::Bytes::from_str(t.address.clone().to_string().as_str()).unwrap(),
                                     decimals: t.decimals as usize,
                                     symbol: t.symbol.clone(),
-                                    gas: BigUint::ZERO, // !?
+                                    gas: BigUint::from(g),
                                 });
                             }
                             let elasped = time.elapsed().unwrap().as_millis();

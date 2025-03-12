@@ -56,7 +56,6 @@ async fn _tokens(network: Network) -> Option<Vec<SrzToken>> {
 // GET /network => Get network object and its configuration
 async fn tokens(Extension(network): Extension<Network>) -> impl IntoResponse {
     log::info!("👾 API: GET /tokens on {} network", network.name);
-    let key = shd::r#static::data::keys::stream::tokens(network.name.clone());
     match _tokens(network.clone()).await {
         Some(tokens) => Json(json!({ "tokens": tokens })),
         _ => Json(json!({ "tokens": [] })),

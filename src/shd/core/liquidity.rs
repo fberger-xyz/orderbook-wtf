@@ -1,4 +1,5 @@
 use crate::shd::{
+    core::amms::component_liquidity,
     data::fmt::{SrzEVMPoolState, SrzProtocolComponent, SrzToken, SrzUniswapV2State, SrzUniswapV3State, SrzUniswapV4State},
     maths::{self},
     types::PairQuery,
@@ -16,10 +17,7 @@ use tycho_simulation::{
     protocol::state::ProtocolSim,
 };
 
-use crate::shd::{
-    types::{AmmType, Network, PairLiquidityBook, ProtoTychoState},
-    utils::tokens::get_balance,
-};
+use crate::shd::types::{AmmType, Network, PairLiquidityBook, ProtoTychoState};
 
 pub trait ToLiquidityBook {
     fn structurate(&self, component: SrzProtocolComponent, tks: Vec<SrzToken>, query: PairQuery, fee: f64, price: f64, poolb0: f64, poolb1: f64) -> LiquidityPoolBook;
@@ -149,10 +147,8 @@ pub async fn build(network: Network, datapools: Vec<ProtoTychoState>, tokens: Ve
         let t0 = Token::from(srzt0.clone());
         let t1 = Token::from(srzt1.clone());
         let provider = ProviderBuilder::new().with_chain(alloy_chains::NamedChain::Mainnet).on_http(network.rpc.clone().parse().unwrap());
-        let poolb0 = get_balance(&provider, srzt0.address.to_string(), pdata.component.id.clone()).await;
-        let poolb0 = poolb0 as f64 / 10f64.powi(t0.decimals as i32);
-        let poolb1 = get_balance(&provider, srzt1.address.to_string(), pdata.component.id.clone()).await;
-        let poolb1 = poolb1 as f64 / 10f64.powi(t1.decimals as i32);
+        let balances = component_liquidity(&provider, pdata.component.clone()).await;
+        let (poolb0, poolb1) = (balances[0], balances[1]);
         log::info!("Pool balances: {}-{} => {} and {}", t0.symbol, t1.symbol, poolb0, poolb1);
         let (base, quote) = if query.z0to1 { (t0, t1) } else { (t1, t0) };
         let proto = pdata.protosim.clone();
@@ -195,7 +191,6 @@ pub async fn build(network: Network, datapools: Vec<ProtoTychoState>, tokens: Ve
         log::info!("\n");
     }
 
-    
     // let path = format!("misc/data/{}.eth-usdc.pair-orderbook.json", network.name);
     // crate::shd::utils::misc::save1(output.clone(), path.as_str());
     PairLiquidityBook {
