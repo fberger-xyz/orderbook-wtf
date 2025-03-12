@@ -1,0 +1,2148 @@
+{
+    "from": {
+        "address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+        "decimals": 6,
+        "symbol": "USDC",
+        "gas": "0"
+    },
+    "to": {
+        "address": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+        "decimals": 18,
+        "symbol": "WETH",
+        "gas": "0"
+    },
+    "trades": [
+        {
+            "input": 1,
+            "output": 1914,
+            "distribution": [
+                20.0,
+                20.0,
+                39.0,
+                20.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 2,
+            "output": 3829,
+            "distribution": [
+                36.0,
+                20.0,
+                23.0,
+                20.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 3,
+            "output": 5743,
+            "distribution": [
+                39.0,
+                20.0,
+                20.0,
+                20.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 4,
+            "output": 7658,
+            "distribution": [
+                43.0,
+                20.0,
+                20.0,
+                16.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 5,
+            "output": 9573,
+            "distribution": [
+                48.0,
+                20.0,
+                20.0,
+                11.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 6,
+            "output": 11487,
+            "distribution": [
+                49.0,
+                20.0,
+                20.0,
+                10.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 7,
+            "output": 13402,
+            "distribution": [
+                51.0,
+                20.0,
+                20.0,
+                8.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 8,
+            "output": 15317,
+            "distribution": [
+                52.0,
+                20.0,
+                20.0,
+                7.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 9,
+            "output": 17231,
+            "distribution": [
+                53.0,
+                20.0,
+                20.0,
+                6.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 10,
+            "output": 19146,
+            "distribution": [
+                53.0,
+                20.0,
+                20.0,
+                6.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 11,
+            "output": 21061,
+            "distribution": [
+                54.0,
+                20.0,
+                20.0,
+                5.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 12,
+            "output": 22975,
+            "distribution": [
+                54.0,
+                20.0,
+                20.0,
+                5.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 13,
+            "output": 24890,
+            "distribution": [
+                55.0,
+                20.0,
+                20.0,
+                4.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 14,
+            "output": 26804,
+            "distribution": [
+                55.0,
+                20.0,
+                20.0,
+                4.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 15,
+            "output": 28719,
+            "distribution": [
+                55.0,
+                20.0,
+                20.0,
+                4.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 16,
+            "output": 30633,
+            "distribution": [
+                56.0,
+                20.0,
+                20.0,
+                3.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 17,
+            "output": 32547,
+            "distribution": [
+                56.0,
+                20.0,
+                20.0,
+                3.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 18,
+            "output": 34462,
+            "distribution": [
+                56.0,
+                20.0,
+                20.0,
+                3.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 19,
+            "output": 36376,
+            "distribution": [
+                56.0,
+                20.0,
+                20.0,
+                3.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 20,
+            "output": 38290,
+            "distribution": [
+                56.0,
+                20.0,
+                20.0,
+                3.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 21,
+            "output": 40204,
+            "distribution": [
+                56.0,
+                20.0,
+                20.0,
+                3.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 22,
+            "output": 42119,
+            "distribution": [
+                57.0,
+                20.0,
+                20.0,
+                2.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 23,
+            "output": 44033,
+            "distribution": [
+                57.0,
+                20.0,
+                20.0,
+                2.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 24,
+            "output": 45947,
+            "distribution": [
+                57.0,
+                20.0,
+                20.0,
+                2.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 25,
+            "output": 47861,
+            "distribution": [
+                57.0,
+                20.0,
+                20.0,
+                2.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 26,
+            "output": 49775,
+            "distribution": [
+                57.0,
+                20.0,
+                20.0,
+                2.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 27,
+            "output": 51689,
+            "distribution": [
+                57.0,
+                20.0,
+                20.0,
+                2.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 28,
+            "output": 53603,
+            "distribution": [
+                57.0,
+                20.0,
+                20.0,
+                2.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 29,
+            "output": 55516,
+            "distribution": [
+                57.0,
+                20.0,
+                20.0,
+                2.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 30,
+            "output": 57430,
+            "distribution": [
+                58.0,
+                20.0,
+                20.0,
+                1.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 31,
+            "output": 59344,
+            "distribution": [
+                58.0,
+                20.0,
+                20.0,
+                1.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 32,
+            "output": 61258,
+            "distribution": [
+                58.0,
+                20.0,
+                20.0,
+                1.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 33,
+            "output": 63175,
+            "distribution": [
+                60.0,
+                20.0,
+                18.0,
+                1.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 34,
+            "output": 65089,
+            "distribution": [
+                60.0,
+                20.0,
+                18.0,
+                1.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 35,
+            "output": 67002,
+            "distribution": [
+                60.0,
+                20.0,
+                18.0,
+                1.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 36,
+            "output": 68919,
+            "distribution": [
+                62.0,
+                20.0,
+                16.0,
+                1.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 37,
+            "output": 70834,
+            "distribution": [
+                62.0,
+                20.0,
+                16.0,
+                1.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 38,
+            "output": 72747,
+            "distribution": [
+                62.0,
+                20.0,
+                16.0,
+                1.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 39,
+            "output": 74661,
+            "distribution": [
+                62.0,
+                20.0,
+                16.0,
+                1.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 40,
+            "output": 76578,
+            "distribution": [
+                63.0,
+                20.0,
+                14.0,
+                1.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 41,
+            "output": 78492,
+            "distribution": [
+                63.0,
+                20.0,
+                14.0,
+                1.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 42,
+            "output": 80406,
+            "distribution": [
+                63.0,
+                20.0,
+                14.0,
+                1.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 43,
+            "output": 82320,
+            "distribution": [
+                63.0,
+                20.0,
+                14.0,
+                1.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 44,
+            "output": 84234,
+            "distribution": [
+                63.0,
+                20.0,
+                14.0,
+                1.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 45,
+            "output": 86151,
+            "distribution": [
+                65.0,
+                20.0,
+                13.0,
+                1.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 46,
+            "output": 88065,
+            "distribution": [
+                65.0,
+                20.0,
+                13.0,
+                1.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 47,
+            "output": 89979,
+            "distribution": [
+                65.0,
+                20.0,
+                13.0,
+                1.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 48,
+            "output": 91893,
+            "distribution": [
+                65.0,
+                20.0,
+                13.0,
+                1.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 49,
+            "output": 93807,
+            "distribution": [
+                65.0,
+                20.0,
+                13.0,
+                1.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 50,
+            "output": 95724,
+            "distribution": [
+                66.0,
+                20.0,
+                11.0,
+                1.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 51,
+            "output": 97638,
+            "distribution": [
+                67.0,
+                20.0,
+                11.0,
+                1.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 52,
+            "output": 99552,
+            "distribution": [
+                67.0,
+                20.0,
+                11.0,
+                1.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 53,
+            "output": 101466,
+            "distribution": [
+                67.0,
+                20.0,
+                11.0,
+                1.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 54,
+            "output": 103380,
+            "distribution": [
+                67.0,
+                20.0,
+                11.0,
+                1.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 55,
+            "output": 105297,
+            "distribution": [
+                68.0,
+                20.0,
+                10.0,
+                1.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 56,
+            "output": 107211,
+            "distribution": [
+                68.0,
+                20.0,
+                10.0,
+                1.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 57,
+            "output": 109126,
+            "distribution": [
+                68.0,
+                20.0,
+                10.0,
+                1.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 58,
+            "output": 111040,
+            "distribution": [
+                68.0,
+                20.0,
+                10.0,
+                1.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 59,
+            "output": 112954,
+            "distribution": [
+                68.0,
+                20.0,
+                10.0,
+                1.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 60,
+            "output": 114868,
+            "distribution": [
+                68.0,
+                20.0,
+                10.0,
+                1.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 61,
+            "output": 116785,
+            "distribution": [
+                69.0,
+                20.0,
+                9.0,
+                1.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 62,
+            "output": 118699,
+            "distribution": [
+                69.0,
+                20.0,
+                9.0,
+                1.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 63,
+            "output": 120613,
+            "distribution": [
+                69.0,
+                20.0,
+                9.0,
+                0.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 64,
+            "output": 122527,
+            "distribution": [
+                69.0,
+                20.0,
+                9.0,
+                0.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 65,
+            "output": 124441,
+            "distribution": [
+                69.0,
+                20.0,
+                9.0,
+                0.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 66,
+            "output": 126355,
+            "distribution": [
+                69.0,
+                20.0,
+                9.0,
+                0.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 67,
+            "output": 128269,
+            "distribution": [
+                69.0,
+                20.0,
+                9.0,
+                0.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 68,
+            "output": 130186,
+            "distribution": [
+                70.0,
+                20.0,
+                8.0,
+                0.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 69,
+            "output": 132100,
+            "distribution": [
+                70.0,
+                20.0,
+                8.0,
+                0.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 70,
+            "output": 134014,
+            "distribution": [
+                70.0,
+                20.0,
+                8.0,
+                0.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 71,
+            "output": 135928,
+            "distribution": [
+                70.0,
+                20.0,
+                8.0,
+                0.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 72,
+            "output": 137842,
+            "distribution": [
+                70.0,
+                20.0,
+                8.0,
+                0.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 73,
+            "output": 139756,
+            "distribution": [
+                70.0,
+                20.0,
+                8.0,
+                0.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 74,
+            "output": 141670,
+            "distribution": [
+                70.0,
+                20.0,
+                8.0,
+                0.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 75,
+            "output": 143584,
+            "distribution": [
+                70.0,
+                20.0,
+                8.0,
+                0.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 76,
+            "output": 145501,
+            "distribution": [
+                71.0,
+                20.0,
+                7.0,
+                0.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 77,
+            "output": 147415,
+            "distribution": [
+                71.0,
+                20.0,
+                7.0,
+                0.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 78,
+            "output": 149329,
+            "distribution": [
+                71.0,
+                20.0,
+                7.0,
+                0.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 79,
+            "output": 151243,
+            "distribution": [
+                71.0,
+                20.0,
+                7.0,
+                0.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 80,
+            "output": 153157,
+            "distribution": [
+                71.0,
+                20.0,
+                7.0,
+                0.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 81,
+            "output": 155071,
+            "distribution": [
+                71.0,
+                20.0,
+                7.0,
+                0.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 82,
+            "output": 156985,
+            "distribution": [
+                71.0,
+                20.0,
+                7.0,
+                0.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 83,
+            "output": 158899,
+            "distribution": [
+                71.0,
+                20.0,
+                7.0,
+                0.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 84,
+            "output": 160816,
+            "distribution": [
+                72.0,
+                20.0,
+                6.0,
+                0.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 85,
+            "output": 162730,
+            "distribution": [
+                72.0,
+                20.0,
+                6.0,
+                0.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 86,
+            "output": 164644,
+            "distribution": [
+                72.0,
+                20.0,
+                6.0,
+                0.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 87,
+            "output": 166558,
+            "distribution": [
+                72.0,
+                20.0,
+                6.0,
+                0.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 88,
+            "output": 168472,
+            "distribution": [
+                72.0,
+                20.0,
+                6.0,
+                0.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 89,
+            "output": 170386,
+            "distribution": [
+                72.0,
+                20.0,
+                6.0,
+                0.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 90,
+            "output": 172300,
+            "distribution": [
+                72.0,
+                20.0,
+                6.0,
+                0.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 91,
+            "output": 174214,
+            "distribution": [
+                72.0,
+                20.0,
+                6.0,
+                0.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 92,
+            "output": 176128,
+            "distribution": [
+                72.0,
+                20.0,
+                6.0,
+                0.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 93,
+            "output": 178042,
+            "distribution": [
+                72.0,
+                20.0,
+                6.0,
+                0.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 94,
+            "output": 179958,
+            "distribution": [
+                72.0,
+                20.0,
+                6.0,
+                0.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 95,
+            "output": 181872,
+            "distribution": [
+                72.0,
+                20.0,
+                6.0,
+                0.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 96,
+            "output": 183787,
+            "distribution": [
+                73.0,
+                20.0,
+                6.0,
+                0.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 97,
+            "output": 185700,
+            "distribution": [
+                73.0,
+                20.0,
+                6.0,
+                0.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 98,
+            "output": 187614,
+            "distribution": [
+                73.0,
+                20.0,
+                6.0,
+                0.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 99,
+            "output": 189528,
+            "distribution": [
+                73.0,
+                20.0,
+                6.0,
+                0.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 100,
+            "output": 191442,
+            "distribution": [
+                73.0,
+                20.0,
+                6.0,
+                0.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 100,
+            "output": 191442,
+            "distribution": [
+                73.0,
+                20.0,
+                6.0,
+                0.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 125,
+            "output": 239294,
+            "distribution": [
+                74.0,
+                20.0,
+                5.0,
+                0.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 150,
+            "output": 287141,
+            "distribution": [
+                75.0,
+                20.0,
+                4.0,
+                0.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 175,
+            "output": 334982,
+            "distribution": [
+                75.0,
+                20.0,
+                3.0,
+                0.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 200,
+            "output": 382817,
+            "distribution": [
+                76.0,
+                20.0,
+                3.0,
+                0.0,
+                0.0
+            ],
+            "ratio": 1914
+        },
+        {
+            "input": 225,
+            "output": 430648,
+            "distribution": [
+                76.0,
+                20.0,
+                3.0,
+                0.0,
+                0.0
+            ],
+            "ratio": 1913
+        },
+        {
+            "input": 250,
+            "output": 478474,
+            "distribution": [
+                76.0,
+                20.0,
+                2.0,
+                0.0,
+                0.0
+            ],
+            "ratio": 1913
+        },
+        {
+            "input": 275,
+            "output": 526295,
+            "distribution": [
+                76.0,
+                20.0,
+                2.0,
+                0.0,
+                0.0
+            ],
+            "ratio": 1913
+        },
+        {
+            "input": 300,
+            "output": 574109,
+            "distribution": [
+                76.0,
+                20.0,
+                2.0,
+                0.0,
+                0.0
+            ],
+            "ratio": 1913
+        },
+        {
+            "input": 325,
+            "output": 621919,
+            "distribution": [
+                77.0,
+                20.0,
+                2.0,
+                0.0,
+                0.0
+            ],
+            "ratio": 1913
+        },
+        {
+            "input": 350,
+            "output": 669723,
+            "distribution": [
+                77.0,
+                20.0,
+                2.0,
+                0.0,
+                0.0
+            ],
+            "ratio": 1913
+        },
+        {
+            "input": 375,
+            "output": 717524,
+            "distribution": [
+                77.0,
+                20.0,
+                1.0,
+                0.0,
+                0.0
+            ],
+            "ratio": 1913
+        },
+        {
+            "input": 400,
+            "output": 765318,
+            "distribution": [
+                77.0,
+                20.0,
+                1.0,
+                0.0,
+                0.0
+            ],
+            "ratio": 1913
+        },
+        {
+            "input": 425,
+            "output": 813107,
+            "distribution": [
+                77.0,
+                20.0,
+                1.0,
+                0.0,
+                0.0
+            ],
+            "ratio": 1913
+        },
+        {
+            "input": 450,
+            "output": 860893,
+            "distribution": [
+                77.0,
+                20.0,
+                1.0,
+                0.0,
+                0.0
+            ],
+            "ratio": 1913
+        },
+        {
+            "input": 475,
+            "output": 908672,
+            "distribution": [
+                77.0,
+                20.0,
+                1.0,
+                0.0,
+                0.0
+            ],
+            "ratio": 1912
+        },
+        {
+            "input": 500,
+            "output": 956445,
+            "distribution": [
+                77.0,
+                20.0,
+                1.0,
+                0.0,
+                0.0
+            ],
+            "ratio": 1912
+        },
+        {
+            "input": 525,
+            "output": 1004214,
+            "distribution": [
+                77.0,
+                20.0,
+                1.0,
+                0.0,
+                0.0
+            ],
+            "ratio": 1912
+        },
+        {
+            "input": 550,
+            "output": 1051978,
+            "distribution": [
+                76.0,
+                20.0,
+                1.0,
+                0.0,
+                0.0
+            ],
+            "ratio": 1912
+        },
+        {
+            "input": 575,
+            "output": 1099739,
+            "distribution": [
+                76.0,
+                20.0,
+                1.0,
+                0.0,
+                0.0
+            ],
+            "ratio": 1912
+        },
+        {
+            "input": 600,
+            "output": 1147494,
+            "distribution": [
+                76.0,
+                21.0,
+                1.0,
+                0.0,
+                0.0
+            ],
+            "ratio": 1912
+        },
+        {
+            "input": 625,
+            "output": 1195243,
+            "distribution": [
+                76.0,
+                21.0,
+                1.0,
+                0.0,
+                0.0
+            ],
+            "ratio": 1912
+        },
+        {
+            "input": 650,
+            "output": 1242986,
+            "distribution": [
+                75.0,
+                21.0,
+                1.0,
+                0.0,
+                0.0
+            ],
+            "ratio": 1912
+        },
+        {
+            "input": 675,
+            "output": 1290726,
+            "distribution": [
+                75.0,
+                21.0,
+                1.0,
+                0.0,
+                0.0
+            ],
+            "ratio": 1912
+        },
+        {
+            "input": 700,
+            "output": 1338460,
+            "distribution": [
+                75.0,
+                21.0,
+                1.0,
+                0.0,
+                0.0
+            ],
+            "ratio": 1912
+        },
+        {
+            "input": 725,
+            "output": 1386190,
+            "distribution": [
+                75.0,
+                22.0,
+                1.0,
+                0.0,
+                0.0
+            ],
+            "ratio": 1911
+        },
+        {
+            "input": 750,
+            "output": 1433915,
+            "distribution": [
+                75.0,
+                22.0,
+                1.0,
+                0.0,
+                0.0
+            ],
+            "ratio": 1911
+        },
+        {
+            "input": 775,
+            "output": 1481635,
+            "distribution": [
+                74.0,
+                22.0,
+                1.0,
+                0.0,
+                0.0
+            ],
+            "ratio": 1911
+        },
+        {
+            "input": 800,
+            "output": 1529352,
+            "distribution": [
+                74.0,
+                22.0,
+                1.0,
+                0.0,
+                0.0
+            ],
+            "ratio": 1911
+        },
+        {
+            "input": 825,
+            "output": 1577062,
+            "distribution": [
+                74.0,
+                22.0,
+                1.0,
+                0.0,
+                0.0
+            ],
+            "ratio": 1911
+        },
+        {
+            "input": 850,
+            "output": 1624767,
+            "distribution": [
+                74.0,
+                22.0,
+                1.0,
+                0.0,
+                0.0
+            ],
+            "ratio": 1911
+        },
+        {
+            "input": 875,
+            "output": 1672468,
+            "distribution": [
+                74.0,
+                22.0,
+                1.0,
+                0.0,
+                0.0
+            ],
+            "ratio": 1911
+        },
+        {
+            "input": 900,
+            "output": 1720163,
+            "distribution": [
+                74.0,
+                23.0,
+                1.0,
+                0.0,
+                0.0
+            ],
+            "ratio": 1911
+        },
+        {
+            "input": 925,
+            "output": 1767854,
+            "distribution": [
+                74.0,
+                23.0,
+                1.0,
+                0.0,
+                0.0
+            ],
+            "ratio": 1911
+        },
+        {
+            "input": 950,
+            "output": 1815540,
+            "distribution": [
+                74.0,
+                23.0,
+                1.0,
+                0.0,
+                0.0
+            ],
+            "ratio": 1911
+        },
+        {
+            "input": 975,
+            "output": 1863220,
+            "distribution": [
+                74.0,
+                23.0,
+                1.0,
+                0.0,
+                0.0
+            ],
+            "ratio": 1910
+        },
+        {
+            "input": 1000,
+            "output": 1910892,
+            "distribution": [
+                73.0,
+                23.0,
+                1.0,
+                0.0,
+                1.0
+            ],
+            "ratio": 1910
+        },
+        {
+            "input": 1000,
+            "output": 1910892,
+            "distribution": [
+                73.0,
+                23.0,
+                1.0,
+                0.0,
+                1.0
+            ],
+            "ratio": 1910
+        },
+        {
+            "input": 2000,
+            "output": 3813905,
+            "distribution": [
+                72.0,
+                25.0,
+                1.0,
+                0.0,
+                1.0
+            ],
+            "ratio": 1906
+        },
+        {
+            "input": 3000,
+            "output": 5708100,
+            "distribution": [
+                74.0,
+                22.0,
+                1.0,
+                0.0,
+                1.0
+            ],
+            "ratio": 1902
+        },
+        {
+            "input": 4000,
+            "output": 7580262,
+            "distribution": [
+                77.0,
+                19.0,
+                1.0,
+                0.0,
+                1.0
+            ],
+            "ratio": 1895
+        },
+        {
+            "input": 5000,
+            "output": 9416600,
+            "distribution": [
+                76.0,
+                16.0,
+                1.0,
+                0.0,
+                5.0
+            ],
+            "ratio": 1883
+        },
+        {
+            "input": 6000,
+            "output": 11241276,
+            "distribution": [
+                79.0,
+                15.0,
+                1.0,
+                0.0,
+                2.0
+            ],
+            "ratio": 1873
+        },
+        {
+            "input": 7000,
+            "output": 13035315,
+            "distribution": [
+                80.0,
+                14.0,
+                1.0,
+                0.0,
+                2.0
+            ],
+            "ratio": 1862
+        },
+        {
+            "input": 8000,
+            "output": 14801327,
+            "distribution": [
+                81.0,
+                13.0,
+                2.0,
+                0.0,
+                2.0
+            ],
+            "ratio": 1850
+        },
+        {
+            "input": 9000,
+            "output": 16513869,
+            "distribution": [
+                80.0,
+                13.0,
+                2.0,
+                0.0,
+                2.0
+            ],
+            "ratio": 1834
+        },
+        {
+            "input": 10000,
+            "output": 18259439,
+            "distribution": [
+                80.0,
+                14.0,
+                1.0,
+                0.0,
+                3.0
+            ],
+            "ratio": 1825
+        },
+        {
+            "input": 11000,
+            "output": 19923247,
+            "distribution": [
+                77.0,
+                16.0,
+                1.0,
+                0.0,
+                3.0
+            ],
+            "ratio": 1811
+        },
+        {
+            "input": 12000,
+            "output": 21461759,
+            "distribution": [
+                74.0,
+                19.0,
+                1.0,
+                0.0,
+                4.0
+            ],
+            "ratio": 1788
+        },
+        {
+            "input": 13000,
+            "output": 23030553,
+            "distribution": [
+                71.0,
+                21.0,
+                1.0,
+                0.0,
+                4.0
+            ],
+            "ratio": 1771
+        },
+        {
+            "input": 14000,
+            "output": 24436002,
+            "distribution": [
+                67.0,
+                21.0,
+                1.0,
+                0.0,
+                8.0
+            ],
+            "ratio": 1745
+        },
+        {
+            "input": 15000,
+            "output": 25635322,
+            "distribution": [
+                64.0,
+                20.0,
+                1.0,
+                0.0,
+                11.0
+            ],
+            "ratio": 1709
+        },
+        {
+            "input": 16000,
+            "output": 27133882,
+            "distribution": [
+                64.0,
+                25.0,
+                1.0,
+                0.0,
+                7.0
+            ],
+            "ratio": 1695
+        },
+        {
+            "input": 17000,
+            "output": 28438637,
+            "distribution": [
+                61.0,
+                25.0,
+                1.0,
+                0.0,
+                11.0
+            ],
+            "ratio": 1672
+        },
+        {
+            "input": 18000,
+            "output": 29768632,
+            "distribution": [
+                63.0,
+                26.0,
+                0.0,
+                0.0,
+                8.0
+            ],
+            "ratio": 1653
+        },
+        {
+            "input": 19000,
+            "output": 30705853,
+            "distribution": [
+                61.0,
+                26.0,
+                1.0,
+                0.0,
+                9.0
+            ],
+            "ratio": 1616
+        },
+        {
+            "input": 20000,
+            "output": 31710132,
+            "distribution": [
+                60.0,
+                25.0,
+                1.0,
+                0.0,
+                10.0
+            ],
+            "ratio": 1585
+        },
+        {
+            "input": 21000,
+            "output": 32554735,
+            "distribution": [
+                59.0,
+                24.0,
+                2.0,
+                0.0,
+                13.0
+            ],
+            "ratio": 1550
+        },
+        {
+            "input": 22000,
+            "output": 33437083,
+            "distribution": [
+                58.0,
+                24.0,
+                1.0,
+                0.0,
+                14.0
+            ],
+            "ratio": 1519
+        },
+        {
+            "input": 23000,
+            "output": 34290658,
+            "distribution": [
+                59.0,
+                23.0,
+                1.0,
+                0.0,
+                14.0
+            ],
+            "ratio": 1490
+        },
+        {
+            "input": 24000,
+            "output": 35008493,
+            "distribution": [
+                59.0,
+                22.0,
+                0.0,
+                0.0,
+                16.0
+            ],
+            "ratio": 1458
+        },
+        {
+            "input": 10000,
+            "output": 18259439,
+            "distribution": [
+                80.0,
+                14.0,
+                1.0,
+                0.0,
+                3.0
+            ],
+            "ratio": 1825
+        }
+    ],
+    "pools": [
+        {
+            "address": "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640",
+            "id": "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640",
+            "tokens": [
+                {
+                    "address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                    "decimals": 6,
+                    "symbol": "USDC",
+                    "gas": "0"
+                },
+                {
+                    "address": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+                    "decimals": 18,
+                    "symbol": "WETH",
+                    "gas": "0"
+                }
+            ],
+            "protocol_system": "uniswap_v3",
+            "protocol_type_name": "uniswap_v3_pool",
+            "chain": "ethereum",
+            "contract_ids": [],
+            "static_attributes": [
+                [
+                    "fee",
+                    "0x01f4"
+                ],
+                [
+                    "pool_address",
+                    "0x88e6a0c2ddd26feeb64f039a2c41296fcb3f5640"
+                ],
+                [
+                    "tick_spacing",
+                    "0x0a"
+                ]
+            ],
+            "creation_tx": "0x125e0b641d4a4b08806bf52c0c6757648c9963bcda8681e4f996f09e00d4c2cc",
+            "created_at": "2021-05-05T21:42:11"
+        },
+        {
+            "address": "0x8ad599c3a0ff1de082011efddc58f1908eb6e6d8",
+            "id": "0x8ad599c3a0ff1de082011efddc58f1908eb6e6d8",
+            "tokens": [
+                {
+                    "address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                    "decimals": 6,
+                    "symbol": "USDC",
+                    "gas": "0"
+                },
+                {
+                    "address": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+                    "decimals": 18,
+                    "symbol": "WETH",
+                    "gas": "0"
+                }
+            ],
+            "protocol_system": "uniswap_v3",
+            "protocol_type_name": "uniswap_v3_pool",
+            "chain": "ethereum",
+            "contract_ids": [],
+            "static_attributes": [
+                [
+                    "pool_address",
+                    "0x8ad599c3a0ff1de082011efddc58f1908eb6e6d8"
+                ],
+                [
+                    "fee",
+                    "0x0bb8"
+                ],
+                [
+                    "tick_spacing",
+                    "0x3c"
+                ]
+            ],
+            "creation_tx": "0x89d75075eaef8c21ab215ae54144ba563b850ee7460f89b2a175fd0e267ed330",
+            "created_at": "2021-05-04T23:10:00"
+        },
+        {
+            "address": "0xe0554a476a092703abdb3ef35c80e0d76d32939f",
+            "id": "0xe0554a476a092703abdb3ef35c80e0d76d32939f",
+            "tokens": [
+                {
+                    "address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                    "decimals": 6,
+                    "symbol": "USDC",
+                    "gas": "0"
+                },
+                {
+                    "address": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+                    "decimals": 18,
+                    "symbol": "WETH",
+                    "gas": "0"
+                }
+            ],
+            "protocol_system": "uniswap_v3",
+            "protocol_type_name": "uniswap_v3_pool",
+            "chain": "ethereum",
+            "contract_ids": [],
+            "static_attributes": [
+                [
+                    "tick_spacing",
+                    "0x01"
+                ],
+                [
+                    "fee",
+                    "0x64"
+                ],
+                [
+                    "pool_address",
+                    "0xe0554a476a092703abdb3ef35c80e0d76d32939f"
+                ]
+            ],
+            "creation_tx": "0x9a773c2ab3acc47552e73d553b35e29c8fb0ca9576882f46552254232edb3cfd",
+            "created_at": "2021-11-14T21:44:29"
+        },
+        {
+            "address": "0x7bea39867e4169dbe237d55c8242a8f2fcdcc387",
+            "id": "0x7bea39867e4169dbe237d55c8242a8f2fcdcc387",
+            "tokens": [
+                {
+                    "address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                    "decimals": 6,
+                    "symbol": "USDC",
+                    "gas": "0"
+                },
+                {
+                    "address": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+                    "decimals": 18,
+                    "symbol": "WETH",
+                    "gas": "0"
+                }
+            ],
+            "protocol_system": "uniswap_v3",
+            "protocol_type_name": "uniswap_v3_pool",
+            "chain": "ethereum",
+            "contract_ids": [],
+            "static_attributes": [
+                [
+                    "tick_spacing",
+                    "0x00c8"
+                ],
+                [
+                    "pool_address",
+                    "0x7bea39867e4169dbe237d55c8242a8f2fcdcc387"
+                ],
+                [
+                    "fee",
+                    "0x2710"
+                ]
+            ],
+            "creation_tx": "0x004cb88319b0678320cb0a04fab8003897f33c345576adfbb1f79b903a0509f0",
+            "created_at": "2021-05-04T20:07:45"
+        },
+        {
+            "address": "0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc",
+            "id": "0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc",
+            "tokens": [
+                {
+                    "address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+                    "decimals": 6,
+                    "symbol": "USDC",
+                    "gas": "0"
+                },
+                {
+                    "address": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
+                    "decimals": 18,
+                    "symbol": "WETH",
+                    "gas": "0"
+                }
+            ],
+            "protocol_system": "uniswap_v2",
+            "protocol_type_name": "uniswap_v2_pool",
+            "chain": "ethereum",
+            "contract_ids": [],
+            "static_attributes": [
+                [
+                    "fee",
+                    "0x1e"
+                ],
+                [
+                    "pool_address",
+                    "0xb4e16d0168e52d35cacd2c6185b44281ec28c9dc"
+                ]
+            ],
+            "creation_tx": "0xd07cbde817318492092cc7a27b3064a69bd893c01cb593d6029683ffd290ab3a",
+            "created_at": "2020-05-05T20:22:25"
+        }
+    ]
+}

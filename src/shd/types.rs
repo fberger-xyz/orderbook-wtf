@@ -1,3 +1,4 @@
+use num_bigint::BigUint;
 use serde::{Deserialize, Serialize};
 use tokio::sync::RwLock;
 
@@ -185,6 +186,30 @@ pub struct Orderbook {
     pub spacing: u64,       // Tick spacing
     pub bids: Vec<LiquidityTickAmounts>,
     pub asks: Vec<LiquidityTickAmounts>,
+}
+
+// #[derive(Debug, Clone, Serialize, Deserialize)]
+// pub struct TradeResult {
+//     pub input: BigUint,             // e.g. 100 (meaning 100 ETH)
+//     pub output: BigUint,            // in token_out human–readable units
+//     pub distribution: Vec<BigUint>, // percentage distribution per pool (0–100)
+//     pub ratio: BigUint,             // output per unit input (human–readable)
+// }
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct TradeResult {
+    pub input: u128,            // e.g. 100 (meaning 100 ETH)
+    pub output: u128,           // in token_out human–readable units
+    pub distribution: Vec<f64>, // percentage distribution per pool (0–100)
+    pub ratio: u128,            // output per unit input (human–readable)
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct PairSimulatedOrderbook {
+    pub from: SrzToken,
+    pub to: SrzToken,
+    pub trades: Vec<TradeResult>,
+    pub pools: Vec<SrzProtocolComponent>,
 }
 
 #[derive(Debug, Clone)]

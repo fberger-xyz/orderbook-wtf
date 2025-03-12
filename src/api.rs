@@ -157,8 +157,9 @@ async fn pair(Extension(shtss): Extension<SharedTychoStreamState>, Extension(net
                         datapools.push(PoolComputeData { component: cp, protosim });
                     }
                 }
-                shd::core::pair::prepare(network.clone(), datapools.clone(), tokens.clone(), params.clone()).await;
-                Json(json!({ "pair": [] }))// !
+                // shd::core::pair::prepare(network.clone(), datapools.clone(), tokens.clone(), params.clone()).await;
+                shd::core::pair::simulate(network.clone(), datapools.clone(), tokens.clone(), params.clone()).await;
+                Json(json!({ "pair": [] })) // !
             } else {
                 Json(json!({ "pair": "Query param Tag must contain only 2 tokens separated by a dash '-'." }))
             }
