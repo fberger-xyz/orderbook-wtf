@@ -117,8 +117,5 @@ pub async fn simulate(network: Network, datapools: Vec<PoolComputeData>, tokens:
         log::info!("Spot price for {}-{} => {}", base.symbol, quote.symbol, price);
         log::info!("\n");
     }
-    let result = optimization(network.clone(), pools, tokens, query).await;
-    let path = format!("misc/data/{}.opti.eth-usdc.orderbook.json", network.name);
-    crate::shd::utils::misc::save1(result.clone(), path.as_str());
-    result
+    optimization(network.clone(), pools, tokens, query).await
 }

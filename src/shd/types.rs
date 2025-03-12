@@ -198,11 +198,19 @@ pub struct Orderbook {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TradeResult {
-    pub input: u128,            // e.g. 100 (meaning 100 ETH)
-    pub output: u128,           // in token_out human–readable units
+    pub input: f64,             // e.g. 100 (meaning 100 ETH)
+    pub output: f64,            // in token_out human–readable units
     pub distribution: Vec<f64>, // percentage distribution per pool (0–100)
-    pub ratio: u128,            // output per unit input (human–readable)
+    pub ratio: f64,             // output per unit input (human–readable)
 }
+
+// #[derive(Debug, Clone, Serialize, Deserialize)]
+// struct TradeResult {
+//     pub input: f64,
+//     pub output: f64,
+//     pub distribution: Vec<f64>,
+//     pub unit_price: f64,
+// }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PairSimulatedOrderbook {
