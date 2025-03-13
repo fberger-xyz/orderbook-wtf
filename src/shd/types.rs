@@ -129,6 +129,7 @@ pub struct TychoStreamState {
     // Maps a network name to its new ProtocolComponent.
     // pub components: HashMap<String, ProtocolComponent>,
     pub components: HashMap<String, ProtocolComponent>,
+    pub balances: HashMap<String, HashMap<String, u128>>, // FuLL Lowercase
 }
 
 pub type ChainCore = tycho_core::dto::Chain;
@@ -216,7 +217,8 @@ pub struct TradeResult {
 pub struct PairSimulatedOrderbook {
     pub from: SrzToken,
     pub to: SrzToken,
-    pub trades: Vec<TradeResult>,
+    pub trades0to1: Vec<TradeResult>,
+    pub trades1to0: Vec<TradeResult>,
     pub pools: Vec<SrzProtocolComponent>,
 }
 
@@ -241,4 +243,17 @@ pub struct LiquidityTickAmounts {
 pub struct SummedLiquidity {
     pub amount0: f64,
     pub amount1: f64,
+}
+
+#[derive(Debug, Clone, Copy)]
+pub struct IncrementationSegment {
+    pub start: f64,
+    pub end: f64,
+    pub step: f64,
+}
+
+#[derive(Debug)]
+pub struct PairSimuIncrementConfig {
+    pub segments: Vec<IncrementationSegment>,
+    pub price: f64, // For 1 ETH worth 2,000 USDC, price1to0 = 2000.0, so input amounts will be *2000 more than ETH amounts
 }

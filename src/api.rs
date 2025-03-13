@@ -135,6 +135,9 @@ async fn orderbook(Extension(shtss): Extension<SharedTychoStreamState>, Extensio
             let srzt0 = atks.iter().find(|x| x.address.to_lowercase() == tokens[0].clone()).unwrap();
             let srzt1 = atks.iter().find(|x| x.address.to_lowercase() == tokens[1].clone()).unwrap();
             let tokens = vec![srzt0.clone(), srzt1.clone()];
+            let mtx = shtss.read().await;
+            let balances = mtx.balances.clone();
+            drop(mtx);
             if tokens.len() == 2 {
                 let mut datapools: Vec<ProtoTychoState> = vec![];
                 for cp in cps.clone() {
@@ -142,6 +145,7 @@ async fn orderbook(Extension(shtss): Extension<SharedTychoStreamState>, Extensio
                     if cptks.len() != 2 {
                         log::warn!("Component {} has {} tokens instead of 2. Component with >2 tokens are not handled yet.", cp.id, cptks.len());
                     } else if cptks[0].address.to_lowercase() == tokens[0].address.to_lowercase() && cptks[1].address.to_lowercase() == tokens[1].address.to_lowercase() {
+                        // ! This condition need to be improved, no token0/1 and multi-token
                         let mtx = shtss.read().await;
                         let protosim = mtx.protosims.get(&cp.id.to_lowercase()).unwrap().clone();
                         drop(mtx);
@@ -149,7 +153,7 @@ async fn orderbook(Extension(shtss): Extension<SharedTychoStreamState>, Extensio
                     }
                 }
                 // shd::core::pair::prepare(network.clone(), datapools.clone(), tokens.clone(), params.clone()).await;
-                shd::core::orderbook::build(network.clone(), datapools.clone(), tokens.clone(), params.clone()).await;
+                shd::core::orderbook::build(network.clone(), balances.clone(), datapools.clone(), tokens.clone(), params.clone()).await;
                 Json(json!({ "orderbook": [] })) // !
             } else {
                 log::error!("Query param Tag must contain only 2 tokens separated by a dash '-'");
@@ -175,6 +179,9 @@ async fn liquidity(Extension(shtss): Extension<SharedTychoStreamState>, Extensio
             let srzt1 = atks.iter().find(|x| x.address.to_lowercase() == tokens[1].clone()).unwrap();
             let tokens = vec![srzt0.clone(), srzt1.clone()];
             if tokens.len() == 2 {
+                let mtx = shtss.read().await;
+                let balances = mtx.balances.clone();
+                drop(mtx);
                 let mut datapools: Vec<ProtoTychoState> = vec![];
                 for cp in cps.clone() {
                     let cptks = cp.tokens.clone();
@@ -207,6 +214,7 @@ pub async fn start(n: Network, shared: SharedTychoStreamState, config: EnvConfig
     log::info!("Testing SharedTychoStreamState read = {:?} with {:?}", rstate.protosims.keys(), rstate.protosims.values());
     log::info!(" => rstate.states.keys and rstate.states.values => {:?} with {:?}", rstate.protosims.keys(), rstate.protosims.values());
     log::info!(" => rstate.components.keys and rstate.components.values => {:?} with {:?}", rstate.components.keys(), rstate.components.values());
+    log::info!(" => rstate.balances.keys and rstate.balances.values => {:?} with {:?}", rstate.balances.keys(), rstate.balances.values());
     drop(rstate);
     let app = Router::new()
         .route("/", get(root))

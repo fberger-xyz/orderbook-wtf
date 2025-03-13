@@ -34,7 +34,7 @@ pub async fn get_pool_balances(network: Network, provider: &RootProvider<Http<Cl
                 let contract = IERC20::new(t.address.parse().unwrap(), client.clone());
                 let balance = contract.balanceOf(cp.address.parse().unwrap()).call().await.unwrap().balance.to_string().parse::<u128>().unwrap();
                 let balance = balance as f64 / 10u128.pow(t.decimals as u32) as f64;
-                log::info!(" uniswap_v2_pool uniswap_v3_pool curve => {} balance: {}", t.symbol, balance);
+                log::info!(" uniswap_v2_pool // uniswap_v3_pool // curve => {} balance: {:.2}", t.symbol, balance);
                 balances[i] = balance;
             }
         }
@@ -66,7 +66,7 @@ pub async fn get_pool_balances(network: Network, provider: &RootProvider<Http<Cl
                             let balance = res.balances[i].to_string().parse::<u128>().unwrap();
                             let balance = balance as f64 / 10u128.pow(t.decimals as u32) as f64;
                             balances[i] = balance;
-                            log::info!(" balancer_v2_pool => {} balance: {}", t.symbol, balance);
+                            log::info!(" balancer_v2_pool => {} balance: {:.2}", t.symbol, balance);
                         } else {
                             log::error!("Balancer pool token address mismatch: {} != {}", btk, t.address);
                             balances[i] = 0.;

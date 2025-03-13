@@ -70,5 +70,7 @@ try() {
 # try "GET /components" "$API_URL/components"
 # try "GET /pool/:id" "$API_URL/pool/0x7bea39867e4169dbe237d55c8242a8f2fcdcc387"
 # try "GET /pair" "$API_URL/pair?tag=0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48-0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2&z0to1=false"
-try "GET /liquidity" "$API_URL/liquidity?tag=0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48-0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2&z0to1=false"
-# try "GET /orderbook" "$API_URL/orderbook?tag=0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48-0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2&z0to1=false"
+# try "GET /liquidity" "$API_URL/liquidity?tag=0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48-0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2&z0to1=false"
+try "GET /orderbook" "$API_URL/orderbook?tag=0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48-0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2&z0to1=false"
+
+# By the way how do you manage to recompute the balance of v4 ?

@@ -67,7 +67,7 @@ impl ToLiquidityBook for SrzUniswapV3State {
     fn structurate(&self, component: SrzProtocolComponent, tks: Vec<SrzToken>, query: PairQuery, fee: f64, price: f64, poolb0: f64, poolb1: f64) -> LiquidityPoolBook {
         // CCT
         let spacing = self.ticks.tick_spacing as i32;
-        maths::ticks::ticks_liquidity(self.liquidity as i128, self.tick, spacing, &self.ticks.clone(), tks[0].clone(), tks[1].clone());
+        maths::ticks::ticks_liquidity(self.liquidity as i128, self.tick, spacing, &self.ticks.clone(), tks[0].clone(), tks[1].clone(), false);
         let tick_data_range = maths::ticks::compute_tick_data(self.tick, self.ticks.tick_spacing as i32);
         // let (p0to1, p1to0) = maths::ticks::tick_to_prices(tick_data_range.tick_lower, tks[0].decimals as u8, tks[1].decimals as u8);
         let (p0to1, p1to0) = maths::ticks::tick_to_prices(self.tick, tks[0].decimals as u8, tks[1].decimals as u8);
@@ -85,7 +85,7 @@ impl ToLiquidityBook for SrzUniswapV3State {
         log::info!("ToLiquidityBook: SrzUniswapV3State: Analysing each tick individually.");
         let mut ticks_list = self.ticks.clone();
         ticks_list.ticks.sort_by(|a, b| a.index.cmp(&b.index));
-        let ticks_amounts = maths::ticks::ticks_liquidity(self.liquidity as i128, self.tick, spacing, &ticks_list.clone(), tks[0].clone(), tks[1].clone());
+        let ticks_amounts = maths::ticks::ticks_liquidity(self.liquidity as i128, self.tick, spacing, &ticks_list.clone(), tks[0].clone(), tks[1].clone(), false);
         let (mut bids, asks) = maths::ticks::filter_and_classify_ticks(ticks_amounts, self.tick, tick_data_range.tick_lower, p0to1, p1to0);
         bids.push(current_tick_amounts.clone());
         LiquidityPoolBook {

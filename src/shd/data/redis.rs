@@ -11,13 +11,7 @@ use redis::{
     AsyncCommands, Client, RedisError,
 };
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
-pub enum SyncStatus {
-    Down = 0,
-    Syncing = 1,
-    Ready = 2,
-    Error = 3,
-}
+use crate::shd::types::SyncState;
 
 /// ================ Naming Convention ================
 /// ALL             : <network>                            : One struct for eveything related to a network
@@ -68,34 +62,33 @@ pub async fn connect() -> Result<MultiplexedConnection, RedisError> {
 }
 
 /**
- * Get the status of the Redis db for a given network and a given protocol
+ * Get the status of the Redis db for a given network
  */
-pub async fn status(namespace: String) -> SyncStatus {
-    let key = format!("{}:status", namespace);
-    // log::info!("Getting Redis Status (key = {})", key);
+pub async fn status(key: String) -> SyncState {
     let status = get::<u128>(key.as_str()).await;
     match status {
         Some(status) => match status {
-            0 => SyncStatus::Down,
-            1 => SyncStatus::Syncing,
-            2 => SyncStatus::Ready,
-            _ => SyncStatus::Error,
+            1 => SyncState::Down,
+            2 => SyncState::Launching,
+            3 => SyncState::Syncing,
+            4 => SyncState::Running,
+            _ => SyncState::Error,
         },
-        None => SyncStatus::Error,
+        None => SyncState::Error,
     }
 }
 
 /**
- * Infinite waiting for the status 'Synced' for a given network and a given protocol
+ * Infinite waiting for the status 'Running' for a given network
  */
-pub async fn wstatus(namespace: String) {
+pub async fn wstatus(key: String) {
     let time = std::time::SystemTime::now();
     log::info!("Waiting Redis Synchro");
     loop {
-        tokio::time::sleep(std::time::Duration::from_millis(5000)).await;
-        let status = status(namespace.clone()).await;
+        tokio::time::sleep(std::time::Duration::from_millis(2500)).await;
+        let status = status(key.clone()).await;
         log::info!("Got Redis Status: {:?}", status);
-        if let SyncStatus::Ready = status {
+        if let SyncState::Running = status {
             let elasped = time.elapsed().unwrap().as_millis();
             log::info!("wstatus: redis db is ready. Took {} ms to sync", elasped);
             break;

@@ -96,11 +96,13 @@ pub fn derive(
     let amount0div = amount0 / 10_f64.powi(t0.decimals as i32);
     let amount1div = amount1 / 10_f64.powi(t1.decimals as i32);
     if v {
-        log::info!("Inputs: tick_low: {} | tick_high: {} | liquidity: {} | x96: {}", tick_low, tick_high, liquidity, x96);
-        log::info!(" - current_tick: {} | Boundaries: sqrt_low: {:.8}, sqrt_high: {:.8}, actual: {:.8}", current_tick, sqrt_ratio_a, sqrt_ratio_b, sqrt_price);
-        log::info!(" - Price0to1: {:.8} | Price1to0: {:.8}", price0to1, price1to0);
-        log::info!(" - {} amount0 {:.8} | amount1 {:.8}", _prefix, amount0, amount1);
-        log::info!(" - tick: {} | lqdty: {} | {}: {:.6} | {}: {:.6}\n", current_tick, liquidity, t0.symbol, amount0div, t1.symbol, amount1div);
+        log::info!("--- Tick very close to spot sprice ---");
+        log::info!("- Inputs: tick_low: {} | tick_high: {} | liquidity: {}", tick_low, tick_high, liquidity);
+        log::info!(" - current_tick: {} | Boundaries: sqrt_low: {:.2}, sqrt_high: {:.2}, actual: {:.2}", current_tick, sqrt_ratio_a, sqrt_ratio_b, sqrt_price);
+        log::info!(" - Price0to1: {:.7} | Price1to0: {:.7}", price0to1, price1to0);
+        log::info!(" - {} amount0 {:.7} | amount1 {:.7}", _prefix, amount0, amount1);
+        log::info!(" - {} : {:.6} | {}: {:.6}", t0.symbol, amount0div, t1.symbol, amount1div);
+        log::info!("--- Done for tick#{tick_low} ---")
     }
 
     LiquidityTickAmounts {
@@ -134,8 +136,8 @@ pub fn compute_cumulative_liquidity(active_liquidity: i128, current_tick: i32, t
 
 /// Simulates available token amounts for each tick in the tick list in both directions (bid/ask).
 /// For each tick, it calculates cumulative liquidity and then computes token amounts using derive().
-pub fn ticks_liquidity(active: i128, current_tick: i32, tick_spacing: i32, tick_list: &SrzTickList, t0: SrzToken, t1: SrzToken) -> Vec<LiquidityTickAmounts> {
-    log::info!("--- Computing liquidity across ticks ---");
+pub fn ticks_liquidity(active: i128, current_tick: i32, tick_spacing: i32, tick_list: &SrzTickList, t0: SrzToken, t1: SrzToken, verbose: bool) -> Vec<LiquidityTickAmounts> {
+    log::info!("------- Computing liquidity across ticks -------");
     let mut output = vec![];
     for tick in tick_list.ticks.iter() {
         let target_tick = tick.index;
@@ -168,18 +170,20 @@ pub fn ticks_liquidity(active: i128, current_tick: i32, tick_spacing: i32, tick_
         // Compute token amounts using the simulated sqrt price.
         let tick_amounts = derive(cum_liq, simulated_sqrt_price_x96, range_low, range_high, t0.clone(), t1.clone(), verbose);
         output.push(tick_amounts.clone());
-        log::info!(
-            "Tick {} within [{}, {}] | {}: {:.6}, {}: {:.6} | p0to1 = {:.6}, p1to0 = {:.6}",
-            target_tick,
-            range_low,
-            range_high,
-            t0.symbol,
-            tick_amounts.amount0,
-            t1.symbol,
-            tick_amounts.amount1,
-            p0to1,
-            p1to0
-        );
+        if verbose {
+            log::info!(
+                "Tick {} within [{}, {}] | {}: {:.6}, {}: {:.6} | p0to1 = {:.6}, p1to0 = {:.6}",
+                target_tick,
+                range_low,
+                range_high,
+                t0.symbol,
+                tick_amounts.amount0,
+                t1.symbol,
+                tick_amounts.amount1,
+                p0to1,
+                p1to0
+            );
+        }
     }
     output
 }

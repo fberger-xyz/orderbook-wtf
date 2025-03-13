@@ -70,6 +70,3 @@
  Got 0 removed_pairs
  No new pairs
 
-
-                                                                                                                                                                                                                                                 /1m-19.9s
-➜  Tycho git:(main) ✗

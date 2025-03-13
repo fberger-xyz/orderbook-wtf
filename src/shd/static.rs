@@ -1,6 +1,9 @@
 pub enum TychoDex {
     UniswapV2,
     UniswapV3,
+    UniswapV4,
+    BalancerV2,
+    Curve,
 }
 
 impl ToString for TychoDex {
@@ -8,7 +11,23 @@ impl ToString for TychoDex {
         match self {
             TychoDex::UniswapV2 => "uniswap_v2".to_string(),
             TychoDex::UniswapV3 => "uniswap_v3".to_string(),
+            TychoDex::UniswapV4 => "uniswap_v4".to_string(),
+            TychoDex::BalancerV2 => "vm:balancer_v2".to_string(),
+            TychoDex::Curve => "vm:curve".to_string(),
         }
+    }
+}
+
+// Impl vectorize for TychoDex
+impl TychoDex {
+    pub fn vectorize() -> Vec<String> {
+        vec![
+            TychoDex::UniswapV2.to_string(),
+            TychoDex::UniswapV3.to_string(),
+            TychoDex::UniswapV4.to_string(),
+            TychoDex::BalancerV2.to_string(),
+            TychoDex::Curve.to_string(),
+        ]
     }
 }
 
@@ -31,6 +50,11 @@ pub mod data {
             // stream:status:<network> => SyncState
             pub fn status(network: String) -> String {
                 format!("stream:status:{}", network.to_lowercase())
+            }
+
+            // stream:status2:<network> => SyncState => Used to wait for Stream to fully sync (balances)
+            pub fn stream2(network: String) -> String {
+                format!("stream2:status:{}", network.to_lowercase())
             }
 
             // stream:latest:<network> => u64

@@ -53,6 +53,7 @@ pub mod log {
             .level(LevelFilter::Off) // Disable all logging from crates
             .level_for(prog.clone(), LevelFilter::Info) // Launcher logging
             .level_for("tap2", LevelFilter::Info) // Library logging
+            .level_for("tests", LevelFilter::Info) // Library logging
             .apply()
             .unwrap();
     }
