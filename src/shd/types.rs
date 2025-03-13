@@ -255,5 +255,5 @@ pub struct IncrementationSegment {
 #[derive(Debug)]
 pub struct PairSimuIncrementConfig {
     pub segments: Vec<IncrementationSegment>,
-    pub price: f64, // For 1 ETH worth 2,000 USDC, price1to0 = 2000.0, so input amounts will be *2000 more than ETH amounts
+    // pub price: f64, // For 1 ETH worth 2,000 USDC, price1to0 = 2000.0, so input amounts will be *2000 more than ETH amounts
 }

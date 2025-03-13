@@ -3,6 +3,7 @@ use tycho_simulation::{models::Token, protocol::state::ProtocolSim};
 use crate::shd::{
     self,
     data::fmt::{SrzProtocolComponent, SrzToken},
+    r#static::maths::{BPD, ONE_MILLIONTH, ONE_PERCENT_IN_MN},
     types::{IncrementationSegment, Network, PairQuery, PairSimuIncrementConfig, PairSimulatedOrderbook, ProtoTychoState, TradeResult},
 };
 use num_bigint::BigUint;
@@ -42,14 +43,10 @@ pub async fn build(network: Network, balances: HashMap<String, HashMap<String, u
 
     let cps: Vec<SrzProtocolComponent> = pools.clone().iter().map(|p| p.component.clone()).collect();
     let aggregated = shd::maths::steps::deepth(cps.clone(), tokens.clone(), balances.clone());
-    for balance in aggregated.iter() {
-        log::info!("Token: {} | Aggregated Balance: {}", balance.0, balance.1);
-    }
-
     let avgp0to1 = prices0to1.iter().sum::<f64>() / prices0to1.len() as f64;
     let avgp1to0 = prices1to0.iter().sum::<f64>() / prices1to0.len() as f64; // Ponderation by TVL ?
     log::info!("Average price 0to1: {} | Average price 1to0: {}", avgp0to1, avgp1to0);
-    let pso = optimization(network.clone(), pools.clone(), tokens, query, avgp0to1, avgp1to0).await;
+    let pso = optimization(network.clone(), pools.clone(), tokens, query, aggregated.clone(), avgp0to1, avgp1to0).await;
     let path = format!("misc/data/{}.pso.usdc-eth.json", network.name);
     crate::shd::utils::misc::save1(pso.clone(), path.as_str());
     pso
@@ -142,7 +139,7 @@ pub fn optimizer(
  * The function generates a set of test amounts for ETH and USDC, then runs the optimizer for each amount.
  * The optimizer uses a simple gradient-based approach to move a fixed fraction of the allocation from the pool with the lowest marginal return to the one with the highest.
  */
-pub async fn optimization(network: Network, pcsdata: Vec<ProtoTychoState>, tokens: Vec<SrzToken>, query: PairQuery, price0to1: f64, price1to0: f64) -> PairSimulatedOrderbook {
+pub async fn optimization(network: Network, pcsdata: Vec<ProtoTychoState>, tokens: Vec<SrzToken>, query: PairQuery, aggregated: HashMap<String, u128>, price0to1: f64, price1to0: f64) -> PairSimulatedOrderbook {
     log::info!("Network: {} | Got {} pools to optimize for pair: '{}'", network.name, pcsdata.len(), query.tag);
     let t0 = tokens[0].clone();
     let t1 = tokens[1].clone();
@@ -152,30 +149,44 @@ pub async fn optimization(network: Network, pcsdata: Vec<ProtoTychoState>, token
         pools.push(pcdata.component.clone());
     }
 
-    let segments = vec![
-        IncrementationSegment { start: 1., end: 100., step: 1. },
-        IncrementationSegment { start: 101., end: 1000., step: 50. },
-        IncrementationSegment { start: 1001., end: 10_000., step: 250. },
-    ];
+    let t0tb = aggregated.iter().find(|b| b.0.clone().to_lowercase() == t0.address.to_lowercase()).unwrap().1.clone();
+    let t1tb = aggregated.iter().find(|b| b.0.clone().to_lowercase() == t1.address.to_lowercase()).unwrap().1.clone();
+    let t0tb_one_mn = t0tb as f64 / ONE_MILLIONTH / 10f64.powi(t0.decimals as i32);
+    let t1tb_one_mn = t1tb as f64 / ONE_MILLIONTH / 10f64.powi(t1.decimals as i32);
+    log::info!(
+        "Aggregated onchain liquidity balance for {} is {} (for 1 millionth => {})",
+        t0.address,
+        t0tb as f64 / 10f64.powi(t0.decimals as i32),
+        t0tb_one_mn
+    );
+    log::info!(
+        "Aggregated onchain liquidity balance for {} is {} (for 1 millionth => {})",
+        t1.address,
+        t1tb as f64 / 10f64.powi(t1.decimals as i32),
+        t1tb_one_mn
+    );
 
-    let config = PairSimuIncrementConfig { segments, price: price1to0 };
-    let (steps0to1, steps1to0) = shd::maths::steps::generate(config);
+    let segments0to1 = shd::maths::steps::gsegments(t0tb_one_mn);
+    let steps0to1 = shd::maths::steps::gsteps(PairSimuIncrementConfig { segments: segments0to1.clone() }.segments);
+
+    let segments1to0 = shd::maths::steps::gsegments(t1tb_one_mn);
+    let steps1to0 = shd::maths::steps::gsteps(PairSimuIncrementConfig { segments: segments1to0.clone() }.segments);
 
     let mut trades0to1 = Vec::new();
     for amount in steps0to1.iter() {
         let start = Instant::now();
         let result = optimizer(amount.clone(), &pcsdata, t0.clone(), t1.clone());
         let elapsed = start.elapsed();
-        // log::info!(
-        //     "Input: {} {}, Output: {} {} at price1to0: {} | Distribution: {:?}, Time: {:?}",
-        //     result.input,
-        //     t0.symbol,
-        //     result.output,
-        //     t1.symbol,
-        //     result.ratio,
-        //     result.distribution,
-        //     elapsed
-        // );
+        log::info!(
+            "Input: {} {}, Output: {} {} at price1to0: {} | Distribution: {:?}, Time: {:?}",
+            result.input,
+            t0.symbol,
+            result.output,
+            t1.symbol,
+            result.ratio,
+            result.distribution,
+            elapsed
+        );
         trades0to1.push(result);
     }
 
@@ -184,16 +195,16 @@ pub async fn optimization(network: Network, pcsdata: Vec<ProtoTychoState>, token
         let start = Instant::now();
         let result = optimizer(amount.clone(), &pcsdata, t1.clone(), t0.clone());
         let elapsed = start.elapsed();
-        // log::info!(
-        //     "Input: {} {}, Output: {} {} at price0to1: {} | Distribution: {:?}, Time: {:?}",
-        //     result.input,
-        //     t1.symbol,
-        //     result.output,
-        //     t0.symbol,
-        //     result.ratio,
-        //     result.distribution,
-        //     elapsed
-        // );
+        log::info!(
+            "Input: {} {}, Output: {} {} at price0to1: {} | Distribution: {:?}, Time: {:?}",
+            result.input,
+            t1.symbol,
+            result.output,
+            t0.symbol,
+            result.ratio,
+            result.distribution,
+            elapsed
+        );
         trades1to0.push(result);
     }
 

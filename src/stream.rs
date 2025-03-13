@@ -71,6 +71,7 @@ async fn state_stream(network: Network, shared: SharedTychoStreamState, config: 
                 let mtx = shared.read().await;
                 let mut updated = mtx.balances.clone();
                 drop(mtx);
+                let before = updated.len();
                 let amms = TychoDex::vectorize();
                 for amm in amms.clone() {
                     match fm.state_msgs.get(amm.as_str()) {
@@ -105,11 +106,12 @@ async fn state_stream(network: Network, shared: SharedTychoStreamState, config: 
                 let mut mtx = shared.write().await;
                 mtx.balances = updated.clone();
                 drop(mtx);
-                log::info!("Shared 'balances' hashmap updated, mutex dropped. Currently {} entries in memory", after);
+                log::info!("Shared balances hashmap updated. Currently {} entries in memory (before = {})", after, before);
             }
         } // Failed to build tycho stream: BlockSynchronizerError("Not a single synchronizer healthy!")
         Err(e) => {
             log::error!("Failed to create stream: {:?}", e.to_string());
+            shd::data::redis::set(keys::stream::stream2(network.name.clone()).as_str(), SyncState::Error as u128).await;
         }
     }
 }
