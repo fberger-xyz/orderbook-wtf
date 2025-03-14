@@ -1,4 +1,5 @@
 use std::collections::HashMap;
+use std::str::FromStr;
 
 use alloy::primitives::ruint::aliases::U256;
 use chrono::NaiveDateTime;
@@ -44,7 +45,7 @@ impl From<Token> for SrzToken {
 impl From<SrzToken> for Token {
     fn from(serialized: SrzToken) -> Self {
         Token {
-            address: Bytes::from(serialized.address.into_bytes()), // Convert String to Bytes
+            address: Bytes::from_str(serialized.address.to_lowercase().as_str()).unwrap(),
             decimals: serialized.decimals,
             symbol: serialized.symbol,
             gas: BigUint::parse_bytes(serialized.gas.as_bytes(), 10).expect("Failed to parse BigUint"), // Convert String back to BigUint
@@ -90,15 +91,15 @@ impl From<ProtocolComponent> for SrzProtocolComponent {
 impl From<SrzProtocolComponent> for ProtocolComponent {
     fn from(serialized: SrzProtocolComponent) -> Self {
         ProtocolComponent {
-            address: Bytes::from(serialized.address.into_bytes()),
-            id: Bytes::from(serialized.id.into_bytes()),
+            address: Bytes::from_str(serialized.address.to_lowercase().as_str()).unwrap(),
+            id: Bytes::from_str(serialized.id.to_lowercase().as_str()).unwrap(),
             tokens: serialized.tokens.into_iter().map(Token::from).collect(),
             protocol_system: serialized.protocol_system,
             protocol_type_name: serialized.protocol_type_name,
             chain: serialized.chain,
-            contract_ids: serialized.contract_ids.into_iter().map(|s| Bytes::from(s.into_bytes())).collect(),
-            static_attributes: serialized.static_attributes.into_iter().map(|(k, v)| (k, Bytes::from(v.into_bytes()))).collect(),
-            creation_tx: Bytes::from(serialized.creation_tx.into_bytes()),
+            contract_ids: serialized.contract_ids.into_iter().map(|s| Bytes::from(s.into_bytes())).collect(),                     // !
+            static_attributes: serialized.static_attributes.into_iter().map(|(k, v)| (k, Bytes::from(v.into_bytes()))).collect(), // !
+            creation_tx: Bytes::from(serialized.creation_tx.into_bytes()),                                                        // !
             created_at: serialized.created_at,
         }
     }
@@ -244,5 +245,60 @@ impl From<(EVMPoolState<PreCachedDB>, String)> for SrzEVMPoolState {
             block: state.block.number,
             balances: state.balances.iter().map(|(k, v)| (k.to_string().to_lowercase(), *v)).collect(),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+
+    use std::str::FromStr;
+
+    use super::*;
+    use num_bigint::BigUint;
+
+    #[test]
+    fn test_token_to_srztoken_conversion() {
+        let token = Token {
+            address: Bytes::from_str("0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2").unwrap(), // Example address
+            decimals: 18,
+            symbol: "ETH".to_string(),
+            gas: BigUint::from(1000u32), // Example gas value
+        };
+
+        let srz_token: SrzToken = token.clone().into();
+        assert_eq!(srz_token.address, "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2");
+        assert_eq!(srz_token.decimals, 18);
+        assert_eq!(srz_token.symbol, "ETH");
+        assert_eq!(srz_token.gas, "1000"); // Ensure BigUint is properly converted to string
+    }
+
+    #[test]
+    fn test_srztoken_to_token_conversion() {
+        let srz_token = SrzToken {
+            address: "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2".to_string(),
+            decimals: 18,
+            symbol: "ETH".to_string(),
+            gas: "1000".to_string(), // Stored as a string
+        };
+
+        let token: Token = srz_token.clone().into();
+
+        assert_eq!(token.address, Bytes::from_str("0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2").unwrap());
+        assert_eq!(token.decimals, 18);
+        assert_eq!(token.symbol, "ETH");
+        assert_eq!(token.gas, BigUint::from(1000u32)); // Ensure string converts back to BigUint
+    }
+
+    #[test]
+    fn test_round_trip_conversion() {
+        let original_token = Token {
+            address: Bytes::from_str("0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2").unwrap(), // Example address
+            decimals: 8,
+            symbol: "BTC".to_string(),
+            gas: BigUint::from(5000u32),
+        };
+        let srz_token: SrzToken = original_token.clone().into();
+        let converted_token: Token = srz_token.into();
+        assert_eq!(original_token, converted_token, "Round trip conversion failed");
     }
 }

@@ -25,21 +25,15 @@ pub fn deepth(components: Vec<SrzProtocolComponent>, targets: Vec<SrzToken>, dat
     });
     // Every component containing 'tokens'
     for cp in components.clone().iter() {
-        match data.get(&cp.id) {
-            Some(balances) => {
-                for tk in targets.iter() {
-                    match balances.get(tk.address.to_lowercase().as_str()) {
-                        Some(balance) => {
-                            log::info!("Component {} has {} of token {}", cp.id, balance, tk.symbol);
-                            let c = cumulated.get(tk.address.to_lowercase().as_str()).unwrap();
-                            let new = c + balance;
-                            cumulated.insert(tk.clone().address, new);
-                        }
-                        None => {}
-                    }
+        if let Some(balances) = data.get(&cp.id) {
+            for tk in targets.iter() {
+                if let Some(balance) = balances.get(tk.address.to_lowercase().as_str()) {
+                    log::info!("Component {} has {} of token {}", cp.id, balance, tk.symbol);
+                    let c = cumulated.get(tk.address.to_lowercase().as_str()).unwrap();
+                    let new = c + balance;
+                    cumulated.insert(tk.clone().address, new);
                 }
             }
-            None => {}
         }
     }
     cumulated
@@ -52,7 +46,7 @@ pub fn gsteps(segments: Vec<IncrementationSegment>) -> Vec<f64> {
     let mut result: Vec<f64> = Vec::new();
     for seg in segments {
         let mut x = seg.start;
-        if result.last().map_or(true, |&last| (x - last).abs() > f64::EPSILON) {
+        if result.last().is_none_or(|&last| (x - last).abs() > f64::EPSILON) {
             result.push(x);
         }
         while x < seg.end {
@@ -60,7 +54,7 @@ pub fn gsteps(segments: Vec<IncrementationSegment>) -> Vec<f64> {
             if x > seg.end {
                 x = seg.end;
             }
-            if result.last().map_or(true, |&last| x > last) {
+            if result.last().is_none_or(|&last| x > last) {
                 result.push(x);
             }
         }
@@ -101,7 +95,7 @@ pub fn gsegments(tb_one_mn: f64) -> Vec<IncrementationSegment> {
     };
     segments.push(s1);
     segments.push(s2);
-    segments.push(s3);
+    // segments.push(s3);
     segments
 }
 

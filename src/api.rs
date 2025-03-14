@@ -124,6 +124,23 @@ async fn pool(Extension(network): Extension<Network>, Path(id): Path<String>) ->
     _pool(network, id).await
 }
 
+// Check if a component has the desired tokens
+pub fn matchcp(cptks: Vec<SrzToken>, tokens: Vec<SrzToken>) -> bool {
+    for x in cptks.clone() {
+        if alloy::primitives::Address::default().to_string() == x.address {
+            log::error!("Component {} has a token with an empty address", x.address);
+            return false;
+        }
+    }
+    for x in tokens.clone() {
+        if alloy::primitives::Address::default().to_string() == x.address {
+            log::error!("Component {} has a token with an empty address", x.address);
+            return false;
+        }
+    }
+    tokens.iter().all(|token| cptks.iter().any(|cptk| cptk.address.eq_ignore_ascii_case(&token.address)))
+}
+
 // GET /orderbook/{0xt0-0xt1} => Get all component & state for a given pair of token, and simulate the orderbook
 async fn orderbook(Extension(shtss): Extension<SharedTychoStreamState>, Extension(network): Extension<Network>, Query(params): Query<PairQuery>) -> impl IntoResponse {
     log::info!("👾 API: Querying orderbook endpoint: {:?}", params.tag);
@@ -142,14 +159,18 @@ async fn orderbook(Extension(shtss): Extension<SharedTychoStreamState>, Extensio
                 let mut datapools: Vec<ProtoTychoState> = vec![];
                 for cp in cps.clone() {
                     let cptks = cp.tokens.clone();
-                    if cptks.len() != 2 {
-                        log::warn!("Component {} has {} tokens instead of 2. Component with >2 tokens are not handled yet.", cp.id, cptks.len());
-                    } else if cptks[0].address.to_lowercase() == tokens[0].address.to_lowercase() && cptks[1].address.to_lowercase() == tokens[1].address.to_lowercase() {
-                        // ! This condition need to be improved, no token0/1 and multi-token
+                    let matchcp = matchcp(cptks.clone(), tokens.clone());
+                    if matchcp {
+                        if cptks.len() != 2 {
+                            // ! This condition need to be improved, no token0/1 ordering rule, and allow multi-token
+                            log::error!("Component {} has {} tokens instead of 2. Component with >2 tokens are not handled yet.", cp.id, cptks.len());
+                        }
                         let mtx = shtss.read().await;
                         let protosim = mtx.protosims.get(&cp.id.to_lowercase()).unwrap().clone();
                         drop(mtx);
                         datapools.push(ProtoTychoState { component: cp, protosim });
+                    } else {
+                        log::warn!("Component {} doesn't match the pair of tokens {}-{}", cp.id, tokens[0].address, tokens[1].address);
                     }
                 }
                 // shd::core::pair::prepare(network.clone(), datapools.clone(), tokens.clone(), params.clone()).await;
@@ -180,7 +201,7 @@ async fn liquidity(Extension(shtss): Extension<SharedTychoStreamState>, Extensio
             let tokens = vec![srzt0.clone(), srzt1.clone()];
             if tokens.len() == 2 {
                 let mtx = shtss.read().await;
-                let balances = mtx.balances.clone();
+                let _balances = mtx.balances.clone();
                 drop(mtx);
                 let mut datapools: Vec<ProtoTychoState> = vec![];
                 for cp in cps.clone() {
@@ -229,8 +250,7 @@ pub async fn start(n: Network, shared: SharedTychoStreamState, config: EnvConfig
         .route("/liquidity", get(liquidity))
         .layer(Extension(n.clone()))
         .layer(Extension(shared.clone())); // Shared state
-
-    // shd::utils::misc::log::logtest();
+                                           // shd::utils::misc::log::logtest();
     match tokio::net::TcpListener::bind(format!("0.0.0.0:{}", n.port)).await {
         Ok(listener) => match axum::serve(listener, app).await {
             Ok(_) => {

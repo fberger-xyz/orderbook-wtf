@@ -81,13 +81,13 @@ pub async fn status(key: String) -> SyncState {
 /**
  * Infinite waiting for the status 'Running' for a given network
  */
-pub async fn wstatus(key: String) {
+pub async fn wstatus(key: String, object: String) {
     let time = std::time::SystemTime::now();
     log::info!("Waiting Redis Synchro");
     loop {
-        tokio::time::sleep(std::time::Duration::from_millis(2500)).await;
+        tokio::time::sleep(std::time::Duration::from_millis(5000)).await;
         let status = status(key.clone()).await;
-        log::info!("Got Redis Status: {:?}", status);
+        log::info!("Waiting for '{object}'. Current status: {:?}", status);
         if let SyncState::Running = status {
             let elasped = time.elapsed().unwrap().as_millis();
             log::info!("wstatus: redis db is ready. Took {} ms to sync", elasped);

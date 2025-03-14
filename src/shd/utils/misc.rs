@@ -1,3 +1,7 @@
+use serde::Deserialize;
+use std::collections::HashMap;
+use std::fs;
+
 use std::{
     fs::{File, OpenOptions},
     io::{Read, Write},
@@ -127,4 +131,17 @@ pub fn save1<T: Serialize>(output: T, file: &str) {
     file.write_all(json.as_bytes()).expect("Failed to write to file");
     file.write_all(b"\n").expect("Failed to write newline to file");
     file.flush().expect("Failed to flush file");
+}
+
+// Load Balances
+
+#[derive(Serialize, Deserialize, Debug)]
+struct NestedMap {
+    inner: HashMap<String, HashMap<String, u128>>,
+}
+
+pub fn balances() -> HashMap<String, HashMap<String, u128>> {
+    let data = fs::read_to_string("misc/data-back/ethereum.stream-balances.json").expect("Failed to read file");
+    let parsed: HashMap<String, HashMap<String, u128>> = serde_json::from_str(&data).expect("JSON parsing failed");
+    parsed
 }
