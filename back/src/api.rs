@@ -128,13 +128,13 @@ async fn pool(Extension(network): Extension<Network>, Path(id): Path<String>) ->
 pub fn matchcp(cptks: Vec<SrzToken>, tokens: Vec<SrzToken>) -> bool {
     for x in cptks.clone() {
         if alloy::primitives::Address::default().to_string() == x.address {
-            log::error!("Component {} has a token with an empty address", x.address);
+            log::info!("🔺 Component {} has a token with an empty address", x.address);
             return false;
         }
     }
     for x in tokens.clone() {
         if alloy::primitives::Address::default().to_string() == x.address {
-            log::error!("Component {} has a token with an empty address", x.address);
+            log::info!("🔺 Component {} has a token with an empty address", x.address);
             return false;
         }
     }
@@ -207,7 +207,7 @@ async fn liquidity(Extension(shtss): Extension<SharedTychoStreamState>, Extensio
                 for cp in cps.clone() {
                     let cptks = cp.tokens.clone();
                     if cptks.len() != 2 {
-                        log::warn!("Component {} has {} tokens instead of 2. Component with >2 tokens are not handled yet.", cp.id, cptks.len());
+                        log::info!("Component {} has {} tokens instead of 2. Component with >2 tokens are not handled yet.", cp.id, cptks.len());
                     } else if cptks[0].address.to_lowercase() == tokens[0].address.to_lowercase() && cptks[1].address.to_lowercase() == tokens[1].address.to_lowercase() {
                         let mtx = shtss.read().await;
                         let protosim = mtx.protosims.get(&cp.id.to_lowercase()).unwrap().clone();

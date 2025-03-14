@@ -30,7 +30,7 @@ services:
     ports:
       - "42001:42001"
     volumes:
-      - ./:/app
+      - ./back:/app
     command: cargo watch -w /app -x "run --bin stream"
     depends_on:
       redis:

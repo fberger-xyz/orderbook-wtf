@@ -8000,6 +8000,7 @@ dependencies = [
  "futures 0.3.31",
  "hex",
  "hex-literal",
+ "indicatif",
  "log",
  "num-bigint",
  "num-traits",

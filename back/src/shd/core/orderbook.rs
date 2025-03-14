@@ -6,6 +6,7 @@ use crate::shd::{
     r#static::maths::ONE_MILLIONTH,
     types::{Network, PairQuery, PairSimuIncrementConfig, PairSimulatedOrderbook, ProtoTychoState, TradeResult},
 };
+use indicatif::{ProgressBar, ProgressStyle};
 use num_bigint::BigUint;
 use num_traits::Zero;
 use std::{collections::HashMap, time::Instant};
@@ -20,11 +21,11 @@ pub async fn build(network: Network, balances: HashMap<String, HashMap<String, u
     // let mut balance1 = vec![];
     for pdata in datapools.clone() {
         log::info!("Preparing pool: {} | Type: {}", pdata.component.id, pdata.component.protocol_type_name);
-        if pdata.component.protocol_type_name.to_lowercase() == "uniswap_v4_pool" {
-            // || pdata.component.protocol_type_name.to_lowercase() == "balancer_v2_pool" {
-            log::info!("Skipping pool {} because it's {}", pdata.component.id, pdata.component.protocol_type_name.to_lowercase());
-            continue;
-        }
+        // if pdata.component.protocol_type_name.to_lowercase() == "uniswap_v4_pool" {
+        //     // || pdata.component.protocol_type_name.to_lowercase() == "balancer_v2_pool" {
+        //     log::info!("Skipping pool {} because it's {}", pdata.component.id, pdata.component.protocol_type_name.to_lowercase());
+        //     continue;
+        // }
         pools.push(pdata.clone());
         let srzt0 = tokens[0].clone();
         let srzt1 = tokens[1].clone();
@@ -47,7 +48,8 @@ pub async fn build(network: Network, balances: HashMap<String, HashMap<String, u
     let avgp0to1 = prices0to1.iter().sum::<f64>() / prices0to1.len() as f64;
     let avgp1to0 = prices1to0.iter().sum::<f64>() / prices1to0.len() as f64; // Ponderation by TVL ?
     log::info!("Average price 0to1: {} | Average price 1to0: {}", avgp0to1, avgp1to0);
-    let pso = optimization(network.clone(), pools.clone(), tokens, query, aggregated.clone(), avgp0to1, avgp1to0).await;
+    let pso = optimization(network.clone(), pools.clone(), tokens, query.clone(), aggregated.clone(), avgp0to1, avgp1to0).await;
+    log::info!("Optimization done for pair: '{}'", query.tag);
     let path = format!("misc/data-front/{}.pso.usdc-eth.json", network.name);
     crate::shd::utils::misc::save1(pso.clone(), path.as_str());
     pso
@@ -62,17 +64,17 @@ pub async fn build(network: Network, balances: HashMap<String, HashMap<String, u
 pub fn optimizer(
     input: f64, // human–readable input (e.g. 100 meaning 100 ETH)
     pools: &Vec<ProtoTychoState>,
-    balances: &HashMap<String, u128>,
+    _balances: &HashMap<String, u128>,
     token_in: SrzToken,
     token_out: SrzToken,
 ) -> TradeResult {
-    let max_inputs_per_pool: Vec<u128> = pools
-        .iter()
-        .map(|p| {
-            let token = p.component.tokens.iter().find(|t| t.address.to_lowercase() == token_in.address.to_lowercase()).unwrap();
-            balances.get(&token.address.to_lowercase()).unwrap() * 25 / 100
-        })
-        .collect();
+    // let max_inputs_per_pool: Vec<u128> = pools
+    //     .iter()
+    //     .map(|p| {
+    //         let token = p.component.tokens.iter().find(|t| t.address.to_lowercase() == token_in.address.to_lowercase()).unwrap();
+    //         balances.get(&token.address.to_lowercase()).unwrap() * 25 / 100
+    //     })
+    //     .collect();
 
     // Convert tokens to tycho-simulation tokens
     let token_in = Token::from(token_in.clone());
@@ -97,9 +99,19 @@ pub fn optimizer(
             let current_alloc = allocations[i].clone();
             // log::info!("Current allocation for pool {}: {} | TokenIn {} TokenOut {}", i, current_alloc, token_in.address, token_out.address.clone());
             let result_got = pool.protosim.get_amount_out(current_alloc.clone(), &token_in, &token_out);
-            let amount_got = if result_got.is_err() { BigUint::ZERO } else { result_got.unwrap().amount };
+            let amount_got = if result_got.is_err() {
+                // log::error!("get_amount_out on pool #{} at {} failed", i, pool.component.id);
+                BigUint::ZERO
+            } else {
+                result_got.unwrap().amount
+            };
             let result_esplison_got = pool.protosim.get_amount_out(&current_alloc + &epsilon, &token_in, &token_out);
-            let amount_esplison_got = if result_esplison_got.is_err() { BigUint::ZERO } else { result_esplison_got.unwrap().amount };
+            let amount_esplison_got = if result_esplison_got.is_err() {
+                // log::error!("get_amount_out on pool #{} at {} failed", i, pool.component.id);
+                BigUint::ZERO
+            } else {
+                result_esplison_got.unwrap().amount
+            };
             let marginal = if amount_esplison_got > amount_got { &amount_esplison_got - &amount_got } else { BigUint::zero() };
             marginals.push(marginal);
         }
@@ -133,7 +145,7 @@ pub fn optimizer(
         let result = pool.protosim.get_amount_out(alloc.clone(), &token_in, &token_out).unwrap();
         let output = result.amount;
         let gas = result.gas;
-        log::info!("Pool {} | Input: {} | Output: {} | Gas: {}", i, alloc, output, gas);
+        // log::info!("Pool {} | Input: {} | Output: {} | Gas: {}", i, alloc, output, gas);
         total_output_raw += &output;
         let percent = (alloc.to_string().parse::<f64>().unwrap() * 100.0f64) / inputpow.to_string().parse::<f64>().unwrap(); // Distribution percentage (integer percentage).
         distribution.push((percent * 1000.).round() / 1000.); // Round to 3 decimal places.
@@ -154,6 +166,8 @@ pub fn optimizer(
  * Optimizes a trade for a given pair of tokens and a set of pools.
  * The function generates a set of test amounts for ETH and USDC, then runs the optimizer for each amount.
  * The optimizer uses a simple gradient-based approach to move a fixed fraction of the allocation from the pool with the lowest marginal return to the one with the highest.
+ * ToDo: AmountIn must now be greater than the component balance, or let's say 50% of it, because it don't make sense to impact more than 50% of the pool, even some % it worsens the price
+ * ToDo: Top n pooL most liquid only, remove the too small liquidity pools
  */
 pub async fn optimization(network: Network, pcsdata: Vec<ProtoTychoState>, tokens: Vec<SrzToken>, query: PairQuery, balances: HashMap<String, u128>, price0to1: f64, price1to0: f64) -> PairSimulatedOrderbook {
     log::info!("Network: {} | Got {} pools to optimize for pair: '{}'", network.name, pcsdata.len(), query.tag);
@@ -167,9 +181,6 @@ pub async fn optimization(network: Network, pcsdata: Vec<ProtoTychoState>, token
             log::info!("Token: {} => {}", x.symbol, x.address.to_string());
         }
     }
-
-    // ! AmountIn must now be greater than the component balance, or let's say 50% of it, because it don't make sense to impact more than 50% of the pool, even some % it worsens the price
-    // ! Top n pooL most liquid
 
     let t0tb = *balances.iter().find(|x| x.0.clone().to_lowercase() == t0.address.to_lowercase()).unwrap().1;
     let t1tb = *balances.iter().find(|x| x.0.clone().to_lowercase() == t1.address.to_lowercase()).unwrap().1;
@@ -190,44 +201,67 @@ pub async fn optimization(network: Network, pcsdata: Vec<ProtoTychoState>, token
 
     let segments0to1 = shd::maths::steps::gsegments(t0tb_one_mn);
     let steps0to1 = shd::maths::steps::gsteps(PairSimuIncrementConfig { segments: segments0to1.clone() }.segments);
-
     let mut trades0to1 = Vec::new();
-    for amount in steps0to1.iter() {
-        let start = Instant::now();
-        let result = optimizer(*amount, &pcsdata, &balances, t0.clone(), t1.clone());
-        let elapsed = start.elapsed();
-        log::info!(
-            "Input: {} {}, Output: {} {} at price1to0: {} | Distribution: {:?}, Time: {:?}",
-            result.input,
-            t0.symbol,
-            result.output,
-            t1.symbol,
-            result.ratio,
-            result.distribution,
-            elapsed
+    {
+        let total_steps = steps0to1.len() as u64;
+        let pb = ProgressBar::new(total_steps);
+        pb.set_style(
+            ProgressStyle::default_bar()
+                .template("{spinner:.green} [{elapsed_precise}] [{bar:40.green/white}] {pos}/{len} ({eta})")
+                .unwrap()
+                .progress_chars("#>-"),
         );
-        trades0to1.push(result);
+        for amount in steps0to1.iter() {
+            let start = Instant::now();
+            let result = optimizer(*amount, &pcsdata, &balances, t0.clone(), t1.clone());
+            let elapsed = start.elapsed();
+            log::info!(
+                "Input: {} {}, Output: {} {} at price1to0: {} | Distribution: {:?}, Time: {:?}",
+                result.input,
+                t0.symbol,
+                result.output,
+                t1.symbol,
+                result.ratio,
+                result.distribution,
+                elapsed
+            );
+            pb.inc(1); // Update the progress bar on each iteration.
+            trades0to1.push(result);
+        }
     }
 
     let segments1to0 = shd::maths::steps::gsegments(t1tb_one_mn);
     let steps1to0 = shd::maths::steps::gsteps(PairSimuIncrementConfig { segments: segments1to0.clone() }.segments);
 
     let mut trades1to0 = Vec::new();
-    for amount in steps1to0.iter() {
-        let start = Instant::now();
-        let result = optimizer(*amount, &pcsdata, &balances, t1.clone(), t0.clone());
-        let elapsed = start.elapsed();
-        log::info!(
-            "Input: {} {}, Output: {} {} at price0to1: {} | Distribution: {:?}, Time: {:?}",
-            result.input,
-            t1.symbol,
-            result.output,
-            t0.symbol,
-            result.ratio,
-            result.distribution,
-            elapsed
+    {
+        let total_steps = steps0to1.len() as u64;
+        let pb = ProgressBar::new(total_steps);
+        pb.set_style(
+            ProgressStyle::default_bar()
+                .template("{spinner:.green} [{elapsed_precise}] [{bar:40.green/white}] {pos}/{len} ({eta})")
+                .unwrap()
+                .progress_chars("#>-"),
         );
-        trades1to0.push(result);
+
+        for amount in steps1to0.iter() {
+            let start = Instant::now();
+            let result = optimizer(*amount, &pcsdata, &balances, t1.clone(), t0.clone());
+            let elapsed = start.elapsed();
+            log::info!(
+                "Input: {} {}, Output: {} {} at price0to1: {} | Distribution: {:?}, Time: {:?}",
+                result.input,
+                t1.symbol,
+                result.output,
+                t0.symbol,
+                result.ratio,
+                result.distribution,
+                elapsed
+            );
+            pb.inc(1); // Update the progress bar on each iteration.
+
+            trades1to0.push(result);
+        }
     }
 
     PairSimulatedOrderbook {
