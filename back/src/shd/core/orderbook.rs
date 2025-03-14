@@ -12,37 +12,29 @@ use num_traits::Zero;
 use std::{collections::HashMap, time::Instant};
 
 /// @notice Reading 'state' from Redis DB while using TychoStreamState state and functions to compute/simulate might create a inconsistency
-pub async fn build(network: Network, balances: HashMap<String, HashMap<String, u128>>, datapools: Vec<ProtoTychoState>, tokens: Vec<SrzToken>, query: PairQuery) -> PairSimulatedOrderbook {
+pub async fn build(network: Network, atks: Vec<SrzToken>, balances: HashMap<String, HashMap<String, u128>>, datapools: Vec<ProtoTychoState>, tokens: Vec<SrzToken>, query: PairQuery) -> PairSimulatedOrderbook {
     log::info!("Got {} pools to compute for pair: '{}'", datapools.len(), query.tag);
     let mut pools = Vec::new();
     let mut prices0to1 = vec![];
     let mut prices1to0 = vec![];
-    // let mut balance0 = vec![];
-    // let mut balance1 = vec![];
+    let srzt0 = tokens[0].clone();
+    let srzt1 = tokens[1].clone();
+    let t0 = Token::from(srzt0.clone());
+    let t1 = Token::from(srzt1.clone());
+    let (base, quote) = (t0, t1);
+    log::info!("Pricing base token ... (Base: {} | Quote: {})", base.symbol, quote.symbol);
+    let t0pricing = shd::core::gas::pricing(network.clone(), datapools.clone(), atks.clone(), base.address.to_string().to_lowercase().clone());
+    log::info!("Pricing for {} => {:?}", base.symbol, t0pricing);
     for pdata in datapools.clone() {
         log::info!("Preparing pool: {} | Type: {}", pdata.component.id, pdata.component.protocol_type_name);
-        // if pdata.component.protocol_type_name.to_lowercase() == "uniswap_v4_pool" {
-        //     // || pdata.component.protocol_type_name.to_lowercase() == "balancer_v2_pool" {
-        //     log::info!("Skipping pool {} because it's {}", pdata.component.id, pdata.component.protocol_type_name.to_lowercase());
-        //     continue;
-        // }
         pools.push(pdata.clone());
-        let srzt0 = tokens[0].clone();
-        let srzt1 = tokens[1].clone();
-        let t0 = Token::from(srzt0.clone());
-        let t1 = Token::from(srzt1.clone());
-        let (base, quote) = if query.z0to1 { (t0, t1) } else { (t1, t0) };
         let proto = pdata.protosim.clone();
         let price0to1 = proto.spot_price(&base, &quote).unwrap_or_default();
         let price1to0 = proto.spot_price(&base, &quote).unwrap_or_default();
-        prices0to1.push(proto.spot_price(&base, &quote).unwrap_or_default());
-        prices1to0.push(proto.spot_price(&quote, &base).unwrap_or_default());
-        // let poolb0 = fetchbal(&provider, srzt0.address.to_string(), pdata.component.id.clone()).await;
-        // let poolb1 = fetchbal(&provider, srzt1.address.to_string(), pdata.component.id.clone()).await;
+        prices0to1.push(price0to1);
+        prices1to0.push(price1to0);
         log::info!("Spot price for {}-{} => price0to1 = {} and price1to0 = {}", base.symbol, quote.symbol, price0to1, price1to0);
-        log::info!("\n");
     }
-
     let cps: Vec<SrzProtocolComponent> = pools.clone().iter().map(|p| p.component.clone()).collect();
     let aggregated = shd::maths::steps::deepth(cps.clone(), tokens.clone(), balances.clone());
     let avgp0to1 = prices0to1.iter().sum::<f64>() / prices0to1.len() as f64;
@@ -64,6 +56,7 @@ pub fn optimizer(
     input: f64, // human–readable input (e.g. 100 meaning 100 ETH)
     pools: &Vec<ProtoTychoState>,
     _balances: &HashMap<String, u128>,
+    _ethusd: f64,
     token_in: SrzToken,
     token_out: SrzToken,
 ) -> TradeResult {
@@ -141,13 +134,25 @@ pub fn optimizer(
     let mut distribution: Vec<f64> = Vec::with_capacity(size);
     for (i, pool) in pools.iter().enumerate() {
         let alloc = allocations[i].clone();
-        let result = pool.protosim.get_amount_out(alloc.clone(), &token_in, &token_out).unwrap();
-        let output = result.amount;
-        let gas = result.gas;
-        // log::info!("Pool {} | Input: {} | Output: {} | Gas: {}", i, alloc, output, gas);
-        total_output_raw += &output;
-        let percent = (alloc.to_string().parse::<f64>().unwrap() * 100.0f64) / inputpow.to_string().parse::<f64>().unwrap(); // Distribution percentage (integer percentage).
-        distribution.push((percent * 1000.).round() / 1000.); // Round to 3 decimal places.
+        match pool.protosim.get_amount_out(alloc.clone(), &token_in, &token_out) {
+            Ok(result) => {
+                // log::info!("Pool {} | Input: {} | Output: {} | Gas: {}", i, alloc, result.amount, result.gas);
+                let output = result.amount;
+                let gas = result.gas;
+                let usdgas = gas.to_string().parse::<f64>().unwrap() / 10e18f64;
+                // log::info!("Pool {} | Input: {} | Output: {} | Gas: {}", i, alloc, output, gas);
+                total_output_raw += &output;
+                let percent = (alloc.to_string().parse::<f64>().unwrap() * 100.0f64) / inputpow.to_string().parse::<f64>().unwrap(); // Distribution percentage (integer percentage).
+                distribution.push((percent * 1000.).round() / 1000.); // Round to 3 decimal places.
+            }
+            Err(_e) => {
+                // Often due to 'No Liquidity' error.
+                // log::error!("get_amount_out on pool #{} at {} failed: {}", i, pool.component.id, e);
+                distribution.push(0.);
+                // ToDo: Re-Allocate the failed pool to the others
+                // reallocation.push(allocations[i].clone());
+            }
+        }
     }
     let token_in_multiplier = 10f64.powi(token_in.decimals as i32);
     let token_out_multiplier = 10f64.powi(token_out.decimals as i32);
@@ -169,7 +174,8 @@ pub fn optimizer(
  * ToDo: Top n pooL most liquid only, remove the too small liquidity pools
  */
 pub async fn optimization(network: Network, pcsdata: Vec<ProtoTychoState>, tokens: Vec<SrzToken>, query: PairQuery, balances: HashMap<String, u128>, price0to1: f64, price1to0: f64) -> PairSimulatedOrderbook {
-    log::info!("Network: {} | Got {} pools to optimize for pair: '{}'", network.name, pcsdata.len(), query.tag);
+    let ethusd = shd::core::gas::ethusd().await;
+    log::info!("Network: {} | Current ETH-USD: {:.2} | Got {} pools to optimize for pair: '{}'", network.name, ethusd, pcsdata.len(), query.tag);
     let t0 = tokens[0].clone();
     let t1 = tokens[1].clone();
     let mut pools = Vec::new();
@@ -187,13 +193,13 @@ pub async fn optimization(network: Network, pcsdata: Vec<ProtoTychoState>, token
     let t1tb_one_mn = t1tb as f64 / ONE_MILLIONTH / 10f64.powi(t1.decimals as i32);
     log::info!(
         "Aggregated onchain liquidity balance for {} is {} (for 1 millionth => {})",
-        t0.address,
+        t0.symbol,
         t0tb as f64 / 10f64.powi(t0.decimals as i32),
         t0tb_one_mn
     );
     log::info!(
         "Aggregated onchain liquidity balance for {} is {} (for 1 millionth => {})",
-        t1.address,
+        t1.symbol,
         t1tb as f64 / 10f64.powi(t1.decimals as i32),
         t1tb_one_mn
     );
@@ -210,12 +216,12 @@ pub async fn optimization(network: Network, pcsdata: Vec<ProtoTychoState>, token
                 .unwrap()
                 .progress_chars("#>-"),
         );
-        for amount in steps0to1.iter() {
+        for (x, amount) in steps0to1.iter().enumerate() {
             let start = Instant::now();
-            let result = optimizer(*amount, &pcsdata, &balances, t0.clone(), t1.clone());
+            let result = optimizer(*amount, &pcsdata, &balances, ethusd, t0.clone(), t1.clone());
             let elapsed = start.elapsed();
             log::info!(
-                "Input: {} {}, Output: {} {} at price1to0: {} | Distribution: {:?}, Time: {:?}",
+                "#{x} | Input: {} {}, Output: {} {} at price1to0: {} | Distribution: {:?}, Time: {:?}",
                 result.input,
                 t0.symbol,
                 result.output,
@@ -224,7 +230,7 @@ pub async fn optimization(network: Network, pcsdata: Vec<ProtoTychoState>, token
                 result.distribution,
                 elapsed
             );
-            pb.inc(1); // Update the progress bar on each iteration.
+            // pb.inc(1); // Update the progress bar on each iteration.
             trades0to1.push(result);
         }
     }
@@ -244,12 +250,12 @@ pub async fn optimization(network: Network, pcsdata: Vec<ProtoTychoState>, token
                 .progress_chars("#>-"),
         );
 
-        for amount in steps1to0.iter() {
+        for (x, amount) in steps1to0.iter().enumerate() {
             let start = Instant::now();
-            let result = optimizer(*amount, &pcsdata, &balances, t1.clone(), t0.clone());
+            let result = optimizer(*amount, &pcsdata, &balances, ethusd, t1.clone(), t0.clone());
             let elapsed = start.elapsed();
             log::info!(
-                "Input: {} {}, Output: {} {} at price0to1: {} | Distribution: {:?}, Time: {:?}",
+                "#{x} | Input: {} {}, Output: {} {} at price0to1: {} | Distribution: {:?}, Time: {:?}",
                 result.input,
                 t1.symbol,
                 result.output,
@@ -258,7 +264,7 @@ pub async fn optimization(network: Network, pcsdata: Vec<ProtoTychoState>, token
                 result.distribution,
                 elapsed
             );
-            pb.inc(1); // Update the progress bar on each iteration.
+            // pb.inc(1); // Update the progress bar on each iteration.
 
             trades1to0.push(result);
         }

@@ -30,7 +30,6 @@ impl ToLiquidityBook for SrzUniswapV2State {
         LiquidityPoolBook {
             address: component.id.clone().to_lowercase(),
             protocol: component.protocol_type_name.clone(),
-            z0to1: query.z0to1,
             concentrated: false,
             fee,
             price,
@@ -48,7 +47,6 @@ impl ToLiquidityBook for SrzEVMPoolState {
         LiquidityPoolBook {
             address: component.id.clone().to_lowercase(),
             protocol: component.protocol_type_name.clone(),
-            z0to1: query.z0to1,
             concentrated: false,
             fee,
             price,
@@ -91,7 +89,6 @@ impl ToLiquidityBook for SrzUniswapV3State {
         LiquidityPoolBook {
             address: component.id.clone().to_lowercase(),
             protocol: component.protocol_type_name.clone(),
-            z0to1: query.z0to1,
             concentrated: true,
             fee,
             price,
@@ -109,7 +106,6 @@ impl ToLiquidityBook for SrzUniswapV4State {
         LiquidityPoolBook {
             address: component.id.clone().to_lowercase(),
             protocol: component.protocol_type_name.clone(),
-            z0to1: query.z0to1,
             concentrated: true,
             fee,
             price,
@@ -150,7 +146,8 @@ pub async fn build(network: Network, datapools: Vec<ProtoTychoState>, tokens: Ve
         let cpbs = get_pool_balances(network.clone(), &provider, pdata.component.clone()).await;
         let (poolb0, poolb1) = (cpbs[0], cpbs[1]);
         log::info!("Pool cpbs: {}-{} => {} and {}", t0.symbol, t1.symbol, poolb0, poolb1);
-        let (base, quote) = if query.z0to1 { (t0, t1) } else { (t1, t0) };
+        // let (base, quote) = if query.z0to1 { (t0, t1) } else { (t1, t0) };
+        let (base, quote) = (t0, t1); // !
         let proto = pdata.protosim.clone();
         let price = proto.spot_price(&base, &quote).unwrap_or_default();
         log::info!("Spot price for {}-{} => {}", base.symbol, quote.symbol, price);

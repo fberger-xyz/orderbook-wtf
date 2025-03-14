@@ -71,6 +71,12 @@ pub struct SrzProtocolComponent {
     pub created_at: NaiveDateTime,
 }
 
+impl SrzProtocolComponent {
+    pub fn contains(&self, token: &str) -> bool {
+        self.tokens.iter().any(|t| t.symbol.eq_ignore_ascii_case(token))
+    }
+}
+
 impl From<ProtocolComponent> for SrzProtocolComponent {
     fn from(pc: ProtocolComponent) -> Self {
         SrzProtocolComponent {

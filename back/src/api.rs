@@ -146,15 +146,18 @@ pub fn matchcp(cptks: Vec<SrzToken>, tokens: Vec<SrzToken>) -> bool {
             return false;
         }
     }
+    // if cptks.len() != 2 {
+    //     log::error!("Component {} has {} tokens instead of 2. Component with >2 tokens are not handled yet.", cp.id, cptks.len());
+    //     return false;
+    // }
     tokens.iter().all(|token| cptks.iter().any(|cptk| cptk.address.eq_ignore_ascii_case(&token.address)))
 }
 
 // GET /orderbook/{0xt0-0xt1} => Get all component & state for a given pair of token, and simulate the orderbook
 async fn orderbook(Extension(shtss): Extension<SharedTychoStreamState>, Extension(network): Extension<Network>, Query(params): Query<PairQuery>) -> impl IntoResponse {
     log::info!("👾 API: Querying orderbook endpoint: {:?}", params.tag);
-    let atks = _tokens(network.clone()).await.unwrap();
-    match _components(network.clone()).await {
-        Some(cps) => {
+    match (_tokens(network.clone()).await, _components(network.clone()).await) {
+        (Some(atks), Some(cps)) => {
             let target = params.tag.clone();
             let tokens = target.split("-").map(|x| x.to_string().to_lowercase()).collect::<Vec<String>>();
             let srzt0 = atks.iter().find(|x| x.address.to_lowercase() == tokens[0].clone()).unwrap();
@@ -164,34 +167,30 @@ async fn orderbook(Extension(shtss): Extension<SharedTychoStreamState>, Extensio
             let balances = mtx.balances.clone();
             drop(mtx);
             if tokens.len() == 2 {
-                let mut datapools: Vec<ProtoTychoState> = vec![];
+                let mut ptss: Vec<ProtoTychoState> = vec![];
                 for cp in cps.clone() {
                     let cptks = cp.tokens.clone();
-                    let matchcp = matchcp(cptks.clone(), tokens.clone());
-                    if matchcp {
-                        if cptks.len() != 2 {
-                            // ! This condition need to be improved, no token0/1 ordering rule, and allow multi-token
-                            log::error!("Component {} has {} tokens instead of 2. Component with >2 tokens are not handled yet.", cp.id, cptks.len());
-                        }
+                    if matchcp(cptks.clone(), tokens.clone()) {
                         let mtx = shtss.read().await;
                         let protosim = mtx.protosims.get(&cp.id.to_lowercase()).unwrap().clone();
                         drop(mtx);
-                        datapools.push(ProtoTychoState { component: cp, protosim });
-                    } else {
-                        log::warn!("Component {} doesn't match the pair of tokens {}-{}", cp.id, tokens[0].address, tokens[1].address);
+                        ptss.push(ProtoTychoState { component: cp, protosim });
                     }
                 }
-                // shd::core::pair::prepare(network.clone(), datapools.clone(), tokens.clone(), params.clone()).await;
-                let result = shd::core::orderbook::build(network.clone(), balances.clone(), datapools.clone(), tokens.clone(), params.clone()).await;
+                if ptss.is_empty() {
+                    return Json(json!({ "orderbook": {} }));
+                }
+                // shd::core::pair::prepare(network.clone(), ptss.clone(), tokens.clone(), params.clone()).await;
+                let result = shd::core::orderbook::build(network.clone(), atks.clone(), balances.clone(), ptss.clone(), tokens.clone(), params.clone()).await;
                 let path = format!("misc/data-front/odb.{}.{}.json", network.name, params.tag);
                 crate::shd::utils::misc::save1(result.clone(), path.as_str());
-                Json(json!({ "orderbook": result.clone() })) // !
+                Json(json!({ "orderbook": result.clone() }))
             } else {
                 log::error!("Query param Tag must contain only 2 tokens separated by a dash '-'");
                 Json(json!({ "orderbook": "Query param Tag must contain only 2 tokens separated by a dash '-'." }))
             }
         }
-        None => {
+        _ => {
             log::error!("Couldn't not read internal components");
             Json(json!({ "orderbook": "Couldn't not read internal components" }))
         }
@@ -201,9 +200,8 @@ async fn orderbook(Extension(shtss): Extension<SharedTychoStreamState>, Extensio
 // GET /liquidity/{0xt0-0xt1} => Get all component & state (= /pool) for a given pair of token, and organize the liquidity across n pools of n AMMs
 async fn liquidity(Extension(shtss): Extension<SharedTychoStreamState>, Extension(network): Extension<Network>, Query(params): Query<PairQuery>) -> impl IntoResponse {
     log::info!("👾 API: Querying liquidity endpoint: {:?}", params.tag);
-    let atks = _tokens(network.clone()).await.unwrap();
-    match _components(network.clone()).await {
-        Some(cps) => {
+    match (_tokens(network.clone()).await, _components(network.clone()).await) {
+        (Some(atks), Some(cps)) => {
             let target = params.tag.clone();
             let tokens = target.split("-").map(|x| x.to_string().to_lowercase()).collect::<Vec<String>>();
             let srzt0 = atks.iter().find(|x| x.address.to_lowercase() == tokens[0].clone()).unwrap();
@@ -232,7 +230,7 @@ async fn liquidity(Extension(shtss): Extension<SharedTychoStreamState>, Extensio
                 Json(json!({ "liquidity": "Query param Tag must contain only 2 tokens separated by a dash '-'." }))
             }
         }
-        None => {
+        _ => {
             log::error!("Couldn't not read internal components");
             Json(json!({ "liquidity": "Couldn't not read internal components" }))
         }
@@ -288,3 +286,57 @@ pub async fn start(n: Network, shared: SharedTychoStreamState, config: EnvConfig
 // - /component/:id => Get the component the given pool  📍
 // - /state/:id => Get the component the given pool 📍
 // - /components/:pair => Get ALL components for 1 pair 📍
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    // Assuming alloy::primitives::Address is accessible,
+    // here we use its default address to simulate an empty address.
+    // For this example, let's assume that Address::default().to_string() returns "0x0000000000000000000000000000000000000000".
+
+    // Helper function to create a token.
+    fn token(address: &str, symbol: &str) -> SrzToken {
+        SrzToken {
+            address: address.to_string(),
+            decimals: 18,
+            symbol: symbol.to_string(),
+            gas: "gas".to_string(),
+        }
+    }
+
+    #[test]
+    fn test_matchcp_all_match() {
+        // Component tokens contain two tokens
+        let comp_tokens = vec![token("0xABC", "token1"), token("0xDEF", "token2")];
+        // Query asks for token1 (using different case in address)
+        let query_tokens = vec![token("0xabc", "token1")];
+        assert!(matchcp(comp_tokens, query_tokens));
+    }
+
+    #[test]
+    fn test_matchcp_empty_address_in_component() {
+        // Use the default empty address (as provided by alloy)
+        let default_addr = alloy::primitives::Address::default().to_string();
+        let comp_tokens = vec![token(&default_addr, "token1"), token("0xDEF", "token2")];
+        let query_tokens = vec![token("0xDEF", "token2")];
+        // Should return false because one component token has an empty address.
+        assert!(!matchcp(comp_tokens, query_tokens));
+    }
+
+    #[test]
+    fn test_matchcp_empty_address_in_query() {
+        let default_addr = alloy::primitives::Address::default().to_string();
+        let comp_tokens = vec![token("0xABC", "token1")];
+        let query_tokens = vec![token(&default_addr, "token1")];
+        // Should return false because the query token has an empty address.
+        assert!(!matchcp(comp_tokens, query_tokens));
+    }
+
+    #[test]
+    fn test_matchcp_no_match() {
+        let comp_tokens = vec![token("0xABC", "token1")];
+        let query_tokens = vec![token("0xDEF", "token2")];
+        // Should return false because the query token is not found among the component tokens.
+        assert!(!matchcp(comp_tokens, query_tokens));
+    }
+}

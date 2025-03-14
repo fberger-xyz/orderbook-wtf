@@ -9,7 +9,7 @@ pub struct EnvConfig {
     pub network: String,
 }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Default, Debug, Clone, Serialize, Deserialize)]
 pub struct Network {
     pub name: String,
     pub chainid: u64,
@@ -73,7 +73,7 @@ impl ToString for AmmType {
             AmmType::UniswapV3 => "uniswap_v3_pool".to_string(),
             AmmType::UniswapV4 => "uniswap_v4_pool".to_string(),
             AmmType::Balancer => "balancer_v2_pool".to_string(),
-            AmmType::Curve => "curve".to_string(), // ?
+            AmmType::Curve => "curve_pool".to_string(), // ?
         }
     }
 }
@@ -85,7 +85,7 @@ impl From<&str> for AmmType {
             "uniswap_v3_pool" => AmmType::UniswapV3,
             "uniswap_v4_pool" => AmmType::UniswapV4,
             "balancer_v2_pool" => AmmType::Balancer,
-            "curve" => AmmType::Curve, // ?
+            "curve_pool" => AmmType::Curve, // ?
             _ => panic!("Unknown AMM type"),
         }
     }
@@ -154,7 +154,7 @@ pub fn chain(name: String) -> Option<(ChainCore, ChainSimu)> {
 #[derive(Clone, Debug, Deserialize)]
 pub struct PairQuery {
     pub tag: String, // Pair uniq identifier: token0-token1
-    pub z0to1: bool, // Zero to One as Uniswap expresses it
+                     // pub z0to1: bool, // Zero to One as Uniswap expresses it
 }
 
 #[derive(Debug, Deserialize)]
@@ -179,9 +179,9 @@ pub struct PairLiquidityBook {
 /// Whatever the protocol is, it must comply with this struct
 #[derive(Default, Debug, Clone, Serialize, Deserialize)]
 pub struct LiquidityPoolBook {
-    pub address: String,    // Proto/PooL address
-    pub protocol: String,   // Component Protocol name
-    pub z0to1: bool,        // Zero to One as Uniswap expresses it
+    pub address: String,  // Proto/PooL address
+    pub protocol: String, // Component Protocol name
+    // pub z0to1: bool,        // Zero to One as Uniswap expresses it
     pub concentrated: bool, // Concentrated liquidity
     pub fee: f64,           // Fee according to ProtoSim
     pub price: f64,         // Price Spot (0 to 1 if z0to1 is true)

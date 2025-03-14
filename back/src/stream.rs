@@ -129,7 +129,7 @@ async fn stream_protocol(network: Network, shdstate: SharedTychoStreamState, tok
     let balancer = balancer_pool_filter;
     let curve = curve_pool_filter;
     let (_, chain) = shd::types::chain(network.name.clone()).expect("Invalid chain");
-    let filter = ComponentFilter::with_tvl_range(1.0, 50.0);
+    let filter = ComponentFilter::with_tvl_range(1.0, 50.0); // ! Important
 
     // ===== Tycho Tokens =====
     let mut hmt = HashMap::new();
@@ -142,29 +142,39 @@ async fn stream_protocol(network: Network, shdstate: SharedTychoStreamState, tok
 
     // ===== Test Mode Targets (WETH/USDC) =====
     let mut toktag = HashMap::new();
-    let weth = hmt.get(&Bytes::from_str(network.eth.as_str()).unwrap()).unwrap_or_else(|| panic!("WETH not found on {}", network.name));
-    let usdc = hmt.get(&Bytes::from_str(network.usdc.as_str()).unwrap()).unwrap_or_else(|| panic!("USDC not found on {}", network.name));
-    let wbtc = hmt.get(&Bytes::from_str(network.wbtc.as_str()).unwrap()).unwrap_or_else(|| panic!("WBTC not found on {}", network.name));
-    toktag.insert(weth.clone().address, weth.clone());
-    toktag.insert(usdc.clone().address, usdc.clone());
-    toktag.insert(wbtc.clone().address, wbtc.clone());
-    // let dai = hmt.get(&Bytes::from_str("0x6b175474e89094c44da98b954eedeac495271d0f").unwrap()).expect("DAI not found");
-    // let usdt = hmt.get(&Bytes::from_str("0xdac17f958d2ee523a2206206994597c13d831ec7").unwrap()).expect("USDT not found");
-
+    {
+        let weth = hmt.get(&Bytes::from_str(network.eth.as_str()).unwrap()).unwrap_or_else(|| panic!("WETH not found on {}", network.name));
+        let usdc = hmt.get(&Bytes::from_str(network.usdc.as_str()).unwrap()).unwrap_or_else(|| panic!("USDC not found on {}", network.name));
+        let wbtc = hmt.get(&Bytes::from_str(network.wbtc.as_str()).unwrap()).unwrap_or_else(|| panic!("WBTC not found on {}", network.name));
+        let dai = hmt.get(&Bytes::from_str(network.dai.as_str()).unwrap()).expect("DAI not found");
+        let usdt = hmt.get(&Bytes::from_str(network.usdt.as_str()).unwrap()).expect("USDT not found");
+        toktag.insert(weth.clone().address, weth.clone());
+        toktag.insert(usdc.clone().address, usdc.clone());
+        toktag.insert(wbtc.clone().address, wbtc.clone());
+        toktag.insert(dai.clone().address, dai.clone());
+        toktag.insert(usdt.clone().address, usdt.clone());
+    }
     // ===== Tycho Stream Builder =====
     'retry: loop {
         let endpoint = network.tycho.trim_start_matches("https://");
         log::info!("Connecting to >>> ProtocolStreamBuilder <<< at {} on {:?} ...\n", endpoint, chain);
         let psb = ProtocolStreamBuilder::new(endpoint, chain)
-            .exchange::<UniswapV2State>("uniswap_v2", filter.clone(), None)
-            .exchange::<UniswapV3State>("uniswap_v3", filter.clone(), None)
-            .exchange::<UniswapV4State>("uniswap_v4", filter.clone(), Some(u4))
-            .exchange::<EVMPoolState<PreCachedDB>>("vm:balancer_v2", filter.clone(), Some(balancer))
-            .exchange::<EVMPoolState<PreCachedDB>>("vm:curve", filter.clone(), Some(curve))
+            .exchange::<UniswapV2State>("uniswap_v2", filter.clone(), None) // ! Filter ?
+            .exchange::<UniswapV3State>("uniswap_v3", filter.clone(), None) // ! Filter ?
+            .exchange::<UniswapV4State>("uniswap_v4", filter.clone(), None) // ! Filter ?
+            .exchange::<EVMPoolState<PreCachedDB>>("vm:balancer_v2", filter.clone(), None)
+            .exchange::<EVMPoolState<PreCachedDB>>("vm:curve", filter.clone(), None)
             .auth_key(Some(config.tycho_api_key.clone()))
-            .skip_state_decode_failures(true) // ? To study !
+            .skip_state_decode_failures(true)
             .set_tokens(hmt.clone()) // ALL Tokens
             .await;
+
+        // ? To study:
+        // block_time
+        // timeout
+        // auth_key
+        // skip_state_decode_failures
+
         match psb.build().await {
             Ok(mut stream) => {
                 // The stream created emits BlockUpdate messages which consist of:
@@ -209,11 +219,18 @@ async fn stream_protocol(network: Network, shdstate: SharedTychoStreamState, tok
                             for (id, comp) in msg.new_pairs.iter() {
                                 pairs.entry(id.clone()).or_insert_with(|| comp.clone());
                                 let t0 = comp.tokens.first().unwrap();
+                                let addr0 = t0.address.clone();
                                 let t1 = comp.tokens.get(1).unwrap();
-                                if (t0.address == weth.address || t1.address == weth.address) && (t0.address == usdc.address || t1.address == usdc.address) {
+                                let addr1 = t1.address.clone();
+                                if toktag.contains_key(&addr0) || toktag.contains_key(&addr1) {
                                     targets.push(comp.id.to_string().to_lowercase());
                                 }
+                                // if (t0.address == weth.address || t1.address == weth.address) && (t0.address == usdc.address || t1.address == usdc.address) {
+                                //     targets.push(comp.id.to_string().to_lowercase());
+                                // }
                             }
+
+                            log::info!("Got {} components monitored on {}", targets.len(), network.name);
 
                             if !initialised {
                                 // ===== Update Shared State at first sync only =====
@@ -234,21 +251,25 @@ async fn stream_protocol(network: Network, shdstate: SharedTychoStreamState, tok
                                 for m in targets.clone() {
                                     if let Some(proto) = msg.states.get(&m.to_string()) {
                                         let comp = msg.new_pairs.get(&m.to_string()).expect("New pair not found");
-                                        log::info!("Match USDC|ETH at {:?} | Proto: {}", comp.id, comp.protocol_type_name);
+                                        log::info!("Component: {} | Proto {}", comp.id, comp.protocol_type_name);
+                                        if comp.id.to_string().contains("0x0000000000000000000000000000000000000000") {
+                                            log::info!("Component {} has no address. Skipping.", comp.id);
+                                            continue;
+                                        }
                                         let stattribute = comp.static_attributes.clone();
                                         for (k, v) in stattribute.iter() {
                                             log::info!(" >>> Static Attributes: {}: {:?}", k, v);
                                         }
-                                        let base = comp.tokens.first().unwrap();
-                                        let quote = comp.tokens.get(1).unwrap();
-                                        log::info!(" - Base Token : {:?} | Spot Price base/quote = {:?}", base.symbol, proto.spot_price(base, quote));
-                                        log::info!(" - Quote Token: {:?} | Spot Price quote/base = {:?}", quote.symbol, proto.spot_price(quote, base));
+                                        let first = comp.tokens.first().unwrap();
+                                        let second = comp.tokens.get(1).unwrap();
+                                        log::info!(" - first Token : {:?} | Spot Price first/second = {:?}", first.symbol, proto.spot_price(first, second));
+                                        log::info!(" - second Token: {:?} | Spot Price second/first = {:?}", second.symbol, proto.spot_price(second, first));
                                         match AmmType::from(comp.protocol_type_name.as_str()) {
                                             AmmType::UniswapV2 => {
                                                 if let Some(state) = proto.as_any().downcast_ref::<UniswapV2State>() {
                                                     // log::info!("Good downcast to UniswapV2State");
-                                                    log::info!(" - reserve0: {}", state.reserve0.to_string());
-                                                    log::info!(" - reserve1: {}", state.reserve1.to_string());
+                                                    // log::info!(" - reserve0: {}", state.reserve0.to_string());
+                                                    // log::info!(" - reserve1: {}", state.reserve1.to_string());
                                                     // --- Component ---
                                                     let pc = SrzProtocolComponent::from(comp.clone());
                                                     components.push(pc.clone());
@@ -265,8 +286,8 @@ async fn stream_protocol(network: Network, shdstate: SharedTychoStreamState, tok
                                             }
                                             AmmType::UniswapV3 => {
                                                 if let Some(state) = proto.as_any().downcast_ref::<UniswapV3State>() {
-                                                    log::info!(" - (comp) fee: {:?}", state.fee());
-                                                    log::info!(" - (comp) spot_sprice: {:?}", state.spot_price(base, quote));
+                                                    // log::info!(" - (comp) fee: {:?}", state.fee());
+                                                    // log::info!(" - (comp) spot_sprice: {:?}", state.spot_price(base, quote));
                                                     // --- Component ---
                                                     let key1 = keys::stream::component(network.name.clone(), comp.id.to_string().to_lowercase());
                                                     let pc = SrzProtocolComponent::from(comp.clone());
@@ -277,20 +298,18 @@ async fn stream_protocol(network: Network, shdstate: SharedTychoStreamState, tok
                                                     let srz = SrzUniswapV3State::from((state.clone(), comp.id.to_string()));
                                                     shd::data::redis::set(key2.as_str(), srz.clone()).await;
                                                     u3states.push(srz.clone());
-                                                    log::info!(" - (srz state) liquidity   : {} ", srz.liquidity);
-                                                    log::info!(" - (srz state) sqrt_price  : {} ", srz.sqrt_price.to_string());
-                                                    log::info!(" - (srz state) fee         : {:?} ", srz.fee);
-                                                    log::info!(" - (srz state) tick        : {} ", srz.tick);
-                                                    log::info!(" - (srz state) tick_spacing: {} ", srz.ticks.tick_spacing);
-                                                    log::info!(" - (srz state) ticks len   : {}", srz.ticks.ticks.len());
+                                                    // log::info!(" - (srz state) liquidity   : {} ", srz.liquidity);
+                                                    // log::info!(" - (srz state) sqrt_price  : {} ", srz.sqrt_price.to_string());
+                                                    // log::info!(" - (srz state) fee         : {:?} ", srz.fee);
+                                                    // log::info!(" - (srz state) tick        : {} ", srz.tick);
+                                                    // log::info!(" - (srz state) tick_spacing: {} ", srz.ticks.tick_spacing);
+                                                    // log::info!(" - (srz state) ticks len   : {}", srz.ticks.ticks.len());
                                                 } else {
                                                     log::info!("Downcast to 'UniswapV3State' failed on proto '{}'", comp.protocol_type_name);
                                                 }
                                             }
                                             AmmType::UniswapV4 => {
                                                 if let Some(state) = proto.as_any().downcast_ref::<UniswapV4State>() {
-                                                    log::info!(" - fee: {:?}", state.fee());
-                                                    log::info!(" - spot_sprice: {:?}", state.spot_price(base, quote));
                                                     // --- Component ---
                                                     let key1 = keys::stream::component(network.name.clone(), comp.id.to_string().to_lowercase());
                                                     let pc = SrzProtocolComponent::from(comp.clone());
@@ -301,12 +320,11 @@ async fn stream_protocol(network: Network, shdstate: SharedTychoStreamState, tok
                                                     let srz = SrzUniswapV4State::from((state.clone(), comp.id.to_string()));
                                                     u4states.push(srz.clone());
                                                     shd::data::redis::set(key2.as_str(), srz.clone()).await;
-                                                    log::info!(" - (srz state) liquidity   : {} ", srz.liquidity);
-                                                    log::info!(" - (srz state) sqrt_price  : {:?} ", srz.sqrt_price);
-                                                    log::info!(" - (srz state) fees        : {:?} ", srz.fees);
-                                                    log::info!(" - (srz state) tick        : {} ", srz.tick);
-                                                    log::info!(" - (srz state) tick_spacing: {} ", srz.ticks.tick_spacing);
-                                                    log::info!(" - (srz state) ticks len   : {} ", srz.ticks.ticks.len());
+                                                    // log::info!(" - (srz state) liquidity   : {} ", srz.liquidity);
+                                                    // log::info!(" - (srz state) sqrt_price  : {:?} ", srz.sqrt_price);
+                                                    // log::info!(" - (srz state) tick        : {} ", srz.tick);
+                                                    // log::info!(" - (srz state) tick_spacing: {} ", srz.ticks.tick_spacing);
+                                                    // log::info!(" - (srz state) ticks len   : {} ", srz.ticks.ticks.len());
                                                 } else {
                                                     log::info!("Downcast to 'UniswapV4State' failed on proto '{}'", comp.protocol_type_name);
                                                 }
@@ -329,11 +347,11 @@ async fn stream_protocol(network: Network, shdstate: SharedTychoStreamState, tok
                                                     //     balances: state.balances.iter().map(|(k, v)| (k.to_string(), *v)).collect(),
                                                     // };
                                                     cbstates.push(srz.clone());
-                                                    log::info!(" - spot_sprice: {:?}", state.spot_price(base, quote));
-                                                    log::info!(" - (srz state) id        : {} ", srz.id);
-                                                    log::info!(" - (srz state) tokens    : {:?} ", srz.tokens);
-                                                    log::info!(" - (srz state) block     : {} ", srz.block);
-                                                    log::info!(" - (srz state) balances  : {:?} ", srz.balances);
+                                                    // log::info!(" - spot_sprice: {:?}", state.spot_price(base, quote));
+                                                    // log::info!(" - (srz state) id        : {} ", srz.id);
+                                                    // log::info!(" - (srz state) tokens    : {:?} ", srz.tokens);
+                                                    // log::info!(" - (srz state) block     : {} ", srz.block);
+                                                    // log::info!(" - (srz state) balances  : {:?} ", srz.balances);
                                                     shd::data::redis::set(key2.as_str(), srz.clone()).await;
                                                 } else {
                                                     log::info!("Downcast to 'EVMPoolState<PreCachedDB>' failed on proto '{}'", comp.protocol_type_name);
@@ -341,7 +359,7 @@ async fn stream_protocol(network: Network, shdstate: SharedTychoStreamState, tok
                                             }
                                         }
                                     }
-                                    log::info!(" --- --- --- --- ---\n\n");
+                                    log::info!(" --- --- --- --- --- ");
                                 }
 
                                 // ===== Storing ALL pairs (token0-token1) based on components =====

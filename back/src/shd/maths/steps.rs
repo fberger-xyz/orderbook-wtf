@@ -86,7 +86,7 @@ pub fn gsegments(tb_one_mn: f64) -> Vec<IncrementationSegment> {
     let s2 = IncrementationSegment {
         start: tb_one_mn * 1000.,
         end: tb_one_mn * ONE_PERCENT_IN_MN,
-        step: tb_one_mn * 1000.,
+        step: tb_one_mn * 2000.,
     };
     let s3 = IncrementationSegment {
         start: tb_one_mn * ONE_PERCENT_IN_MN,
@@ -95,7 +95,7 @@ pub fn gsegments(tb_one_mn: f64) -> Vec<IncrementationSegment> {
     };
     segments.push(s1);
     segments.push(s2);
-    segments.push(s3);
+    // segments.push(s3);
     segments
 }
 
@@ -185,11 +185,11 @@ mod tests {
         ];
         let config = PairSimuIncrementConfig { segments };
         let (steps0to1, steps1to0) = _generate(config);
-        for t in steps0to1.iter() {
-            println!("t0: Generated step: {}", t);
-        }
-        for t in steps1to0.iter() {
-            println!("t1: Generated step: {}", t);
-        }
+        // for t in steps0to1.iter() {
+        //     println!("t0: Generated step: {}", t);
+        // }
+        // for t in steps1to0.iter() {
+        //     println!("t1: Generated step: {}", t);
+        // }
     }
 }
