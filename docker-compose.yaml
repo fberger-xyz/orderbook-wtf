@@ -47,6 +47,19 @@ services:
     networks:
       - tycho
 
+  # web:
+  #   build:
+  #     context: front  # Ensure your frontend is inside 'front/' directory
+  #     dockerfile: ops/Dockerfile
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     - NEXT_PUBLIC_API_URL=http://ethereum:42001  # Internal service name for API communication
+  #   depends_on:
+  #     - ethereum  # Ensure backend starts before frontend
+  #   networks:
+  #     - tycho
+
   # base:
   # arbitrum:
   # starknet:
