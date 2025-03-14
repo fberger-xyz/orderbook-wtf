@@ -23,7 +23,7 @@ services:
 
   ethereum:
     build: 
-      context: ..
+      context: back
       dockerfile: ops/Dockerfile
       args:
         - PROGRAM=stream
