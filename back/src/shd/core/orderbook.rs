@@ -50,8 +50,7 @@ pub async fn build(network: Network, balances: HashMap<String, HashMap<String, u
     log::info!("Average price 0to1: {} | Average price 1to0: {}", avgp0to1, avgp1to0);
     let pso = optimization(network.clone(), pools.clone(), tokens, query.clone(), aggregated.clone(), avgp0to1, avgp1to0).await;
     log::info!("Optimization done for pair: '{}'", query.tag);
-    let path = format!("misc/data-front/{}.pso.usdc-eth.json", network.name);
-    crate::shd::utils::misc::save1(pso.clone(), path.as_str());
+
     pso
 }
 
@@ -230,6 +229,7 @@ pub async fn optimization(network: Network, pcsdata: Vec<ProtoTychoState>, token
         }
     }
 
+    log::info!("🔄  Switching to 1to0");
     let segments1to0 = shd::maths::steps::gsegments(t1tb_one_mn);
     let steps1to0 = shd::maths::steps::gsteps(PairSimuIncrementConfig { segments: segments1to0.clone() }.segments);
 

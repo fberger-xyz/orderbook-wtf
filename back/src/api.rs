@@ -174,8 +174,10 @@ async fn orderbook(Extension(shtss): Extension<SharedTychoStreamState>, Extensio
                     }
                 }
                 // shd::core::pair::prepare(network.clone(), datapools.clone(), tokens.clone(), params.clone()).await;
-                shd::core::orderbook::build(network.clone(), balances.clone(), datapools.clone(), tokens.clone(), params.clone()).await;
-                Json(json!({ "orderbook": [] })) // !
+                let result = shd::core::orderbook::build(network.clone(), balances.clone(), datapools.clone(), tokens.clone(), params.clone()).await;
+                let path = format!("misc/data-front/odb.{}.{}.json", network.name, params.tag);
+                crate::shd::utils::misc::save1(result.clone(), path.as_str());
+                Json(json!({ "orderbook": result.clone() })) // !
             } else {
                 log::error!("Query param Tag must contain only 2 tokens separated by a dash '-'");
                 Json(json!({ "orderbook": "Query param Tag must contain only 2 tokens separated by a dash '-'." }))
