@@ -4,7 +4,6 @@ use axum::{
     routing::get,
     Extension, Json, Router,
 };
-use redis::AsyncCommands;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use tap2::shd::{
@@ -13,7 +12,16 @@ use tap2::shd::{
     types::{AmmType, EnvConfig, Network, PairQuery, ProtoTychoState, SharedTychoStreamState},
 };
 
-#[derive(Serialize, Deserialize)]
+use utoipa::ToSchema;
+
+#[utoipa::path(
+    get,
+    path = "/version",
+    responses(
+        (status = 200, description = "Get API version", body = APIVersion)
+    )
+)]
+#[derive(Serialize, Deserialize, ToSchema)]
 pub struct APIVersion {
     pub version: String,
 }
