@@ -144,8 +144,10 @@ async fn stream_protocol(network: Network, shdstate: SharedTychoStreamState, tok
     let mut toktag = HashMap::new();
     let weth = hmt.get(&Bytes::from_str(network.eth.as_str()).unwrap()).unwrap_or_else(|| panic!("WETH not found on {}", network.name));
     let usdc = hmt.get(&Bytes::from_str(network.usdc.as_str()).unwrap()).unwrap_or_else(|| panic!("USDC not found on {}", network.name));
+    let wbtc = hmt.get(&Bytes::from_str(network.wbtc.as_str()).unwrap()).unwrap_or_else(|| panic!("WBTC not found on {}", network.name));
     toktag.insert(weth.clone().address, weth.clone());
     toktag.insert(usdc.clone().address, usdc.clone());
+    toktag.insert(wbtc.clone().address, wbtc.clone());
     // let dai = hmt.get(&Bytes::from_str("0x6b175474e89094c44da98b954eedeac495271d0f").unwrap()).expect("DAI not found");
     // let usdt = hmt.get(&Bytes::from_str("0xdac17f958d2ee523a2206206994597c13d831ec7").unwrap()).expect("USDT not found");
 
@@ -153,7 +155,7 @@ async fn stream_protocol(network: Network, shdstate: SharedTychoStreamState, tok
     'retry: loop {
         let endpoint = network.tycho.trim_start_matches("https://");
         log::info!("Connecting to >>> ProtocolStreamBuilder <<< at {} on {:?} ...\n", endpoint, chain);
-        match ProtocolStreamBuilder::new(endpoint, chain)
+        let psb = ProtocolStreamBuilder::new(endpoint, chain)
             .exchange::<UniswapV2State>("uniswap_v2", filter.clone(), None)
             .exchange::<UniswapV3State>("uniswap_v3", filter.clone(), None)
             .exchange::<UniswapV4State>("uniswap_v4", filter.clone(), Some(u4))
@@ -162,10 +164,8 @@ async fn stream_protocol(network: Network, shdstate: SharedTychoStreamState, tok
             .auth_key(Some(config.tycho_api_key.clone()))
             .skip_state_decode_failures(true) // ? To study !
             .set_tokens(hmt.clone()) // ALL Tokens
-            .await
-            .build()
-            .await
-        {
+            .await;
+        match psb.build().await {
             Ok(mut stream) => {
                 // The stream created emits BlockUpdate messages which consist of:
                 // - block number- the block this update message refers to
