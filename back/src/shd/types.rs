@@ -9,7 +9,7 @@ pub struct EnvConfig {
     pub network: String,
 }
 
-#[derive(Default, Debug, Clone, Serialize, Deserialize)]
+#[derive(Default, Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct Network {
     pub name: String,
     pub chainid: u64,

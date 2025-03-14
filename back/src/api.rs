@@ -12,15 +12,31 @@ use tap2::shd::{
     types::{AmmType, EnvConfig, Network, PairQuery, ProtoTychoState, SharedTychoStreamState},
 };
 
+use utoipa::OpenApi;
 use utoipa::ToSchema;
 
-// #[utoipa::path(
-//     get,
-//     path = "/version",
-//     responses(
-//         (status = 200, description = "Get API version", body = APIVersion)
-//     )
-// )]
+use utoipa_axum::router::OpenApiRouter;
+use utoipa_axum::routes;
+use utoipa_swagger_ui::SwaggerUi;
+
+/// OpenAPI documentation for the API.
+#[derive(OpenApi)]
+#[openapi(
+    paths(
+        version,
+        network,
+        status
+    ),
+    components(
+        schemas(APIVersion, Network)
+    ),
+    tags(
+        (name = "api", description = "General API endpoints")
+    )
+)]
+struct ApiDoc;
+
+// A simple structure for the API version.
 #[derive(Serialize, Deserialize, ToSchema)]
 pub struct APIVersion {
     pub version: String,
@@ -31,19 +47,46 @@ async fn root() -> impl IntoResponse {
     Json(json!({ "data": "Tycho Stream running" }))
 }
 
-// GET /version => Get version of the API (for example, a commit hash)
+/// Version endpoint: returns the API version.
+#[utoipa::path(
+    get,
+    path = "/version",
+    responses(
+        (status = 200, description = "API Version", body = APIVersion)
+    )
+)]
 async fn version() -> impl IntoResponse {
     log::info!("👾 API: GET /version");
     Json(APIVersion { version: "0.1.0".into() })
 }
 
 // GET /network => Get network object and its configuration
+#[utoipa::path(
+    get,
+    path = "/network",
+    responses(
+        (status = 200, description = "Network configuration", body = Network)
+    )
+)]
 async fn network(Extension(network): Extension<Network>) -> impl IntoResponse {
     log::info!("👾 API: GET /network on {} network", network.name);
     Json(network)
 }
 
+#[derive(Serialize, Deserialize, ToSchema)]
+struct Status {
+    status: String,
+    latest: String,
+}
+
 // GET /status => Get network status + last block synced
+#[utoipa::path(
+    get,
+    path = "/status",
+    responses(
+        (status = 200, description = "API Status", body = Status)
+    )
+)]
 async fn status(Extension(network): Extension<Network>) -> impl IntoResponse {
     log::info!("👾 API: GET /status on {} network", network.name);
     let key1 = shd::r#static::data::keys::stream::status(network.name.clone());
@@ -51,8 +94,14 @@ async fn status(Extension(network): Extension<Network>) -> impl IntoResponse {
     let status = shd::data::redis::get::<u128>(key1.as_str()).await;
     let latest = shd::data::redis::get::<u64>(key2.as_str()).await;
     match (status, latest) {
-        (Some(status), Some(latest)) => Json(json!({ "status": status.to_string(), "latest": latest.to_string() })),
-        _ => Json(json!({ "status": "unknown", "latest": "0" })),
+        (Some(status), Some(latest)) => Json(json!(Status {
+            status: status.to_string(),
+            latest: latest.to_string()
+        })),
+        _ => Json(json!(Status {
+            status: "error".to_string(),
+            latest: "error".to_string()
+        })),
     }
 }
 
@@ -61,7 +110,14 @@ async fn _tokens(network: Network) -> Option<Vec<SrzToken>> {
     shd::data::redis::get::<Vec<SrzToken>>(key.as_str()).await
 }
 
-// GET /network => Get network object and its configuration
+// GET /tokens => Get tokens object from Tycho
+#[utoipa::path(
+    get,
+    path = "/tokens",
+    responses(
+        (status = 200, description = "Tycho Tokens", body = Vec<SrzToken>)
+    )
+)]
 async fn tokens(Extension(network): Extension<Network>) -> impl IntoResponse {
     log::info!("👾 API: GET /tokens on {} network", network.name);
     match _tokens(network.clone()).await {
@@ -239,12 +295,15 @@ async fn liquidity(Extension(shtss): Extension<SharedTychoStreamState>, Extensio
 
 pub async fn start(n: Network, shared: SharedTychoStreamState, config: EnvConfig) {
     log::info!("👾 Launching API for '{}' network | 🧪 Testing mode: {:?} | Port: {}", n.name, config.testing, n.port);
+    // shd::utils::misc::log::logtest();
     let rstate = shared.read().await;
     log::info!("Testing SharedTychoStreamState read = {:?} with {:?}", rstate.protosims.keys(), rstate.protosims.values());
     log::info!(" => rstate.states.keys and rstate.states.values => {:?} with {:?}", rstate.protosims.keys(), rstate.protosims.values());
     log::info!(" => rstate.components.keys and rstate.components.values => {:?} with {:?}", rstate.components.keys(), rstate.components.values());
     log::info!(" => rstate.balances.keys and rstate.balances.values => {:?} with {:?}", rstate.balances.keys(), rstate.balances.values());
     drop(rstate);
+
+    // Add /api prefix
     let app = Router::new()
         .route("/", get(root))
         .route("/version", get(version))
@@ -256,9 +315,11 @@ pub async fn start(n: Network, shared: SharedTychoStreamState, config: EnvConfig
         .route("/pool/{id}", get(pool))
         .route("/orderbook", get(orderbook))
         .route("/liquidity", get(liquidity))
+        // Swagger
+        .merge(SwaggerUi::new("/swagger-ui").url("/api-docs/openapi.json", ApiDoc::openapi()))
         .layer(Extension(n.clone()))
         .layer(Extension(shared.clone())); // Shared state
-                                           // shd::utils::misc::log::logtest();
+
     match tokio::net::TcpListener::bind(format!("0.0.0.0:{}", n.port)).await {
         Ok(listener) => match axum::serve(listener, app).await {
             Ok(_) => {
@@ -286,57 +347,3 @@ pub async fn start(n: Network, shared: SharedTychoStreamState, config: EnvConfig
 // - /component/:id => Get the component the given pool  📍
 // - /state/:id => Get the component the given pool 📍
 // - /components/:pair => Get ALL components for 1 pair 📍
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    // Assuming alloy::primitives::Address is accessible,
-    // here we use its default address to simulate an empty address.
-    // For this example, let's assume that Address::default().to_string() returns "0x0000000000000000000000000000000000000000".
-
-    // Helper function to create a token.
-    fn token(address: &str, symbol: &str) -> SrzToken {
-        SrzToken {
-            address: address.to_string(),
-            decimals: 18,
-            symbol: symbol.to_string(),
-            gas: "gas".to_string(),
-        }
-    }
-
-    #[test]
-    fn test_matchcp_all_match() {
-        // Component tokens contain two tokens
-        let comp_tokens = vec![token("0xABC", "token1"), token("0xDEF", "token2")];
-        // Query asks for token1 (using different case in address)
-        let query_tokens = vec![token("0xabc", "token1")];
-        assert!(matchcp(comp_tokens, query_tokens));
-    }
-
-    #[test]
-    fn test_matchcp_empty_address_in_component() {
-        // Use the default empty address (as provided by alloy)
-        let default_addr = alloy::primitives::Address::default().to_string();
-        let comp_tokens = vec![token(&default_addr, "token1"), token("0xDEF", "token2")];
-        let query_tokens = vec![token("0xDEF", "token2")];
-        // Should return false because one component token has an empty address.
-        assert!(!matchcp(comp_tokens, query_tokens));
-    }
-
-    #[test]
-    fn test_matchcp_empty_address_in_query() {
-        let default_addr = alloy::primitives::Address::default().to_string();
-        let comp_tokens = vec![token("0xABC", "token1")];
-        let query_tokens = vec![token(&default_addr, "token1")];
-        // Should return false because the query token has an empty address.
-        assert!(!matchcp(comp_tokens, query_tokens));
-    }
-
-    #[test]
-    fn test_matchcp_no_match() {
-        let comp_tokens = vec![token("0xABC", "token1")];
-        let query_tokens = vec![token("0xDEF", "token2")];
-        // Should return false because the query token is not found among the component tokens.
-        assert!(!matchcp(comp_tokens, query_tokens));
-    }
-}

@@ -15,6 +15,7 @@ use tycho_simulation::evm::tycho_models::Chain;
 use tycho_simulation::models::Token;
 use tycho_simulation::protocol::models::ProtocolComponent;
 use tycho_simulation::tycho_core::Bytes;
+use utoipa::ToSchema;
 
 /// @notice Format of the data that will be read/stored in the database
 /// By default Tycho object are not srz
@@ -23,7 +24,7 @@ use tycho_simulation::tycho_core::Bytes;
 // Tycho Tokens
 // =====================================================================================================================================================================================================
 
-#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize, ToSchema)]
 pub struct SrzToken {
     pub address: String,
     pub decimals: usize,
