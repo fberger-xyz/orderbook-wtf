@@ -14,13 +14,13 @@ use tap2::shd::{
 
 use utoipa::ToSchema;
 
-#[utoipa::path(
-    get,
-    path = "/version",
-    responses(
-        (status = 200, description = "Get API version", body = APIVersion)
-    )
-)]
+// #[utoipa::path(
+//     get,
+//     path = "/version",
+//     responses(
+//         (status = 200, description = "Get API version", body = APIVersion)
+//     )
+// )]
 #[derive(Serialize, Deserialize, ToSchema)]
 pub struct APIVersion {
     pub version: String,
