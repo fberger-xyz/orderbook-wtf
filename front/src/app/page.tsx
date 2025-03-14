@@ -1,103 +1,55 @@
-import Image from "next/image";
+import { ChartLayout } from '@/components/charts/ChartsCommons'
+import DepthChart from '@/components/charts/DepthChart'
+import CommitInfo from '@/components/common/CommitInfo'
+import AppStoreLoader from '@/components/stores/AppStoreLoader'
+import SelectedTrade from '@/components/wallet/SelectedTrade'
+import { OrderbookTrades } from '@/interfaces'
+import { promises as fs } from 'fs'
 
-export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm/6 text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-[family-name:var(--font-geist-mono)] font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+enum JsonInputs {
+    ASKS = 'asks-ethereum.opti.eth-usdc.orderbook-0to1.json',
+    BIDS = 'bids-ethereum.opti.eth-usdc.orderbook-1to0.json',
+}
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
-  );
+export default async function Page() {
+    // read locally
+    const ASKS_PATH = process.cwd() + `/src/data/depth-chart/${JsonInputs.ASKS}`
+    const BIDS_PATH = process.cwd() + `/src/data/depth-chart/${JsonInputs.BIDS}`
+
+    // parse
+    const ASKS_FILE = await fs.readFile(ASKS_PATH, 'utf8')
+    const BIDS_FILE = await fs.readFile(BIDS_PATH, 'utf8')
+
+    // cast
+    const ASKS = JSON.parse(ASKS_FILE) as OrderbookTrades
+    const BIDS = JSON.parse(BIDS_FILE) as OrderbookTrades
+
+    // hardcoded for now
+    const token0 = 'WETH'
+    const token1 = 'USDC'
+    // const zeroToOne = true
+
+    return (
+        <AppStoreLoader>
+            {/* take inspiration from https://app.uniswap.org/explore/pools/ethereum/0x88e6A0c2dDD26FEEb64F039a2c41296FcB3f5640 */}
+            <div className="flex w-full grow flex-col gap-8 md:flex-row">
+                <ChartLayout
+                    title={`Ethereum ${token0}/${token1} - market depth`}
+                    subtitle={`Work in progress 🚧`}
+                    chart={<DepthChart bids={BIDS} asks={ASKS} />}
+                />
+                <div className="flex size-[500px] flex-col gap-4">
+                    <div className="flex w-full flex-col rounded-2xl bg-very-light-hover p-4">
+                        <SelectedTrade />
+                    </div>
+                </div>
+            </div>
+            {/* <ChartLayout
+                title={`${token0}/${token1} liquidity`}
+                subtitle={`some description`}
+                chart={<ActiveLiquidityChart token0={token0} token1={token1} zeroToOne={zeroToOne} />}
+            /> */}
+            <CommitInfo />
+        </AppStoreLoader>
+    )
 }
