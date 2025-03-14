@@ -47,19 +47,23 @@ services:
     networks:
       - tycho
 
-  # web:
-  #   build:
-  #     context: front  # Ensure your frontend is inside 'front/' directory
-  #     dockerfile: ops/Dockerfile
-  #   ports:
-  #     - "3000:3000"
-  #   environment:
-  #     - NEXT_PUBLIC_API_URL=http://ethereum:42001  # Internal service name for API communication
-  #   depends_on:
-  #     - ethereum  # Ensure backend starts before frontend
-  #   networks:
-  #     - tycho
-
+  web:
+    build:
+      context: front
+      dockerfile: ops/Dockerfile  # Uses the Dockerfile from front/ops
+    ports:
+      - "41777:3000"  # Expose container's port 3000 on host port 41777
+    volumes:
+      - ./front:/app
+    environment:
+      - NEXT_PUBLIC_STREAM_API_URL=http://ethereum:42001
+      - NEXT_PUBLIC_ORDERBOOK_ENDPOINT=/orderbook?tag=0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48-0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2&z0to1=false
+    depends_on:
+      - ethereum
+    restart: always
+    networks:
+      - tycho
+  
   # base:
   # arbitrum:
   # starknet:

@@ -1,14 +1,17 @@
-# Use official Next.js image
-FROM node:18-alpine
-# Set working directory
+FROM node:18
+
+# Set working directory inside the container
 WORKDIR /app
-# Copy package.json and package-lock.json
-COPY package*.json ./
-# Install dependencies
+
+# Copy package.json and install dependencies
+COPY package.json package-lock.json ./
 RUN npm install
-# Copy project files
+
+# Copy the rest of the application
 COPY . .
-# Expose port
+
+# Expose port 3000
 EXPOSE 3000
-# Start Next.js app
+
+# Start the Next.js development server
 CMD ["npm", "run", "dev"]
