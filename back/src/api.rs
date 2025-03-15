@@ -9,7 +9,7 @@ use serde_json::json;
 use tap2::shd::{
     self,
     data::fmt::{SrzEVMPoolState, SrzProtocolComponent, SrzToken, SrzUniswapV2State, SrzUniswapV3State, SrzUniswapV4State},
-    types::{AmmType, EnvConfig, Network, PairQuery, PairSimulatedOrderbook, ProtoTychoState, SharedTychoStreamState},
+    types::{AmmType, EnvConfig, Network, PairQuery, PairSimulatedOrderbook, ProtoTychoState, SharedTychoStreamState, SyncState},
 };
 
 use utoipa::OpenApi;
@@ -46,20 +46,21 @@ pub fn matchcp(cptks: Vec<SrzToken>, tokens: Vec<SrzToken>) -> bool {
     info(
         title = "TAP-2 Orderbook API",
         version = "1.0.0",
-        description = "An Rust Axum API serving different Tycho Streams, providing orderbook and liquidity data.",
+        description = "An Rust Axum API serving different Tycho Streams, providing orderbook and liquidity data for one network",
     ),
     paths(
         version,
         network,
         status,
         tokens,
+        components,
         orderbook
     ),
     components(
-        schemas(APIVersion, Network, Status, SrzToken, PairSimulatedOrderbook)
+        schemas(APIVersion, Network, Status, SrzToken, SrzProtocolComponent, PairSimulatedOrderbook)
     ),
     tags(
-        (name = "API", description = "API endpoints")
+        (name = "API", description = "Endpoints")
     )
 )]
 struct ApiDoc;
@@ -80,8 +81,12 @@ async fn root() -> impl IntoResponse {
 #[utoipa::path(
     get,
     path = "/version",
+    summary = "API version",
     responses(
         (status = 200, description = "API Version", body = APIVersion)
+    ),
+    tag = (
+        "API"
     )
 )]
 async fn version() -> impl IntoResponse {
@@ -93,8 +98,12 @@ async fn version() -> impl IntoResponse {
 #[utoipa::path(
     get,
     path = "/network",
+    summary = "Network configuration",
     responses(
         (status = 200, description = "Network configuration", body = Network)
+    ),
+    tag = (
+        "API"
     )
 )]
 async fn network(Extension(network): Extension<Network>) -> impl IntoResponse {
@@ -106,7 +115,7 @@ async fn network(Extension(network): Extension<Network>) -> impl IntoResponse {
 struct Status {
     #[schema(example = "Running")]
     status: String,
-    #[schema(example = "123456")]
+    #[schema(example = "22051447")]
     latest: String,
 }
 
@@ -114,8 +123,13 @@ struct Status {
 #[utoipa::path(
     get,
     path = "/status",
+    summary = "Fetches the API status and latest block synchronized",
+    description = "API is 'running' when Redis and Stream are ready. Block updated at each new header after processing state updates",
     responses(
-        (status = 200, description = "API Status", body = Status)
+        (status = 200, description = "Current API status and latest block synchronized", body = Status)
+    ),
+    tag = (
+        "API"
     )
 )]
 async fn status(Extension(network): Extension<Network>) -> impl IntoResponse {
@@ -130,8 +144,8 @@ async fn status(Extension(network): Extension<Network>) -> impl IntoResponse {
             latest: latest.to_string()
         })),
         _ => Json(json!(Status {
-            status: "error".to_string(),
-            latest: "error".to_string()
+            status: SyncState::Error.to_string(),
+            latest: "0".to_string()
         })),
     }
 }
@@ -145,8 +159,13 @@ async fn _tokens(network: Network) -> Option<Vec<SrzToken>> {
 #[utoipa::path(
     get,
     path = "/tokens",
+    summary = "Fetches all Tycho tokens",
+    description = "Only quality tokens are listed here (evaluated at 100 by Tycho = no rebasing, etc)",
     responses(
-        (status = 200, description = "Tycho Tokens", body = Vec<SrzToken>)
+        (status = 200, description = "Tycho Tokens on the network", body = Vec<SrzToken>)
+    ),
+    tag = (
+        "API"
     )
 )]
 async fn tokens(Extension(network): Extension<Network>) -> impl IntoResponse {
@@ -173,6 +192,18 @@ async fn _components(network: Network) -> Option<Vec<SrzProtocolComponent>> {
 }
 
 // GET /components => Get all existing components
+#[utoipa::path(
+    get,
+    path = "/components",
+    summary = "Fetches all Tycho components (= liquidity pools)",
+    description = "Returns all components available on the network",
+    responses(
+        (status = 200, description = "Tycho Components (= liquidity pools)", body = SrzProtocolComponent)
+    ),
+    tag = (
+        "API"
+    )
+)]
 async fn components(Extension(network): Extension<Network>) -> impl IntoResponse {
     log::info!("👾 API: GET /components on {} network", network.name);
     match _components(network).await {
@@ -223,12 +254,18 @@ async fn pool(Extension(network): Extension<Network>, Path(id): Path<String>) ->
 #[utoipa::path(
     get,
     path = "/orderbook",
+    summary = "Fetches the orderbook for a given pair of tokens",
+    description = "Aggregate liquidity across AMMs, simulates an orderbook (bids/asks). Depending on the number of components and simulation input, the orderbook can be more or less accurate, and the simulation can take severals minutes",
     params(
-        ("tag" = String, Query, description = "A dash-separated pair of token addresses, e.g. '0xt0-0xt1', no order required")
+        ("tag" = String, Query, description = "A dash-separated pair of token addresses, e.g. '0xt0-0xt1', no order required", example = "0xt0-0xt1")
     ),
     responses(
         (status = 200, description = "Contains trade simulations, results and components", body = PairSimulatedOrderbook)
+    ),
+    tag = (
+        "API"
     )
+   
 )]
 async fn orderbook(Extension(shtss): Extension<SharedTychoStreamState>, Extension(network): Extension<Network>, Query(params): Query<PairQuery>) -> impl IntoResponse {
     log::info!("👾 API: Querying orderbook endpoint: {:?}", params.tag);

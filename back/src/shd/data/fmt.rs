@@ -26,7 +26,7 @@ use utoipa::ToSchema;
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize, ToSchema)]
 pub struct SrzToken {
-    #[schema(example = "0x")]
+    #[schema(example = "0xTokenAddress")]
     pub address: String,
     #[schema(example = "6")]
     pub decimals: usize,
@@ -64,11 +64,11 @@ impl From<SrzToken> for Token {
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
 pub struct SrzProtocolComponent {
-    #[schema(example = "0x")]
+    #[schema(example = "0xTokenAddress")]
     pub address: String,
-    #[schema(example = "0x")]
+    #[schema(example = "0xTokenAddress")]
     pub id: String,
-    #[schema(example = "Array of tokens")]
+    #[schema(example = "Array of SrzToken")]
     pub tokens: Vec<SrzToken>,
     #[schema(example = "uniswap_v4")]
     pub protocol_system: String,
@@ -77,7 +77,7 @@ pub struct SrzProtocolComponent {
     // pub chain: Chain,
     #[schema(example = "Array of contract ids")]
     pub contract_ids: Vec<String>,
-    #[schema(example = "Hashmap of static attributes")]
+    #[schema(example = "Vector <String, String> of static attributes (fee, tick_spacing, etc)")]
     pub static_attributes: Vec<(String, String)>,
     #[schema(example = "0xHash")]
     pub creation_tx: String,
