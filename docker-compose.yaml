@@ -50,9 +50,9 @@ services:
   web:
     build:
       context: front
-      dockerfile: ops/Dockerfile  # Uses the Dockerfile from front/ops
+      dockerfile: ops/Dockerfile
     ports:
-      - "41777:3000"  # Expose container's port 3000 on host port 41777
+      - "41777:3000"
     volumes:
       - ./front:/app
     environment:
