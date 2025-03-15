@@ -12,7 +12,7 @@ import { useAppStore } from '@/stores/app.store'
 import { DEFAULT_THEME } from '@/config/app.config'
 import { ErrorBoundaryFallback } from '../common/ErrorBoundaryFallback'
 import { formatAmount } from '@/utils'
-import { OrderbookTrades, Pool } from '@/interfaces'
+import { NewOrderbookTrades, NewPool } from '@/interfaces'
 import numeral from 'numeral'
 import { OrderbookDataPoint } from '@/types'
 
@@ -24,8 +24,7 @@ const getOptions = (
     token1: string,
     bids: OrderbookDataPoint[],
     asks: OrderbookDataPoint[],
-    bidsPools: Pool[],
-    asksPools: Pool[],
+    pools: NewPool[],
 ): echarts.EChartsOption => {
     return {
         tooltip: {
@@ -49,22 +48,22 @@ const getOptions = (
                 const [price, tradersInput, side, distribution] = firstSerieDataPoints.data as OrderbookDataPoint
                 const tradersOutput = side === OrderbookSide.ASK ? tradersInput / price : tradersInput * price
                 const distributionLines = distribution.map((percent, percentIndex) => {
-                    const protocolName = OrderbookSide.ASK ? asksPools[percentIndex].protocol_system : bidsPools[percentIndex].protocol_system
-                    const attributes = OrderbookSide.ASK ? asksPools[percentIndex].static_attributes : bidsPools[percentIndex].static_attributes
+                    const protocolName = pools[percentIndex].protocol_system
+                    const attributes = pools[percentIndex].static_attributes
                     const hexaPercent = attributes.find((entry) => entry[0].toLowerCase() === 'fee')?.[1] ?? ''
                     // https://github.com/adamwdraper/Numeral-js/issues/123
                     return `- ${numeral(percent / 100).format('#4#0,0%')} in ${protocolName} ${numeral(parseInt(hexaPercent, 16)).divide(100).format('0,0.[0]')}bps`
                 })
                 return [
                     `<strong>Trader's input</strong>`,
-                    `= ${numeral(tradersInput).format('0,0.[000000]')} ${side === OrderbookSide.ASK ? token0 : token1}`,
+                    `= ${numeral(tradersInput).format('0,0.[0000000]')} ${side === OrderbookSide.ASK ? token0 : token1}`,
                     ``,
                     `<strong>Simulated price</strong>`,
-                    `= ${numeral(price).format('0,0.[0]')} ${token0} for 1 ${token1}`,
+                    `= ${numeral(price).format('0,0.[0000000]')} ${token0} for 1 ${token1}`,
                     `= ${numeral(1 / price).format('0,0.[0000000]')} ${token1} for 1 ${token0}`,
                     ``,
                     `<strong>Trader's output</strong>`,
-                    `= ${numeral(tradersOutput).format('0,0.[000000]')} ${side === OrderbookSide.ASK ? token1 : token0}`,
+                    `= ${numeral(tradersOutput).format('0,0.[0000000]')} ${side === OrderbookSide.ASK ? token1 : token0}`,
                     ``,
                     `<strong>Distribution</strong>`,
                     ...distributionLines,
@@ -128,8 +127,8 @@ const getOptions = (
                 height: 30,
                 bottom: '3%',
                 // todo improve this
-                startValue: bids.length > 145 ? bids[bids.length - 145][0] : undefined,
-                endValue: asks.length > 145 ? asks[145][0] : undefined,
+                // startValue: bids.length > 145 ? bids[bids.length - 145][0] : undefined,
+                // endValue: asks.length > 145 ? asks[145][0] : undefined,
                 fillerColor: 'transparent',
                 backgroundColor: 'transparent',
                 borderColor: colors.line[resolvedTheme],
@@ -372,11 +371,11 @@ const getOptions = (
     }
 }
 
-export default function DepthChart(props: { bids: OrderbookTrades; asks: OrderbookTrades }) {
+export default function DepthChart(props: { orderbook: NewOrderbookTrades }) {
     const { resolvedTheme } = useTheme()
     const { storeRefreshedAt, selectOrderbookDataPoint } = useAppStore()
     const [options, setOptions] = useState<echarts.EChartsOption>(
-        getOptions((resolvedTheme ?? DEFAULT_THEME) as AppThemes, '', '', [], [], props.bids.pools, props.asks.pools),
+        getOptions((resolvedTheme ?? DEFAULT_THEME) as AppThemes, '', '', [], [], props.orderbook.pools),
     )
 
     // load/refresh chart
@@ -385,19 +384,19 @@ export default function DepthChart(props: { bids: OrderbookTrades; asks: Orderbo
         const theme = (resolvedTheme ?? DEFAULT_THEME) as AppThemes
 
         // asks
-        const asks = props.asks.trades
+        const asks = props.orderbook.trades0to1
             .filter((trade, tradeIndex, trades) => trades.findIndex((_trade) => _trade.input === trade.input) === tradeIndex)
             .map((trade) => [1 / trade.ratio, trade.input, OrderbookSide.ASK, trade.distribution] as OrderbookDataPoint)
             .sort((curr, next) => Number(curr[0]) - Number(next[0]))
 
         // bids
-        const bids = props.bids.trades
+        const bids = props.orderbook.trades1to0
             .filter((trade, tradeIndex, trades) => trades.findIndex((_trade) => _trade.input === trade.input) === tradeIndex)
             .map((trade) => [trade.ratio, trade.input, OrderbookSide.BID, trade.distribution] as OrderbookDataPoint)
             .sort((curr, next) => Number(curr[0]) - Number(next[0]))
 
         // options
-        const newOptions = getOptions(theme, props.bids.from.symbol, props.bids.to.symbol, bids, asks, props.bids.pools, props.asks.pools)
+        const newOptions = getOptions(theme, props.orderbook.from.symbol, props.orderbook.to.symbol, bids, asks, props.orderbook.pools)
 
         // update
         setOptions(newOptions)
@@ -406,7 +405,7 @@ export default function DepthChart(props: { bids: OrderbookTrades; asks: Orderbo
     // methods
     const handlePointClick = (params: { value: undefined | OrderbookDataPoint }) => {
         if (params.value && Array.isArray(params.value))
-            selectOrderbookDataPoint({ datapoint: params.value, bidsPools: props.bids.pools, asksPools: props.asks.pools })
+            selectOrderbookDataPoint({ datapoint: params.value, bidsPools: props.orderbook.pools, asksPools: props.orderbook.pools })
     }
 
     return (

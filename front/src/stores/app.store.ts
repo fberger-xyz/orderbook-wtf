@@ -2,18 +2,18 @@ import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 import { APP_METADATA, IS_DEV } from '@/config/app.config'
 import { OrderbookDataPoint } from '@/types'
-import { Pool } from '@/interfaces'
+import { NewPool } from '@/interfaces'
 
 export const useAppStore = create<{
     showMobileMenu: boolean
     hasHydrated: boolean
     storeRefreshedAt: number
     refetchInterval: number
-    selectedTrade?: { datapoint: OrderbookDataPoint; bidsPools: Pool[]; asksPools: Pool[] }
+    selectedTrade?: { datapoint: OrderbookDataPoint; bidsPools: NewPool[]; asksPools: NewPool[] }
     setShowMobileMenu: (showMobileMenu: boolean) => void
     setHasHydrated: (hasHydrated: boolean) => void
     setStoreRefreshedAt: (storeRefreshedAt: number) => void
-    selectOrderbookDataPoint: (selectedTrade: { datapoint: OrderbookDataPoint; bidsPools: Pool[]; asksPools: Pool[] }) => void
+    selectOrderbookDataPoint: (selectedTrade: { datapoint: OrderbookDataPoint; bidsPools: NewPool[]; asksPools: NewPool[] }) => void
 }>()(
     persist(
         (set) => ({

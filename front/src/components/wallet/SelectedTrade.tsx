@@ -44,12 +44,13 @@ export default function SelectedTrade() {
                 <p className="text-sm font-bold text-secondary">Route</p>
                 {routes.map((path, pathIndex) => (
                     <div key={`${path.pool.id}-${pathIndex}`} className="flex w-full gap-1 text-sm">
-                        <p className="text-inactive">{path.pool.chain.slice(0, 3)}</p>
+                        {/* hardcoded */}
+                        <p className="text-inactive">ethereum</p>
                         <p className="text-inactive">{'>'}</p>
                         <p className="text-inactive">{path.pool.protocol_system}</p>
                         <p className="text-inactive">{'>'}</p>
                         <p className="text-inactive">{path.pool.tokens.map((token) => token.symbol).join('/')}</p>
-                        <p className="text-inactive">{numeral(parseInt(path.hexaPercent, 16)).divide(100).format('0,0.[0]')}bps</p>
+                        {/* <p className="text-inactive">{numeral(parseInt(path.hexaPercent, 16)).divide(100).format('0,0.[0]')}bps</p> */}
                         <p className="text-inactive">{'>'}</p>
                         <p>{numeral(path.percent / 100).format('#4#0,0%')}</p>
                     </div>
