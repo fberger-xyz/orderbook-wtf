@@ -9,6 +9,7 @@ use std::{
 
 use serde::{de::DeserializeOwned, Serialize};
 
+use crate::shd::data::fmt::SrzToken;
 use crate::shd::types::EnvConfig;
 
 pub mod log {
@@ -144,4 +145,13 @@ pub fn balances() -> HashMap<String, HashMap<String, u128>> {
     let data = fs::read_to_string("misc/data-back/ethereum.stream-balances.json").expect("Failed to read file");
     let parsed: HashMap<String, HashMap<String, u128>> = serde_json::from_str(&data).expect("JSON parsing failed");
     parsed
+}
+
+// Check if a component has the desired tokens
+pub fn matchcp(cptks: Vec<SrzToken>, tokens: Vec<SrzToken>) -> bool {
+    // if cptks.len() != 2 {
+    //     log::error!("Component {} has {} tokens instead of 2. Component with >2 tokens are not handled yet.", cp.id, cptks.len());
+    //     return false;
+    // }
+    tokens.iter().all(|token| cptks.iter().any(|cptk| cptk.address.eq_ignore_ascii_case(&token.address)))
 }

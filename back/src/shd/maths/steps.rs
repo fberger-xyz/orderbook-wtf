@@ -28,7 +28,7 @@ pub fn deepth(components: Vec<SrzProtocolComponent>, targets: Vec<SrzToken>, dat
         if let Some(balances) = data.get(&cp.id) {
             for tk in targets.iter() {
                 if let Some(balance) = balances.get(tk.address.to_lowercase().as_str()) {
-                    log::info!("Component {} has {} of token {}", cp.id, balance, tk.symbol);
+                    // log::info!("Component {} has {} of token {}", cp.id, balance, tk.symbol);
                     let c = cumulated.get(tk.address.to_lowercase().as_str()).unwrap();
                     let new = c + balance;
                     cumulated.insert(tk.clone().address, new);

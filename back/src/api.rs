@@ -19,27 +19,6 @@ use utoipa_axum::router::OpenApiRouter;
 use utoipa_axum::routes;
 use utoipa_swagger_ui::SwaggerUi;
 
-// Check if a component has the desired tokens
-pub fn matchcp(cptks: Vec<SrzToken>, tokens: Vec<SrzToken>) -> bool {
-    for x in cptks.clone() {
-        if alloy::primitives::Address::default().to_string() == x.address {
-            log::info!("🔺 Component {} has a token with an empty address", x.address);
-            return false;
-        }
-    }
-    for x in tokens.clone() {
-        if alloy::primitives::Address::default().to_string() == x.address {
-            log::info!("🔺 Component {} has a token with an empty address", x.address);
-            return false;
-        }
-    }
-    // if cptks.len() != 2 {
-    //     log::error!("Component {} has {} tokens instead of 2. Component with >2 tokens are not handled yet.", cp.id, cptks.len());
-    //     return false;
-    // }
-    tokens.iter().all(|token| cptks.iter().any(|cptk| cptk.address.eq_ignore_ascii_case(&token.address)))
-}
-
 /// OpenAPI documentation for the API.
 #[derive(OpenApi)]
 #[openapi(
@@ -123,7 +102,7 @@ struct Status {
 #[utoipa::path(
     get,
     path = "/status",
-    summary = "Fetches the API status and latest block synchronized",
+    summary = "API status and latest block synchronized",
     description = "API is 'running' when Redis and Stream are ready. Block updated at each new header after processing state updates",
     responses(
         (status = 200, description = "Current API status and latest block synchronized", body = Status)
@@ -159,7 +138,7 @@ async fn _tokens(network: Network) -> Option<Vec<SrzToken>> {
 #[utoipa::path(
     get,
     path = "/tokens",
-    summary = "Fetches all Tycho tokens",
+    summary = "All Tycho tokens on the network",
     description = "Only quality tokens are listed here (evaluated at 100 by Tycho = no rebasing, etc)",
     responses(
         (status = 200, description = "Tycho Tokens on the network", body = Vec<SrzToken>)
@@ -177,16 +156,16 @@ async fn tokens(Extension(network): Extension<Network>) -> impl IntoResponse {
 }
 
 // GET /pairs => Get all existing pairs in the database (as a vector of strings like "0xToken0-0xToken1")
-async fn pairs(Extension(network): Extension<Network>) -> impl IntoResponse {
-    log::info!("👾 API: GET /pairs on {} network", network.name);
-    let key = shd::r#static::data::keys::stream::pairs(network.name.clone());
-    match shd::data::redis::get::<Vec<String>>(key.as_str()).await {
-        Some(pairs) => Json(json!({ "pairs": pairs })),
-        _ => Json(json!({ "pairs": [] })),
-    }
-}
+// async fn pairs(Extension(network): Extension<Network>) -> impl IntoResponse {
+//     log::info!("👾 API: GET /pairs on {} network", network.name);
+//     let key = shd::r#static::data::keys::stream::pairs(network.name.clone());
+//     match shd::data::redis::get::<Vec<String>>(key.as_str()).await {
+//         Some(pairs) => Json(json!({ "pairs": pairs })),
+//         _ => Json(json!({ "pairs": [] })),
+//     }
+// }
 
-async fn _components(network: Network) -> Option<Vec<SrzProtocolComponent>> {
+pub async fn _components(network: Network) -> Option<Vec<SrzProtocolComponent>> {
     let key = shd::r#static::data::keys::stream::components(network.name.clone());
     shd::data::redis::get::<Vec<SrzProtocolComponent>>(key.as_str()).await
 }
@@ -195,7 +174,7 @@ async fn _components(network: Network) -> Option<Vec<SrzProtocolComponent>> {
 #[utoipa::path(
     get,
     path = "/components",
-    summary = "Fetches all Tycho components (= liquidity pools)",
+    summary = "Tycho components (= liquidity pools)",
     description = "Returns all components available on the network",
     responses(
         (status = 200, description = "Tycho Components (= liquidity pools)", body = SrzProtocolComponent)
@@ -207,55 +186,58 @@ async fn _components(network: Network) -> Option<Vec<SrzProtocolComponent>> {
 async fn components(Extension(network): Extension<Network>) -> impl IntoResponse {
     log::info!("👾 API: GET /components on {} network", network.name);
     match _components(network).await {
-        Some(cps) => Json(json!({ "components": cps })),
+        Some(cps) => {
+            log::info!("Returning {} components", cps.len());
+            Json(json!({ "components": cps }))
+        }
         _ => Json(json!({ "components": [] })),
     }
 }
 
-async fn _pool(network: Network, id: String) -> Json<serde_json::Value> {
-    let key = shd::r#static::data::keys::stream::component(network.name.clone(), id.clone());
-    match shd::data::redis::get::<SrzProtocolComponent>(key.as_str()).await {
-        Some(comp) => {
-            let key = shd::r#static::data::keys::stream::state(network.name.clone(), id.clone());
-            match AmmType::from(comp.protocol_type_name.as_str()) {
-                AmmType::UniswapV2 => match shd::data::redis::get::<SrzUniswapV2State>(key.as_str()).await {
-                    Some(state) => Json(json!({ "component": comp, "state": state })),
-                    _ => Json(json!({ "component": comp, "state": {} })),
-                },
-                AmmType::UniswapV3 => match shd::data::redis::get::<SrzUniswapV3State>(key.as_str()).await {
-                    Some(state) => Json(json!({ "component": comp, "state": state })),
-                    _ => Json(json!({ "component": comp, "state": {} })),
-                },
-                AmmType::UniswapV4 => match shd::data::redis::get::<SrzUniswapV4State>(key.as_str()).await {
-                    Some(state) => Json(json!({ "component": comp, "state": state })),
-                    _ => Json(json!({ "component": comp, "state": {} })),
-                },
-                AmmType::Balancer => match shd::data::redis::get::<SrzEVMPoolState>(key.as_str()).await {
-                    Some(state) => Json(json!({ "component": comp, "state": state })),
-                    _ => Json(json!({ "component": comp, "state": {} })),
-                },
-                AmmType::Curve => match shd::data::redis::get::<SrzEVMPoolState>(key.as_str()).await {
-                    Some(state) => Json(json!({ "component": comp, "state": state })),
-                    _ => Json(json!({ "component": comp, "state": {} })),
-                },
-            }
-        }
-        None => Json(json!({ "component": {}, "state": {}})),
-    }
-}
+// async fn _pool(network: Network, id: String) -> Json<serde_json::Value> {
+//     let key = shd::r#static::data::keys::stream::component(network.name.clone(), id.clone());
+//     match shd::data::redis::get::<SrzProtocolComponent>(key.as_str()).await {
+//         Some(comp) => {
+//             let key = shd::r#static::data::keys::stream::state(network.name.clone(), id.clone());
+//             match AmmType::from(comp.protocol_type_name.as_str()) {
+//                 AmmType::UniswapV2 => match shd::data::redis::get::<SrzUniswapV2State>(key.as_str()).await {
+//                     Some(state) => Json(json!({ "component": comp, "state": state })),
+//                     _ => Json(json!({ "component": comp, "state": {} })),
+//                 },
+//                 AmmType::UniswapV3 => match shd::data::redis::get::<SrzUniswapV3State>(key.as_str()).await {
+//                     Some(state) => Json(json!({ "component": comp, "state": state })),
+//                     _ => Json(json!({ "component": comp, "state": {} })),
+//                 },
+//                 AmmType::UniswapV4 => match shd::data::redis::get::<SrzUniswapV4State>(key.as_str()).await {
+//                     Some(state) => Json(json!({ "component": comp, "state": state })),
+//                     _ => Json(json!({ "component": comp, "state": {} })),
+//                 },
+//                 AmmType::Balancer => match shd::data::redis::get::<SrzEVMPoolState>(key.as_str()).await {
+//                     Some(state) => Json(json!({ "component": comp, "state": state })),
+//                     _ => Json(json!({ "component": comp, "state": {} })),
+//                 },
+//                 AmmType::Curve => match shd::data::redis::get::<SrzEVMPoolState>(key.as_str()).await {
+//                     Some(state) => Json(json!({ "component": comp, "state": state })),
+//                     _ => Json(json!({ "component": comp, "state": {} })),
+//                 },
+//             }
+//         }
+//         None => Json(json!({ "component": {}, "state": {}})),
+//     }
+// }
 
-// GET /component/{id} => Get the component for the given pool (by id)
-async fn pool(Extension(network): Extension<Network>, Path(id): Path<String>) -> impl IntoResponse {
-    log::info!("👾 API: GET /pool on {} network", network.name);
-    _pool(network, id).await
-}
+// // GET /component/{id} => Get the component for the given pool (by id)
+// async fn pool(Extension(network): Extension<Network>, Path(id): Path<String>) -> impl IntoResponse {
+//     log::info!("👾 API: GET /pool on {} network", network.name);
+//     _pool(network, id).await
+// }
 
 // GET /orderbook/{0xt0-0xt1} => Get all component & state for a given pair of token, and simulate the orderbook
 #[utoipa::path(
     get,
     path = "/orderbook",
-    summary = "Fetches the orderbook for a given pair of tokens",
-    description = "Aggregate liquidity across AMMs, simulates an orderbook (bids/asks). Depending on the number of components and simulation input, the orderbook can be more or less accurate, and the simulation can take severals minutes",
+    summary = "Orderbook for a given pair of tokens",
+    description = "Aggregate liquidity across AMMs, simulates an orderbook (bids/asks). Depending on the number of components (pool having t0 AND t1) and simulation input config, the orderbook can be more or less accurate, and the simulation can take up to severals minutes",
     params(
         ("tag" = String, Query, description = "A dash-separated pair of token addresses, e.g. '0xt0-0xt1', no order required", example = "0xt0-0xt1")
     ),
@@ -265,7 +247,6 @@ async fn pool(Extension(network): Extension<Network>, Path(id): Path<String>) ->
     tag = (
         "API"
     )
-   
 )]
 async fn orderbook(Extension(shtss): Extension<SharedTychoStreamState>, Extension(network): Extension<Network>, Query(params): Query<PairQuery>) -> impl IntoResponse {
     log::info!("👾 API: Querying orderbook endpoint: {:?}", params.tag);
@@ -283,7 +264,7 @@ async fn orderbook(Extension(shtss): Extension<SharedTychoStreamState>, Extensio
                 let mut ptss: Vec<ProtoTychoState> = vec![];
                 for cp in cps.clone() {
                     let cptks = cp.tokens.clone();
-                    if matchcp(cptks.clone(), tokens.clone()) {
+                    if shd::utils::misc::matchcp(cptks.clone(), tokens.clone()) {
                         let mtx = shtss.read().await;
                         let protosim = mtx.protosims.get(&cp.id.to_lowercase()).unwrap().clone();
                         drop(mtx);
@@ -295,7 +276,7 @@ async fn orderbook(Extension(shtss): Extension<SharedTychoStreamState>, Extensio
                 }
                 // shd::core::pair::prepare(network.clone(), ptss.clone(), tokens.clone(), params.clone()).await;
                 let result = shd::core::orderbook::build(network.clone(), atks.clone(), balances.clone(), ptss.clone(), tokens.clone(), params.clone()).await;
-                let path = format!("misc/data-front/odb.{}.{}.json", network.name, params.tag);
+                let path = format!("misc/data-front-v2/orderbook.{}.{}.json", network.name, params.tag);
                 crate::shd::utils::misc::save1(result.clone(), path.as_str());
                 Json(json!({ "orderbook": result.clone() }))
             } else {
@@ -367,13 +348,13 @@ pub async fn start(n: Network, shared: SharedTychoStreamState, config: EnvConfig
         .route("/network", get(network))
         .route("/status", get(status))
         .route("/tokens", get(tokens))
-        .route("/pairs", get(pairs))
+        // .route("/pairs", get(pairs))
+        // .route("/pool/{id}", get(pool))
         .route("/components", get(components))
-        .route("/pool/{id}", get(pool))
         .route("/orderbook", get(orderbook))
         .route("/liquidity", get(liquidity))
         // Swagger
-        .merge(SwaggerUi::new("/swagger-ui").url("/api-docs/openapi.json", ApiDoc::openapi()))
+        .merge(SwaggerUi::new("/swagger").url("/api-docs/openapi.json", ApiDoc::openapi()))
         .layer(Extension(n.clone()))
         .layer(Extension(shared.clone())); // Shared state
 

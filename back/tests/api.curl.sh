@@ -61,31 +61,29 @@ try() {
     echo "\n-----------------------------\n"
 }
 
-# try "GET /" "$API_URL/"
-# try "GET /version" "$API_URL/version"
-# try "GET /network" "$API_URL/network"
-# try "GET /status" "$API_URL/status"
-# try "GET /tokens" "$API_URL/tokens"
+try "GET /" "$API_URL/"
+try "GET /version" "$API_URL/version"
+try "GET /network" "$API_URL/network"
+try "GET /status" "$API_URL/status"
+try "GET /tokens" "$API_URL/tokens"
 # try "GET /pairs" "$API_URL/pairs"
-# try "GET /components" "$API_URL/components"
+try "GET /components" "$API_URL/components"
 # try "GET /pool/:id" "$API_URL/pool/0x7bea39867e4169dbe237d55c8242a8f2fcdcc387"
-# try "GET /pair" "$API_URL/pair?tag=0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48-0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
-# try "GET /liquidity" "$API_URL/liquidity?tag=0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48-0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
 
 # MAINNET
-# USDC-ETH
-# try "GET /orderbook" "$API_URL/orderbook?tag=0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48-0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"
-# ETH-WBTC
-# try "GET /orderbook" "$API_URL/orderbook?tag=0x2260fac5e5542a773aa44fbcfedf7c193bc2c599-0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
-
-#
 export eth="0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
 export usdc="0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
 export wbtc="0x2260fac5e5542a773aa44fbcfedf7c193bc2c599"
 export dai="0x6b175474e89094c44da98b954eedeac495271d0f"
 export usdt="0xdac17f958d2ee523a2206206994597c13d831ec7"
 
-# try "GET /orderbook" "$API_URL/orderbook?tag=$wbtc-$usdt"
-try "GET /orderbook" "$API_URL/orderbook?tag=$usdt-$wbtc"
-# try "GET /orderbook" "$API_URL/orderbook?tag=$dai-$usdt"
-# try "GET /orderbook" "$API_URL/orderbook?tag=$wbtc-$usdc"
+# try "GET /orderbook" "$API_URL/orderbook?tag=$eth-$usdc"
+# try "GET /orderbook" "$API_URL/orderbook?tag=$eth-$wbtc"
+# try "GET /orderbook" "$API_URL/orderbook?tag=$eth-$dai"
+# try "GET /orderbook" "$API_URL/orderbook?tag=$eth-$usdt"
+# try "GET /orderbook" "$API_URL/orderbook?tag=$usdc-$wbtc"
+# try "GET /orderbook" "$API_URL/orderbook?tag=$usdc-$dai"
+try "GET /orderbook" "$API_URL/orderbook?tag=$usdc-$usdt"
+try "GET /orderbook" "$API_URL/orderbook?tag=$wbtc-$dai"
+try "GET /orderbook" "$API_URL/orderbook?tag=$wbtc-$usdt"
+try "GET /orderbook" "$API_URL/orderbook?tag=$dai-$usdt"

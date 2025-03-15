@@ -1,5 +1,7 @@
 pub enum TychoDex {
     UniswapV2,
+    // Sushiswap,
+    // Pancakeswap,
     UniswapV3,
     UniswapV4,
     BalancerV2,

@@ -22,7 +22,7 @@ pub async fn build(network: Network, atks: Vec<SrzToken>, balances: HashMap<Stri
     let t0 = Token::from(srzt0.clone());
     let t1 = Token::from(srzt1.clone());
     let (base, quote) = (t0, t1);
-    log::info!("Pricing base token ... (Base: {} | Quote: {})", base.symbol, quote.symbol);
+    log::info!("🏷️ Searching a swap-path to price the base token in gas (ETH) | Base: {} | Quote: {})", base.symbol, quote.symbol);
     let t0pricing = shd::core::gas::pricing(network.clone(), datapools.clone(), atks.clone(), base.address.to_string().to_lowercase().clone());
     log::info!("Pricing for {} => {:?}", base.symbol, t0pricing);
     for pdata in datapools.clone() {
@@ -41,7 +41,7 @@ pub async fn build(network: Network, atks: Vec<SrzToken>, balances: HashMap<Stri
     let avgp1to0 = prices1to0.iter().sum::<f64>() / prices1to0.len() as f64; // Ponderation by TVL ?
     log::info!("Average price 0to1: {} | Average price 1to0: {}", avgp0to1, avgp1to0);
     let pso = optimization(network.clone(), pools.clone(), tokens, query.clone(), aggregated.clone(), avgp0to1, avgp1to0).await;
-    log::info!("Optimization done for pair: '{}'", query.tag);
+    log::info!("Optimization done. Returning Simulated Orderbook for pair (base-quote) => '{}-{}'", base.symbol, quote.symbol);
 
     pso
 }
@@ -112,7 +112,7 @@ pub fn optimizer(
         let (mini, min_marginal) = marginals.iter().enumerate().min_by(|a, b| a.1.cmp(b.1)).unwrap();
         // If difference is zero (or below tolerance), stop.
         if max_marginal.clone() - min_marginal.clone() <= tolerance {
-            log::info!("Converged after {} iterations", iter);
+            // log::info!("Converged after {} iterations", iter);
             break; // ? If I'm correct in theory it will never converge, unless we take a very small epsilon that would make no difference = convergence
         }
         // Reallocate 10% of the allocation from the pool with the lowest marginal.
@@ -132,23 +132,25 @@ pub fn optimizer(
     // ------- Compute total output (raw) and distribution -------
     let mut total_output_raw = BigUint::zero();
     let mut distribution: Vec<f64> = Vec::with_capacity(size);
+    let mut vgas: Vec<u128> = Vec::with_capacity(size);
     for (i, pool) in pools.iter().enumerate() {
         let alloc = allocations[i].clone();
         match pool.protosim.get_amount_out(alloc.clone(), &token_in, &token_out) {
             Ok(result) => {
                 // log::info!("Pool {} | Input: {} | Output: {} | Gas: {}", i, alloc, result.amount, result.gas);
                 let output = result.amount;
-                let gas = result.gas;
-                let usdgas = gas.to_string().parse::<f64>().unwrap() / 10e18f64;
+                let gas = result.gas.to_string().parse::<u128>().unwrap_or_default();
+                vgas.push(gas);
                 // log::info!("Pool {} | Input: {} | Output: {} | Gas: {}", i, alloc, output, gas);
                 total_output_raw += &output;
                 let percent = (alloc.to_string().parse::<f64>().unwrap() * 100.0f64) / inputpow.to_string().parse::<f64>().unwrap(); // Distribution percentage (integer percentage).
-                distribution.push((percent * 1000.).round() / 1000.); // Round to 3 decimal places.
+                distribution.push((percent * 100.).round() / 100.); // Round to 3 decimal places.
             }
             Err(_e) => {
                 // Often due to 'No Liquidity' error.
                 // log::error!("get_amount_out on pool #{} at {} failed: {}", i, pool.component.id, e);
                 distribution.push(0.);
+                vgas.push(0);
                 // ToDo: Re-Allocate the failed pool to the others
                 // reallocation.push(allocations[i].clone());
             }
@@ -162,6 +164,7 @@ pub fn optimizer(
         input: input.to_string().parse().unwrap(),
         output: output.to_string().parse().unwrap(),
         distribution: distribution.clone(),
+        gas_costs: vgas.clone(),
         ratio: ratio.to_string().parse().unwrap(),
     }
 }
@@ -175,16 +178,17 @@ pub fn optimizer(
  */
 pub async fn optimization(network: Network, pcsdata: Vec<ProtoTychoState>, tokens: Vec<SrzToken>, query: PairQuery, balances: HashMap<String, u128>, price0to1: f64, price1to0: f64) -> PairSimulatedOrderbook {
     let ethusd = shd::core::gas::ethusd().await;
-    log::info!("Network: {} | Current ETH-USD: {:.2} | Got {} pools to optimize for pair: '{}'", network.name, ethusd, pcsdata.len(), query.tag);
+    let gasp = shd::core::gas::gasprice(network.rpc).await;
     let t0 = tokens[0].clone();
     let t1 = tokens[1].clone();
+    log::info!("🔎 Optimisation | Network: {} | Got {} pools to optimize for pair: {}-{}", network.name, pcsdata.len(), t0.symbol, t1.symbol);
     let mut pools = Vec::new();
     for pcdata in pcsdata.iter() {
         log::info!("pcdata: {} | Type: {}", pcdata.component.id, pcdata.component.protocol_type_name);
         pools.push(pcdata.component.clone());
-        for x in pcdata.component.tokens.iter() {
-            log::info!("Token: {} => {}", x.symbol, x.address.to_string());
-        }
+        // for x in pcdata.component.tokens.iter() {
+        //     log::info!("Token: {} => {}", x.symbol, x.address.to_string());
+        // }
     }
 
     let t0tb = *balances.iter().find(|x| x.0.clone().to_lowercase() == t0.address.to_lowercase()).unwrap().1;
@@ -220,14 +224,17 @@ pub async fn optimization(network: Network, pcsdata: Vec<ProtoTychoState>, token
             let start = Instant::now();
             let result = optimizer(*amount, &pcsdata, &balances, ethusd, t0.clone(), t1.clone());
             let elapsed = start.elapsed();
+            let total_gas_cost = (result.gas_costs.iter().sum::<u128>());
+            let total_gas_cost = (total_gas_cost * gasp) as f64 * ethusd / 1e18f64;
             log::info!(
-                "#{x} | Input: {} {}, Output: {} {} at price1to0: {} | Distribution: {:?}, Time: {:?}",
+                " - #{x} | Input: {} {:.4}, Output: {} {:.4} at price1to0: {:.7} | Distribution: {:?} | Total Gas cost: {:.8} $ | Took: {:?}",
                 result.input,
                 t0.symbol,
                 result.output,
                 t1.symbol,
                 result.ratio,
                 result.distribution,
+                total_gas_cost,
                 elapsed
             );
             // pb.inc(1); // Update the progress bar on each iteration.
@@ -254,14 +261,17 @@ pub async fn optimization(network: Network, pcsdata: Vec<ProtoTychoState>, token
             let start = Instant::now();
             let result = optimizer(*amount, &pcsdata, &balances, ethusd, t1.clone(), t0.clone());
             let elapsed = start.elapsed();
+            let total_gas_cost = result.gas_costs.iter().sum::<u128>();
+            let total_gas_cost = (total_gas_cost * gasp) as f64 * ethusd / 1e18f64;
             log::info!(
-                "#{x} | Input: {} {}, Output: {} {} at price0to1: {} | Distribution: {:?}, Time: {:?}",
+                " - #{x} | Input: {} {:.4}, Output: {} {:.4} at price0to1: {:.7} | Distribution: {:?} | Total Gas cost: {:.8} $ | Took: {:?}",
                 result.input,
                 t1.symbol,
                 result.output,
                 t0.symbol,
                 result.ratio,
                 result.distribution,
+                total_gas_cost,
                 elapsed
             );
             // pb.inc(1); // Update the progress bar on each iteration.

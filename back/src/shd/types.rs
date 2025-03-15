@@ -224,6 +224,8 @@ pub struct TradeResult {
     pub output: f64, // in token_out human–readable units
     #[schema(example = "[0.42, 0.37, 0.21]")]
     pub distribution: Vec<f64>, // percentage distribution per pool (0–100)
+    #[schema(example = "ToDo")]
+    pub gas_costs: Vec<u128>,
     #[schema(example = "0.0005")]
     pub ratio: f64, // output per unit input (human–readable)
 }

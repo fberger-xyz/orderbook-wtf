@@ -5,6 +5,7 @@ use crate::shd::{
     r#static::endpoints::COINGECKO_ETH_USD,
     types::{Network, ProtoTychoState},
 };
+use alloy::providers::{Provider, ProviderBuilder};
 use reqwest;
 use serde::Deserialize;
 use tycho_simulation::models::Token;
@@ -21,6 +22,14 @@ struct CryptoPrice {
 
 /**
  * Used to retrieve gas price
+ */
+pub async fn gasprice(provider: String) -> u128 {
+    let provider = ProviderBuilder::new().on_http(provider.parse().unwrap());
+    provider.get_gas_price().await.unwrap_or_default()
+}
+
+/**
+ * Used to retrieve eth usd price
  */
 pub async fn ethusd() -> f64 {
     match reqwest::get(COINGECKO_ETH_USD).await {
@@ -67,8 +76,8 @@ pub fn pricing(network: Network, ptss: Vec<ProtoTychoState>, atks: Vec<SrzToken>
         if let Some(neighbors) = graph.get(&current) {
             for (next, rate) in neighbors {
                 let mut new = path.clone();
-                new.push(next.clone());
-                stack.push((next.clone(), product * rate, new));
+                new.push(next.clone().to_lowercase());
+                stack.push((next.clone().to_lowercase(), product * rate, new));
             }
         }
     }
