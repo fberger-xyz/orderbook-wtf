@@ -5,3 +5,4 @@ plot/
 .env.prod 
 **.env.prod 
 misc/logs
+dump.rdb
