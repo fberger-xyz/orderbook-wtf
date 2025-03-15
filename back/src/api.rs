@@ -9,7 +9,7 @@ use serde_json::json;
 use tap2::shd::{
     self,
     data::fmt::{SrzEVMPoolState, SrzProtocolComponent, SrzToken, SrzUniswapV2State, SrzUniswapV3State, SrzUniswapV4State},
-    types::{AmmType, EnvConfig, Network, PairQuery, ProtoTychoState, SharedTychoStreamState},
+    types::{AmmType, EnvConfig, Network, PairQuery, PairSimulatedOrderbook, ProtoTychoState, SharedTychoStreamState},
 };
 
 use utoipa::OpenApi;
@@ -19,19 +19,47 @@ use utoipa_axum::router::OpenApiRouter;
 use utoipa_axum::routes;
 use utoipa_swagger_ui::SwaggerUi;
 
+// Check if a component has the desired tokens
+pub fn matchcp(cptks: Vec<SrzToken>, tokens: Vec<SrzToken>) -> bool {
+    for x in cptks.clone() {
+        if alloy::primitives::Address::default().to_string() == x.address {
+            log::info!("🔺 Component {} has a token with an empty address", x.address);
+            return false;
+        }
+    }
+    for x in tokens.clone() {
+        if alloy::primitives::Address::default().to_string() == x.address {
+            log::info!("🔺 Component {} has a token with an empty address", x.address);
+            return false;
+        }
+    }
+    // if cptks.len() != 2 {
+    //     log::error!("Component {} has {} tokens instead of 2. Component with >2 tokens are not handled yet.", cp.id, cptks.len());
+    //     return false;
+    // }
+    tokens.iter().all(|token| cptks.iter().any(|cptk| cptk.address.eq_ignore_ascii_case(&token.address)))
+}
+
 /// OpenAPI documentation for the API.
 #[derive(OpenApi)]
 #[openapi(
+    info(
+        title = "TAP-2 Orderbook API",
+        version = "1.0.0",
+        description = "An Rust Axum API serving different Tycho Streams, providing orderbook and liquidity data.",
+    ),
     paths(
         version,
         network,
-        status
+        status,
+        tokens,
+        orderbook
     ),
     components(
-        schemas(APIVersion, Network)
+        schemas(APIVersion, Network, Status, SrzToken, PairSimulatedOrderbook)
     ),
     tags(
-        (name = "api", description = "General API endpoints")
+        (name = "API", description = "API endpoints")
     )
 )]
 struct ApiDoc;
@@ -39,12 +67,13 @@ struct ApiDoc;
 // A simple structure for the API version.
 #[derive(Serialize, Deserialize, ToSchema)]
 pub struct APIVersion {
+    #[schema(example = "0.1.0")]
     pub version: String,
 }
 
 // GET / => "Hello, Tycho!"
 async fn root() -> impl IntoResponse {
-    Json(json!({ "data": "Tycho Stream running" }))
+    Json(json!({ "data": "HeLLo Tycho" }))
 }
 
 /// Version endpoint: returns the API version.
@@ -75,7 +104,9 @@ async fn network(Extension(network): Extension<Network>) -> impl IntoResponse {
 
 #[derive(Serialize, Deserialize, ToSchema)]
 struct Status {
+    #[schema(example = "Running")]
     status: String,
+    #[schema(example = "123456")]
     latest: String,
 }
 
@@ -188,28 +219,17 @@ async fn pool(Extension(network): Extension<Network>, Path(id): Path<String>) ->
     _pool(network, id).await
 }
 
-// Check if a component has the desired tokens
-pub fn matchcp(cptks: Vec<SrzToken>, tokens: Vec<SrzToken>) -> bool {
-    for x in cptks.clone() {
-        if alloy::primitives::Address::default().to_string() == x.address {
-            log::info!("🔺 Component {} has a token with an empty address", x.address);
-            return false;
-        }
-    }
-    for x in tokens.clone() {
-        if alloy::primitives::Address::default().to_string() == x.address {
-            log::info!("🔺 Component {} has a token with an empty address", x.address);
-            return false;
-        }
-    }
-    // if cptks.len() != 2 {
-    //     log::error!("Component {} has {} tokens instead of 2. Component with >2 tokens are not handled yet.", cp.id, cptks.len());
-    //     return false;
-    // }
-    tokens.iter().all(|token| cptks.iter().any(|cptk| cptk.address.eq_ignore_ascii_case(&token.address)))
-}
-
 // GET /orderbook/{0xt0-0xt1} => Get all component & state for a given pair of token, and simulate the orderbook
+#[utoipa::path(
+    get,
+    path = "/orderbook",
+    params(
+        ("tag" = String, Query, description = "A dash-separated pair of token addresses, e.g. '0xt0-0xt1', no order required")
+    ),
+    responses(
+        (status = 200, description = "Contains trade simulations, results and components", body = PairSimulatedOrderbook)
+    )
+)]
 async fn orderbook(Extension(shtss): Extension<SharedTychoStreamState>, Extension(network): Extension<Network>, Query(params): Query<PairQuery>) -> impl IntoResponse {
     log::info!("👾 API: Querying orderbook endpoint: {:?}", params.tag);
     match (_tokens(network.clone()).await, _components(network.clone()).await) {

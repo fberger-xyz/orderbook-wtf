@@ -26,9 +26,13 @@ use utoipa::ToSchema;
 
 #[derive(Debug, Clone, Eq, PartialEq, Serialize, Deserialize, ToSchema)]
 pub struct SrzToken {
+    #[schema(example = "0x")]
     pub address: String,
+    #[schema(example = "6")]
     pub decimals: usize,
+    #[schema(example = "ETH")]
     pub symbol: String,
+    #[schema(example = "21000")]
     pub gas: String,
 }
 
@@ -58,18 +62,26 @@ impl From<SrzToken> for Token {
 // Tycho Compoment: Convert a ProtocolComponent to a serialized version (and more readable)
 // =====================================================================================================================================================================================================
 
-#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize, ToSchema)]
 pub struct SrzProtocolComponent {
+    #[schema(example = "0x")]
     pub address: String,
+    #[schema(example = "0x")]
     pub id: String,
+    #[schema(example = "Array of tokens")]
     pub tokens: Vec<SrzToken>,
+    #[schema(example = "uniswap_v4")]
     pub protocol_system: String,
+    #[schema(example = "uniswap_v4_pool")]
     pub protocol_type_name: String,
-    pub chain: Chain,
+    // pub chain: Chain,
+    #[schema(example = "Array of contract ids")]
     pub contract_ids: Vec<String>,
+    #[schema(example = "Hashmap of static attributes")]
     pub static_attributes: Vec<(String, String)>,
+    #[schema(example = "0xHash")]
     pub creation_tx: String,
-    pub created_at: NaiveDateTime,
+    // pub created_at: NaiveDateTime,
 }
 
 impl SrzProtocolComponent {
@@ -86,31 +98,31 @@ impl From<ProtocolComponent> for SrzProtocolComponent {
             tokens: pc.tokens.into_iter().map(SrzToken::from).collect(),
             protocol_system: pc.protocol_system,
             protocol_type_name: pc.protocol_type_name,
-            chain: pc.chain,
+            // chain: pc.chain,
             contract_ids: pc.contract_ids.into_iter().map(|b| b.to_string()).collect(),
             static_attributes: pc.static_attributes.into_iter().map(|(k, v)| (k, v.to_string())).collect(),
             creation_tx: pc.creation_tx.to_string(),
-            created_at: pc.created_at,
+            // created_at: pc.created_at,
         }
     }
 }
 
-impl From<SrzProtocolComponent> for ProtocolComponent {
-    fn from(serialized: SrzProtocolComponent) -> Self {
-        ProtocolComponent {
-            address: Bytes::from_str(serialized.address.to_lowercase().as_str()).unwrap(),
-            id: Bytes::from_str(serialized.id.to_lowercase().as_str()).unwrap(),
-            tokens: serialized.tokens.into_iter().map(Token::from).collect(),
-            protocol_system: serialized.protocol_system,
-            protocol_type_name: serialized.protocol_type_name,
-            chain: serialized.chain,
-            contract_ids: serialized.contract_ids.into_iter().map(|s| Bytes::from(s.into_bytes())).collect(),                     // !
-            static_attributes: serialized.static_attributes.into_iter().map(|(k, v)| (k, Bytes::from(v.into_bytes()))).collect(), // !
-            creation_tx: Bytes::from(serialized.creation_tx.into_bytes()),                                                        // !
-            created_at: serialized.created_at,
-        }
-    }
-}
+// impl From<SrzProtocolComponent> for ProtocolComponent {
+//     fn from(serialized: SrzProtocolComponent) -> Self {
+//         ProtocolComponent {
+//             address: Bytes::from_str(serialized.address.to_lowercase().as_str()).unwrap(),
+//             id: Bytes::from_str(serialized.id.to_lowercase().as_str()).unwrap(),
+//             tokens: serialized.tokens.into_iter().map(Token::from).collect(),
+//             protocol_system: serialized.protocol_system,
+//             protocol_type_name: serialized.protocol_type_name,
+//             // chain: serialized.chain,
+//             contract_ids: serialized.contract_ids.into_iter().map(|s| Bytes::from(s.into_bytes())).collect(),                     // !
+//             static_attributes: serialized.static_attributes.into_iter().map(|(k, v)| (k, Bytes::from(v.into_bytes()))).collect(), // !
+//             creation_tx: Bytes::from(serialized.creation_tx.into_bytes()),                                                        // !
+//             // created_at: serialized.created_at,
+//         }
+//     }
+// }
 
 // =====================================================================================================================================================================================================
 // Convert a part of a protocol State to a serialized version (and more readable)

@@ -21,9 +21,9 @@ function start() {
     echo "Build successful. Executing..."
     (
         trap - SIGINT
-        export RUST_BACKTRACE=1
-        cargo run --bin stream -q # 2>/dev/null
-        # cargo watch -w src/ -x "run --bin stream" -q
+        # export RUST_BACKTRACE=1
+        # cargo run --bin stream -q # 2>/dev/null
+        cargo watch -w src/ -x "run --bin stream" -q
     )
     echo "Program has finished or was interrupted. Continuing with the rest of the shell script ..."
     status+=($?)

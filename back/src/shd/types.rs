@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 use tokio::sync::RwLock;
+use utoipa::ToSchema;
 
 #[derive(Debug, Clone)]
 pub struct EnvConfig {
@@ -11,20 +12,35 @@ pub struct EnvConfig {
 
 #[derive(Default, Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
 pub struct Network {
+    #[schema(example = "ethereum")]
     pub name: String,
+    #[schema(example = "1")]
     pub chainid: u64,
+    #[schema(example = "0x")]
     pub eth: String,
+    #[schema(example = "0x")]
     pub usdc: String,
+    #[schema(example = "0x")]
     pub exotic: String,
+    #[schema(example = "0x")]
     pub wbtc: String,
+    #[schema(example = "0x")]
     pub dai: String,
+    #[schema(example = "0x")]
     pub usdt: String,
+
+    #[schema(example = "https://rpc.payload.de")]
     pub rpc: String,
+    #[schema(example = "https://etherscan.io/")]
     pub exp: String,
+    #[schema(example = "true")]
     pub enabled: bool,
+    #[schema(example = "http://tycho-beta.propellerheads.xyz")]
     pub tycho: String,
+    #[schema(example = "4242")]
     pub port: u64,
-    pub balance_v2_vault: String,
+    #[schema(example = "0x")]
+    pub balancer: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -200,12 +216,16 @@ pub struct LiquidityPoolBook {
 //     pub ratio: BigUint,             // output per unit input (human–readable)
 // }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
 pub struct TradeResult {
-    pub input: f64,             // e.g. 100 (meaning 100 ETH)
-    pub output: f64,            // in token_out human–readable units
+    #[schema(example = "1.0")]
+    pub input: f64, // e.g. 100 (meaning 100 ETH)
+    #[schema(example = "2000.0")]
+    pub output: f64, // in token_out human–readable units
+    #[schema(example = "[0.42, 0.37, 0.21]")]
     pub distribution: Vec<f64>, // percentage distribution per pool (0–100)
-    pub ratio: f64,             // output per unit input (human–readable)
+    #[schema(example = "0.0005")]
+    pub ratio: f64, // output per unit input (human–readable)
 }
 
 // #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -216,7 +236,7 @@ pub struct TradeResult {
 //     pub unit_price: f64,
 // }
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
 pub struct PairSimulatedOrderbook {
     pub from: SrzToken,
     pub to: SrzToken,

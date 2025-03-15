@@ -12,8 +12,8 @@
         "exp": "https://etherscan.io/",
         "tycho": "https://tycho-beta.propellerheads.xyz",
         "enabled": true,
-        "balance_v2_vault": "0xBA12222222228d8Ba445958a75a0704d566BF2C8",
-        "uniswap_v4_pool_manager": "0x000000000004444c5dc75cb358380d2e3de08a90",
+        "balancer": "0xBA12222222228d8Ba445958a75a0704d566BF2C8",
+        "uniswapv4pm": "0x000000000004444c5dc75cb358380d2e3de08a90",
         "port": 42001
     },
     {
@@ -29,8 +29,8 @@
         "exp": "https://arbiscan.io/",
         "tycho": "",
         "enabled": false,
-        "balance_v2_vault": "0xba12222222228d8ba445958a75a0704d566bf2c8",
-        "uniswap_v4_pool_manager": "0x360e68faccca8ca495c1b759fd9eee466db9fb32",
+        "balancer": "0xba12222222228d8ba445958a75a0704d566bf2c8",
+        "uniswapv4pm": "0x360e68faccca8ca495c1b759fd9eee466db9fb32",
         "port": 42002
     },
     {
@@ -46,8 +46,8 @@
         "rpc": "https://mainnet.base.org",
         "exp": "https://basescan.io/",
         "enabled": false,
-        "balance_v2_vault": "0xBA12222222228d8Ba445958a75a0704d566BF2C8",
-        "uniswap_v4_pool_manager": "0x498581ff718922c3f8e6a244956af099b2652b2b",
+        "balancer": "0xBA12222222228d8Ba445958a75a0704d566BF2C8",
+        "uniswapv4pm": "0x498581ff718922c3f8e6a244956af099b2652b2b",
         "port": 42003
     }
 ]

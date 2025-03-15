@@ -57,7 +57,7 @@ pub async fn get_pool_balances(network: Network, provider: &RootProvider<Http<Cl
             // Example: https://etherscan.io/address/0xba12222222228d8ba445958a75a0704d566bf2c8#readContract
             // - 0x96646936b91d6b9d7d0c47c496afbf3d6ec7b6f8000200000000000000000019
             // v3: https://docs.balancer.fi/developer-reference/contracts/deployment-addresses/arbitrum.html
-            let contract = IBalancer2Vault::new(network.balance_v2_vault.parse().unwrap(), client.clone());
+            let contract = IBalancer2Vault::new(network.balancer.parse().unwrap(), client.clone());
             match contract.getPoolTokens(cp.id.to_string().parse().unwrap()).call().await {
                 Ok(res) => {
                     for (i, t) in cp.tokens.iter().enumerate() {
