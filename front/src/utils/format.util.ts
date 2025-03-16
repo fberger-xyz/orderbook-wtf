@@ -33,9 +33,13 @@ export const formatAmount = (amount: number | string) => {
             return `${numeral(absAmount)
                 .multiply(isNegative ? -1 : 1)
                 .format('0,0')}`
+        if (absAmount < 10000)
+            return `${numeral(absAmount)
+                .multiply(isNegative ? -1 : 1)
+                .format('0,0.[00]a')}`
         return `${numeral(absAmount)
             .multiply(isNegative ? -1 : 1)
-            .format('0,0.[00]a')}`
+            .format('0,0.[0]a')}`
     } catch (error) {
         return `error ${amount}`
     }

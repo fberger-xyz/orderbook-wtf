@@ -10,10 +10,14 @@ export const useAppStore = create<{
     storeRefreshedAt: number
     refetchInterval: number
     selectedTrade?: { datapoint: OrderbookDataPoint; bidsPools: NewPool[]; asksPools: NewPool[] }
+    yAxisType: 'value' | 'log',
+    yAxisLogBase: number,
     setShowMobileMenu: (showMobileMenu: boolean) => void
     setHasHydrated: (hasHydrated: boolean) => void
     setStoreRefreshedAt: (storeRefreshedAt: number) => void
     selectOrderbookDataPoint: (selectedTrade: { datapoint: OrderbookDataPoint; bidsPools: NewPool[]; asksPools: NewPool[] }) => void
+    setYAxisType: (yAxisType: 'value' | 'log') => void
+    setYAxisLogBase: (yAxisLogBase: number) => void
 }>()(
     persist(
         (set) => ({
@@ -22,10 +26,14 @@ export const useAppStore = create<{
             storeRefreshedAt: -1,
             refetchInterval: (IS_DEV ? 60 : 15) * 1000,
             selectedTrade: undefined,
+            yAxisType: 'value',
+            yAxisLogBase: 10,
             setShowMobileMenu: (showMobileMenu) => set(() => ({ showMobileMenu })),
             setHasHydrated: (hasHydrated) => set(() => ({ hasHydrated })),
             setStoreRefreshedAt: (storeRefreshedAt) => set(() => ({ storeRefreshedAt })),
             selectOrderbookDataPoint: (selectedTrade) => set(() => ({ selectedTrade })),
+            setYAxisType: (yAxisType) => set(() => ({ yAxisType })),
+            setYAxisLogBase: (yAxisLogBase) => set(() => ({ yAxisLogBase })),
         }),
         {
             name: IS_DEV

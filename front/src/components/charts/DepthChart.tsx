@@ -15,6 +15,7 @@ import { formatAmount } from '@/utils'
 import { NewOrderbookTrades, NewPool } from '@/interfaces'
 import numeral from 'numeral'
 import { OrderbookDataPoint } from '@/types'
+import Button from '../common/Button'
 
 const serie1Name = 'Market Depth'
 
@@ -25,6 +26,8 @@ const getOptions = (
     bids: OrderbookDataPoint[],
     asks: OrderbookDataPoint[],
     pools: NewPool[],
+    yAxisType: 'value' | 'log',
+    yAxisLogBase: number,
 ): echarts.EChartsOption => {
     return {
         tooltip: {
@@ -50,7 +53,7 @@ const getOptions = (
                 const distributionLines = distribution.map((percent, percentIndex) => {
                     const protocolName = pools[percentIndex].protocol_system
                     const attributes = pools[percentIndex].static_attributes
-                    const hexaPercent = attributes.find((entry) => entry[0].toLowerCase() === 'fee')?.[1] ?? ''
+                    const hexaPercent = attributes.find((entry) => entry[0].toLowerCase() === 'fee')?.[1] ?? '0'
                     // https://github.com/adamwdraper/Numeral-js/issues/123
                     return `- ${numeral(percent / 100).format('#4#0,0%')} in ${protocolName} ${numeral(parseInt(hexaPercent, 16)).divide(100).format('0,0.[0]')}bps`
                 })
@@ -116,8 +119,10 @@ const getOptions = (
                         color: colors.line[resolvedTheme],
                     },
                 },
-                min: Math.min(...bids.map((trade) => trade[0])),
-                max: Math.max(...asks.map((trade) => trade[0])),
+                // min: Math.min(...bids.map((trade) => trade[0])),
+                // max: Math.max(...asks.map((trade) => trade[0])),
+                min: 'dataMin',
+                max: 'dataMax',
             },
         ],
         dataZoom: [
@@ -140,7 +145,11 @@ const getOptions = (
         ],
         yAxis: [
             {
-                type: 'value',
+                // type: 'log',
+                // logBase: 10,
+                // type: 'value',
+                type: yAxisType,
+                logBase: yAxisType === 'log' ? yAxisLogBase : undefined,
                 name: `Trader's input in ${token1}`,
                 nameTextStyle: {
                     fontWeight: 'bold',
@@ -173,10 +182,16 @@ const getOptions = (
                 axisPointer: {
                     snap: true,
                 },
-                min: 0,
+                // min: 0,
+                min: 'dataMin',
+                max: 'dataMax',
             },
             {
-                type: 'value',
+                // type: 'log',
+                // logBase: 10,
+                // type: 'value',
+                type: yAxisType,
+                logBase: yAxisType === 'log' ? yAxisLogBase : undefined,
                 name: `Trader's input in ${token0}`,
                 nameTextStyle: {
                     fontWeight: 'bold',
@@ -209,7 +224,9 @@ const getOptions = (
                 axisPointer: {
                     snap: true,
                 },
-                min: 0,
+                // min: 0,
+                min: 'dataMin',
+                max: 'dataMax',
             },
         ],
         textStyle: {
@@ -228,7 +245,7 @@ const getOptions = (
                 name: 'Bids',
                 type: 'line',
                 data: bids,
-                step: 'start',
+                step: 'end',
                 lineStyle: { width: 1.5, color: colors.line[resolvedTheme] },
                 symbol: 'circle',
                 symbolSize: 4,
@@ -254,7 +271,7 @@ const getOptions = (
                     data: bids.length
                         ? [
                               {
-                                  xAxis: Math.round(bids[bids.length - 1][0]),
+                                  xAxis: bids[bids.length - 1][0],
                                   lineStyle: { color: 'green', opacity: 0.5 },
                                   label: {
                                       show: true,
@@ -276,7 +293,7 @@ const getOptions = (
                         ? [
                               [
                                   {
-                                      xAxis: 0,
+                                      xAxis: bids[0][0],
                                       label: {
                                           show: true,
                                           // https://echarts.apache.org/en/option.html#series-bar.markArea.data.0.label.position
@@ -290,7 +307,7 @@ const getOptions = (
                                           opacity: 0.05,
                                       },
                                   },
-                                  { xAxis: Math.round(bids[bids.length - 1][0]) },
+                                  { xAxis: bids[bids.length - 1][0] },
                               ],
                           ]
                         : undefined,
@@ -327,7 +344,7 @@ const getOptions = (
                     data: asks.length
                         ? [
                               {
-                                  xAxis: Math.round(asks[0][0]),
+                                  xAxis: asks[0][0],
                                   lineStyle: { color: 'red', opacity: 0.5 },
                                   label: {
                                       show: true,
@@ -348,7 +365,7 @@ const getOptions = (
                         ? [
                               [
                                   {
-                                      xAxis: Math.round(asks[0][0]),
+                                      xAxis: asks[0][0],
                                       label: {
                                           show: true,
                                           position: 'top',
@@ -361,7 +378,7 @@ const getOptions = (
                                           opacity: 0.05,
                                       },
                                   },
-                                  { xAxis: Math.round(asks[asks.length - 1][0]) },
+                                  { xAxis: asks[asks.length - 1][0] },
                               ],
                           ]
                         : undefined,
@@ -373,9 +390,9 @@ const getOptions = (
 
 export default function DepthChart(props: { orderbook: NewOrderbookTrades }) {
     const { resolvedTheme } = useTheme()
-    const { storeRefreshedAt, selectOrderbookDataPoint } = useAppStore()
+    const { storeRefreshedAt, yAxisType, yAxisLogBase, setYAxisType, selectOrderbookDataPoint } = useAppStore()
     const [options, setOptions] = useState<echarts.EChartsOption>(
-        getOptions((resolvedTheme ?? DEFAULT_THEME) as AppThemes, '', '', [], [], props.orderbook.pools),
+        getOptions((resolvedTheme ?? DEFAULT_THEME) as AppThemes, '', '', [], [], props.orderbook.pools, yAxisType, yAxisLogBase),
     )
 
     // load/refresh chart
@@ -385,22 +402,24 @@ export default function DepthChart(props: { orderbook: NewOrderbookTrades }) {
 
         // asks
         const asks = props.orderbook.trades0to1
+            .filter((curr) => !isNaN(curr.ratio * curr.input))
             .filter((trade, tradeIndex, trades) => trades.findIndex((_trade) => _trade.input === trade.input) === tradeIndex)
-            .map((trade) => [1 / trade.ratio, trade.input, OrderbookSide.ASK, trade.distribution] as OrderbookDataPoint)
+            .map((trade) => [trade.ratio, trade.input, OrderbookSide.ASK, trade.distribution] as OrderbookDataPoint)
             .sort((curr, next) => Number(curr[0]) - Number(next[0]))
 
         // bids
         const bids = props.orderbook.trades1to0
+            .filter((curr) => !isNaN(curr.ratio * curr.input))
             .filter((trade, tradeIndex, trades) => trades.findIndex((_trade) => _trade.input === trade.input) === tradeIndex)
-            .map((trade) => [trade.ratio, trade.input, OrderbookSide.BID, trade.distribution] as OrderbookDataPoint)
+            .map((trade) => [1 / trade.ratio, trade.input, OrderbookSide.BID, trade.distribution] as OrderbookDataPoint)
             .sort((curr, next) => Number(curr[0]) - Number(next[0]))
 
         // options
-        const newOptions = getOptions(theme, props.orderbook.from.symbol, props.orderbook.to.symbol, bids, asks, props.orderbook.pools)
+        const newOptions = getOptions(theme, props.orderbook.from.symbol, props.orderbook.to.symbol, bids, asks, props.orderbook.pools, yAxisType, yAxisLogBase)
 
         // update
         setOptions(newOptions)
-    }, [storeRefreshedAt, resolvedTheme])
+    }, [storeRefreshedAt, yAxisType, yAxisLogBase, resolvedTheme])
 
     // methods
     const handlePointClick = (params: { value: undefined | OrderbookDataPoint }) => {
@@ -424,6 +443,12 @@ export default function DepthChart(props: { orderbook: NewOrderbookTrades }) {
                     )}
                 </ChartBackground>
             </ErrorBoundary>
+            <div className="w-full flex flex-col items-start mt-5 text-sm">
+                <div className="flex gap-4 items-center">
+                <Button text={`yAxisType=${yAxisType}`} onClickFn={() => setYAxisType(yAxisType === 'log' ? 'value' : 'log')} />
+                    {yAxisType === 'log' && <p>log base={yAxisLogBase}</p> }
+                </div>
+            </div>
         </Suspense>
     )
 }
