@@ -1,4 +1,4 @@
 import { OrderbookSide } from '@/enums'
 
-// ratio, input, side, output, distribution
-export type OrderbookDataPoint = [number, number, OrderbookSide, number[]]
+// ratio, input, side, distribution, number
+export type OrderbookDataPoint = [number, number, OrderbookSide, number[], number]

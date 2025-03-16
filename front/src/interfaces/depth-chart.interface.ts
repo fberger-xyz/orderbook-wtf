@@ -35,8 +35,8 @@ export interface Token {
 
 // new
 export interface NewOrderbookTrades {
-    from: Token;
-    to: Token;
+    token0: Token;
+    token1: Token;
     trades0to1: NewTrade[];
     trades1to0: NewTrade[];
     pools: NewPool[];

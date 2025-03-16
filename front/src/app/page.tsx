@@ -9,14 +9,16 @@ import { promises as fs } from 'fs'
 export default async function Page() {
 
     const commonPath = "../back/misc/data-front-v2/orderbook.ethereum."
-    // const FILE_PATH = `${commonPath}0x2260fac5e5542a773aa44fbcfedf7c193bc2c599-0x6b175474e89094c44da98b954eedeac495271d0f.json`
-    // const FILE_PATH = `${commonPath}0x2260fac5e5542a773aa44fbcfedf7c193bc2c599-0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48.json`
-    // const FILE_PATH = `${commonPath}0x2260fac5e5542a773aa44fbcfedf7c193bc2c599-0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2.json`
-    // const FILE_PATH = `${commonPath}0x2260fac5e5542a773aa44fbcfedf7c193bc2c599-0xdac17f958d2ee523a2206206994597c13d831ec7.json` // wtbc/usdt
-    // const FILE_PATH = `${commonPath}0x6b175474e89094c44da98b954eedeac495271d0f-0xdac17f958d2ee523a2206206994597c13d831ec7.json`
-    // const FILE_PATH = `${commonPath}0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48-0xdac17f958d2ee523a2206206994597c13d831ec7.json`
-    const FILE_PATH = `${commonPath}0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48-0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2.json`
-    // const FILE_PATH = `${commonPath}0xdac17f958d2ee523a2206206994597c13d831ec7-0x2260fac5e5542a773aa44fbcfedf7c193bc2c599.json`
+    // const FILE_PATH = `${commonPath}DAI-USDT.json`
+    // const FILE_PATH = `${commonPath}USDC-DAI.json`
+    // const FILE_PATH = `${commonPath}USDC-USDT.json`
+    // const FILE_PATH = `${commonPath}USDC-WBTC.json`
+    // const FILE_PATH = `${commonPath}WBTC-DAI.json`
+    const FILE_PATH = `${commonPath}WBTC-USDT.json`
+    // const FILE_PATH = `${commonPath}WETH-DAI.json`
+    // const FILE_PATH = `${commonPath}WETH-USDC.json`
+    // const FILE_PATH = `${commonPath}WETH-USDT.json`
+    // const FILE_PATH = `${commonPath}WETH-WBTC.json`
 
     // read locally
     const ORDERBOOK_PATH = process.cwd() + `/${FILE_PATH}`
@@ -27,9 +29,9 @@ export default async function Page() {
     return (
         <AppStoreLoader>
             {/* take inspiration from https://app.uniswap.org/explore/pools/ethereum/0x88e6A0c2dDD26FEEb64F039a2c41296FcB3f5640 */}
-            <div className="flex w-full grow flex-col gap-8 md:flex-row">
+            <div className="flex w-full grow flex-col gap-8 lg:flex-row">
                 <ChartLayout
-                    title={`Ethereum ${ORDERBOOK.from.symbol}/${ORDERBOOK.to.symbol} - market depth`}
+                    title={`Ethereum ${ORDERBOOK.token0.symbol}/${ORDERBOOK.token1.symbol} - market depth`}
                     subtitle={`Work in progress 🚧`}
                     chart={<DepthChart orderbook={ORDERBOOK} />}
                 />
