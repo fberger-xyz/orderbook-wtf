@@ -127,11 +127,93 @@ pub fn steps_to_bg(steps: Vec<f64>, decimals: u32) -> Vec<BigUint> {
         .collect()
 }
 
+/// Generates `n_points` along an exponential curve between `start` and `end`.
+///
+/// When `start` is not zero, the interpolation is defined by:
+///   y = start * ((end / start) ^ t)
+/// so that y(0) = start and y(1) = end.
+///
+/// If `start` is zero, an "ease‑in" interpolation is used:
+///   y = end * (exp(lambda * t) - 1) / (exp(lambda) - 1)
+/// with lambda fixed to 2.0 by default.
+///
+/// # Arguments
+/// * `n_points` - Number of points to generate.
+/// * `start` - The starting value of the curve.
+/// * `end` - The ending value of the curve.
+///
+/// # Returns
+/// A vector of f64 values representing the points along the exponential curve.
+///
+/// # Examples
+///
+/// ```
+/// let points = generate_exponential_points(100, 1.0, 1000.0);
+/// assert_eq!(points.len(), 100);
+/// assert!((points[0] - 1.0).abs() < f64::EPSILON);
+/// assert!((points[99] - 1000.0).abs() < 1e-6);
+/// ```
+pub fn generate_exponential_points(n_points: usize, start: f64, end: f64) -> Vec<f64> {
+    let lambda = 2.0; // parameter for the ease-in when start == 0
+    let mut points = Vec::with_capacity(n_points);
+
+    // Ensure we do not divide by zero when calculating t.
+    let divisor = if n_points > 1 { (n_points - 1) as f64 } else { 1.0 };
+
+    for i in 0..n_points {
+        let t = i as f64 / divisor;
+        let value = if start == 0.0 {
+            // Ease-in exponential: avoids division by zero when start is zero.
+            let numerator = (lambda * t).exp() - 1.0;
+            let denominator = lambda.exp() - 1.0;
+            end * numerator / denominator
+        } else {
+            // Standard exponential interpolation.
+            start * (end / start).powf(t)
+        };
+        points.push(value);
+    }
+    points
+}
+
 #[cfg(test)]
 mod tests {
     use crate::shd::types::IncrementationSegment;
 
     use super::*;
+
+    #[test]
+    fn test_exponential_points_nonzero_start() {
+        println!("--- test_exponential_points_nonzero_start ---");
+        // Idea here to generate points between 1 millionth and between 10-25% of that millionth => 100_000 to 250_000
+        let n_points = 25;
+        let start = 1.0;
+        let end = 100000.0; // BPD
+        let points = generate_exponential_points(n_points, start, end);
+        assert_eq!(points.len(), n_points);
+        // Check that the first point equals the start value.
+        assert!((points.first().unwrap() - start).abs() < f64::EPSILON);
+        // Check that the last point equals the end value.
+        assert!((points.last().unwrap() - end).abs() < 1e-6);
+        for p in points {
+            println!("Generated point: {}", p);
+        }
+    }
+
+    #[test]
+    fn test_exponential_points_zero_start() {
+        println!("--- test_exponential_points_zero_start ---");
+        let n_points = 25;
+        let start = 0.0;
+        let end = 100000.0; // BPD
+        let points = generate_exponential_points(n_points, start, end);
+        assert_eq!(points.len(), n_points);
+        assert!((points.first().unwrap() - 0.0).abs() < f64::EPSILON);
+        assert!((points.last().unwrap() - end).abs() < 1e-6);
+        for p in points {
+            println!("Generated point: {}", p);
+        }
+    }
 
     #[test]
     fn test_steps_strictly_increasing() {

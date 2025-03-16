@@ -4,7 +4,6 @@ use std::sync::Arc;
 
 use alloy::primitives::map::HashSet;
 use futures::StreamExt;
-use num_bigint::BigUint;
 use tap2::shd;
 use tap2::shd::data::fmt::SrzEVMPoolState;
 use tap2::shd::data::fmt::SrzProtocolComponent;
@@ -21,8 +20,6 @@ use tap2::shd::types::SharedTychoStreamState;
 use tap2::shd::types::SyncState;
 use tap2::shd::types::TychoStreamState;
 use tokio::sync::RwLock;
-use tycho_client::rpc::HttpRPCClient;
-use tycho_client::rpc::RPCClient;
 use tycho_simulation::evm::protocol::filters::curve_pool_filter;
 use tycho_simulation::evm::protocol::filters::uniswap_v4_pool_with_hook_filter;
 use tycho_simulation::evm::protocol::uniswap_v3::state::UniswapV3State;
@@ -134,7 +131,7 @@ async fn stream_protocol(network: Network, shdstate: SharedTychoStreamState, tok
     let balancer = balancer_pool_filter;
     let curve = curve_pool_filter;
     let (_, chain) = shd::types::chain(network.name.clone()).expect("Invalid chain");
-    let filter = ComponentFilter::with_tvl_range(1.0, 50.0); // ! Important
+    let filter = ComponentFilter::with_tvl_range(1.0, 500.0); // ! Important. 250 ETH minimum
 
     // ===== Tycho Tokens =====
     let mut hmt = HashMap::new();
@@ -372,7 +369,7 @@ async fn stream_protocol(network: Network, shdstate: SharedTychoStreamState, tok
                                 // ! Deprecated
                                 let mut hset = HashSet::new();
                                 for cp in components.clone() {
-                                    let (t0, t1) = (cp.tokens.get(0), cp.tokens.get(1));
+                                    let (t0, t1) = (cp.tokens.first(), cp.tokens.get(1));
                                     if let (Some(t0), Some(t1)) = (t0, t1) {
                                         hset.insert(format!("{}-{}", t0.address.to_lowercase(), t1.address.to_lowercase()));
                                     }

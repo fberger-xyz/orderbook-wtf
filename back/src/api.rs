@@ -1,5 +1,5 @@
 use axum::{
-    extract::{Path, Query},
+    extract::Query,
     response::IntoResponse,
     routing::get,
     Extension, Json, Router,
@@ -8,15 +8,13 @@ use serde::{Deserialize, Serialize};
 use serde_json::json;
 use tap2::shd::{
     self,
-    data::fmt::{SrzEVMPoolState, SrzProtocolComponent, SrzToken, SrzUniswapV2State, SrzUniswapV3State, SrzUniswapV4State},
-    types::{AmmType, EnvConfig, Network, PairQuery, PairSimulatedOrderbook, ProtoTychoState, SharedTychoStreamState, SyncState},
+    data::fmt::{SrzProtocolComponent, SrzToken},
+    types::{EnvConfig, Network, PairQuery, PairSimulatedOrderbook, ProtoTychoState, SharedTychoStreamState, SyncState},
 };
 
 use utoipa::OpenApi;
 use utoipa::ToSchema;
 
-use utoipa_axum::router::OpenApiRouter;
-use utoipa_axum::routes;
 use utoipa_swagger_ui::SwaggerUi;
 
 /// OpenAPI documentation for the API.

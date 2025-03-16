@@ -2,7 +2,6 @@ use std::collections::HashMap;
 use std::str::FromStr;
 
 use alloy::primitives::ruint::aliases::U256;
-use chrono::NaiveDateTime;
 use num_bigint::BigUint;
 use serde::{Deserialize, Serialize};
 use tycho_simulation::evm::engine_db::tycho_db::PreCachedDB;
@@ -11,7 +10,6 @@ use tycho_simulation::evm::protocol::uniswap_v3::state::UniswapV3State;
 use tycho_simulation::evm::protocol::uniswap_v4::state::UniswapV4State;
 use tycho_simulation::evm::protocol::utils::uniswap::tick_list::{TickInfo, TickList};
 use tycho_simulation::evm::protocol::vm::state::EVMPoolState;
-use tycho_simulation::evm::tycho_models::Chain;
 use tycho_simulation::models::Token;
 use tycho_simulation::protocol::models::ProtocolComponent;
 use tycho_simulation::tycho_core::Bytes;

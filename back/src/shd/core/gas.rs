@@ -1,7 +1,7 @@
 use std::collections::{HashMap, HashSet};
 
 use crate::shd::{
-    data::fmt::{SrzProtocolComponent, SrzToken},
+    data::fmt::SrzToken,
     r#static::endpoints::COINGECKO_ETH_USD,
     types::{Network, ProtoTychoState},
 };
