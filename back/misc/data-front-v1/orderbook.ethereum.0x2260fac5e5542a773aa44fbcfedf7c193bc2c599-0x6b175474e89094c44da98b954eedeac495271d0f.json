@@ -1,11 +1,11 @@
 {
-    "from": {
+    "token0": {
         "address": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
         "decimals": 8,
         "symbol": "WBTC",
         "gas": "32803"
     },
-    "to": {
+    "token1": {
         "address": "0x6b175474e89094c44da98b954eedeac495271d0f",
         "decimals": 18,
         "symbol": "DAI",
@@ -462,6 +462,7 @@
                 }
             ],
             "protocol_system": "vm:balancer_v2",
+            "fee": 0,
             "protocol_type_name": "balancer_v2_pool",
             "contract_ids": [
                 "0xba12222222228d8ba445958a75a0704d566bf2c8",
@@ -509,6 +510,7 @@
                 }
             ],
             "protocol_system": "uniswap_v3",
+            "fee": 0,
             "protocol_type_name": "uniswap_v3_pool",
             "contract_ids": [],
             "static_attributes": [

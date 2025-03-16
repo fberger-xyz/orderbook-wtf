@@ -11,6 +11,8 @@ pub enum TychoDex {
 impl ToString for TychoDex {
     fn to_string(&self) -> String {
         match self {
+            // TychoDex::Pancakeswap => "pancakeswap_v2".to_string(),
+            // TychoDex::Sushiswap => "sushiswap_v2".to_string(),
             TychoDex::UniswapV2 => "uniswap_v2".to_string(),
             TychoDex::UniswapV3 => "uniswap_v3".to_string(),
             TychoDex::UniswapV4 => "uniswap_v4".to_string(),

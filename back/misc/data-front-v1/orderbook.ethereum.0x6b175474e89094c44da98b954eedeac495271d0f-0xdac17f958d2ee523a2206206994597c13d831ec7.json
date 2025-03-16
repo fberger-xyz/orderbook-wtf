@@ -1,11 +1,11 @@
 {
-    "from": {
+    "token0": {
         "address": "0x6b175474e89094c44da98b954eedeac495271d0f",
         "decimals": 18,
         "symbol": "DAI",
         "gas": "30174"
     },
-    "to": {
+    "token1": {
         "address": "0xdac17f958d2ee523a2206206994597c13d831ec7",
         "decimals": 6,
         "symbol": "USDT",
@@ -578,6 +578,7 @@
                 }
             ],
             "protocol_system": "uniswap_v3",
+            "fee": 0,
             "protocol_type_name": "uniswap_v3_pool",
             "contract_ids": [],
             "static_attributes": [
@@ -620,6 +621,7 @@
                 }
             ],
             "protocol_system": "vm:curve",
+            "fee": 0,
             "protocol_type_name": "curve_pool",
             "contract_ids": [
                 "0xbebc44782c7db0a1a60cb6fe97d0b483032ff1c7"
@@ -670,6 +672,7 @@
                 }
             ],
             "protocol_system": "vm:curve",
+            "fee": 0,
             "protocol_type_name": "curve_pool",
             "contract_ids": [
                 "0xa5407eae9ba41422680e2e00537571bcc53efbfd"
@@ -708,6 +711,7 @@
                 }
             ],
             "protocol_system": "uniswap_v3",
+            "fee": 0,
             "protocol_type_name": "uniswap_v3_pool",
             "contract_ids": [],
             "static_attributes": [

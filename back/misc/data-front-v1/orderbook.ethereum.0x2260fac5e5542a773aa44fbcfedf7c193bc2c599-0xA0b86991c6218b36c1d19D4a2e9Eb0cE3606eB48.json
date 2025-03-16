@@ -1,11 +1,11 @@
 {
-    "from": {
+    "token0": {
         "address": "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599",
         "decimals": 8,
         "symbol": "WBTC",
         "gas": "32803"
     },
-    "to": {
+    "token1": {
         "address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
         "decimals": 6,
         "symbol": "USDC",
@@ -643,6 +643,7 @@
             ],
             "protocol_system": "uniswap_v3",
             "protocol_type_name": "uniswap_v3_pool",
+            "fee": 0,
             "contract_ids": [],
             "static_attributes": [
                 [
@@ -679,6 +680,7 @@
             ],
             "protocol_system": "uniswap_v4",
             "protocol_type_name": "uniswap_v4_pool",
+            "fee": 0,
             "contract_ids": [],
             "static_attributes": [
                 [
@@ -719,6 +721,7 @@
             ],
             "protocol_system": "uniswap_v3",
             "protocol_type_name": "uniswap_v3_pool",
+            "fee": 0,
             "contract_ids": [],
             "static_attributes": [
                 [
@@ -755,6 +758,7 @@
             ],
             "protocol_system": "uniswap_v2",
             "protocol_type_name": "uniswap_v2_pool",
+            "fee": 0,
             "contract_ids": [],
             "static_attributes": [
                 [
@@ -787,6 +791,7 @@
             ],
             "protocol_system": "uniswap_v3",
             "protocol_type_name": "uniswap_v3_pool",
+            "fee": 0,
             "contract_ids": [],
             "static_attributes": [
                 [

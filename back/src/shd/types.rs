@@ -240,8 +240,10 @@ pub struct TradeResult {
 
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
 pub struct PairSimulatedOrderbook {
-    pub from: SrzToken,
-    pub to: SrzToken,
+    pub token0: SrzToken,
+    pub token1: SrzToken,
+    pub prices0to1: Vec<f64>,
+    pub prices1to0: Vec<f64>,
     pub trades0to1: Vec<TradeResult>,
     pub trades1to0: Vec<TradeResult>,
     pub pools: Vec<SrzProtocolComponent>,

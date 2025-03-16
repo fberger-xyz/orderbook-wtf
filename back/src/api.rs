@@ -276,7 +276,8 @@ async fn orderbook(Extension(shtss): Extension<SharedTychoStreamState>, Extensio
                 }
                 // shd::core::pair::prepare(network.clone(), ptss.clone(), tokens.clone(), params.clone()).await;
                 let result = shd::core::orderbook::build(network.clone(), atks.clone(), balances.clone(), ptss.clone(), tokens.clone(), params.clone()).await;
-                let path = format!("misc/data-front-v2/orderbook.{}.{}.json", network.name, params.tag);
+                let path = format!("misc/data-front-v2/orderbook.{}.{}-{}.json", network.name, srzt0.symbol.to_lowercase(), srzt1.symbol.to_lowercase());
+
                 crate::shd::utils::misc::save1(result.clone(), path.as_str());
                 Json(json!({ "orderbook": result.clone() }))
             } else {

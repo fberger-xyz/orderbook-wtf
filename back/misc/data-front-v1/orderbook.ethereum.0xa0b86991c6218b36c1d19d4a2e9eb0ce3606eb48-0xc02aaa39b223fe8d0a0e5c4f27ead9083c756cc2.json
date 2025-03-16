@@ -1,11 +1,11 @@
 {
-    "from": {
+    "token0": {
         "address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
         "decimals": 6,
         "symbol": "USDC",
         "gas": "40652"
     },
-    "to": {
+    "token1": {
         "address": "0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2",
         "decimals": 18,
         "symbol": "WETH",
@@ -707,6 +707,7 @@
             ],
             "protocol_system": "uniswap_v3",
             "protocol_type_name": "uniswap_v3_pool",
+            "fee": 0,
             "contract_ids": [],
             "static_attributes": [
                 [
@@ -743,6 +744,7 @@
             ],
             "protocol_system": "vm:balancer_v2",
             "protocol_type_name": "balancer_v2_pool",
+            "fee": 0,
             "contract_ids": [
                 "0xba12222222228d8ba445958a75a0704d566bf2c8",
                 "0x96646936b91d6b9d7d0c47c496afbf3d6ec7b6f8"
@@ -786,6 +788,7 @@
             ],
             "protocol_system": "uniswap_v3",
             "protocol_type_name": "uniswap_v3_pool",
+            "fee": 0,
             "contract_ids": [],
             "static_attributes": [
                 [
@@ -822,6 +825,7 @@
             ],
             "protocol_system": "uniswap_v3",
             "protocol_type_name": "uniswap_v3_pool",
+            "fee": 0,
             "contract_ids": [],
             "static_attributes": [
                 [
@@ -858,6 +862,7 @@
             ],
             "protocol_system": "uniswap_v2",
             "protocol_type_name": "uniswap_v2_pool",
+            "fee": 0,
             "contract_ids": [],
             "static_attributes": [
                 [
@@ -890,6 +895,7 @@
             ],
             "protocol_system": "uniswap_v3",
             "protocol_type_name": "uniswap_v3_pool",
+            "fee": 0,
             "contract_ids": [],
             "static_attributes": [
                 [

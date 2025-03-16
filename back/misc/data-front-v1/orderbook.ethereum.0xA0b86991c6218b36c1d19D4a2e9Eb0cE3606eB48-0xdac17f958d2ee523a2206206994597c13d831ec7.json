@@ -1,11 +1,11 @@
 {
-    "from": {
+    "token0": {
         "address": "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
         "decimals": 6,
         "symbol": "USDC",
         "gas": "40652"
     },
-    "to": {
+    "token1": {
         "address": "0xdac17f958d2ee523a2206206994597c13d831ec7",
         "decimals": 6,
         "symbol": "USDT",
@@ -771,6 +771,7 @@
             ],
             "protocol_system": "uniswap_v2",
             "protocol_type_name": "uniswap_v2_pool",
+            "fee": 0,
             "contract_ids": [],
             "static_attributes": [
                 [
@@ -803,6 +804,7 @@
             ],
             "protocol_system": "uniswap_v3",
             "protocol_type_name": "uniswap_v3_pool",
+            "fee": 0,
             "contract_ids": [],
             "static_attributes": [
                 [
@@ -851,6 +853,7 @@
             ],
             "protocol_system": "vm:curve",
             "protocol_type_name": "curve_pool",
+            "fee": 0,
             "contract_ids": [
                 "0xa5407eae9ba41422680e2e00537571bcc53efbfd"
             ],
@@ -895,6 +898,7 @@
             ],
             "protocol_system": "vm:curve",
             "protocol_type_name": "curve_pool",
+            "fee": 0,
             "contract_ids": [
                 "0xbebc44782c7db0a1a60cb6fe97d0b483032ff1c7"
             ],
@@ -933,6 +937,7 @@
             ],
             "protocol_system": "uniswap_v4",
             "protocol_type_name": "uniswap_v4_pool",
+            "fee": 0,
             "contract_ids": [],
             "static_attributes": [
                 [
@@ -973,6 +978,7 @@
             ],
             "protocol_system": "uniswap_v3",
             "protocol_type_name": "uniswap_v3_pool",
+            "fee": 0,
             "contract_ids": [],
             "static_attributes": [
                 [
@@ -1009,6 +1015,7 @@
             ],
             "protocol_system": "uniswap_v3",
             "protocol_type_name": "uniswap_v3_pool",
+            "fee": 0,
             "contract_ids": [],
             "static_attributes": [
                 [

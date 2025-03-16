@@ -47,6 +47,7 @@ pub mod api;
 /**
  * Stream a part of state from each components, with TychoStreamBuilder.
  * Mostly used to get components balances
+ * Didn't know at the time that HttpClient could be used to fetch states/balances, instead of opening a stream here. Can be usefull later so keep it.
  */
 async fn stream_state(network: Network, shared: SharedTychoStreamState, config: EnvConfig) {
     log::info!("1️⃣  Launching TychoStreamBuilder task for {}", network.name);
@@ -65,7 +66,7 @@ async fn stream_state(network: Network, shared: SharedTychoStreamState, config: 
     {
         Ok((mut _handle, mut receiver)) => {
             while let Some(fm) = receiver.recv().await {
-                log::info!("🔹 TychoStreamBuilder [for balances only]: received {} state messages and {} sync states 🔹", fm.state_msgs.len(), fm.sync_states.len());
+                log::info!("🔹 TychoStreamBuilder [for balances only]: received {} state messages and {} sync states", fm.state_msgs.len(), fm.sync_states.len());
                 let mtx = shared.read().await;
                 let mut updated = mtx.balances.clone();
                 let _before = updated.len();
@@ -191,7 +192,7 @@ async fn stream_protocol(network: Network, shdstate: SharedTychoStreamState, tok
                     match msg {
                         Ok(msg) => {
                             log::info!(
-                                "🔸 ProtocolStreamBuilder: received block # {} 🔸 With {} state, {} new_pairs and {} removed_pairs",
+                                "🔸 ProtocolStreamBuilder: received block # {} with {} state, {} new_pairs and {} removed_pairs",
                                 msg.block_number,
                                 msg.states.len(),
                                 msg.new_pairs.len(),
@@ -266,7 +267,10 @@ async fn stream_protocol(network: Network, shdstate: SharedTychoStreamState, tok
                                         // --- Debug ---
                                         // let stattribute = comp.static_attributes.clone();
                                         // for (k, v) in stattribute.iter() {
-                                        //     log::info!(" >>> Static Attributes: {}: {:?}", k, v);
+                                        //     let fee = match k == "key_lp_fee" || k == "fee" {
+                                        //         true => shd::core::amms::feebps(comp.protocol_type_name.clone(), comp.id.to_string().clone(), v.to_string()),
+                                        //         false => 0,
+                                        //     };
                                         // }
                                         // let first = comp.tokens.first().unwrap();
                                         // let second = comp.tokens.get(1).unwrap();

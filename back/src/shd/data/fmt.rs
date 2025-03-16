@@ -82,7 +82,27 @@ pub struct SrzProtocolComponent {
     #[schema(example = "0xHash")]
     pub creation_tx: String,
     // pub created_at: NaiveDateTime,
+
+    // Extended attributes
+    #[schema(example = "30")]
+    pub fee: u128,
 }
+
+// --- AMM fees ---
+// Pancake v2: 0.25% bps hardcoded
+// Sushiswap: 0.3% bps hardcoded
+// Uniswap v2: 0.3% bps hardcoded
+// Uniswap v3: /1e6 (1 million) => 0.3% = 3000
+// Uniswap v4: variable, stored on 1e6 => 0.3% = 3000
+// Curve = pow10 => 0.04% (4 bps) fee is stored as 4000000 (0x3D0900 in hex).
+// Balancer = pow18 => 0.1% (10 bps) = 0.001 * 10^18 = 1 * 10^15 = 0x38d7ea4c68000
+
+// --- Tycho Fee Attribute ---
+// uniswap_v2_pool: fee: Bytes(0x1e)
+// uniswap_v3_pool: fee: Bytes(0x2710)
+// uniswap_v4_pool: key_lp_fee: Bytes(0x0bb8)
+// balancer_v2_pool: fee: Bytes(0x0aa87bee538000)
+// curve: not implemented (todo!) = considering 0
 
 impl SrzProtocolComponent {
     pub fn contains(&self, token: &str) -> bool {
@@ -92,17 +112,20 @@ impl SrzProtocolComponent {
 
 impl From<ProtocolComponent> for SrzProtocolComponent {
     fn from(pc: ProtocolComponent) -> Self {
+        //  "key_lp_fee" || k == "fee"
+        let fee_value = pc.static_attributes.iter().find(|(k, _)| *k == "key_lp_fee" || *k == "fee").map(|(_, v)| v.to_string()).unwrap_or_default();
         SrzProtocolComponent {
             address: pc.id.to_string().to_lowercase(),
             id: pc.id.to_string().to_lowercase(),
             tokens: pc.tokens.into_iter().map(SrzToken::from).collect(),
-            protocol_system: pc.protocol_system,
-            protocol_type_name: pc.protocol_type_name,
+            protocol_system: pc.protocol_system.clone(),
+            protocol_type_name: pc.protocol_type_name.clone(),
             // chain: pc.chain,
             contract_ids: pc.contract_ids.into_iter().map(|b| b.to_string()).collect(),
             static_attributes: pc.static_attributes.into_iter().map(|(k, v)| (k, v.to_string())).collect(),
             creation_tx: pc.creation_tx.to_string(),
             // created_at: pc.created_at,
+            fee: crate::shd::core::amms::feebps(pc.protocol_type_name.to_string().clone(), pc.id.to_string().clone(), fee_value),
         }
     }
 }

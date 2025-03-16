@@ -22,7 +22,7 @@ pub async fn build(network: Network, atks: Vec<SrzToken>, balances: HashMap<Stri
     let t0 = Token::from(srzt0.clone());
     let t1 = Token::from(srzt1.clone());
     let (base, quote) = (t0, t1);
-    log::info!("🏷️ Searching a swap-path to price the base token in gas (ETH) | Base: {} | Quote: {})", base.symbol, quote.symbol);
+    log::info!("🏷️  Searching a swap-path to price the base token in gas (ETH) | Base: {} | Quote: {})", base.symbol, quote.symbol);
     let t0pricing = shd::core::gas::pricing(network.clone(), datapools.clone(), atks.clone(), base.address.to_string().to_lowercase().clone());
     log::info!("Pricing for {} => {:?}", base.symbol, t0pricing);
     for pdata in datapools.clone() {
@@ -30,7 +30,7 @@ pub async fn build(network: Network, atks: Vec<SrzToken>, balances: HashMap<Stri
         pools.push(pdata.clone());
         let proto = pdata.protosim.clone();
         let price0to1 = proto.spot_price(&base, &quote).unwrap_or_default();
-        let price1to0 = proto.spot_price(&base, &quote).unwrap_or_default();
+        let price1to0 = proto.spot_price(&quote, &base).unwrap_or_default();
         prices0to1.push(price0to1);
         prices1to0.push(price1to0);
         log::info!("Spot price for {}-{} => price0to1 = {} and price1to0 = {}", base.symbol, quote.symbol, price0to1, price1to0);
@@ -40,7 +40,9 @@ pub async fn build(network: Network, atks: Vec<SrzToken>, balances: HashMap<Stri
     let avgp0to1 = prices0to1.iter().sum::<f64>() / prices0to1.len() as f64;
     let avgp1to0 = prices1to0.iter().sum::<f64>() / prices1to0.len() as f64; // Ponderation by TVL ?
     log::info!("Average price 0to1: {} | Average price 1to0: {}", avgp0to1, avgp1to0);
-    let pso = optimization(network.clone(), pools.clone(), tokens, query.clone(), aggregated.clone(), avgp0to1, avgp1to0).await;
+    let mut pso = optimization(network.clone(), pools.clone(), tokens, query.clone(), aggregated.clone()).await;
+    pso.prices0to1 = prices0to1.clone();
+    pso.prices1to0 = prices1to0.clone();
     log::info!("Optimization done. Returning Simulated Orderbook for pair (base-quote) => '{}-{}'", base.symbol, quote.symbol);
 
     pso
@@ -176,7 +178,7 @@ pub fn optimizer(
  * ToDo: AmountIn must now be greater than the component balance, or let's say 50% of it, because it don't make sense to impact more than 50% of the pool, even some % it worsens the price
  * ToDo: Top n pooL most liquid only, remove the too small liquidity pools
  */
-pub async fn optimization(network: Network, pcsdata: Vec<ProtoTychoState>, tokens: Vec<SrzToken>, query: PairQuery, balances: HashMap<String, u128>, price0to1: f64, price1to0: f64) -> PairSimulatedOrderbook {
+pub async fn optimization(network: Network, pcsdata: Vec<ProtoTychoState>, tokens: Vec<SrzToken>, query: PairQuery, balances: HashMap<String, u128>) -> PairSimulatedOrderbook {
     let ethusd = shd::core::gas::ethusd().await;
     let gasp = shd::core::gas::gasprice(network.rpc).await;
     let t0 = tokens[0].clone();
@@ -281,10 +283,12 @@ pub async fn optimization(network: Network, pcsdata: Vec<ProtoTychoState>, token
     }
 
     PairSimulatedOrderbook {
-        from: tokens[0].clone(),
-        to: tokens[1].clone(),
+        token0: tokens[0].clone(),
+        token1: tokens[1].clone(),
         trades0to1: trades0to1.clone(),
         trades1to0: trades1to0.clone(),
+        prices0to1: vec![],
+        prices1to0: vec![],
         pools: pools.clone(),
     }
 }
