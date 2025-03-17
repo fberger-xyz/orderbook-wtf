@@ -29,6 +29,7 @@ const config: Config = {
                 'gradient-morph': 'gradient 15s ease infinite',
                 'pulse-slow': 'pulse 8s ease-in-out infinite',
                 float: 'float 6s ease-in-out infinite',
+                'skeleton-move': 'skeleton-move 1.5s infinite',
             },
             keyframes: {
                 gradient: {
@@ -38,6 +39,10 @@ const config: Config = {
                 float: {
                     '0%, 100%': { transform: 'translateY(0)' },
                     '50%': { transform: 'translateY(-20px)' },
+                },
+                'skeleton-move': {
+                    '0%': { transform: 'translateX(-100%)' },
+                    '100%': { transform: 'translateX(100%)' },
                 },
             },
         },

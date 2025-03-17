@@ -2,22 +2,28 @@ import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 import { APP_METADATA, IS_DEV } from '@/config/app.config'
 import { OrderbookDataPoint } from '@/types'
-import { NewPool } from '@/interfaces'
+import { AmmAsOrderbook, AmmPool } from '@/interfaces'
 
 export const useAppStore = create<{
     showMobileMenu: boolean
     hasHydrated: boolean
     storeRefreshedAt: number
     refetchInterval: number
-    selectedTrade?: { datapoint: OrderbookDataPoint; bidsPools: NewPool[]; asksPools: NewPool[] }
+    selectedTrade?: { datapoint: OrderbookDataPoint; bidsPools: AmmPool[]; asksPools: AmmPool[] }
     yAxisType: 'value' | 'log'
     yAxisLogBase: number
+    availablePairs: string[]
+    selectedPair?: string
+    loadedOrderbooks: Record<string, undefined | AmmAsOrderbook>
     setShowMobileMenu: (showMobileMenu: boolean) => void
     setHasHydrated: (hasHydrated: boolean) => void
     setStoreRefreshedAt: (storeRefreshedAt: number) => void
-    selectOrderbookDataPoint: (selectedTrade: { datapoint: OrderbookDataPoint; bidsPools: NewPool[]; asksPools: NewPool[] }) => void
+    selectOrderbookDataPoint: (selectedTrade?: { datapoint: OrderbookDataPoint; bidsPools: AmmPool[]; asksPools: AmmPool[] }) => void
     setYAxisType: (yAxisType: 'value' | 'log') => void
     setYAxisLogBase: (yAxisLogBase: number) => void
+    setAvailablePairs: (availablePairs: string[]) => void
+    selectPair: (selectedPair?: string) => void
+    saveLoadedOrderbook: (pair: string, orderbook?: AmmAsOrderbook) => void
 }>()(
     persist(
         (set) => ({
@@ -28,12 +34,18 @@ export const useAppStore = create<{
             selectedTrade: undefined,
             yAxisType: 'value',
             yAxisLogBase: 10,
+            availablePairs: [],
+            selectedPair: undefined,
+            loadedOrderbooks: {},
             setShowMobileMenu: (showMobileMenu) => set(() => ({ showMobileMenu })),
             setHasHydrated: (hasHydrated) => set(() => ({ hasHydrated })),
             setStoreRefreshedAt: (storeRefreshedAt) => set(() => ({ storeRefreshedAt })),
             selectOrderbookDataPoint: (selectedTrade) => set(() => ({ selectedTrade })),
             setYAxisType: (yAxisType) => set(() => ({ yAxisType })),
             setYAxisLogBase: (yAxisLogBase) => set(() => ({ yAxisLogBase })),
+            setAvailablePairs: (availablePairs) => set(() => ({ availablePairs })),
+            selectPair: (selectedPair) => set(() => ({ selectedPair })),
+            saveLoadedOrderbook: (pair, orderbook) => set((state) => ({ loadedOrderbooks: { ...state.loadedOrderbooks, [pair]: orderbook } })),
         }),
         {
             name: IS_DEV
@@ -44,7 +56,11 @@ export const useAppStore = create<{
             storage: createJSONStorage(() => sessionStorage),
             skipHydration: false,
             onRehydrateStorage: () => (state) => {
-                if (!state?.hasHydrated) state?.setHasHydrated(true)
+                if (!state?.hasHydrated) {
+                    state?.setHasHydrated(true)
+                    state?.setAvailablePairs([]) // reset
+                    state?.selectOrderbookDataPoint(undefined) // reset
+                }
             },
         },
     ),

@@ -36,7 +36,7 @@ export function ConnectOrDisconnect() {
 
     if (!isClient) return null // Avoid rendering during SSR
 
-    const buttonClassNames = `group flex items-center gap-4 rounded-2xl px-4 py-1.5 border border-light-hover font-bold bg-light-hover justify-around shadow-sm`
+    const buttonClassNames = `w-full group flex items-center gap-4 rounded-2xl px-4 py-1.5 border border-light-hover font-bold bg-light-hover justify-around shadow-sm`
 
     return account.isConnecting ? (
         <button className={buttonClassNames}>

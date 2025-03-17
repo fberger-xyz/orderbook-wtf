@@ -1,33 +1,32 @@
-import { ChartLayout } from '@/components/charts/ChartsCommons'
-import DepthChart from '@/components/charts/DepthChart'
 import CommitInfo from '@/components/common/CommitInfo'
 import AppStoreLoader from '@/components/stores/AppStoreLoader'
-import SelectedTrade from '@/components/wallet/SelectedTrade'
-import { NewOrderbookTrades } from '@/interfaces'
-import { promises as fs } from 'fs'
+import Dashboard from '@/components/app/Dashboard'
+// import { AmmAsOrderbook } from '@/interfaces'
+// import { promises as fs } from 'fs'
 
-export default async function Page() {
-    const commonPath = '../back/misc/data-front-v2/orderbook.ethereum.'
+export default function Page() {
+    // const commonPath = '../back/misc/data-front-v2/orderbook.ethereum.'
     // const FILE_PATH = `${commonPath}DAI-USDT.json`
     // const FILE_PATH = `${commonPath}USDC-DAI.json`
     // const FILE_PATH = `${commonPath}USDC-USDT.json`
     // const FILE_PATH = `${commonPath}USDC-WBTC.json`
     // const FILE_PATH = `${commonPath}WBTC-DAI.json`
-    const FILE_PATH = `${commonPath}WBTC-USDT.json`
+    // const FILE_PATH = `${commonPath}WBTC-USDT.json`
     // const FILE_PATH = `${commonPath}WETH-DAI.json`
     // const FILE_PATH = `${commonPath}WETH-USDC.json`
     // const FILE_PATH = `${commonPath}WETH-USDT.json`
     // const FILE_PATH = `${commonPath}WETH-WBTC.json`
 
     // read locally
-    const ORDERBOOK_PATH = process.cwd() + `/${FILE_PATH}`
-    const ORDERBOOK_CONTENT = await fs.readFile(ORDERBOOK_PATH, 'utf8')
-    const ORDERBOOK = JSON.parse(ORDERBOOK_CONTENT) as NewOrderbookTrades
+    // const ORDERBOOK_PATH = process.cwd() + `/${FILE_PATH}`
+    // const ORDERBOOK_CONTENT = await fs.readFile(ORDERBOOK_PATH, 'utf8')
+    // const ORDERBOOK = JSON.parse(ORDERBOOK_CONTENT) as AmmAsOrderbook
 
     return (
         <AppStoreLoader>
             {/* take inspiration from https://app.uniswap.org/explore/pools/ethereum/0x88e6A0c2dDD26FEEb64F039a2c41296FcB3f5640 */}
-            <div className="flex w-full grow flex-col gap-8 lg:flex-row">
+            <Dashboard />
+            {/* <div className="flex w-full grow flex-col gap-8 lg:flex-row">
                 <ChartLayout
                     title={`Ethereum ${ORDERBOOK.token0.symbol}/${ORDERBOOK.token1.symbol} - market depth`}
                     subtitle={`Work in progress 🚧`}
@@ -38,12 +37,7 @@ export default async function Page() {
                         <SelectedTrade />
                     </div>
                 </div>
-            </div>
-            {/* <ChartLayout
-                title={`${token0}/${token1} liquidity`}
-                subtitle={`some description`}
-                chart={<ActiveLiquidityChart token0={token0} token1={token1} zeroToOne={zeroToOne} />}
-            /> */}
+            </div> */}
             <CommitInfo />
         </AppStoreLoader>
     )

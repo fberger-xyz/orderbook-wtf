@@ -12,7 +12,7 @@ import { useAppStore } from '@/stores/app.store'
 import { DEFAULT_THEME } from '@/config/app.config'
 import { ErrorBoundaryFallback } from '../common/ErrorBoundaryFallback'
 import { formatAmount } from '@/utils'
-import { NewOrderbookTrades, NewPool } from '@/interfaces'
+import { AmmAsOrderbook, AmmPool } from '@/interfaces'
 import numeral from 'numeral'
 import { OrderbookDataPoint } from '@/types'
 import Button from '../common/Button'
@@ -24,9 +24,10 @@ const getOptions = (
     resolvedTheme: AppThemes,
     token0: string,
     token1: string,
+    spot: number[],
     bids: OrderbookDataPoint[],
     asks: OrderbookDataPoint[],
-    pools: NewPool[],
+    pools: AmmPool[],
     yAxisType: 'value' | 'log',
     yAxisLogBase: number,
 ): echarts.EChartsOption => {
@@ -149,7 +150,7 @@ const getOptions = (
                 },
                 position: 'left',
                 nameLocation: 'middle',
-                nameGap: 50,
+                nameGap: 55,
                 alignTicks: true,
                 splitLine: {
                     show: false,
@@ -174,7 +175,6 @@ const getOptions = (
                 axisPointer: {
                     snap: true,
                 },
-                // min: 0,
                 min: 'dataMin',
                 max: 'dataMax',
             },
@@ -188,7 +188,7 @@ const getOptions = (
                 },
                 position: 'right',
                 nameLocation: 'middle',
-                nameGap: 50,
+                nameGap: 55,
                 alignTicks: true,
                 splitLine: {
                     show: false,
@@ -233,7 +233,7 @@ const getOptions = (
                 name: 'Bids',
                 type: 'line',
                 data: bids,
-                step: 'start',
+                // step: 'start',
                 lineStyle: { width: 1.5, color: colors.line[resolvedTheme] },
                 symbol: 'circle',
                 symbolSize: 4,
@@ -306,7 +306,7 @@ const getOptions = (
                 name: 'Asks',
                 type: 'line',
                 data: asks,
-                step: 'end',
+                // step: 'end',
                 lineStyle: { width: 1.5, color: colors.line[resolvedTheme] },
                 symbol: 'circle',
                 symbolSize: 4,
@@ -377,11 +377,21 @@ const getOptions = (
     }
 }
 
-export default function DepthChart(props: { orderbook: NewOrderbookTrades }) {
+export default function DepthChart(props: { orderbook: AmmAsOrderbook }) {
     const { resolvedTheme } = useTheme()
     const { storeRefreshedAt, yAxisType, yAxisLogBase, setYAxisType, selectOrderbookDataPoint } = useAppStore()
     const [options, setOptions] = useState<echarts.EChartsOption>(
-        getOptions((resolvedTheme ?? DEFAULT_THEME) as AppThemes, '', '', [], [], props.orderbook.pools, yAxisType, yAxisLogBase),
+        getOptions(
+            (resolvedTheme ?? DEFAULT_THEME) as AppThemes,
+            '',
+            '',
+            props.orderbook.spot,
+            [],
+            [],
+            props.orderbook.pools,
+            yAxisType,
+            yAxisLogBase,
+        ),
     )
 
     // load/refresh chart
@@ -436,6 +446,7 @@ export default function DepthChart(props: { orderbook: NewOrderbookTrades }) {
             theme,
             props.orderbook.token0.symbol,
             props.orderbook.token1.symbol,
+            props.orderbook.spot,
             bids,
             asks,
             props.orderbook.pools,

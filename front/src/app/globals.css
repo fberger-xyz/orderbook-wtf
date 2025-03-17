@@ -35,3 +35,13 @@ html.dark {
         scrollbar-width: none; /* firefox */
     }
 }
+
+.skeleton-loading {
+    @apply relative overflow-hidden rounded-lg bg-light-border;
+}
+
+.skeleton-loading::before {
+    content: '';
+    @apply absolute inset-0 rounded-lg animate-skeleton-move bg-gradient-to-r from-transparent via-inactive to-transparent;
+    transform: translateX(-100%);
+}

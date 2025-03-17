@@ -11,14 +11,14 @@ export default function Footer(props: { className?: string }) {
     return (
         <div className={cn('w-full flex justify-center text-sm border-t-2 border-light-hover bg-background/30', props.className)}>
             <div className="mx-auto my-8 flex max-w-[600px] flex-col justify-center items-center gap-1 py-6 sm:max-w-[700px]">
-                <p className="text-sm text-secondary mx-auto text-center font-bold">Data provided by Tycho Indexer</p>
+                <p className="text-sm text-secondary mx-auto text-center font-bold">Data provided by Tycho</p>
                 <Image
                     src="https://docs.propellerheads.xyz/~gitbook/image?url=https%3A%2F%2F1487321251-files.gitbook.io%2F%7E%2Ffiles%2Fv0%2Fb%2Fgitbook-x-prod.appspot.com%2Fo%2Fspaces%252FjrIe0oInIEt65tHqWn2w%252Fuploads%252FL4NnLGGDr9gnBxcyG5ik%252Findexer.png%3Falt%3Dmedia%26token%3D37f95e88-b9bd-4d6c-a641-d6987ba54212&width=768&dpr=4&quality=100&sign=3fab38f6&sv=2"
                     width={240}
                     height={240}
                     alt="tycho-indexer"
                 />
-                <p className="text-sm text-secondary mx-auto text-center font-bold mt-2">Tool coded by</p>
+                <p className="text-sm text-secondary mx-auto text-center font-bold mt-6">Visualisation coded by</p>
                 <div className="flex gap-4 items-center flex-col md:flex-row">
                     {/* fberger */}
                     <div className="flex flex-col gap-2">
