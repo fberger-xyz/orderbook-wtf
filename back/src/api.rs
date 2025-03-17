@@ -1,9 +1,4 @@
-use axum::{
-    extract::Query,
-    response::IntoResponse,
-    routing::get,
-    Extension, Json, Router,
-};
+use axum::{extract::Query, response::IntoResponse, routing::get, Extension, Json, Router};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use tap2::shd::{
@@ -249,7 +244,7 @@ async fn components(Extension(network): Extension<Network>) -> impl IntoResponse
 async fn orderbook(Extension(shtss): Extension<SharedTychoStreamState>, Extension(network): Extension<Network>, Query(params): Query<PairQuery>) -> impl IntoResponse {
     log::info!("👾 API: Querying orderbook endpoint: {:?}", params.tag);
     match (_tokens(network.clone()).await, _components(network.clone()).await) {
-        (Some(atks), Some(cps)) => {
+        (Some(atks), Some(acps)) => {
             let target = params.tag.clone();
             let tokens = target.split("-").map(|x| x.to_string().to_lowercase()).collect::<Vec<String>>();
             let srzt0 = atks.iter().find(|x| x.address.to_lowercase() == tokens[0].clone()).unwrap();
@@ -260,7 +255,7 @@ async fn orderbook(Extension(shtss): Extension<SharedTychoStreamState>, Extensio
             drop(mtx);
             if tokens.len() == 2 {
                 let mut ptss: Vec<ProtoTychoState> = vec![];
-                for cp in cps.clone() {
+                for cp in acps.clone() {
                     let cptks = cp.tokens.clone();
                     if shd::utils::misc::matchcp(cptks.clone(), tokens.clone()) {
                         let mtx = shtss.read().await;
@@ -272,11 +267,18 @@ async fn orderbook(Extension(shtss): Extension<SharedTychoStreamState>, Extensio
                 if ptss.is_empty() {
                     return Json(json!({ "orderbook": {} }));
                 }
+
+                let path = shd::core::gas::find_conversion_path(acps.clone(), atks.clone(), srzt0.address.to_string().to_lowercase(), network.eth.to_lowercase());
+                log::info!("Path from {} to {} is {:?}", srzt0.symbol, network.eth, path);
+
+                // let t0pricing = shd::core::gas::pricing(network.clone(), ptss.clone(), atks.clone(), srzt0.address.to_string().to_lowercase().clone());
+                // log::info!("Pricing for {} is worth (in ETH) => {:?}", srzt0.symbol, t0pricing);
+                // let t0pricing2 = shd::core::gas::pricing2(network.clone(), ptss.clone(), atks.clone(), srzt0.address.to_string().to_lowercase().clone());
+                // log::info!("Pricing for {} is worth (in ETH) => {:?}", srzt0.symbol, t0pricing2);
                 // shd::core::pair::prepare(network.clone(), ptss.clone(), tokens.clone(), params.clone()).await;
                 let result = shd::core::orderbook::build(network.clone(), atks.clone(), balances.clone(), ptss.clone(), tokens.clone(), params.clone()).await;
-                let path = format!("misc/data-front-v2/orderbook.{}.{}-{}.json", network.name, srzt0.symbol.to_lowercase(), srzt1.symbol.to_lowercase());
-
-                crate::shd::utils::misc::save1(result.clone(), path.as_str());
+                // let path = format!("misc/data-front-v2/orderbook.{}.{}-{}.json", network.name, srzt0.symbol.to_lowercase(), srzt1.symbol.to_lowercase());
+                // crate::shd::utils::misc::save1(result.clone(), path.as_str());
                 Json(json!({ "orderbook": result.clone() }))
             } else {
                 log::error!("Query param Tag must contain only 2 tokens separated by a dash '-'");

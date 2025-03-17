@@ -484,27 +484,27 @@ async fn main() {
     });
 
     // Start the server, only reading from the shared state
-    let dupn = network.clone();
-    let dupc = config.clone();
-    let writeable = Arc::clone(&stss);
-    tokio::spawn(async move {
-        loop {
-            stream_state(dupn.clone(), Arc::clone(&writeable), dupc.clone()).await;
-            tokio::time::sleep(tokio::time::Duration::from_secs(5)).await;
-        }
-    });
+    // let dupn = network.clone();
+    // let dupc = config.clone();
+    // let writeable = Arc::clone(&stss);
+    // tokio::spawn(async move {
+    //     loop {
+    //         stream_state(dupn.clone(), Arc::clone(&writeable), dupc.clone()).await;
+    //         tokio::time::sleep(tokio::time::Duration::from_secs(5)).await;
+    //     }
+    // });
 
     // Tmp to avoid the stream_state
-    // let writeable = Arc::clone(&stss);
-    // let path = format!("misc/data-back/{}.stream-balances.json", network.name);
-    // let data = std::fs::read_to_string(path).expect("Failed to read file");
-    // let balances: HashMap<String, HashMap<String, u128>> = serde_json::from_str(&data).expect("JSON parsing failed");
-    // let mut mtx = writeable.write().await;
-    // mtx.balances = balances.clone();
-    // log::info!("Shared balances hashmap updated. Currently {} entries in memory", balances.len());
-    // drop(mtx);
+    let writeable = Arc::clone(&stss);
+    let path = format!("misc/data-back/{}.stream-balances.json", network.name);
+    let data = std::fs::read_to_string(path).expect("Failed to read file");
+    let balances: HashMap<String, HashMap<String, u128>> = serde_json::from_str(&data).expect("JSON parsing failed");
+    let mut mtx = writeable.write().await;
+    mtx.balances = balances.clone();
+    log::info!("Shared balances hashmap updated. Currently {} entries in memory", balances.len());
+    drop(mtx);
 
-    shd::data::redis::wstatus(keys::stream::stream2(network.name.clone()).to_string(), "TychoStream thread to be initialized".to_string()).await;
+    // shd::data::redis::wstatus(keys::stream::stream2(network.name.clone()).to_string(), "TychoStream thread to be initialized".to_string()).await;
     // Get tokens
     match shd::core::client::get_all_tokens(&network, &config).await {
         Some(tokens) => {

@@ -75,57 +75,115 @@ pub struct Network {
 /// pricing_test builds a conversion graph from the given TestProtoTychoState states and uses DFS
 /// to find a conversion route from the input token (by its address) to the network's ETH target.
 /// It returns the cumulative conversion rate and the route.
-pub fn pricing_test(network: Network, ptss: Vec<TestProtoTychoState>, atks: Vec<SrzToken>, input: String) -> Option<(f64, Vec<String>)> {
+// pub fn pricing_test(network: Network, ptss: Vec<TestProtoTychoState>, atks: Vec<SrzToken>, input: String) -> Option<(f64, Vec<String>)> {
+//     let mut graph: HashMap<String, Vec<(String, f64)>> = HashMap::new();
+//     for state in ptss {
+//         // Build the list of token addresses (in lowercase) available in the component.
+//         let addresses: Vec<String> = state.component.tokens.iter().map(|t| t.address.to_lowercase()).collect();
+//         for token_in in addresses.iter() {
+//             for token_out in addresses.iter() {
+//                 if token_in != token_out {
+//                     // Resolve tokens from the global token list by matching addresses.
+//                     let base = Token::from(atks.iter().find(|t| t.address.to_lowercase() == token_in.clone()).unwrap().clone());
+//                     let quote = Token::from(atks.iter().find(|t| t.address.to_lowercase() == token_out.clone()).unwrap().clone());
+//                     if let Ok(sp) = state.spot_price(&base, &quote) {
+//                         graph.entry(token_in.clone()).or_default().push((token_out.clone(), sp));
+//                     }
+//                 }
+//             }
+//         }
+//     }
+//     let start = input.to_lowercase();
+//     let target = network.eth.to_lowercase();
+//     let unit = 1.0;
+//     let mut stack = vec![(start.clone(), unit, vec![start.clone()])];
+//     let mut visited: HashSet<String> = HashSet::new();
+//     while let Some((current, product, path)) = stack.pop() {
+//         if current == target {
+//             return Some((product, path));
+//         }
+//         if visited.contains(&current) {
+//             continue;
+//         }
+//         visited.insert(current.clone());
+//         if let Some(neighbors) = graph.get(&current) {
+//             for (next, rate) in neighbors {
+//                 let mut new_path = path.clone();
+//                 new_path.push(next.clone());
+//                 stack.push((next.clone(), product * rate, new_path));
+//             }
+//         }
+//     }
+//     None
+// }
+
+pub fn pricing(network: Network, ptss: Vec<TestProtoTychoState>, atks: Vec<SrzToken>, input: String) -> Option<(f64, Vec<String>)> {
     let mut graph: HashMap<String, Vec<(String, f64)>> = HashMap::new();
-    for state in ptss {
-        // Build the list of token addresses (in lowercase) available in the component.
-        let addresses: Vec<String> = state.component.tokens.iter().map(|t| t.address.to_lowercase()).collect();
+    log::info!("Building conversion graph from {} protocol states", ptss.len());
+    for x in ptss {
+        let addresses: Vec<String> = x.component.tokens.iter().map(|t| t.address.to_lowercase()).collect();
+        log::info!("Processing state with tokens: {:?}", addresses);
         for token_in in addresses.iter() {
             for token_out in addresses.iter() {
                 if token_in != token_out {
-                    // Resolve tokens from the global token list by matching addresses.
-                    let base = Token::from(atks.iter().find(|t| t.address.to_lowercase() == token_in.clone()).unwrap().clone());
-                    let quote = Token::from(atks.iter().find(|t| t.address.to_lowercase() == token_out.clone()).unwrap().clone());
-                    if let Ok(sp) = state.spot_price(&base, &quote) {
-                        graph.entry(token_in.clone()).or_default().push((token_out.clone(), sp));
+                    let base = Token::from(atks.iter().find(|t| t.address.to_lowercase() == token_in.clone()).expect("Token not found in global list").clone());
+                    let quote = Token::from(atks.iter().find(|t| t.address.to_lowercase() == token_out.clone()).expect("Token not found in global list").clone());
+                    match x.spot_price(&base, &quote) {
+                        Ok(sp) => {
+                            log::info!("Adding edge: {} -> {} at rate {}", token_in, token_out, sp);
+                            graph.entry(token_in.clone()).or_default().push((token_out.clone(), sp));
+                        }
+                        Err(e) => {
+                            log::info!("No conversion from {} to {}: {}", token_in, token_out, e);
+                        }
                     }
                 }
             }
         }
     }
+    log::info!("Graph built: {:?}", graph);
+
     let start = input.to_lowercase();
     let target = network.eth.to_lowercase();
     let unit = 1.0;
     let mut stack = vec![(start.clone(), unit, vec![start.clone()])];
     let mut visited: HashSet<String> = HashSet::new();
+    log::info!("Starting DFS from {} to target {}", start, target);
+
     while let Some((current, product, path)) = stack.pop() {
+        log::info!("At node {} with product {} and path {:?}", current, product, path);
         if current == target {
+            log::info!("Target {} reached with product {} and path {:?}", target, product, path);
             return Some((product, path));
         }
         if visited.contains(&current) {
+            log::info!("Token {} already visited; skipping", current);
             continue;
         }
         visited.insert(current.clone());
         if let Some(neighbors) = graph.get(&current) {
             for (next, rate) in neighbors {
                 let mut new_path = path.clone();
-                new_path.push(next.clone());
-                stack.push((next.clone(), product * rate, new_path));
+                new_path.push(next.to_lowercase());
+                log::info!("Pushing neighbor {} with rate {}: new product {} and path {:?}", next, rate, product * rate, new_path);
+                stack.push((next.to_lowercase(), product * rate, new_path));
             }
+        } else {
+            log::info!("No neighbors for token {}", current);
         }
     }
+    log::info!("DFS complete; no conversion path found from {} to {}", start, target);
     None
 }
 
 #[cfg(test)]
 mod tests {
 
-    
-
     use super::*;
 
     #[test]
     fn test_pricing_test_wbtc_to_eth() {
+        tap2::shd::utils::misc::log::new("routing".to_string());
         // Use mainnet addresses:
         // WBTC: 0x2260fac5e5542a773aa44fbcfedf7c193bc2c599
         // USDC: 0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48
@@ -231,7 +289,7 @@ mod tests {
         // 1 WBTC -> 20000 USDC; 1 USDC -> 1 USDT; 1 USDT -> 0.0003 WETH.
         // Cumulative: 20000 * 1 * 0.0003 = 6.0 WETH.
         // Expected route: [WBTC address, USDC address, USDT address, WETH address].
-        let result = pricing_test(network.clone(), ptss.clone(), atks.clone(), input.clone()).expect("A conversion path must exist");
+        let result = pricing(network.clone(), ptss.clone(), atks.clone(), input.clone()).expect("A conversion path must exist");
         let (price, route) = result;
         println!("Price: {}, Route: {:?}", price, route);
         assert!((price - 6.0).abs() < 1e-12, "Expected 6.0 WETH, got {}", price);
@@ -247,10 +305,16 @@ mod tests {
         // 1 USDT -> 1/20 000 BTC; 1/20 000 BTC -> 1 USDC; 1 USDC -> 0.0003 WETH.
         // Cumulative: 20000 * 1 * 0.0003 = 6.0 WETH.
         // Expected route: [WBTC address, USDC address, USDT address, WETH address].
-        let result = pricing_test(network.clone(), ptss, atks, input).expect("A conversion path must exist");
+        let result = pricing(network.clone(), ptss.clone(), atks.clone(), input).expect("A conversion path must exist");
         let (price, route) = result;
         println!("Price: {}, Route: {:?}", price, route);
         assert!((price - 0.0003).abs() < 1e-12, "Expected 0.0003 WETH, got {}", price);
         assert_eq!(route, vec![token_usdt.address.to_lowercase(), token_weth.address.to_lowercase()]);
+
+        // #3
+        let input = token_usdc.address.to_lowercase();
+        let result = pricing(network.clone(), ptss.clone(), atks.clone(), input.clone()).expect("A conversion path must exist");
+        let (price, route) = result;
+        println!("Price: {}, Route: {:?}", price, route);
     }
 }

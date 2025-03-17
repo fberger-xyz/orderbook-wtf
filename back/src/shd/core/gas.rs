@@ -1,7 +1,7 @@
-use std::collections::{HashMap, HashSet};
+use std::collections::{HashMap, HashSet, VecDeque};
 
 use crate::shd::{
-    data::fmt::SrzToken,
+    data::fmt::{SrzProtocolComponent, SrzToken},
     r#static::endpoints::COINGECKO_ETH_USD,
     types::{Network, ProtoTychoState},
 };
@@ -45,15 +45,15 @@ pub async fn ethusd() -> f64 {
  * Depth-first search (DFS) is a graph traversal method that explores as far as possible along each branch before backtracking.
  */
 pub fn pricing(network: Network, ptss: Vec<ProtoTychoState>, atks: Vec<SrzToken>, input: String) -> Option<(f64, Vec<String>)> {
-    let mut graph: HashMap<String, Vec<(String, f64)>> = HashMap::new();
-    for x in ptss {
-        let addresses: Vec<String> = x.component.tokens.iter().map(|t| t.address.to_lowercase()).collect();
+    let mut graph: std::collections::HashMap<String, Vec<(String, f64)>> = std::collections::HashMap::new();
+    for state in ptss {
+        let addresses: Vec<String> = state.component.tokens.iter().map(|t| t.address.to_lowercase()).collect();
         for token_in in addresses.iter() {
             for token_out in addresses.iter() {
                 if token_in != token_out {
                     let base = Token::from(atks.iter().find(|t| t.address.to_lowercase() == token_in.clone()).unwrap().clone());
                     let quote = Token::from(atks.iter().find(|t| t.address.to_lowercase() == token_out.clone()).unwrap().clone());
-                    if let Ok(sp) = x.protosim.spot_price(&base, &quote) {
+                    if let Ok(sp) = state.protosim.spot_price(&base, &quote) {
                         graph.entry(token_in.clone()).or_default().push((token_out.clone(), sp));
                     }
                 }
@@ -63,22 +63,112 @@ pub fn pricing(network: Network, ptss: Vec<ProtoTychoState>, atks: Vec<SrzToken>
     let start = input.to_lowercase();
     let target = network.eth.to_lowercase();
     let unit = 1.0;
+    // The stack holds (current token, cumulative rate, path so far)
     let mut stack = vec![(start.clone(), unit, vec![start.clone()])];
-    let mut visited: HashSet<String> = HashSet::new();
+    // Remove the global visited set; instead, check for cycles in the current path only.
     while let Some((current, product, path)) = stack.pop() {
         if current == target {
             return Some((product, path));
+        }
+        if let Some(neighbors) = graph.get(&current) {
+            for (next, rate) in neighbors {
+                // Only check the current path to avoid cycles.
+                if path.contains(&next.to_lowercase()) {
+                    continue;
+                }
+                let mut new_path = path.clone();
+                new_path.push(next.to_lowercase());
+                stack.push((next.to_lowercase(), product * rate, new_path));
+            }
+        }
+    }
+    None
+}
+
+pub fn pricing2(network: Network, ptss: Vec<ProtoTychoState>, atks: Vec<SrzToken>, input: String) -> Option<(f64, Vec<String>)> {
+    // Build the conversion graph:
+    // key: token address (lowercase), value: list of (target token address, conversion rate)
+    let mut graph: HashMap<String, Vec<(String, f64)>> = HashMap::new();
+    for state in ptss {
+        let addresses: Vec<String> = state.component.tokens.iter().map(|t| t.address.to_lowercase()).collect();
+        for token_in in addresses.iter() {
+            for token_out in addresses.iter() {
+                if token_in != token_out {
+                    let base = Token::from(atks.iter().find(|t| t.address.to_lowercase() == *token_in).unwrap().clone());
+                    let quote = Token::from(atks.iter().find(|t| t.address.to_lowercase() == *token_out).unwrap().clone());
+                    if let Ok(sp) = state.protosim.spot_price(&base, &quote) {
+                        graph.entry(token_in.clone()).or_default().push((token_out.clone(), sp));
+                    }
+                }
+            }
+        }
+    }
+
+    let start = input.to_lowercase();
+    let target = network.eth.to_lowercase();
+    let unit = 1.0;
+    let mut queue: VecDeque<(String, f64, Vec<String>)> = VecDeque::new();
+    queue.push_back((start.clone(), unit, vec![start.clone()]));
+    let mut visited: HashSet<String> = HashSet::new();
+
+    while let Some((current, product, path)) = queue.pop_front() {
+        if current == target {
+            return Some((product, path));
+        }
+        // Use the same visited approach as in the working routing code.
+        if !visited.insert(current.clone()) {
+            continue;
+        }
+        if let Some(neighbors) = graph.get(&current) {
+            for (next, rate) in neighbors {
+                // Create a new path and add the next token.
+                let mut new_path = path.clone();
+                new_path.push(next.clone());
+                queue.push_back((next.clone(), product * rate, new_path));
+            }
+        }
+    }
+    None
+}
+
+// First, a function to build the conversion graph and find a conversion path.
+pub fn find_conversion_path(cps: Vec<SrzProtocolComponent>, atks: Vec<SrzToken>, input: String, target: String) -> Option<Vec<String>> {
+    let mut graph: HashMap<String, Vec<String>> = HashMap::new();
+    for state in cps {
+        // Collect the token addresses (in lowercase) from the component.
+        let addresses: Vec<String> = state.tokens.iter().map(|t| t.address.to_lowercase()).collect();
+        // For each possible conversion within this state, add edges (without rate info).
+        for token_in in &addresses {
+            for token_out in &addresses {
+                if token_in != token_out {
+                    graph.entry(token_in.clone()).or_default().push(token_out.clone());
+                }
+            }
+        }
+    }
+    let start = input.to_lowercase();
+    let target = target.to_lowercase();
+    let mut queue: VecDeque<(String, Vec<String>)> = VecDeque::new();
+    queue.push_back((start.clone(), vec![start.clone()]));
+    let mut visited: HashSet<String> = HashSet::new();
+    while let Some((current, path)) = queue.pop_front() {
+        if current == target {
+            return Some(path);
         }
         if visited.contains(&current) {
             continue;
         }
         visited.insert(current.clone());
         if let Some(neighbors) = graph.get(&current) {
-            for (next, rate) in neighbors {
-                let mut new = path.clone();
-                new.push(next.clone().to_lowercase());
-                stack.push((next.clone().to_lowercase(), product * rate, new));
+            for next in neighbors {
+                if path.contains(next) {
+                    continue;
+                }
+                let mut new_path = path.clone();
+                new_path.push(next.clone());
+                queue.push_back((next.clone(), new_path));
             }
+        } else {
         }
     }
     None

@@ -1,3 +1,9 @@
+use std::{
+    collections::HashMap,
+    fmt::{self, Display},
+    sync::Arc,
+};
+
 use serde::{Deserialize, Serialize};
 use tokio::sync::RwLock;
 use utoipa::ToSchema;
@@ -151,11 +157,6 @@ impl From<&str> for AmmType {
         }
     }
 }
-use std::{
-    collections::HashMap,
-    fmt::{self, Display},
-    sync::Arc,
-};
 
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub enum SyncState {
