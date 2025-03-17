@@ -10,8 +10,8 @@ export const useAppStore = create<{
     storeRefreshedAt: number
     refetchInterval: number
     selectedTrade?: { datapoint: OrderbookDataPoint; bidsPools: NewPool[]; asksPools: NewPool[] }
-    yAxisType: 'value' | 'log',
-    yAxisLogBase: number,
+    yAxisType: 'value' | 'log'
+    yAxisLogBase: number
     setShowMobileMenu: (showMobileMenu: boolean) => void
     setHasHydrated: (hasHydrated: boolean) => void
     setStoreRefreshedAt: (storeRefreshedAt: number) => void

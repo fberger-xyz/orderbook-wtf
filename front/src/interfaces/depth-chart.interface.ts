@@ -16,7 +16,7 @@ export interface Pool {
     contract_ids: unknown[]
     static_attributes: string[][]
     creation_tx: string
-    created_at: string 
+    created_at: string
 }
 
 export interface Trade {
@@ -35,28 +35,28 @@ export interface Token {
 
 // new
 export interface NewOrderbookTrades {
-    token0: Token;
-    token1: Token;
-    trades0to1: NewTrade[];
-    trades1to0: NewTrade[];
-    pools: NewPool[];
+    token0: Token
+    token1: Token
+    trades0to1: NewTrade[]
+    trades1to0: NewTrade[]
+    pools: NewPool[]
 }
 
 export interface NewPool {
-    address: string;
-    id: string;
-    tokens: Token[];
-    protocol_system: string;
-    protocol_type_name: string;
-    contract_ids: string[];
-    static_attributes: string[][];
-    creation_tx: string;
+    address: string
+    id: string
+    tokens: Token[]
+    protocol_system: string
+    protocol_type_name: string
+    contract_ids: string[]
+    static_attributes: string[][]
+    creation_tx: string
 }
 
 export interface NewTrade {
-    input: number;
-    output: number;
-    distribution: number[];
-    gas_costs: number[];
-    ratio: number;
+    input: number
+    output: number
+    distribution: number[]
+    gas_costs: number[]
+    ratio: number
 }

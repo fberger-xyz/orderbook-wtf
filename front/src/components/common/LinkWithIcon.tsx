@@ -6,7 +6,7 @@ export default function LinkWithIcon({ children, href, ...props }: { href: strin
         <LinkWrapper
             href={href}
             className={cn(
-                'flex w-fit cursor-alias items-center gap-2 rounded-xl border border-light-hover px-3 py-1 text-default underline-offset-2 hover:bg-very-light-hover hover:underline',
+                'flex w-fit cursor-alias items-center gap-2 rounded-xl border border-light-hover px-2 py-1 text-default underline-offset-2 hover:bg-very-light-hover hover:underline',
                 props.className,
             )}
             target="_blank"

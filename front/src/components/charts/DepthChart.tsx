@@ -258,20 +258,20 @@ const getOptions = (
                     symbol: 'none',
                     data: bids.length
                         ? [
-                            {
-                                xAxis: bids[bids.length - 1][0],
-                                lineStyle: { color: 'green', opacity: 0.5 },
-                                label: {
-                                    show: true,
-                                    color: 'green',
-                                    formatter: (params) => `Best bid at ${params.value} ${token1}/${token0}`,
-                                    // https://echarts.apache.org/en/option.html#series-bar.markLine.data.0.label.position
-                                    position: 'insideMiddleTop',
-                                    fontSize: 10,
-                                    opacity: 1,
-                                },
-                            },
-                        ]
+                              {
+                                  xAxis: bids[bids.length - 1][0],
+                                  lineStyle: { color: 'green', opacity: 0.5 },
+                                  label: {
+                                      show: true,
+                                      color: 'green',
+                                      formatter: (params) => `Best bid at ${params.value} ${token1}/${token0}`,
+                                      // https://echarts.apache.org/en/option.html#series-bar.markLine.data.0.label.position
+                                      position: 'insideMiddleTop',
+                                      fontSize: 10,
+                                      opacity: 1,
+                                  },
+                              },
+                          ]
                         : undefined,
                 },
 
@@ -279,25 +279,25 @@ const getOptions = (
                 markArea: {
                     data: bids.length
                         ? [
-                            [
-                                {
-                                    xAxis: bids[0][0],
-                                    label: {
-                                        show: true,
-                                        // https://echarts.apache.org/en/option.html#series-bar.markArea.data.0.label.position
-                                        position: 'top',
-                                        fontSize: 10,
-                                        color: colors.text[resolvedTheme],
-                                        formatter: () => `LPs' bids in ${token1}\nfor traders to swap ${token0} in ${token1}`,
-                                    },
-                                    itemStyle: {
-                                        color: 'green',
-                                        opacity: 0.05,
-                                    },
-                                },
-                                { xAxis: bids[bids.length - 1][0] },
-                            ],
-                        ]
+                              [
+                                  {
+                                      xAxis: bids[0][0],
+                                      label: {
+                                          show: true,
+                                          // https://echarts.apache.org/en/option.html#series-bar.markArea.data.0.label.position
+                                          position: 'top',
+                                          fontSize: 10,
+                                          color: colors.text[resolvedTheme],
+                                          formatter: () => `LPs' bids in ${token1}\nfor traders to swap ${token0} in ${token1}`,
+                                      },
+                                      itemStyle: {
+                                          color: 'green',
+                                          opacity: 0.05,
+                                      },
+                                  },
+                                  { xAxis: bids[bids.length - 1][0] },
+                              ],
+                          ]
                         : undefined,
                 },
             },
@@ -331,20 +331,20 @@ const getOptions = (
                     symbol: 'none',
                     data: asks.length
                         ? [
-                            {
-                                xAxis: asks[0][0],
-                                lineStyle: { color: 'red', opacity: 0.5 },
-                                label: {
-                                    show: true,
-                                    color: 'red',
-                                    // formatter: (params) => `Best ask = 1 ${token0} for ${params.value} ${token1}`,
-                                    formatter: (params) => `Best ask at ${params.value} ${token1}/${token0}`,
-                                    position: 'insideMiddleBottom',
-                                    fontSize: 10,
-                                    opacity: 1,
-                                },
-                            },
-                        ]
+                              {
+                                  xAxis: asks[0][0],
+                                  lineStyle: { color: 'red', opacity: 0.5 },
+                                  label: {
+                                      show: true,
+                                      color: 'red',
+                                      // formatter: (params) => `Best ask = 1 ${token0} for ${params.value} ${token1}`,
+                                      formatter: (params) => `Best ask at ${params.value} ${token1}/${token0}`,
+                                      position: 'insideMiddleBottom',
+                                      fontSize: 10,
+                                      opacity: 1,
+                                  },
+                              },
+                          ]
                         : undefined,
                 },
 
@@ -352,24 +352,24 @@ const getOptions = (
                 markArea: {
                     data: asks.length
                         ? [
-                            [
-                                {
-                                    xAxis: asks[0][0],
-                                    label: {
-                                        show: true,
-                                        position: 'top',
-                                        fontSize: 10,
-                                        color: colors.text[resolvedTheme],
-                                        formatter: () => `LPs' asks in ${token0}\nfor traders to swap ${token1} in ${token0}`,
-                                    },
-                                    itemStyle: {
-                                        color: 'red',
-                                        opacity: 0.05,
-                                    },
-                                },
-                                { xAxis: asks[asks.length - 1][0] },
-                            ],
-                        ]
+                              [
+                                  {
+                                      xAxis: asks[0][0],
+                                      label: {
+                                          show: true,
+                                          position: 'top',
+                                          fontSize: 10,
+                                          color: colors.text[resolvedTheme],
+                                          formatter: () => `LPs' asks in ${token0}\nfor traders to swap ${token1} in ${token0}`,
+                                      },
+                                      itemStyle: {
+                                          color: 'red',
+                                          opacity: 0.05,
+                                      },
+                                  },
+                                  { xAxis: asks[asks.length - 1][0] },
+                              ],
+                          ]
                         : undefined,
                 },
             },
@@ -398,13 +398,16 @@ export default function DepthChart(props: { orderbook: NewOrderbookTrades }) {
         const bids = props.orderbook.trades0to1
             .filter((trade, tradeIndex, trades) => trades.findIndex((_trade) => _trade.input === trade.input) === tradeIndex)
             .sort((curr, next) => curr.ratio - next.ratio) // filter by obtained price
-            .map((trade) => [
-                trade.ratio, // 2k
-                trade.input, // input in ETH
-                OrderbookSide.BID,
-                trade.distribution,
-                trade.ratio * trade.input, // output in USDC
-            ] as OrderbookDataPoint)
+            .map(
+                (trade) =>
+                    [
+                        trade.ratio, // 2k
+                        trade.input, // input in ETH
+                        OrderbookSide.BID,
+                        trade.distribution,
+                        trade.ratio * trade.input, // output in USDC
+                    ] as OrderbookDataPoint,
+            )
 
         // example: 0 = weth, 1 = usdc
         // trades1to0 = traders swap USDC into WETH
@@ -416,21 +419,33 @@ export default function DepthChart(props: { orderbook: NewOrderbookTrades }) {
         // asks
         const asks = props.orderbook.trades1to0
             .filter((trade, tradeIndex, trades) => trades.findIndex((_trade) => _trade.input === trade.input) === tradeIndex)
-            .map((trade) => [
-                1 / trade.ratio,
-                trade.input,
-                OrderbookSide.ASK,
-                trade.distribution,
-                trade.ratio * trade.input, // output in USDC
-            ] as OrderbookDataPoint)
+            .map(
+                (trade) =>
+                    [
+                        1 / trade.ratio,
+                        trade.input,
+                        OrderbookSide.ASK,
+                        trade.distribution,
+                        trade.ratio * trade.input, // output in USDC
+                    ] as OrderbookDataPoint,
+            )
             .sort((curr, next) => Number(curr[0]) - Number(next[0])) // filter by obtained price
 
         // options
-        const newOptions = getOptions(theme, props.orderbook.token0.symbol, props.orderbook.token1.symbol, bids, asks, props.orderbook.pools, yAxisType, yAxisLogBase)
+        const newOptions = getOptions(
+            theme,
+            props.orderbook.token0.symbol,
+            props.orderbook.token1.symbol,
+            bids,
+            asks,
+            props.orderbook.pools,
+            yAxisType,
+            yAxisLogBase,
+        )
 
         // update
         setOptions(newOptions)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [storeRefreshedAt, yAxisType, yAxisLogBase, resolvedTheme])
 
     // methods
@@ -457,8 +472,8 @@ export default function DepthChart(props: { orderbook: NewOrderbookTrades }) {
             </ErrorBoundary>
             <div className="w-full flex flex-col items-start mt-5 text-sm">
                 <div className="flex gap-4 items-center">
-                <Button text={`yAxisType=${yAxisType}`} onClickFn={() => setYAxisType(yAxisType === 'log' ? 'value' : 'log')} />
-                    {yAxisType === 'log' && <p>log base={yAxisLogBase}</p> }
+                    <Button text={`yAxisType=${yAxisType}`} onClickFn={() => setYAxisType(yAxisType === 'log' ? 'value' : 'log')} />
+                    {yAxisType === 'log' && <p>log base={yAxisLogBase}</p>}
                 </div>
             </div>
         </Suspense>

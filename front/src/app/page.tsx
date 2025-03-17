@@ -7,8 +7,7 @@ import { NewOrderbookTrades } from '@/interfaces'
 import { promises as fs } from 'fs'
 
 export default async function Page() {
-
-    const commonPath = "../back/misc/data-front-v2/orderbook.ethereum."
+    const commonPath = '../back/misc/data-front-v2/orderbook.ethereum.'
     // const FILE_PATH = `${commonPath}DAI-USDT.json`
     // const FILE_PATH = `${commonPath}USDC-DAI.json`
     // const FILE_PATH = `${commonPath}USDC-USDT.json`
@@ -24,7 +23,6 @@ export default async function Page() {
     const ORDERBOOK_PATH = process.cwd() + `/${FILE_PATH}`
     const ORDERBOOK_CONTENT = await fs.readFile(ORDERBOOK_PATH, 'utf8')
     const ORDERBOOK = JSON.parse(ORDERBOOK_CONTENT) as NewOrderbookTrades
-
 
     return (
         <AppStoreLoader>
