@@ -30,9 +30,12 @@ pub fn optimizer(
     let sizebg = BigUint::from(size as u32);
     let mut allocations: Vec<BigUint> = vec![&inputpow / &sizebg; size]; // Which is naive I guess
 
+    // Reallocate 10% of the allocation from the pool with the lowest marginal.
+    let fraction = BigUint::from(10u32);
+
     // @notice epsilon is key here. It tells us the marginal benefit of giving a little more to that pool. The smaller epsilon is, the more accurately we capture that local behavior
     let epsilon = &inputpow / BigUint::from(10_000u32); // Choose a fixed epsilon for finite difference. May 1e9 is better, IDK.
-    let max_iterations = 50u32; // We'll run a maximum of 100 iterations.
+    let max_iterations = 50u32; // Maximum of iterations.
     let tolerance = BigUint::zero(); // Tolerance: if the difference between max and min marginal is zero.
     for _iter in 0..max_iterations {
         // Compute marginal returns for each pool as: f(x+epsilon) - f(x).
@@ -67,11 +70,9 @@ pub fn optimizer(
             // log::info!("Converged after {} iterations", iter);
             break; // ? If I'm correct in theory it will never converge, unless we take a very small epsilon that would make no difference = convergence
         }
-        // Reallocate 10% of the allocation from the pool with the lowest marginal.
         // => Moving a fixed fraction (10%) of the allocation from the worst-performing pool to the best-performing one
         // Too high a percentage might cause the allocation to swing too quickly, overshooting the optimal balance.
         // Too low a percentage would make convergence very slow.
-        let fraction = BigUint::from(10u32);
         let adjusted = &allocations[mini] / &fraction;
         allocations[mini] = &allocations[mini] - &adjusted;
         allocations[max] = &allocations[max] + &adjusted;

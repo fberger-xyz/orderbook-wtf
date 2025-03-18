@@ -41,7 +41,7 @@ fn test_simulations() {
                         let diff_percent = (diff / last_ratio) * 100.0;
 
                         log::info!(
-                            "Warning: trade#{} Ratio is not decreasing in {:?} at trade with input {:.4} | \t Last_ratio: {:.6}, current_ratio: {:.6}, diff: {:.6}, diff_percent: {:.}% | Distribution => {}",
+                            "Warning: trade#{} Ratio is not decreasing in {:?} at trade with input {} | \t Last_ratio: {}, current_ratio: {}, diff: {}, diff_percent: {:.}% | Distribution => {}",
                             x,
                             path,
                             trade.input,

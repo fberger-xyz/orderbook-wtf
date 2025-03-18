@@ -99,7 +99,12 @@ pub fn optimize(balances: &HashMap<String, u128>, pcs: &Vec<ProtoTychoState>, et
         tokb,
         tokb as f64 / 10f64.powi(token_from.decimals as i32)
     );
-    let steps = shd::maths::steps::exponential(shd::r#static::maths::simu::COUNT, shd::r#static::maths::simu::START_MULTIPLIER, shd::r#static::maths::simu::END_MULTIPLIER, 10.);
+    let steps = shd::maths::steps::exponential(
+        shd::r#static::maths::simu::COUNT,
+        shd::r#static::maths::simu::START_MULTIPLIER,
+        shd::r#static::maths::simu::END_MULTIPLIER,
+        shd::r#static::maths::simu::MIN_EXP_DELTA,
+    );
     let steps = steps.iter().map(|x| x * start).collect::<Vec<f64>>();
     for (x, amount) in steps.iter().enumerate() {
         let start = Instant::now();
