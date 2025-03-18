@@ -9,7 +9,7 @@ use num_traits::Zero;
 use std::collections::HashMap;
 
 /**
- * A very simple gradient-based optimizer that uses fixed iterations (100 max) and
+ * A gradient-based optimizer that uses fixed iterations (100 max) and
  * moves a fixed fraction (10%) of the allocation from the pool with the lowest marginal
  * return to the one with the highest.
  * All arithmetic is done with BigUint.
@@ -17,8 +17,6 @@ use std::collections::HashMap;
 pub fn optimizer(
     input: f64, // human–readable input (e.g. 100 meaning 100 ETH)
     pools: &Vec<ProtoTychoState>,
-    _balances: &HashMap<String, u128>,
-    _ethusd: f64,
     token_in: SrzToken,
     token_out: SrzToken,
 ) -> TradeResult {

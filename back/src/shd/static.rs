@@ -3,6 +3,13 @@ pub mod maths {
     pub static BPD: f64 = 10_000.0;
     pub static ONE_MILLIONTH: f64 = 1_000_000.0;
     pub static ONE_PERCENT_IN_MN: f64 = 10_000.; // 1% in millionths
+
+    pub mod simu {
+        // Config for incrementing amountIn
+        pub static COUNT: usize = 25;
+        pub static START_MULTIPLIER: f64 = 1.;
+        pub static END_MULTIPLIER: f64 = 400_000.;
+    }
 }
 
 pub mod endpoints {
