@@ -297,12 +297,13 @@ async fn orderbook(Extension(shtss): Extension<SharedTychoStreamState>, Extensio
                     return Json(json!({ "orderbook": {} }));
                 }
                 // Token 0
-                let utk_base_ethworth = shd::maths::path::quote(to_eth_ptss.clone(), atks.clone(), t0_to_eth_path.clone()).unwrap_or_default();
-                let utk_quote_ethworth = shd::maths::path::quote(to_eth_ptss.clone(), atks.clone(), t1_to_eth_path.clone()).unwrap_or_default();
-                log::info!(" - One unit of base token ({}) quoted to ETH = {}", srzt0.symbol, utk_base_ethworth);
-                log::info!(" - One unit of quote token ({}) quoted to ETH = {}", srzt1.symbol, utk_quote_ethworth);
-                let result = shd::core::orderbook::build(network.clone(), balances.clone(), ptss.clone(), tokens.clone(), params.clone(), utk_base_ethworth, utk_quote_ethworth).await;
-                let path = format!("misc/data-front-v2/orderbook.{}.{}-{}.json", network.name, srzt0.symbol.to_lowercase(), srzt1.symbol.to_lowercase());
+                let utk0_ethworth = shd::maths::path::quote(to_eth_ptss.clone(), atks.clone(), t0_to_eth_path.clone()).unwrap_or_default();
+                let utk1_ethworth = shd::maths::path::quote(to_eth_ptss.clone(), atks.clone(), t1_to_eth_path.clone()).unwrap_or_default();
+                log::info!(" - One unit of base token ({}) quoted to ETH = {}", srzt0.symbol, utk0_ethworth);
+                log::info!(" - One unit of quote token ({}) quoted to ETH = {}", srzt1.symbol, utk1_ethworth);
+                let ptss = vec![ptss[0].clone()];
+                let result = shd::core::orderbook::build(network.clone(), balances.clone(), ptss.clone(), tokens.clone(), params.clone(), utk0_ethworth, utk1_ethworth).await;
+                let path = format!("misc/data-front-v2/single/orderbook.{}.{}-{}.json", network.name, srzt0.symbol.to_lowercase(), srzt1.symbol.to_lowercase());
                 crate::shd::utils::misc::save1(result.clone(), path.as_str());
                 Json(json!({ "orderbook": result.clone() }))
             } else {

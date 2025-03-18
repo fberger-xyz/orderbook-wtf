@@ -8,7 +8,7 @@ pub mod maths {
         // Config for incrementing amountIn
         pub static COUNT: usize = 25;
         pub static START_MULTIPLIER: f64 = 1.;
-        pub static END_MULTIPLIER: f64 = 400_000.;
+        pub static END_MULTIPLIER: f64 = 750_000.; // 25% is enough
         pub static MIN_EXP_DELTA: f64 = 25.;
     }
 }

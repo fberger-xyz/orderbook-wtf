@@ -9,7 +9,7 @@ use crate::shd::{
 use std::{collections::HashMap, time::Instant};
 
 /// @notice Reading 'state' from Redis DB while using TychoStreamState state and functions to compute/simulate might create a inconsistency
-pub async fn build(network: Network, balances: HashMap<String, HashMap<String, u128>>, ptss: Vec<ProtoTychoState>, tokens: Vec<SrzToken>, query: PairQuery, utk_base_ethworth: f64, utk_quote_ethworth: f64) -> PairSimulatedOrderbook {
+pub async fn build(network: Network, balances: HashMap<String, HashMap<String, u128>>, ptss: Vec<ProtoTychoState>, tokens: Vec<SrzToken>, query: PairQuery, utk0_ethworth: f64, utk1_ethworth: f64) -> PairSimulatedOrderbook {
     log::info!("Got {} pools to compute for pair: '{}'", ptss.len(), query.tag);
     let mut pools = Vec::new();
     let mut prices0to1 = vec![];
@@ -19,6 +19,8 @@ pub async fn build(network: Network, balances: HashMap<String, HashMap<String, u
     let t0 = Token::from(srzt0.clone());
     let t1 = Token::from(srzt1.clone());
     let (base, quote) = (t0, t1);
+    let mut aggt0lqdty = vec![];
+    let mut aggt1lqdty = vec![];
     for pdata in ptss.clone() {
         log::info!("- Preparing pool: {} | Type: {}", pdata.component.id, pdata.component.protocol_type_name);
         pools.push(pdata.clone());
@@ -28,12 +30,22 @@ pub async fn build(network: Network, balances: HashMap<String, HashMap<String, u
         prices0to1.push(price0to1);
         prices1to0.push(price1to0);
         log::info!(" - Spot price for {}-{} => price0to1 = {} and price1to0 = {}", base.symbol, quote.symbol, price0to1, price1to0);
+        match balances.get(&pdata.component.id.to_lowercase()) {
+            Some(cpbs) => {
+                let t0b = cpbs.get(&srzt0.address.to_lowercase()).unwrap_or(&0u128);
+                aggt0lqdty.push(t0b.clone() as f64 / 10f64.powi(srzt0.decimals as i32));
+                let t1b = cpbs.get(&srzt1.address.to_lowercase()).unwrap_or(&0u128);
+                aggt1lqdty.push(t1b.clone() as f64 / 10f64.powi(srzt1.decimals as i32));
+            }
+            None => {}
+        }
     }
     let cps: Vec<SrzProtocolComponent> = pools.clone().iter().map(|p| p.component.clone()).collect();
     let aggregated = shd::maths::steps::deepth(cps.clone(), tokens.clone(), balances.clone());
     let avgp0to1 = prices0to1.iter().sum::<f64>() / prices0to1.len() as f64;
     let avgp1to0 = prices1to0.iter().sum::<f64>() / prices1to0.len() as f64; // Ponderation by TVL ?
     log::info!("Average price 0to1: {} | Average price 1to0: {}", avgp0to1, avgp1to0);
+
     // return PairSimulatedOrderbook {
     //     token0: srzt0.clone(),
     //     token1: srzt1.clone(),
@@ -43,9 +55,12 @@ pub async fn build(network: Network, balances: HashMap<String, HashMap<String, u
     //     prices1to0: prices1to0.clone(),
     //     pools: vec![],
     // };
-    let mut pso = simulate(network.clone(), pools.clone(), tokens, query.clone(), aggregated.clone()).await;
+
+    let mut pso = simulate(network.clone(), pools.clone(), tokens, query.clone(), aggregated.clone(), utk0_ethworth, utk1_ethworth).await;
     pso.prices0to1 = prices0to1.clone();
     pso.prices1to0 = prices1to0.clone();
+    pso.aggt0lqdty = aggt0lqdty.clone();
+    pso.aggt1lqdty = aggt1lqdty.clone();
     log::info!("Optimization done. Returning Simulated Orderbook for pair (base-quote) => '{}-{}'", base.symbol, quote.symbol);
     pso
 }
@@ -57,7 +72,7 @@ pub async fn build(network: Network, balances: HashMap<String, HashMap<String, u
  * ToDo: AmountIn must not be greater than the component balance, or let's say 50% of it, because it don't make sense to impact more than 50% of the pool, even some % it worsens the price
  * ToDo: Top n pooL most liquid only, remove the too small liquidity pools
  */
-pub async fn simulate(network: Network, pcsdata: Vec<ProtoTychoState>, tokens: Vec<SrzToken>, query: PairQuery, balances: HashMap<String, u128>) -> PairSimulatedOrderbook {
+pub async fn simulate(network: Network, pcsdata: Vec<ProtoTychoState>, tokens: Vec<SrzToken>, query: PairQuery, balances: HashMap<String, u128>, utk0_ethworth: f64, utk1_ethworth: f64) -> PairSimulatedOrderbook {
     let ethusd = shd::core::gas::ethusd().await;
     let gasp = shd::core::gas::gasprice(network.rpc).await;
     let t0 = tokens[0].clone();
@@ -85,6 +100,8 @@ pub async fn simulate(network: Network, pcsdata: Vec<ProtoTychoState>, tokens: V
         trades1to0: trades1to0.clone(),
         prices0to1: vec![], // Set later
         prices1to0: vec![], // Set later
+        aggt0lqdty: vec![], // Set later
+        aggt1lqdty: vec![], // Set later
         pools: pools.clone(),
     }
 }
@@ -113,7 +130,7 @@ pub fn optimize(balances: &HashMap<String, u128>, pcs: &Vec<ProtoTychoState>, et
         let total_gas_cost = result.gas_costs.iter().sum::<u128>();
         let total_gas_cost = (total_gas_cost * gasp) as f64 * ethusd / 1e18f64;
         log::info!(
-            " - #{x} | Input: {} {:.4}, Output: {} {:.4} at price {:.7} | Distribution: {:?} | Total Gas cost: {:.8} $ | Took: {:?}",
+            " - #{x} | Input: {} {}, Output: {} {} at price {} | Distribution: {:?} | Total Gas cost: {:.8} $ | Took: {:?}",
             result.input,
             token_from.symbol,
             result.output,

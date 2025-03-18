@@ -452,7 +452,7 @@ async fn stream_protocol(network: Network, shdstate: SharedTychoStreamState, tok
 #[tokio::main]
 async fn main() {
     shd::utils::misc::log::new("stream".to_string());
-    dotenv::from_filename(".env.ex").ok(); // Use .env.ex for testing
+    dotenv::from_filename(".env.prod").ok(); // Use .env.ex for testing
     let config = EnvConfig::new();
     log::info!("Launching Stream | 🧪 Testing mode: {:?}", config.testing);
     let path = "src/shd/config/networks.json".to_string();

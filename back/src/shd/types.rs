@@ -292,6 +292,8 @@ pub struct PairSimulatedOrderbook {
     pub prices1to0: Vec<f64>,
     pub trades0to1: Vec<TradeResult>,
     pub trades1to0: Vec<TradeResult>,
+    pub aggt0lqdty: Vec<f64>,
+    pub aggt1lqdty: Vec<f64>,
     pub pools: Vec<SrzProtocolComponent>,
 }
 
