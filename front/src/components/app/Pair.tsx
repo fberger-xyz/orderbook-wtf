@@ -11,7 +11,7 @@ export default function Pair(props: { pair: string }) {
     return (
         <button
             className={cn('flex gap-3 border rounded-xl py-1.5 px-2 items-center', {
-                'bg-inactive border-primary': props.pair === selectedPair,
+                'bg-light-hover border-primary': props.pair === selectedPair,
                 'bg-very-light-hover border-light-hover hover:border-inactive hover:bg-light-hover': props.pair !== selectedPair,
             })}
             onClick={() => selectPair(props.pair)}

@@ -16,9 +16,11 @@ import { AmmAsOrderbook, AmmPool } from '@/interfaces'
 import numeral from 'numeral'
 import { OrderbookDataPoint } from '@/types'
 import Button from '../common/Button'
+import { Lato } from 'next/font/google'
 
 const serie1Name = 'Market Depth'
 const lightGray = 'rgba(150, 150, 150, 0.5)'
+const font = Lato({ weight: ['100', '300', '400', '700', '900'], subsets: ['latin'] })
 
 const getOptions = (
     resolvedTheme: AppThemes,
@@ -219,6 +221,7 @@ const getOptions = (
         ],
         textStyle: {
             color: colors.text[resolvedTheme],
+            fontFamily: font.style.fontFamily,
         },
         grid: {
             left: '10%',

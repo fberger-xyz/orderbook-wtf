@@ -2,7 +2,7 @@ import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 import { APP_METADATA, IS_DEV } from '@/config/app.config'
 import { OrderbookDataPoint } from '@/types'
-import { AmmAsOrderbook, AmmPool } from '@/interfaces'
+import { AmmAsOrderbook, AmmPool, Token } from '@/interfaces'
 
 export const useAppStore = create<{
     showMobileMenu: boolean
@@ -14,6 +14,9 @@ export const useAppStore = create<{
     yAxisLogBase: number
     availablePairs: string[]
     selectedPair?: string
+    selectedToken0?: Token
+    selectedToken1?: Token
+    availableTokens: Token[]
     loadedOrderbooks: Record<string, undefined | AmmAsOrderbook>
     setShowMobileMenu: (showMobileMenu: boolean) => void
     setHasHydrated: (hasHydrated: boolean) => void
@@ -23,6 +26,9 @@ export const useAppStore = create<{
     setYAxisLogBase: (yAxisLogBase: number) => void
     setAvailablePairs: (availablePairs: string[]) => void
     selectPair: (selectedPair?: string) => void
+    selectToken0: (selectedToken0?: Token) => void
+    selectToken1: (selectedToken1?: Token) => void
+    setAvailableTokens: (availableTokens: Token[]) => void
     saveLoadedOrderbook: (pair: string, orderbook?: AmmAsOrderbook) => void
 }>()(
     persist(
@@ -36,6 +42,19 @@ export const useAppStore = create<{
             yAxisLogBase: 10,
             availablePairs: [],
             selectedPair: undefined,
+            selectedToken0: {
+                address: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+                decimals: 18,
+                symbol: 'WETH',
+                gas: '29962',
+            },
+            selectedToken1: {
+                address: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+                decimals: 6,
+                symbol: 'USDC',
+                gas: '40652',
+            },
+            availableTokens: [],
             loadedOrderbooks: {},
             setShowMobileMenu: (showMobileMenu) => set(() => ({ showMobileMenu })),
             setHasHydrated: (hasHydrated) => set(() => ({ hasHydrated })),
@@ -45,6 +64,9 @@ export const useAppStore = create<{
             setYAxisLogBase: (yAxisLogBase) => set(() => ({ yAxisLogBase })),
             setAvailablePairs: (availablePairs) => set(() => ({ availablePairs })),
             selectPair: (selectedPair) => set(() => ({ selectedPair })),
+            selectToken0: (selectedToken0) => set(() => ({ selectedToken0 })),
+            selectToken1: (selectedToken1) => set(() => ({ selectedToken1 })),
+            setAvailableTokens: (availableTokens) => set(() => ({ availableTokens })),
             saveLoadedOrderbook: (pair, orderbook) => set((state) => ({ loadedOrderbooks: { ...state.loadedOrderbooks, [pair]: orderbook } })),
         }),
         {
