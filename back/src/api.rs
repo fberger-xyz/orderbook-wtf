@@ -267,10 +267,8 @@ async fn orderbook(Extension(shtss): Extension<SharedTychoStreamState>, Extensio
                 if ptss.is_empty() {
                     return Json(json!({ "orderbook": {} }));
                 }
-
                 let path = shd::core::gas::find_conversion_path(acps.clone(), atks.clone(), srzt0.address.to_string().to_lowercase(), network.eth.to_lowercase());
                 log::info!("Path from {} to {} is {:?}", srzt0.symbol, network.eth, path);
-
                 // let t0pricing = shd::core::gas::pricing(network.clone(), ptss.clone(), atks.clone(), srzt0.address.to_string().to_lowercase().clone());
                 // log::info!("Pricing for {} is worth (in ETH) => {:?}", srzt0.symbol, t0pricing);
                 // let t0pricing2 = shd::core::gas::pricing2(network.clone(), ptss.clone(), atks.clone(), srzt0.address.to_string().to_lowercase().clone());

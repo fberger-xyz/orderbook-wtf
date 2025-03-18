@@ -35,25 +35,25 @@ pub async fn build(network: Network, atks: Vec<SrzToken>, balances: HashMap<Stri
         prices1to0.push(price1to0);
         log::info!("Spot price for {}-{} => price0to1 = {} and price1to0 = {}", base.symbol, quote.symbol, price0to1, price1to0);
     }
-    return PairSimulatedOrderbook {
-        token0: srzt0.clone(),
-        token1: srzt1.clone(),
-        trades0to1: vec![],
-        trades1to0: vec![],
-        prices0to1: prices0to1.clone(),
-        prices1to0: prices1to0.clone(),
-        pools: vec![],
-    };
-    // let cps: Vec<SrzProtocolComponent> = pools.clone().iter().map(|p| p.component.clone()).collect();
-    // let aggregated = shd::maths::steps::deepth(cps.clone(), tokens.clone(), balances.clone());
-    // let avgp0to1 = prices0to1.iter().sum::<f64>() / prices0to1.len() as f64;
-    // let avgp1to0 = prices1to0.iter().sum::<f64>() / prices1to0.len() as f64; // Ponderation by TVL ?
-    // log::info!("Average price 0to1: {} | Average price 1to0: {}", avgp0to1, avgp1to0);
-    // let mut pso = optimization(network.clone(), pools.clone(), tokens, query.clone(), aggregated.clone()).await;
-    // pso.prices0to1 = prices0to1.clone();
-    // pso.prices1to0 = prices1to0.clone();
-    // log::info!("Optimization done. Returning Simulated Orderbook for pair (base-quote) => '{}-{}'", base.symbol, quote.symbol);
-    // pso
+    // return PairSimulatedOrderbook {
+    //     token0: srzt0.clone(),
+    //     token1: srzt1.clone(),
+    //     trades0to1: vec![],
+    //     trades1to0: vec![],
+    //     prices0to1: prices0to1.clone(),
+    //     prices1to0: prices1to0.clone(),
+    //     pools: vec![],
+    // };
+    let cps: Vec<SrzProtocolComponent> = pools.clone().iter().map(|p| p.component.clone()).collect();
+    let aggregated = shd::maths::steps::deepth(cps.clone(), tokens.clone(), balances.clone());
+    let avgp0to1 = prices0to1.iter().sum::<f64>() / prices0to1.len() as f64;
+    let avgp1to0 = prices1to0.iter().sum::<f64>() / prices1to0.len() as f64; // Ponderation by TVL ?
+    log::info!("Average price 0to1: {} | Average price 1to0: {}", avgp0to1, avgp1to0);
+    let mut pso = optimization(network.clone(), pools.clone(), tokens, query.clone(), aggregated.clone()).await;
+    pso.prices0to1 = prices0to1.clone();
+    pso.prices1to0 = prices1to0.clone();
+    log::info!("Optimization done. Returning Simulated Orderbook for pair (base-quote) => '{}-{}'", base.symbol, quote.symbol);
+    pso
 }
 
 /**
