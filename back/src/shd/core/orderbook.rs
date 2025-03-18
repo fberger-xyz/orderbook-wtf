@@ -9,8 +9,17 @@ use crate::shd::{
 use std::{collections::HashMap, time::Instant};
 
 /// @notice Reading 'state' from Redis DB while using TychoStreamState state and functions to compute/simulate might create a inconsistency
-pub async fn build(network: Network, atks: Vec<SrzToken>, balances: HashMap<String, HashMap<String, u128>>, datapools: Vec<ProtoTychoState>, tokens: Vec<SrzToken>, query: PairQuery) -> PairSimulatedOrderbook {
-    log::info!("Got {} pools to compute for pair: '{}'", datapools.len(), query.tag);
+pub async fn build(
+    network: Network,
+    atks: Vec<SrzToken>,
+    balances: HashMap<String, HashMap<String, u128>>,
+    ptss: Vec<ProtoTychoState>,
+    tokens: Vec<SrzToken>,
+    query: PairQuery,
+    utk_base_ethworth: f64,
+    utk_quote_ethworth: f64,
+) -> PairSimulatedOrderbook {
+    log::info!("Got {} pools to compute for pair: '{}'", ptss.len(), query.tag);
     let mut pools = Vec::new();
     let mut prices0to1 = vec![];
     let mut prices1to0 = vec![];
@@ -19,41 +28,36 @@ pub async fn build(network: Network, atks: Vec<SrzToken>, balances: HashMap<Stri
     let t0 = Token::from(srzt0.clone());
     let t1 = Token::from(srzt1.clone());
     let (base, quote) = (t0, t1);
-    log::info!("🏷️  Searching a swap-path to price the base token in gas (ETH) | Base: {} | Quote: {})", base.symbol, quote.symbol);
-    let t0pricing = shd::core::gas::pricing(network.clone(), datapools.clone(), atks.clone(), base.address.to_string().to_lowercase().clone());
-    log::info!("Pricing for {} => {:?}", base.symbol, t0pricing);
-    let t0pricing2 = shd::core::gas::pricing2(network.clone(), datapools.clone(), atks.clone(), base.address.to_string().to_lowercase().clone());
-    log::info!("Pricing for {} => {:?}", base.symbol, t0pricing2);
-
-    for pdata in datapools.clone() {
-        log::info!("Preparing pool: {} | Type: {}", pdata.component.id, pdata.component.protocol_type_name);
+    for pdata in ptss.clone() {
+        log::info!("- Preparing pool: {} | Type: {}", pdata.component.id, pdata.component.protocol_type_name);
         pools.push(pdata.clone());
         let proto = pdata.protosim.clone();
         let price0to1 = proto.spot_price(&base, &quote).unwrap_or_default();
         let price1to0 = proto.spot_price(&quote, &base).unwrap_or_default();
         prices0to1.push(price0to1);
         prices1to0.push(price1to0);
-        log::info!("Spot price for {}-{} => price0to1 = {} and price1to0 = {}", base.symbol, quote.symbol, price0to1, price1to0);
+        log::info!(" - Spot price for {}-{} => price0to1 = {} and price1to0 = {}", base.symbol, quote.symbol, price0to1, price1to0);
     }
-    // return PairSimulatedOrderbook {
-    //     token0: srzt0.clone(),
-    //     token1: srzt1.clone(),
-    //     trades0to1: vec![],
-    //     trades1to0: vec![],
-    //     prices0to1: prices0to1.clone(),
-    //     prices1to0: prices1to0.clone(),
-    //     pools: vec![],
-    // };
     let cps: Vec<SrzProtocolComponent> = pools.clone().iter().map(|p| p.component.clone()).collect();
     let aggregated = shd::maths::steps::deepth(cps.clone(), tokens.clone(), balances.clone());
     let avgp0to1 = prices0to1.iter().sum::<f64>() / prices0to1.len() as f64;
     let avgp1to0 = prices1to0.iter().sum::<f64>() / prices1to0.len() as f64; // Ponderation by TVL ?
     log::info!("Average price 0to1: {} | Average price 1to0: {}", avgp0to1, avgp1to0);
-    let mut pso = optimization(network.clone(), pools.clone(), tokens, query.clone(), aggregated.clone()).await;
-    pso.prices0to1 = prices0to1.clone();
-    pso.prices1to0 = prices1to0.clone();
-    log::info!("Optimization done. Returning Simulated Orderbook for pair (base-quote) => '{}-{}'", base.symbol, quote.symbol);
-    pso
+
+    return PairSimulatedOrderbook {
+        token0: srzt0.clone(),
+        token1: srzt1.clone(),
+        trades0to1: vec![],
+        trades1to0: vec![],
+        prices0to1: prices0to1.clone(),
+        prices1to0: prices1to0.clone(),
+        pools: vec![],
+    };
+    // let mut pso = optimization(network.clone(), pools.clone(), tokens, query.clone(), aggregated.clone()).await;
+    // pso.prices0to1 = prices0to1.clone();
+    // pso.prices1to0 = prices1to0.clone();
+    // log::info!("Optimization done. Returning Simulated Orderbook for pair (base-quote) => '{}-{}'", base.symbol, quote.symbol);
+    // pso
 }
 
 /**
@@ -73,9 +77,6 @@ pub async fn optimization(network: Network, pcsdata: Vec<ProtoTychoState>, token
     for pcdata in pcsdata.iter() {
         log::info!("pcdata: {} | Type: {}", pcdata.component.id, pcdata.component.protocol_type_name);
         pools.push(pcdata.component.clone());
-        // for x in pcdata.component.tokens.iter() {
-        //     log::info!("Token: {} => {}", x.symbol, x.address.to_string());
-        // }
     }
 
     let t0tb = *balances.iter().find(|x| x.0.clone().to_lowercase() == t0.address.to_lowercase()).unwrap().1;

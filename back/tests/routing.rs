@@ -1,6 +1,6 @@
-use chrono::{NaiveDateTime, Utc};
+use chrono::NaiveDateTime;
 use serde::{Deserialize, Serialize};
-use std::collections::{HashMap, HashSet};
+use std::collections::{HashMap, HashSet, VecDeque};
 
 /// A simplified token structure for conversion purposes,
 /// now including an address field.
@@ -72,153 +72,129 @@ pub struct Network {
     pub eth: String,
 }
 
-/// pricing_test builds a conversion graph from the given TestProtoTychoState states and uses DFS
-/// to find a conversion route from the input token (by its address) to the network's ETH target.
-/// It returns the cumulative conversion rate and the route.
-// pub fn pricing_test(network: Network, ptss: Vec<TestProtoTychoState>, atks: Vec<SrzToken>, input: String) -> Option<(f64, Vec<String>)> {
-//     let mut graph: HashMap<String, Vec<(String, f64)>> = HashMap::new();
-//     for state in ptss {
-//         // Build the list of token addresses (in lowercase) available in the component.
-//         let addresses: Vec<String> = state.component.tokens.iter().map(|t| t.address.to_lowercase()).collect();
-//         for token_in in addresses.iter() {
-//             for token_out in addresses.iter() {
-//                 if token_in != token_out {
-//                     // Resolve tokens from the global token list by matching addresses.
-//                     let base = Token::from(atks.iter().find(|t| t.address.to_lowercase() == token_in.clone()).unwrap().clone());
-//                     let quote = Token::from(atks.iter().find(|t| t.address.to_lowercase() == token_out.clone()).unwrap().clone());
-//                     if let Ok(sp) = state.spot_price(&base, &quote) {
-//                         graph.entry(token_in.clone()).or_default().push((token_out.clone(), sp));
-//                     }
-//                 }
-//             }
-//         }
-//     }
-//     let start = input.to_lowercase();
-//     let target = network.eth.to_lowercase();
-//     let unit = 1.0;
-//     let mut stack = vec![(start.clone(), unit, vec![start.clone()])];
-//     let mut visited: HashSet<String> = HashSet::new();
-//     while let Some((current, product, path)) = stack.pop() {
-//         if current == target {
-//             return Some((product, path));
-//         }
-//         if visited.contains(&current) {
-//             continue;
-//         }
-//         visited.insert(current.clone());
-//         if let Some(neighbors) = graph.get(&current) {
-//             for (next, rate) in neighbors {
-//                 let mut new_path = path.clone();
-//                 new_path.push(next.clone());
-//                 stack.push((next.clone(), product * rate, new_path));
-//             }
-//         }
-//     }
-//     None
-// }
-
-pub fn pricing(network: Network, ptss: Vec<TestProtoTychoState>, atks: Vec<SrzToken>, input: String) -> Option<(f64, Vec<String>)> {
-    let mut graph: HashMap<String, Vec<(String, f64)>> = HashMap::new();
-    log::info!("Building conversion graph from {} protocol states", ptss.len());
-    for x in ptss {
-        let addresses: Vec<String> = x.component.tokens.iter().map(|t| t.address.to_lowercase()).collect();
-        log::info!("Processing state with tokens: {:?}", addresses);
-        for token_in in addresses.iter() {
-            for token_out in addresses.iter() {
+// First, a function to build the conversion graph and find a conversion path.
+pub fn ethpath(cps: Vec<SrzProtocolComponent>, input: String, target: String) -> Option<(Vec<String>, Vec<String>)> {
+    // (destination token address, component id that provides this conversion)
+    let mut graph: HashMap<String, Vec<(String, String)>> = HashMap::new();
+    for comp in cps {
+        let comp_id = comp.id.clone();
+        let addresses: Vec<String> = comp.tokens.iter().map(|t| t.address.to_lowercase()).collect();
+        for token_in in &addresses {
+            for token_out in &addresses {
                 if token_in != token_out {
-                    let base = Token::from(atks.iter().find(|t| t.address.to_lowercase() == token_in.clone()).expect("Token not found in global list").clone());
-                    let quote = Token::from(atks.iter().find(|t| t.address.to_lowercase() == token_out.clone()).expect("Token not found in global list").clone());
-                    match x.spot_price(&base, &quote) {
-                        Ok(sp) => {
-                            log::info!("Adding edge: {} -> {} at rate {}", token_in, token_out, sp);
-                            graph.entry(token_in.clone()).or_default().push((token_out.clone(), sp));
-                        }
-                        Err(e) => {
-                            log::info!("No conversion from {} to {}: {}", token_in, token_out, e);
-                        }
-                    }
+                    graph.entry(token_in.clone()).or_default().push((token_out.clone(), comp_id.clone()));
                 }
             }
         }
     }
-    log::info!("Graph built: {:?}", graph);
+    // For debugging: print the graph
+    // e.g., log::info!("Graph: {:?}", graph);
 
     let start = input.to_lowercase();
-    let target = network.eth.to_lowercase();
-    let unit = 1.0;
-    let mut stack = vec![(start.clone(), unit, vec![start.clone()])];
+    let target = target.to_lowercase();
+    // Queue items: (current token, token path, component id path)
+    let mut queue: VecDeque<(String, Vec<String>, Vec<String>)> = VecDeque::new();
+    queue.push_back((start.clone(), vec![start.clone()], vec![]));
     let mut visited: HashSet<String> = HashSet::new();
-    log::info!("Starting DFS from {} to target {}", start, target);
 
-    while let Some((current, product, path)) = stack.pop() {
-        log::info!("At node {} with product {} and path {:?}", current, product, path);
+    while let Some((current, token_path, comp_path)) = queue.pop_front() {
         if current == target {
-            log::info!("Target {} reached with product {} and path {:?}", target, product, path);
-            return Some((product, path));
+            return Some((token_path, comp_path));
         }
         if visited.contains(&current) {
-            log::info!("Token {} already visited; skipping", current);
             continue;
         }
         visited.insert(current.clone());
         if let Some(neighbors) = graph.get(&current) {
-            for (next, rate) in neighbors {
-                let mut new_path = path.clone();
-                new_path.push(next.to_lowercase());
-                log::info!("Pushing neighbor {} with rate {}: new product {} and path {:?}", next, rate, product * rate, new_path);
-                stack.push((next.to_lowercase(), product * rate, new_path));
+            for (next, comp_id) in neighbors {
+                if token_path.contains(next) {
+                    continue;
+                }
+                let mut new_token_path = token_path.clone();
+                new_token_path.push(next.clone());
+                let mut new_comp_path = comp_path.clone();
+                new_comp_path.push(comp_id.clone());
+                queue.push_back((next.clone(), new_token_path, new_comp_path));
             }
-        } else {
-            log::info!("No neighbors for token {}", current);
         }
     }
-    log::info!("DFS complete; no conversion path found from {} to {}", start, target);
     None
+}
+
+pub fn quote(ptss: Vec<TestProtoTychoState>, atks: Vec<SrzToken>, path: Vec<String>) -> Option<(f64, Vec<String>)> {
+    if path.len() < 2 {
+        return None;
+    }
+
+    let mut cumulative_price = 1.0;
+    // For each consecutive pair in the path...
+    for window in path.windows(2) {
+        let token_in = window[0].to_lowercase();
+        let token_out = window[1].to_lowercase();
+        log::info!("Calculating conversion from {} to {}", token_in, token_out);
+        // Find a protocol state that can convert token_in to token_out.
+        let mut found = false;
+        for state in &ptss {
+            // Extract the component's token addresses.
+            let comp_tokens: Vec<String> = state.component.tokens.iter().map(|t| t.address.to_lowercase()).collect();
+            if comp_tokens.contains(&token_in) && comp_tokens.contains(&token_out) {
+                // Resolve the tokens from the global list.
+                let base = Token::from(atks.iter().find(|t| t.address.to_lowercase() == token_in).unwrap().clone());
+                let quote = Token::from(atks.iter().find(|t| t.address.to_lowercase() == token_out).unwrap().clone());
+                match state.spot_price(&base, &quote) {
+                    Ok(rate) => {
+                        log::info!("Found rate {} for {} -> {}", rate, token_in, token_out);
+                        cumulative_price *= rate;
+                        found = true;
+                        break;
+                    }
+                    Err(e) => {
+                        log::info!("State cannot convert {} -> {}: {}", token_in, token_out, e);
+                    }
+                }
+            }
+        }
+        if !found {
+            log::info!("No conversion state found for {} -> {}", token_in, token_out);
+            return None;
+        }
+    }
+    Some((cumulative_price, path))
 }
 
 #[cfg(test)]
 mod tests {
-
     use super::*;
+    use chrono::Utc;
+    use std::collections::HashMap;
+
+    // Helper to create a token.
+    fn token(address: &str, symbol: &str, decimals: usize) -> SrzToken {
+        SrzToken {
+            address: address.to_string(),
+            decimals,
+            symbol: symbol.to_string(),
+            gas: "gas".to_string(),
+        }
+    }
 
     #[test]
-    fn test_pricing_test_wbtc_to_eth() {
-        tap2::shd::utils::misc::log::new("routing".to_string());
+    fn test_ethpath_and_quote_unit_wbtc_to_eth() {
         // Use mainnet addresses:
         // WBTC: 0x2260fac5e5542a773aa44fbcfedf7c193bc2c599
         // USDC: 0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48
         // USDT: 0xdac17f958d2ee523a2206206994597c13d831ec7
         // WETH: 0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2
 
-        let token_wbtc = SrzToken {
-            address: "0x2260fac5e5542a773aa44fbcfedf7c193bc2c599".into(),
-            decimals: 8,
-            symbol: "wbtc".into(),
-            gas: "gas1".into(),
-        };
-        let token_usdc = SrzToken {
-            address: "0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48".into(),
-            decimals: 6,
-            symbol: "usdc".into(),
-            gas: "gas2".into(),
-        };
-        let token_usdt = SrzToken {
-            address: "0xdac17f958d2ee523a2206206994597c13d831ec7".into(),
-            decimals: 6,
-            symbol: "usdt".into(),
-            gas: "gas3".into(),
-        };
-        let token_weth = SrzToken {
-            address: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2".into(),
-            decimals: 18,
-            symbol: "eth".into(),
-            gas: "gas4".into(),
-        };
+        let token_wbtc = token("0x2260fac5e5542a773aa44fbcfedf7c193bc2c599", "wbtc", 8);
+        let token_usdc = token("0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48", "usdc", 6);
+        let token_usdt = token("0xdac17f958d2ee523a2206206994597c13d831ec7", "usdt", 6);
+        let token_weth = token("0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", "eth", 18);
 
         // Global token list.
         let atks = vec![token_wbtc.clone(), token_usdc.clone(), token_usdt.clone(), token_weth.clone()];
 
-        // Prepare mock rates using addresses (all lowercased).
+        // Prepare mock rates (keys are lowercased addresses).
         let mut rates1 = HashMap::new();
         rates1.insert((token_wbtc.address.to_lowercase(), token_usdc.address.to_lowercase()), 20000.0);
         let mut rates2 = HashMap::new();
@@ -228,8 +204,9 @@ mod tests {
 
         // Create a dummy creation time.
         let now = Utc::now().naive_utc();
-        let chain = Chain { name: "ethereum".into() };
+        let chain = Chain { name: "ethereum".to_string() };
 
+        // Build protocol components for each conversion pool.
         // Component 1: conversion WBTC -> USDC.
         let comp1 = SrzProtocolComponent {
             address: "comp1".into(),
@@ -275,46 +252,102 @@ mod tests {
         };
         let state3 = TestProtoTychoState { component: comp3, rates: rates3 };
 
+        // Assemble all protocol components (for path-finding) into a vector.
+        let cps = vec![state1.component.clone(), state2.component.clone(), state3.component.clone()];
+        // Also, assemble all protocol states for quoting.
+        let ptss = vec![state1, state2, state3];
+
         // Create the network with WETH as the target.
         let mut network = Network::default();
         network.eth = token_weth.address.to_lowercase();
 
-        // Assemble all states.
-        let ptss = vec![state1, state2, state3];
-
-        // Input is the starting token address for WBTC.
+        // First, find a conversion path from WBTC to WETH.
         let input = token_wbtc.address.to_lowercase();
-
-        // Expected conversion:
-        // 1 WBTC -> 20000 USDC; 1 USDC -> 1 USDT; 1 USDT -> 0.0003 WETH.
-        // Cumulative: 20000 * 1 * 0.0003 = 6.0 WETH.
-        // Expected route: [WBTC address, USDC address, USDT address, WETH address].
-        let result = pricing(network.clone(), ptss.clone(), atks.clone(), input.clone()).expect("A conversion path must exist");
-        let (price, route) = result;
-        println!("Price: {}, Route: {:?}", price, route);
-        assert!((price - 6.0).abs() < 1e-12, "Expected 6.0 WETH, got {}", price);
+        let ethpath = ethpath(cps, input.clone(), network.eth.clone());
+        assert!(ethpath.is_some(), "Expected a conversion path from WBTC to WETH");
+        let ethpath = ethpath.unwrap();
+        let path = ethpath.0;
+        let comp_path = ethpath.1;
+        println!("Found conversion path: {:?}", path);
+        println!("Found comp_path path: {:?}", comp_path);
+        // Expected path: [WBTC, USDC, USDT, WETH]
         assert_eq!(
-            route,
+            path,
             vec![token_wbtc.address.to_lowercase(), token_usdc.address.to_lowercase(), token_usdt.address.to_lowercase(), token_weth.address.to_lowercase()]
         );
 
-        // #2
+        // Next, compute the cumulative conversion rate for 1 WBTC along the found path.
+        let result: Option<(f64, Vec<String>)> = quote(ptss, atks, path.clone());
+        assert!(result.is_some(), "Expected to compute a conversion price along the path");
+        let (price, route) = result.unwrap();
+        println!("Cumulative conversion price: {}, route: {:?}", price, route);
+        // Expected: 20000 * 1 * 0.0003 = 6.0 WETH per WBTC.
+        assert!((price - 6.0).abs() < 1e-12, "Expected 6.0 WETH, got {}", price);
+        assert_eq!(route, path);
+    }
+
+    #[test]
+    fn test_ethpath_and_quote_unit_usdt_to_eth() {
+        // This test checks a direct conversion from USDT to WETH.
+        // Use mainnet addresses (same as above).
+        let token_wbtc = token("0x2260fac5e5542a773aa44fbcfedf7c193bc2c599", "wbtc", 8);
+        let token_usdc = token("0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48", "usdc", 6);
+        let token_usdt = token("0xdac17f958d2ee523a2206206994597c13d831ec7", "usdt", 6);
+        let token_weth = token("0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", "eth", 18);
+
+        let atks = vec![token_wbtc.clone(), token_usdc.clone(), token_usdt.clone(), token_weth.clone()];
+
+        // For this test, we only need the component that converts USDT -> WETH.
+        let mut rates_usdt_weth = HashMap::new();
+        rates_usdt_weth.insert((token_usdt.address.to_lowercase(), token_weth.address.to_lowercase()), 0.0003);
+
+        let now = Utc::now().naive_utc();
+        let chain = Chain { name: "ethereum".to_string() };
+
+        let comp_usdt_weth = SrzProtocolComponent {
+            address: "comp_usdt_weth".into(),
+            id: "component_usdt".into(),
+            tokens: vec![token_usdt.clone(), token_weth.clone()],
+            protocol_system: "TestSystem".into(),
+            protocol_type_name: "Swap".into(),
+            chain: chain.clone(),
+            contract_ids: vec![],
+            static_attributes: vec![],
+            creation_tx: "tx_usdt".into(),
+            created_at: now,
+        };
+        let state_usdt = TestProtoTychoState {
+            component: comp_usdt_weth,
+            rates: rates_usdt_weth,
+        };
+
+        // For path-finding, we need a vector of components.
+        let cps = vec![state_usdt.component.clone()];
+        // And for quoting, the vector of protocol states.
+        let ptss = vec![state_usdt];
+
+        let mut network = Network::default();
+        network.eth = token_weth.address.to_lowercase();
+
+        // Find a conversion path from USDT to WETH.
         let input = token_usdt.address.to_lowercase();
+        let ethpath = ethpath(cps, input.clone(), network.eth.clone());
+        assert!(ethpath.is_some(), "Expected a conversion path from WBTC to WETH");
+        let ethpath = ethpath.unwrap();
+        let path = ethpath.0;
+        let comp_path = ethpath.1;
+        println!("Found conversion path: {:?}", path);
+        println!("Found comp_path path: {:?}", comp_path);
+        // Expected path: [WBTC, USDC, USDT, WETH]        // Expected path: [USDT, WETH]
+        assert_eq!(path, vec![token_usdt.address.to_lowercase(), token_weth.address.to_lowercase()]);
 
-        // Expected conversion:
-        // 1 USDT -> 1/20 000 BTC; 1/20 000 BTC -> 1 USDC; 1 USDC -> 0.0003 WETH.
-        // Cumulative: 20000 * 1 * 0.0003 = 6.0 WETH.
-        // Expected route: [WBTC address, USDC address, USDT address, WETH address].
-        let result = pricing(network.clone(), ptss.clone(), atks.clone(), input).expect("A conversion path must exist");
-        let (price, route) = result;
-        println!("Price: {}, Route: {:?}", price, route);
+        // Compute the cumulative conversion rate along that path.
+        let result = quote(ptss, atks, path.clone());
+        assert!(result.is_some(), "Expected a conversion price for USDT->WETH");
+        let (price, route) = result.unwrap();
+        println!("Cumulative conversion price (USDT->WETH): {}, route: {:?}", price, route);
+        // Expected rate: 0.0003
         assert!((price - 0.0003).abs() < 1e-12, "Expected 0.0003 WETH, got {}", price);
-        assert_eq!(route, vec![token_usdt.address.to_lowercase(), token_weth.address.to_lowercase()]);
-
-        // #3
-        let input = token_usdc.address.to_lowercase();
-        let result = pricing(network.clone(), ptss.clone(), atks.clone(), input.clone()).expect("A conversion path must exist");
-        let (price, route) = result;
-        println!("Price: {}, Route: {:?}", price, route);
+        assert_eq!(route, path);
     }
 }

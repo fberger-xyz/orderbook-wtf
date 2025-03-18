@@ -176,6 +176,7 @@ pub async fn _components(network: Network) -> Option<Vec<SrzProtocolComponent>> 
         "API"
     )
 )]
+
 async fn components(Extension(network): Extension<Network>) -> impl IntoResponse {
     log::info!("👾 API: GET /components on {} network", network.name);
     match _components(network).await {
@@ -253,28 +254,38 @@ async fn orderbook(Extension(shtss): Extension<SharedTychoStreamState>, Extensio
             let mtx = shtss.read().await;
             let balances = mtx.balances.clone();
             drop(mtx);
+            let (t0_to_eth_path, t0_to_eth_comps) = shd::maths::path::ethpath(acps.clone(), srzt0.address.to_string().to_lowercase(), network.eth.to_lowercase()).unwrap_or_default();
+            let (t1_to_eth_path, t1_to_eth_comps) = shd::maths::path::ethpath(acps.clone(), srzt1.address.to_string().to_lowercase(), network.eth.to_lowercase()).unwrap_or_default();
+            // log::info!("Path from {} to network.ETH is {:?}", srzt0.symbol, t0_to_eth_path);
             if tokens.len() == 2 {
                 let mut ptss: Vec<ProtoTychoState> = vec![];
+                let mut to_eth_ptss: Vec<ProtoTychoState> = vec![];
                 for cp in acps.clone() {
                     let cptks = cp.tokens.clone();
                     if shd::utils::misc::matchcp(cptks.clone(), tokens.clone()) {
                         let mtx = shtss.read().await;
                         let protosim = mtx.protosims.get(&cp.id.to_lowercase()).unwrap().clone();
                         drop(mtx);
-                        ptss.push(ProtoTychoState { component: cp, protosim });
+                        ptss.push(ProtoTychoState { component: cp.clone(), protosim });
+                    }
+                    if t0_to_eth_comps.contains(&cp.id.to_lowercase()) || t1_to_eth_comps.contains(&cp.id.to_lowercase()) {
+                        let mtx = shtss.read().await;
+                        let protosim = mtx.protosims.get(&cp.id.to_lowercase()).unwrap().clone();
+                        drop(mtx);
+                        to_eth_ptss.push(ProtoTychoState { component: cp.clone(), protosim });
                     }
                 }
                 if ptss.is_empty() {
                     return Json(json!({ "orderbook": {} }));
                 }
-                let path = shd::core::gas::find_conversion_path(acps.clone(), atks.clone(), srzt0.address.to_string().to_lowercase(), network.eth.to_lowercase());
-                log::info!("Path from {} to {} is {:?}", srzt0.symbol, network.eth, path);
-                // let t0pricing = shd::core::gas::pricing(network.clone(), ptss.clone(), atks.clone(), srzt0.address.to_string().to_lowercase().clone());
-                // log::info!("Pricing for {} is worth (in ETH) => {:?}", srzt0.symbol, t0pricing);
-                // let t0pricing2 = shd::core::gas::pricing2(network.clone(), ptss.clone(), atks.clone(), srzt0.address.to_string().to_lowercase().clone());
-                // log::info!("Pricing for {} is worth (in ETH) => {:?}", srzt0.symbol, t0pricing2);
-                // shd::core::pair::prepare(network.clone(), ptss.clone(), tokens.clone(), params.clone()).await;
-                let result = shd::core::orderbook::build(network.clone(), atks.clone(), balances.clone(), ptss.clone(), tokens.clone(), params.clone()).await;
+                // Token 0
+                let utk_base_ethworth = shd::maths::path::quote(to_eth_ptss.clone(), atks.clone(), t0_to_eth_path.clone()).unwrap_or_default();
+                let utk_quote_ethworth = shd::maths::path::quote(to_eth_ptss.clone(), atks.clone(), t1_to_eth_path.clone()).unwrap_or_default();
+                log::info!(" - One unit of base token ({}) quoted to ETH = {}", srzt0.symbol, utk_base_ethworth);
+                log::info!(" - One unit of quote token ({}) quoted to ETH = {}", srzt1.symbol, utk_quote_ethworth);
+                // Token 1
+
+                let result = shd::core::orderbook::build(network.clone(), atks.clone(), balances.clone(), ptss.clone(), tokens.clone(), params.clone(), utk_base_ethworth, utk_quote_ethworth).await;
                 // let path = format!("misc/data-front-v2/orderbook.{}.{}-{}.json", network.name, srzt0.symbol.to_lowercase(), srzt1.symbol.to_lowercase());
                 // crate::shd::utils::misc::save1(result.clone(), path.as_str());
                 Json(json!({ "orderbook": result.clone() }))
