@@ -15,7 +15,7 @@ pub async fn get_all_tokens(network: &Network, config: &EnvConfig) -> Option<Vec
     match HttpRPCClient::new(format!("https://{}", &network.tycho).as_str(), Some(&config.tycho_api_key)) {
         Ok(client) => {
             let time = std::time::SystemTime::now();
-            let (chain, _) = shd::types::chain(network.name.clone()).expect("Invalid chain");
+            let (chain, _, _) = shd::types::chain(network.name.clone()).expect("Invalid chain");
             match client.get_all_tokens(chain, Some(100), Some(1), 3000).await {
                 Ok(result) => {
                     let mut tokens = vec![];

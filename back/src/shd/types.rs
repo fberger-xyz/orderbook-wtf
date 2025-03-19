@@ -198,16 +198,33 @@ pub struct TychoStreamState {
 }
 
 pub type ChainCore = tycho_core::dto::Chain;
+pub type ChainSimCore = tycho_simulation::tycho_core::dto::Chain;
 pub type ChainSimu = tycho_simulation::evm::tycho_models::Chain;
 
-pub fn chain(name: String) -> Option<(ChainCore, ChainSimu)> {
+pub fn chain(name: String) -> Option<(ChainCore, ChainSimCore, ChainSimu)> {
     match name.as_str() {
-        "ethereum" => Some((ChainCore::Ethereum, ChainSimu::Ethereum)),
-        "arbitrum" => Some((ChainCore::Arbitrum, ChainSimu::Arbitrum)),
-        "starknet" => Some((ChainCore::Starknet, ChainSimu::Starknet)),
-        "zksync" => Some((ChainCore::ZkSync, ChainSimu::ZkSync)),
-        "base" => Some((ChainCore::Base, ChainSimu::Base)),
-        _ => None,
+        "ethereum" => Some((ChainCore::Ethereum, ChainSimCore::Ethereum, ChainSimu::Ethereum)),
+        "arbitrum" => Some((ChainCore::Arbitrum, ChainSimCore::Arbitrum, ChainSimu::Arbitrum)),
+        "base" => Some((ChainCore::Base, ChainSimCore::Base, ChainSimu::Base)),
+        _ => {
+            log::error!("Unknown chain: {}", name);
+            None
+        }
+    }
+}
+
+/// Overwriting - Returns the default block time and timeout values for the given blockchain network.
+pub fn chain_timing(name: String) -> u64 {
+    match name.as_str() {
+        "ethereum" => 600,
+        "starknet" => 30,
+        "zksync" => 1,
+        "arbitrum" => 1,
+        "base" => 10,
+        _ => {
+            log::error!("Unknown chain: {}", name);
+            600
+        }
     }
 }
 

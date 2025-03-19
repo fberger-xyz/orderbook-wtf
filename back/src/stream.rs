@@ -45,22 +45,28 @@ pub mod api;
  * Didn't know at the time that HttpClient could be used to fetch states/balances, instead of opening a stream here. Can be usefull later so keep it.
  */
 async fn stream_state(network: Network, shared: SharedTychoStreamState, config: EnvConfig) {
-    log::info!("1️⃣  Launching TychoStreamBuilder task for {}", network.name);
-    let chain = tycho_simulation::tycho_core::dto::Chain::Ethereum; // ! Tmp
+    let (_, chain, _) = shd::types::chain(network.name.clone()).unwrap();
+    log::info!("1️⃣  Launching TychoStreamBuilder task for {} | Endpoint: {} | Chain {}", network.name, network.tycho, chain);
     let filter = ComponentFilter::with_tvl_range(1.0, 50.0);
 
-    match tycho_simulation::tycho_client::stream::TychoStreamBuilder::new(&network.tycho, chain)
-        .auth_key(Some(config.tycho_api_key))
-        .exchange(TychoSupportedProtocol::Sushiswap.to_string().as_str(), filter.clone())
-        .exchange(TychoSupportedProtocol::Pancakeswap.to_string().as_str(), filter.clone())
+    let mut tsb = tycho_simulation::tycho_client::stream::TychoStreamBuilder::new(&network.tycho, chain)
         .exchange(TychoSupportedProtocol::UniswapV2.to_string().as_str(), filter.clone())
         .exchange(TychoSupportedProtocol::UniswapV3.to_string().as_str(), filter.clone())
         .exchange(TychoSupportedProtocol::UniswapV4.to_string().as_str(), filter.clone())
-        .exchange(TychoSupportedProtocol::BalancerV2.to_string().as_str(), filter.clone())
-        .exchange(TychoSupportedProtocol::Curve.to_string().as_str(), filter.clone())
-        .build()
-        .await
-    {
+        .auth_key(Some(config.tycho_api_key.clone()));
+    // .block_time(shd::types::chain_timing(network.name.clone()) * 10); // No need to update every block // ? Seems it has no effect !
+
+    // let timing = tsb.block_time(block_time)
+
+    if network.name.as_str() == "ethereum" {
+        tsb = tsb
+            .exchange(TychoSupportedProtocol::Sushiswap.to_string().as_str(), filter.clone())
+            .exchange(TychoSupportedProtocol::Pancakeswap.to_string().as_str(), filter.clone())
+            .exchange(TychoSupportedProtocol::BalancerV2.to_string().as_str(), filter.clone())
+            .exchange(TychoSupportedProtocol::Curve.to_string().as_str(), filter.clone());
+    }
+
+    match tsb.build().await {
         Ok((mut _handle, mut receiver)) => {
             while let Some(fm) = receiver.recv().await {
                 log::info!("🔹 TychoStreamBuilder [for balances only]: received {} state messages and {} sync states", fm.state_msgs.len(), fm.sync_states.len());
@@ -93,7 +99,7 @@ async fn stream_state(network: Network, shared: SharedTychoStreamState, config: 
                             }
                         }
                         None => {
-                            log::info!("No state message for {}", amm);
+                            // log::info!("No state message for {}", amm);
                             // shd::data::redis::set(keys::stream::stream2(network.name.clone()).as_str(), SyncState::Error as u128).await;
                         }
                     }
@@ -130,7 +136,7 @@ async fn stream_protocol(network: Network, shdstate: SharedTychoStreamState, tok
     let u4 = uniswap_v4_pool_with_hook_filter;
     let balancer = balancer_pool_filter;
     let curve = curve_pool_filter;
-    let (_, chain) = shd::types::chain(network.name.clone()).expect("Invalid chain");
+    let (_, _, chain) = shd::types::chain(network.name.clone()).expect("Invalid chain");
     let filter = ComponentFilter::with_tvl_range(1.0, 500.0); // ! Important. 250 ETH minimum
 
     // ===== Tycho Tokens =====
@@ -147,12 +153,12 @@ async fn stream_protocol(network: Network, shdstate: SharedTychoStreamState, tok
     {
         let weth = hmt.get(&Bytes::from_str(network.eth.as_str()).unwrap()).unwrap_or_else(|| panic!("WETH not found on {}", network.name));
         let usdc = hmt.get(&Bytes::from_str(network.usdc.as_str()).unwrap()).unwrap_or_else(|| panic!("USDC not found on {}", network.name));
-        let wbtc = hmt.get(&Bytes::from_str(network.wbtc.as_str()).unwrap()).unwrap_or_else(|| panic!("WBTC not found on {}", network.name));
+        // let wbtc = hmt.get(&Bytes::from_str(network.wbtc.as_str()).unwrap()).unwrap_or_else(|| panic!("WBTC not found on {}", network.name));
         let dai = hmt.get(&Bytes::from_str(network.dai.as_str()).unwrap()).expect("DAI not found");
         let usdt = hmt.get(&Bytes::from_str(network.usdt.as_str()).unwrap()).expect("USDT not found");
         toktag.insert(weth.clone().address, weth.clone());
         toktag.insert(usdc.clone().address, usdc.clone());
-        toktag.insert(wbtc.clone().address, wbtc.clone());
+        // toktag.insert(wbtc.clone().address, wbtc.clone());
         toktag.insert(dai.clone().address, dai.clone());
         toktag.insert(usdt.clone().address, usdt.clone());
     }
@@ -160,18 +166,22 @@ async fn stream_protocol(network: Network, shdstate: SharedTychoStreamState, tok
     // ===== Tycho Stream Builder =====
     'retry: loop {
         log::info!("Connecting to >>> ProtocolStreamBuilder <<< at {} on {:?} ...\n", network.tycho, chain);
-        let psb = ProtocolStreamBuilder::new(&network.tycho, chain)
-            .exchange::<UniswapV2State>(TychoSupportedProtocol::Sushiswap.to_string().as_str(), filter.clone(), None) // ! Filter ?
-            .exchange::<UniswapV2State>(TychoSupportedProtocol::Pancakeswap.to_string().as_str(), filter.clone(), None) // ! Filter ?
+        let mut psb = ProtocolStreamBuilder::new(&network.tycho, chain)
             .exchange::<UniswapV2State>(TychoSupportedProtocol::UniswapV2.to_string().as_str(), filter.clone(), None) // ! Filter ?
             .exchange::<UniswapV3State>(TychoSupportedProtocol::UniswapV3.to_string().as_str(), filter.clone(), None) // ! Filter ?
             .exchange::<UniswapV4State>(TychoSupportedProtocol::UniswapV4.to_string().as_str(), filter.clone(), Some(u4)) // ! Filter ?
-            .exchange::<EVMPoolState<PreCachedDB>>(TychoSupportedProtocol::BalancerV2.to_string().as_str(), filter.clone(), Some(balancer))
-            .exchange::<EVMPoolState<PreCachedDB>>(TychoSupportedProtocol::Curve.to_string().as_str(), filter.clone(), Some(curve))
             .auth_key(Some(config.tycho_api_key.clone()))
             .skip_state_decode_failures(true)
             .set_tokens(hmt.clone()) // ALL Tokens
             .await;
+
+        if network.name.as_str() == "ethereum" {
+            psb = psb
+                .exchange::<UniswapV2State>(TychoSupportedProtocol::Sushiswap.to_string().as_str(), filter.clone(), None) // ! Filter ?
+                .exchange::<UniswapV2State>(TychoSupportedProtocol::Pancakeswap.to_string().as_str(), filter.clone(), None) // ! Filter ?
+                .exchange::<EVMPoolState<PreCachedDB>>(TychoSupportedProtocol::BalancerV2.to_string().as_str(), filter.clone(), Some(balancer))
+                .exchange::<EVMPoolState<PreCachedDB>>(TychoSupportedProtocol::Curve.to_string().as_str(), filter.clone(), Some(curve));
+        }
 
         // ? To study:
         // block_time
@@ -416,7 +426,7 @@ async fn stream_protocol(network: Network, shdstate: SharedTychoStreamState, tok
                 }
             }
             Err(e) => {
-                log::error!("Failed to create stream: {:?}", e.to_string());
+                log::error!("🔺 Failed to create stream: {:?}", e.to_string());
                 continue 'retry;
             }
         }
@@ -431,7 +441,7 @@ async fn main() {
     shd::utils::misc::log::new("stream".to_string());
     dotenv::from_filename(".env.prod").ok(); // Use .env.ex for testing
     let config = EnvConfig::new();
-    log::info!("Launching Stream | 🧪 Testing mode: {:?}", config.testing);
+    log::info!("Launching Stream on {} | 🧪 Testing mode: {:?}", config.network, config.testing);
     let path = "src/shd/config/networks.json".to_string();
     let networks: Vec<Network> = shd::utils::misc::read(&path);
     let network = networks.clone().into_iter().filter(|x| x.enabled).find(|x| x.name == config.network).expect("Network not found or not enabled");
@@ -471,17 +481,17 @@ async fn main() {
         }
     });
 
+    shd::data::redis::wstatus(keys::stream::stream2(network.name.clone()).to_string(), "TychoStream thread to be initialized".to_string()).await;
+
     // Tmp to avoid the stream_state
     // let writeable = Arc::clone(&stss);
-    // // let path = format!("misc/data-back/{}.stream-balances.json", network.name);
-    // let data = std::fs::read_to_string(path).expect("Failed to read file");
+    // let data = std::fs::read_to_string(format!("misc/data-back/{}.stream-balances.json", network.name)).expect("Failed to read file");
     // let balances: HashMap<String, HashMap<String, u128>> = serde_json::from_str(&data).expect("JSON parsing failed");
     // let mut mtx = writeable.write().await;
     // mtx.balances = balances.clone();
     // log::info!("Shared balances hashmap updated. Currently {} entries in memory", balances.len());
     // drop(mtx);
 
-    shd::data::redis::wstatus(keys::stream::stream2(network.name.clone()).to_string(), "TychoStream thread to be initialized".to_string()).await;
     // Get tokens
     match shd::core::client::get_all_tokens(&network, &config).await {
         Some(tokens) => {

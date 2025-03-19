@@ -208,8 +208,11 @@ async fn orderbook(Extension(shtss): Extension<SharedTychoStreamState>, Extensio
             let tokens = target.split("-").map(|x| x.to_string().to_lowercase()).collect::<Vec<String>>();
             let srzt0 = atks.iter().find(|x| x.address.to_lowercase() == tokens[0].clone());
             let srzt1 = atks.iter().find(|x| x.address.to_lowercase() == tokens[1].clone());
-            if srzt0.is_none() || srzt1.is_none() {
-                log::error!("Couldn't find tokens for pair {}", target);
+            if srzt0.is_none() {
+                log::error!("Couldn't find tokens[0]: {}", tokens[0]);
+                return Json(json!({ "orderbook": "Couldn't find tokens for pair tag given" }));
+            } else if srzt1.is_none() {
+                log::error!("Couldn't find  tokens[1]: {}", tokens[1]);
                 return Json(json!({ "orderbook": "Couldn't find tokens for pair tag given" }));
             }
             let srzt0 = srzt0.unwrap();
