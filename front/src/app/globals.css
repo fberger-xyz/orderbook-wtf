@@ -3,25 +3,25 @@
 @tailwind utilities;
 
 html.light {
-    --color-primary: 340 100% 55%; /* #ff3366 */
-    --color-secondary: 180 100% 50%; /* #00ffbb */
-    --color-default: 260 35% 30%; /* #50235e */
-    --color-inactive: 220 15% 65%; /* Slightly neutral gray */
-    --color-background: 40 20% 99%; /* Very light background */
-    --color-light-hover: 220 15% 95%; /* Subtle hover effect */
-    --color-very-light-hover: 220 20% 97%; /* Slightly lighter hover */
-    --color-light-border: 220 15% 90%; /* Light border */
+    --color-primary: 340 100% 50%; /* Slightly reduced saturation for less strain */
+    --color-secondary: 180 90% 45%; /* Softer green for better readability */
+    --color-default: 260 40% 28%; /* Darker purple for better contrast */
+    --color-inactive: 220 10% 55%; /* Slightly darker neutral gray for legibility */
+    --color-background: 40 15% 98%; /* A touch darker to improve contrast */
+    --color-light-hover: 220 15% 92%; /* More visible hover effect */
+    --color-very-light-hover: 220 15% 94%; /* Subtle but noticeable */
+    --color-light-border: 220 10% 85%; /* Slightly stronger for better definition */
 }
 
 html.dark {
-    --color-primary: 340 80% 50%; /* Softer reddish-pink, toned down from #ff3366 */
-    --color-secondary: 260 35% 40%; /* #50235e */
-    --color-default: 260 35% 55%; /* #380a53 */
-    --color-inactive: 215 20% 30%; /* Dark neutral */
-    --color-background: 260 50% 10%; /* Deep purple/black */
-    --color-light-hover: 260 50% 15%; /* Slightly lighter hover */
-    --color-very-light-hover: 260 45% 12%; /* Subtle highlight */
-    --color-light-border: 260 35% 22%; /* Dark border */
+    --color-primary: 340 85% 55%; /* More vibrant pink for clarity */
+    --color-secondary: 260 40% 45%; /* Slightly brighter purple */
+    --color-default: 260 40% 58%; /* More contrast for better readability */
+    --color-inactive: 215 15% 38%; /* Softer neutral gray */
+    --color-background: 260 45% 8%; /* Balanced dark background */
+    --color-light-hover: 260 40% 14%; /* Improved hover contrast */
+    --color-very-light-hover: 260 35% 11%; /* Subtle highlight */
+    --color-light-border: 260 30% 18%; /* More noticeable but subtle */
 }
 
 @layer utilities {

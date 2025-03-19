@@ -73,7 +73,7 @@ export default function SelectedTrade() {
                         </button> */}
                         <p>{numeral(selectedToken0Amount).format('0,0.[00000]')}</p>
                     </div>
-                    <p className="ml-auto text-right text-sm text-inactive">~ value in $</p>
+                    <p className="ml-auto text-right text-xs text-inactive">~ value in $</p>
                 </div>
                 <div className="flex flex-col rounded-2xl border border-light-hover p-2">
                     <p className="text-sm font-bold text-inactive">Token out</p>
@@ -102,7 +102,7 @@ export default function SelectedTrade() {
                         </Link>
                         <p>{numeral(selectedToken1Amount).format('0,0.[00000]')}</p>
                     </div>
-                    <p className="ml-auto text-right text-sm text-inactive">~ value in $</p>
+                    <p className="ml-auto text-right text-xs text-inactive">~ value in $</p>
                 </div>
                 {routes.length > 0 && (
                     <div className="flex flex-col rounded-2xl border border-light-hover p-2">
@@ -120,13 +120,13 @@ export default function SelectedTrade() {
                                 <p>{numeral(path.percent / 100).format('#4#0,0%')}</p>
                             </div>
                         ))}
-                        <p className="ml-auto text-right text-sm text-inactive">~ value in $</p>
+                        <p className="ml-auto text-right text-xs text-inactive">~ value in $</p>
                     </div>
                 )}
                 {selectedTrade && (
                     <div className="flex flex-col rounded-2xl border border-light-hover p-2">
                         <p className="text-sm font-bold text-secondary">Fees</p>
-                        <p className="ml-auto text-right text-sm text-inactive">Todo</p>
+                        <p className="ml-auto text-right text-xs text-inactive">Todo</p>
                     </div>
                 )}
                 {account.isConnected ? (
