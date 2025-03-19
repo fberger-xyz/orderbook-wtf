@@ -80,7 +80,6 @@ impl EnvConfig {
     pub fn new() -> Self {
         EnvConfig {
             testing: get("TESTING") == "true",
-            tycho_url: get("TYCHO_URL"),
             tycho_api_key: get("TYCHO_API_KEY"),
             network: get("NETWORK"),
         }

@@ -2,7 +2,7 @@ use crate::shd::{
     core::amms::get_pool_balances,
     data::fmt::{SrzEVMPoolState, SrzProtocolComponent, SrzToken, SrzUniswapV2State, SrzUniswapV3State, SrzUniswapV4State},
     maths::{self},
-    types::PairQuery,
+    types::OrderbookQueryParams,
 };
 
 use crate::shd::types::LiquidityPoolBook;
@@ -20,13 +20,13 @@ use tycho_simulation::{
 use crate::shd::types::{AmmType, Network, PairLiquidityBook, ProtoTychoState};
 
 pub trait ToLiquidityBook {
-    fn structurate(&self, component: SrzProtocolComponent, tks: Vec<SrzToken>, query: PairQuery, fee: f64, price: f64, poolb0: f64, poolb1: f64) -> LiquidityPoolBook;
+    fn structurate(&self, component: SrzProtocolComponent, tks: Vec<SrzToken>, query: OrderbookQueryParams, fee: f64, price: f64, poolb0: f64, poolb1: f64) -> LiquidityPoolBook;
 }
 
 // ========================================================================= NOT CONCENTRATED ===========================================================================================================
 
 impl ToLiquidityBook for SrzUniswapV2State {
-    fn structurate(&self, component: SrzProtocolComponent, tks: Vec<SrzToken>, query: PairQuery, fee: f64, price: f64, poolb0: f64, poolb1: f64) -> LiquidityPoolBook {
+    fn structurate(&self, component: SrzProtocolComponent, tks: Vec<SrzToken>, query: OrderbookQueryParams, fee: f64, price: f64, poolb0: f64, poolb1: f64) -> LiquidityPoolBook {
         LiquidityPoolBook {
             address: component.id.clone().to_lowercase(),
             protocol: component.protocol_type_name.clone(),
@@ -43,7 +43,7 @@ impl ToLiquidityBook for SrzUniswapV2State {
 }
 
 impl ToLiquidityBook for SrzEVMPoolState {
-    fn structurate(&self, component: SrzProtocolComponent, tks: Vec<SrzToken>, query: PairQuery, fee: f64, price: f64, poolb0: f64, poolb1: f64) -> LiquidityPoolBook {
+    fn structurate(&self, component: SrzProtocolComponent, tks: Vec<SrzToken>, query: OrderbookQueryParams, fee: f64, price: f64, poolb0: f64, poolb1: f64) -> LiquidityPoolBook {
         LiquidityPoolBook {
             address: component.id.clone().to_lowercase(),
             protocol: component.protocol_type_name.clone(),
@@ -62,7 +62,7 @@ impl ToLiquidityBook for SrzEVMPoolState {
 // ========================================================================= CONCENTRATED ==============================================================================================================
 
 impl ToLiquidityBook for SrzUniswapV3State {
-    fn structurate(&self, component: SrzProtocolComponent, tks: Vec<SrzToken>, query: PairQuery, fee: f64, price: f64, poolb0: f64, poolb1: f64) -> LiquidityPoolBook {
+    fn structurate(&self, component: SrzProtocolComponent, tks: Vec<SrzToken>, query: OrderbookQueryParams, fee: f64, price: f64, poolb0: f64, poolb1: f64) -> LiquidityPoolBook {
         // CCT
         let spacing = self.ticks.tick_spacing as i32;
         maths::ticks::ticks_liquidity(self.liquidity as i128, self.tick, spacing, &self.ticks.clone(), tks[0].clone(), tks[1].clone(), false);
@@ -102,7 +102,7 @@ impl ToLiquidityBook for SrzUniswapV3State {
 }
 
 impl ToLiquidityBook for SrzUniswapV4State {
-    fn structurate(&self, component: SrzProtocolComponent, tks: Vec<SrzToken>, query: PairQuery, fee: f64, price: f64, poolb0: f64, poolb1: f64) -> LiquidityPoolBook {
+    fn structurate(&self, component: SrzProtocolComponent, tks: Vec<SrzToken>, query: OrderbookQueryParams, fee: f64, price: f64, poolb0: f64, poolb1: f64) -> LiquidityPoolBook {
         LiquidityPoolBook {
             address: component.id.clone().to_lowercase(),
             protocol: component.protocol_type_name.clone(),
@@ -124,7 +124,7 @@ impl ToLiquidityBook for SrzUniswapV4State {
 
 /// @notice Reading 'state' from Redis DB while using TychoStreamState state and functions to compute/simulate might create a inconsistency
 /// @notice This function is used to compute the liquidity on multiple pools from differents AMM, and return a unified liquidity structure
-pub async fn build(network: Network, datapools: Vec<ProtoTychoState>, tokens: Vec<SrzToken>, query: PairQuery) -> PairLiquidityBook {
+pub async fn build(network: Network, datapools: Vec<ProtoTychoState>, tokens: Vec<SrzToken>, query: OrderbookQueryParams) -> PairLiquidityBook {
     log::info!("Got {} pools to compute for pair: '{}'", datapools.len(), query.tag);
     let mut orderbooks = Vec::new();
     for pdata in datapools.clone() {

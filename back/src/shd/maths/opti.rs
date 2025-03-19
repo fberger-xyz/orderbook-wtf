@@ -6,7 +6,6 @@ use crate::shd::{
 };
 use num_bigint::BigUint;
 use num_traits::Zero;
-use std::collections::HashMap;
 
 /**
  * A gradient-based optimizer that uses fixed iterations (100 max) and
@@ -14,7 +13,7 @@ use std::collections::HashMap;
  * return to the one with the highest.
  * All arithmetic is done with BigUint.
  */
-pub fn optimizer(
+pub fn gradient(
     input: f64, // human–readable input (e.g. 100 meaning 100 ETH)
     pools: &Vec<ProtoTychoState>,
     token_in: SrzToken,

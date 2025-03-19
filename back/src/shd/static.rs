@@ -41,6 +41,11 @@ pub mod data {
                 format!("stream:latest:{}", network.to_lowercase())
             }
 
+            // stream:latest:<network> => u64
+            pub fn updatedcps(network: String) -> String {
+                format!("stream:updatedcps:{}", network.to_lowercase())
+            }
+
             // stream:tokens:<network> => array of tokens
             pub fn tokens(network: String) -> String {
                 format!("stream:tokens:{}", network.to_lowercase())

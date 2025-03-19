@@ -10,11 +10,28 @@
         "usdt": "0xdac17f958d2ee523a2206206994597c13d831ec7",
         "rpc": "https://rpc.payload.de",
         "exp": "https://etherscan.io/",
-        "tycho": "https://tycho-beta.propellerheads.xyz",
+        "tycho": "tycho-beta.propellerheads.xyz",
         "enabled": true,
         "balancer": "0xBA12222222228d8Ba445958a75a0704d566BF2C8",
         "uniswapv4pm": "0x000000000004444c5dc75cb358380d2e3de08a90",
         "port": 42001
+    },
+    {
+        "name": "base",
+        "chainid": 8453,
+        "eth": "0x4200000000000000000000000000000000000006",
+        "usdc": "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
+        "exotic": "0x0000000000000000000000000000000000000000",
+        "wbtc": "0x0555E30da8f98308EdB960aa94C0Db47230d2B9c",
+        "dai": "0x50c5725949a6f0c72e6c4a641f24049a917db0cb",
+        "usdt": "0xfde4C96c8593536E31F229EA8f37b2ADa2699bb2",
+        "tycho": "tycho-base-beta.propellerheads.xyz",
+        "rpc": "https://mainnet.base.org",
+        "exp": "https://basescan.io/",
+        "enabled": true,
+        "balancer": "0xBA12222222228d8Ba445958a75a0704d566BF2C8",
+        "uniswapv4pm": "0x498581ff718922c3f8e6a244956af099b2652b2b",
+        "port": 42003
     },
     {
         "name": "arbitrum",
@@ -32,22 +49,5 @@
         "balancer": "0xba12222222228d8ba445958a75a0704d566bf2c8",
         "uniswapv4pm": "0x360e68faccca8ca495c1b759fd9eee466db9fb32",
         "port": 42002
-    },
-    {
-        "name": "base",
-        "chainid": 8453,
-        "eth": "0x4200000000000000000000000000000000000006",
-        "usdc": "0x833589fcd6edb6e08f4c7c32d4f71b54bda02913",
-        "exotic": "0x0000000000000000000000000000000000000000",
-        "wbtc": "0x0555E30da8f98308EdB960aa94C0Db47230d2B9c",
-        "dai": "0x50c5725949a6f0c72e6c4a641f24049a917db0cb",
-        "usdt": "0xfde4C96c8593536E31F229EA8f37b2ADa2699bb2",
-        "tycho": "https://tycho-base-beta.propellerheads.xyz",
-        "rpc": "https://mainnet.base.org",
-        "exp": "https://basescan.io/",
-        "enabled": true,
-        "balancer": "0xBA12222222228d8Ba445958a75a0704d566BF2C8",
-        "uniswapv4pm": "0x498581ff718922c3f8e6a244956af099b2652b2b",
-        "port": 42003
     }
 ]

@@ -12,7 +12,7 @@ use crate::shd::types::Network;
 
 pub async fn get_all_tokens(network: &Network, config: &EnvConfig) -> Option<Vec<Token>> {
     log::info!("Getting all tokens on {}", network.name);
-    match HttpRPCClient::new(&network.tycho, Some(&config.tycho_api_key)) {
+    match HttpRPCClient::new(format!("https://{}", &network.tycho).as_str(), Some(&config.tycho_api_key)) {
         Ok(client) => {
             let time = std::time::SystemTime::now();
             let (chain, _) = shd::types::chain(network.name.clone()).expect("Invalid chain");

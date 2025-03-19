@@ -1,30 +1,5 @@
 #!/bin/bash
-
-# This script tests the following AXUM endpoints:
-# let app = Router::new()
-#     .route("/", get(root))
-#     .route("/version", get(version))
-#     .route("/network", get(network))
-#     .route("/status", get(status))
-#     .route("/tokens", get(tokens))
-#     .route("/pairs", get(pairs))
-#     .route("/components", get(components))
-#     .route("/pool/{id}", get(pool))
-#     // .route("/pair/{", get(pair/{))
-#     .layer(Extension(n.clone()))
-#     .layer(Extension(shared.clone())); // Shared state
-
-# async fn root() -> impl IntoResponse {
-# async fn version() -> impl IntoResponse {
-# async fn network(Extension(network): Extension<Network>) -> impl IntoResponse {
-# async fn status(Extension(network): Extension<Network>) -> impl IntoResponse {
-# async fn tokens(Extension(network): Extension<Network>) -> impl IntoResponse {
-# async fn pairs(Extension(network): Extension<Network>) -> impl IntoResponse {
-# async fn components(Extension(network): Extension<Network>) -> impl IntoResponse {
-# async fn pool(Extension(network): Extension<Network>, Path(id): Path<String>) -> impl IntoResponse {
-# async fn simulate(Extension(shtss): Extension<SharedTychoStreamState>, Extension(network): Extension<Network>) -> impl IntoResponse {
-# async fn pair(Extension(shtss): Extension<SharedTychoStreamState>, Extension(network): Extension<Network>, Query(params): Query<PairQuery>) -> impl IntoResponse {
-
+# This script tests the Axum API endpoints:
 set -e
 
 # Set the API host.
@@ -61,14 +36,12 @@ try() {
     echo "\n-----------------------------\n"
 }
 
-try "GET /" "$API_URL/"
-try "GET /version" "$API_URL/version"
-try "GET /network" "$API_URL/network"
-try "GET /status" "$API_URL/status"
-try "GET /tokens" "$API_URL/tokens"
-# try "GET /pairs" "$API_URL/pairs"
-try "GET /components" "$API_URL/components"
-# try "GET /pool/:id" "$API_URL/pool/0x7bea39867e4169dbe237d55c8242a8f2fcdcc387"
+# try "GET /" "$API_URL/"
+# try "GET /version" "$API_URL/version"
+# try "GET /network" "$API_URL/network"
+# try "GET /status" "$API_URL/status"
+# try "GET /tokens" "$API_URL/tokens"
+# try "GET /components" "$API_URL/components"
 
 # MAINNET
 export eth="0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"
@@ -77,13 +50,15 @@ export wbtc="0x2260fac5e5542a773aa44fbcfedf7c193bc2c599"
 export dai="0x6b175474e89094c44da98b954eedeac495271d0f"
 export usdt="0xdac17f958d2ee523a2206206994597c13d831ec7"
 
-try "GET /orderbook" "$API_URL/orderbook?tag=$eth-$usdc"
-try "GET /orderbook" "$API_URL/orderbook?tag=$eth-$wbtc"
-try "GET /orderbook" "$API_URL/orderbook?tag=$eth-$dai"
-try "GET /orderbook" "$API_URL/orderbook?tag=$eth-$usdt"
-try "GET /orderbook" "$API_URL/orderbook?tag=$usdc-$wbtc"
-# try "GET /orderbook" "$API_URL/orderbook?tag=$usdc-$dai"
-# try "GET /orderbook" "$API_URL/orderbook?tag=$usdc-$usdt"
-# try "GET /orderbook" "$API_URL/orderbook?tag=$wbtc-$dai"
-# try "GET /orderbook" "$API_URL/orderbook?tag=$wbtc-$usdt"
-# try "GET /orderbook" "$API_URL/orderbook?tag=$dai-$usdt"
+echo "$API_URL/orderbook?tag=$eth-$usdc&single=true&sp_input=$eth&sp_amount=100"
+try "GET /orderbook" "$API_URL/orderbook?tag=$eth-$usdc&single=true&sp_input=$eth&sp_amount=100"
+try "GET /orderbook" "$API_URL/orderbook?tag=$eth-$usdc&single=false&sp_input=0x&sp_amount=0"
+# try "GET /orderbook" "$API_URL/orderbook?tag=$eth-$wbtc&single=false&sp_input=0x&sp_amount=0"
+# try "GET /orderbook" "$API_URL/orderbook?tag=$eth-$dai&single=false&sp_input=0x&sp_amount=0"
+# try "GET /orderbook" "$API_URL/orderbook?tag=$eth-$usdt&single=false&sp_input=0x&sp_amount=0"
+# try "GET /orderbook" "$API_URL/orderbook?tag=$usdc-$wbtc&single=false&sp_input=0x&sp_amount=0"
+# try "GET /orderbook" "$API_URL/orderbook?tag=$usdc-$dai&single=false&sp_input=0x&sp_amount=0"
+# try "GET /orderbook" "$API_URL/orderbook?tag=$usdc-$usdt&single=false&sp_input=0x&sp_amount=0"
+# try "GET /orderbook" "$API_URL/orderbook?tag=$wbtc-$dai&single=false&sp_input=0x&sp_amount=0"
+# try "GET /orderbook" "$API_URL/orderbook?tag=$wbtc-$usdt&single=false&sp_input=0x&sp_amount=0"
+# try "GET /orderbook" "$API_URL/orderbook?tag=$dai-$usdt&single=false&sp_input=0x&sp_amount=0"

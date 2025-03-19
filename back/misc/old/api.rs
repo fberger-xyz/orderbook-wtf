@@ -4,7 +4,7 @@ use serde_json::json;
 use tap2::shd::{
     self,
     data::fmt::{SrzProtocolComponent, SrzToken},
-    types::{EnvConfig, Network, OrderbookQueryParams, PairSimulatedOrderbook, ProtoTychoState, SharedTychoStreamState, SyncState},
+    types::{EnvConfig, Network, PairQuery, PairSimulatedOrderbook, ProtoTychoState, SharedTychoStreamState, SyncState},
 };
 
 use utoipa::OpenApi;
@@ -154,6 +154,16 @@ async fn tokens(Extension(network): Extension<Network>) -> impl IntoResponse {
     }
 }
 
+// GET /pairs => Get all existing pairs in the database (as a vector of strings like "0xToken0-0xToken1")
+// async fn pairs(Extension(network): Extension<Network>) -> impl IntoResponse {
+//     log::info!("👾 API: GET /pairs on {} network", network.name);
+//     let key = shd::r#static::data::keys::stream::pairs(network.name.clone());
+//     match shd::data::redis::get::<Vec<String>>(key.as_str()).await {
+//         Some(pairs) => Json(json!({ "pairs": pairs })),
+//         _ => Json(json!({ "pairs": [] })),
+//     }
+// }
+
 pub async fn _components(network: Network) -> Option<Vec<SrzProtocolComponent>> {
     let key = shd::r#static::data::keys::stream::components(network.name.clone());
     shd::data::redis::get::<Vec<SrzProtocolComponent>>(key.as_str()).await
@@ -184,6 +194,44 @@ async fn components(Extension(network): Extension<Network>) -> impl IntoResponse
     }
 }
 
+// async fn _pool(network: Network, id: String) -> Json<serde_json::Value> {
+//     let key = shd::r#static::data::keys::stream::component(network.name.clone(), id.clone());
+//     match shd::data::redis::get::<SrzProtocolComponent>(key.as_str()).await {
+//         Some(comp) => {
+//             let key = shd::r#static::data::keys::stream::state(network.name.clone(), id.clone());
+//             match AmmType::from(comp.protocol_type_name.as_str()) {
+//                 AmmType::UniswapV2 => match shd::data::redis::get::<SrzUniswapV2State>(key.as_str()).await {
+//                     Some(state) => Json(json!({ "component": comp, "state": state })),
+//                     _ => Json(json!({ "component": comp, "state": {} })),
+//                 },
+//                 AmmType::UniswapV3 => match shd::data::redis::get::<SrzUniswapV3State>(key.as_str()).await {
+//                     Some(state) => Json(json!({ "component": comp, "state": state })),
+//                     _ => Json(json!({ "component": comp, "state": {} })),
+//                 },
+//                 AmmType::UniswapV4 => match shd::data::redis::get::<SrzUniswapV4State>(key.as_str()).await {
+//                     Some(state) => Json(json!({ "component": comp, "state": state })),
+//                     _ => Json(json!({ "component": comp, "state": {} })),
+//                 },
+//                 AmmType::Balancer => match shd::data::redis::get::<SrzEVMPoolState>(key.as_str()).await {
+//                     Some(state) => Json(json!({ "component": comp, "state": state })),
+//                     _ => Json(json!({ "component": comp, "state": {} })),
+//                 },
+//                 AmmType::Curve => match shd::data::redis::get::<SrzEVMPoolState>(key.as_str()).await {
+//                     Some(state) => Json(json!({ "component": comp, "state": state })),
+//                     _ => Json(json!({ "component": comp, "state": {} })),
+//                 },
+//             }
+//         }
+//         None => Json(json!({ "component": {}, "state": {}})),
+//     }
+// }
+
+// // GET /component/{id} => Get the component for the given pool (by id)
+// async fn pool(Extension(network): Extension<Network>, Path(id): Path<String>) -> impl IntoResponse {
+//     log::info!("👾 API: GET /pool on {} network", network.name);
+//     _pool(network, id).await
+// }
+
 // GET /orderbook/{0xt0-0xt1} => Get all component & state for a given pair of token, and simulate the orderbook
 #[utoipa::path(
     get,
@@ -200,20 +248,14 @@ async fn components(Extension(network): Extension<Network>) -> impl IntoResponse
         "API"
     )
 )]
-async fn orderbook(Extension(shtss): Extension<SharedTychoStreamState>, Extension(network): Extension<Network>, Query(params): Query<OrderbookQueryParams>) -> impl IntoResponse {
-    log::info!("👾 API: Querying orderbook endpoint: {:?} | OrderbookQueryParams: {:?}", params.tag, params);
+async fn orderbook(Extension(shtss): Extension<SharedTychoStreamState>, Extension(network): Extension<Network>, Query(params): Query<PairQuery>) -> impl IntoResponse {
+    log::info!("👾 API: Querying orderbook endpoint: {:?}", params.tag);
     match (_tokens(network.clone()).await, _components(network.clone()).await) {
         (Some(atks), Some(acps)) => {
             let target = params.tag.clone();
             let tokens = target.split("-").map(|x| x.to_string().to_lowercase()).collect::<Vec<String>>();
-            let srzt0 = atks.iter().find(|x| x.address.to_lowercase() == tokens[0].clone());
-            let srzt1 = atks.iter().find(|x| x.address.to_lowercase() == tokens[1].clone());
-            if srzt0.is_none() || srzt1.is_none() {
-                log::error!("Couldn't find tokens for pair {}", target);
-                return Json(json!({ "orderbook": "Couldn't find tokens for pair tag given" }));
-            }
-            let srzt0 = srzt0.unwrap();
-            let srzt1 = srzt1.unwrap();
+            let srzt0 = atks.iter().find(|x| x.address.to_lowercase() == tokens[0].clone()).unwrap();
+            let srzt1 = atks.iter().find(|x| x.address.to_lowercase() == tokens[1].clone()).unwrap();
             let tokens = vec![srzt0.clone(), srzt1.clone()];
             let mtx = shtss.read().await;
             let balances = mtx.balances.clone();
@@ -267,8 +309,8 @@ async fn orderbook(Extension(shtss): Extension<SharedTychoStreamState>, Extensio
                 log::info!(" - One unit of quote token ({}) quoted to ETH = {}", srzt1.symbol, utk1_ethworth);
                 // let ptss = vec![ptss[0].clone()];
                 let result = shd::core::orderbook::build(network.clone(), balances.clone(), ptss.clone(), tokens.clone(), params.clone(), utk0_ethworth, utk1_ethworth).await;
-                // let path = format!("misc/data-front-v2/orderbook.{}.{}-{}.json", network.name, srzt0.symbol.to_lowercase(), srzt1.symbol.to_lowercase());
-                // crate::shd::utils::misc::save1(result.clone(), path.as_str());
+                let path = format!("misc/data-front-v2/orderbook.{}.{}-{}.json", network.name, srzt0.symbol.to_lowercase(), srzt1.symbol.to_lowercase());
+                crate::shd::utils::misc::save1(result.clone(), path.as_str());
                 Json(json!({ "orderbook": result.clone() }))
             } else {
                 log::error!("Query param Tag must contain only 2 tokens separated by a dash '-'");
@@ -283,7 +325,7 @@ async fn orderbook(Extension(shtss): Extension<SharedTychoStreamState>, Extensio
 }
 
 // GET /liquidity/{0xt0-0xt1} => Get all component & state (= /pool) for a given pair of token, and organize the liquidity across n pools of n AMMs
-async fn liquidity(Extension(shtss): Extension<SharedTychoStreamState>, Extension(network): Extension<Network>, Query(params): Query<OrderbookQueryParams>) -> impl IntoResponse {
+async fn liquidity(Extension(shtss): Extension<SharedTychoStreamState>, Extension(network): Extension<Network>, Query(params): Query<PairQuery>) -> impl IntoResponse {
     log::info!("👾 API: Querying liquidity endpoint: {:?}", params.tag);
     match (_tokens(network.clone()).await, _components(network.clone()).await) {
         (Some(atks), Some(cps)) => {
@@ -343,6 +385,7 @@ pub async fn start(n: Network, shared: SharedTychoStreamState, config: EnvConfig
         // .route("/pool/{id}", get(pool))
         .route("/components", get(components))
         .route("/orderbook", get(orderbook))
+        // .route("/simulate", get(simulate))
         .route("/liquidity", get(liquidity))
         // Swagger
         .merge(SwaggerUi::new("/swagger").url("/api-docs/openapi.json", ApiDoc::openapi()))

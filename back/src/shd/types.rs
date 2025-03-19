@@ -11,7 +11,7 @@ use utoipa::ToSchema;
 #[derive(Debug, Clone)]
 pub struct EnvConfig {
     pub testing: bool,
-    pub tycho_url: String,
+    // pub tycho_url: String,
     pub tycho_api_key: String,
     pub network: String,
 }
@@ -214,9 +214,12 @@ pub fn chain(name: String) -> Option<(ChainCore, ChainSimu)> {
 // ================================================================ API ================================================================
 
 #[derive(Clone, Debug, Deserialize)]
-pub struct PairQuery {
+pub struct OrderbookQueryParams {
     pub tag: String, // Pair uniq identifier: token0-token1
-                     // pub z0to1: bool, // Zero to One as Uniswap expresses it
+    // pub spsq: Option<SinglePointSimulationQuery>,
+    pub single: bool,
+    pub sp_input: String, // 0to1 if input = token0
+    pub sp_amount: f64,
 }
 
 #[derive(Debug, Deserialize)]

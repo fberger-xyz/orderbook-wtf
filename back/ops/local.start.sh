@@ -1,7 +1,8 @@
 RED='\033[0;31m'
 NC='\033[0m' # No Color
-NETWORK=ethereum
+# NETWORK=ethereum
 RPC="https://rpc.payload.de"
+NETWORK="$1"
 
 function start() {
 
