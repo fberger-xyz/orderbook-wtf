@@ -69,8 +69,6 @@ pub async fn build(network: Network, balances: HashMap<String, HashMap<String, u
  * Optimizes a trade for a given pair of tokens and a set of pools.
  * The function generates a set of test amounts for ETH and USDC, then runs the optimizer for each amount.
  * The optimizer uses a simple gradient-based approach to move a fixed fraction of the allocation from the pool with the lowest marginal return to the one with the highest.
- * ToDo: AmountIn must not be greater than the component balance, or let's say 50% of it, because it don't make sense to impact more than 50% of the pool, even some % it worsens the price
- * ToDo: Top n pooL most liquid only, remove the too small liquidity pools
  */
 pub async fn simulate(network: Network, pcsdata: Vec<ProtoTychoState>, tokens: Vec<SrzToken>, query: PairQuery, balances: HashMap<String, u128>, utk0_ethworth: f64, utk1_ethworth: f64) -> PairSimulatedOrderbook {
     let ethusd = shd::core::gas::ethusd().await;
@@ -90,9 +88,9 @@ pub async fn simulate(network: Network, pcsdata: Vec<ProtoTychoState>, tokens: V
         log::info!("pcdata: {} | Type: {}", pcdata.component.id, pcdata.component.protocol_type_name);
         pools.push(pcdata.component.clone());
     }
-    let trades0to1 = optimize(&balances, &pcsdata, ethusd, gasp, &t0, &t1);
+    let trades0to1 = optimize(&balances, &pcsdata, ethusd, gasp, &t0, &t1, utk1_ethworth);
     log::info!("🔄  Switching to 1to0");
-    let trades1to0 = optimize(&balances, &pcsdata, ethusd, gasp, &t1, &t0);
+    let trades1to0 = optimize(&balances, &pcsdata, ethusd, gasp, &t1, &t0, utk0_ethworth);
     PairSimulatedOrderbook {
         token0: tokens[0].clone(),
         token1: tokens[1].clone(),
@@ -106,15 +104,16 @@ pub async fn simulate(network: Network, pcsdata: Vec<ProtoTychoState>, tokens: V
     }
 }
 
-pub fn optimize(balances: &HashMap<String, u128>, pcs: &Vec<ProtoTychoState>, ethusd: f64, gasp: u128, token_from: &SrzToken, token_to: &SrzToken) -> Vec<TradeResult> {
+pub fn optimize(balances: &HashMap<String, u128>, pcs: &Vec<ProtoTychoState>, ethusd: f64, gasp: u128, token_from: &SrzToken, token_to: &SrzToken, output_u_ethworth: f64) -> Vec<TradeResult> {
     let mut trades = Vec::new();
     let tokb = *balances.iter().find(|x| x.0.to_lowercase() == token_from.address.to_lowercase()).unwrap().1;
     let start = tokb as f64 / ONE_MILLIONTH / 10f64.powi(token_from.decimals as i32) / 10.;
     log::info!(
-        "Agg onchain liquidity balance for {} is {} (for 1 millionth => {})",
+        "Agg onchain liquidity balance for {} is {} (for 1 millionth => {}) | Output unit worth: {}",
         token_from.symbol,
         tokb,
-        tokb as f64 / 10f64.powi(token_from.decimals as i32)
+        tokb as f64 / 10f64.powi(token_from.decimals as i32),
+        output_u_ethworth
     );
     let steps = shd::maths::steps::exponential(
         shd::r#static::maths::simu::COUNT,
@@ -125,7 +124,7 @@ pub fn optimize(balances: &HashMap<String, u128>, pcs: &Vec<ProtoTychoState>, et
     let steps = steps.iter().map(|x| x * start).collect::<Vec<f64>>();
     for (x, amount) in steps.iter().enumerate() {
         let start = Instant::now();
-        let result = shd::maths::opti::optimizer(*amount, pcs, token_from.clone(), token_to.clone());
+        let result = shd::maths::opti::optimizer(*amount, pcs, token_from.clone(), token_to.clone(), output_u_ethworth);
         let elapsed = start.elapsed();
         let total_gas_cost = result.gas_costs.iter().sum::<u128>();
         let total_gas_cost = (total_gas_cost * gasp) as f64 * ethusd / 1e18f64;

@@ -19,11 +19,14 @@ pub fn optimizer(
     pools: &Vec<ProtoTychoState>,
     token_in: SrzToken,
     token_out: SrzToken,
+    output_u_ethworth: f64, // One unit of token_out in ETH (divided by 1e18)
 ) -> TradeResult {
     // Convert tokens to tycho-simulation tokens
     let token_in = Token::from(token_in.clone());
     let token_out = Token::from(token_out.clone());
     let inputpow = input * 10f64.powi(token_in.decimals as i32).round(); // ?
+    let output_u_ethworth = output_u_ethworth * 1e18f64;
+    let output_u_ethworth = BigUint::from(output_u_ethworth as u128);
 
     let inputpow = BigUint::from(inputpow as u128);
     let size = pools.len();
@@ -46,6 +49,17 @@ pub fn optimizer(
             let current_alloc = allocations[i].clone();
             // log::info!("Current allocation for pool {}: {} | TokenIn {} TokenOut {}", i, current_alloc, token_in.address, token_out.address.clone());
             let result_got = pool.protosim.get_amount_out(current_alloc.clone(), &token_in, &token_out);
+
+            // Tmp
+            // let result_x = pool.protosim.get_amount_out(current_alloc.clone(), &token_in, &token_out).unwrap();
+            // let gas = result_x.gas * output_u_ethworth.clone();
+            // // ! Need gas_price * gas_amount to get the actual cost.
+            // let gas_price = BigUint::from(1_000_000_000u64); // 1 Gwei
+            // let gas_cost = gas * gas_price;
+            // // log::info!("Gas cost for pool {}: {}", i, gas_cost);
+            // let output_equivalent = gas_cost / output_u_ethworth.clone();
+            // let output_net = result_x.amount - output_equivalent;
+
             let amount_got = if result_got.is_err() {
                 // log::error!("get_amount_out on pool #{} at {} failed", i, pool.component.id);
                 BigUint::ZERO
