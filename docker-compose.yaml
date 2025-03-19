@@ -31,7 +31,7 @@ services:
       - "42001:42001"
     volumes:
       - ./back:/app
-    command: cargo watch -w /app -x "run --bin stream"
+    # command: cargo watch -w /app -x "run --bin stream"
     depends_on:
       redis:
         condition: service_healthy
