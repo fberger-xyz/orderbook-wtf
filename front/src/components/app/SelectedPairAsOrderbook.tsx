@@ -30,7 +30,7 @@ export default function SelectedPairAsOrderbook() {
                     return { responseJson }
                 },
                 refetchOnWindowFocus: false,
-                refetchInterval: 1000 * 10,
+                refetchInterval: 1000 * 20,
             },
         ],
     })

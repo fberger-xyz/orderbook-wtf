@@ -22,7 +22,7 @@ export default function AvailablePairs() {
                     return { tokensResponseJson }
                 },
                 refetchOnWindowFocus: false,
-                refetchInterval: 1000 * 10,
+                refetchInterval: 1000 * 20,
             },
         ],
     })

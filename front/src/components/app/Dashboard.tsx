@@ -30,7 +30,7 @@ export default function Dashboard() {
                     return { tokensResponseJson }
                 },
                 refetchOnWindowFocus: false,
-                refetchInterval: 1000 * 10,
+                refetchInterval: 1000 * 20,
             },
         ],
     })
