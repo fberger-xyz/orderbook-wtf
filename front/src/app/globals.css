@@ -3,25 +3,25 @@
 @tailwind utilities;
 
 html.light {
-    --color-primary: 158 30% 45%;
-    --color-secondary: 215 35% 20%;
-    --color-default: 220 15% 40%;
-    --color-inactive: 215 15% 65%;
-    --color-background: 40 20% 99%;
-    --color-light-hover: 220 15% 95%;
-    --color-very-light-hover: 220 20% 97%;
-    --color-light-border: 220 15% 90%;
+    --color-primary: 340 100% 55%; /* #ff3366 */
+    --color-secondary: 180 100% 50%; /* #00ffbb */
+    --color-default: 260 35% 30%; /* #50235e */
+    --color-inactive: 220 15% 65%; /* Slightly neutral gray */
+    --color-background: 40 20% 99%; /* Very light background */
+    --color-light-hover: 220 15% 95%; /* Subtle hover effect */
+    --color-very-light-hover: 220 20% 97%; /* Slightly lighter hover */
+    --color-light-border: 220 15% 90%; /* Light border */
 }
 
 html.dark {
-    --color-primary: 158 35% 65%;
-    --color-secondary: 220 15% 40%;
-    --color-default: 220 15% 65%;
-    --color-inactive: 215 20% 30%;
-    --color-background: 220 25% 9%;
-    --color-light-hover: 215 30% 15%;
-    --color-very-light-hover: 215 35% 12%;
-    --color-light-border: 215 25% 22%;
+    --color-primary: 340 80% 50%; /* Softer reddish-pink, toned down from #ff3366 */
+    --color-secondary: 260 35% 40%; /* #50235e */
+    --color-default: 260 35% 55%; /* #380a53 */
+    --color-inactive: 215 20% 30%; /* Dark neutral */
+    --color-background: 260 50% 10%; /* Deep purple/black */
+    --color-light-hover: 260 50% 15%; /* Slightly lighter hover */
+    --color-very-light-hover: 260 45% 12%; /* Subtle highlight */
+    --color-light-border: 260 35% 22%; /* Dark border */
 }
 
 @layer utilities {

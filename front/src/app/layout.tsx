@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { Lato } from 'next/font/google'
+import { Inter_Tight } from 'next/font/google'
 import './globals.css'
 import { APP_METADATA, DEFAULT_THEME } from '../config/app.config'
 import { cn } from '../utils'
@@ -16,7 +16,7 @@ import Footer from '@/components/layouts/Footer'
 import { WagmiAndReactQueryProviders } from '@/providers/wagmi-and-react-query.providers'
 
 // https://fonts.google.com/
-const font = Lato({ weight: ['100', '300', '400', '700', '900'], subsets: ['latin'] })
+const font = Inter_Tight({ weight: ['400', '700'], subsets: ['latin'] })
 
 export const metadata: Metadata = {
     title: APP_METADATA.SITE_NAME,

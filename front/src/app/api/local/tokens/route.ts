@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server'
 import { APIResponse, Token } from '@/interfaces'
-import { RUST_API_ROOT } from '@/config/app.config'
+import { PUBLIC_STREAM_API_URL } from '@/config/app.config'
 
 export async function GET() {
     const res: APIResponse<Token[]> = { data: undefined, error: '' }
-    const url = `${RUST_API_ROOT}/tokens`
+    const url = `${PUBLIC_STREAM_API_URL}/tokens`
     try {
         // prepare request
         const controller = new AbortController()

@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { AmmAsOrderbook, APIResponse } from '@/interfaces'
 import { isAddress } from 'viem'
-import { RUST_API_ROOT } from '@/config/app.config'
+import { PUBLIC_STREAM_API_URL } from '@/config/app.config'
 
 export async function GET(req: NextRequest) {
     const res: APIResponse<AmmAsOrderbook> = { data: undefined, error: '' }
-    const url = `${RUST_API_ROOT}/orderbook`
+    const url = `${PUBLIC_STREAM_API_URL}/orderbook`
 
     // safe exec
     try {

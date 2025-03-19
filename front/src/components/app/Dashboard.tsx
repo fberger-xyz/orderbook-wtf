@@ -16,8 +16,6 @@ import { useAppStore } from '@/stores/app.store'
 
 export default function Dashboard() {
     const { setAvailableTokens } = useAppStore()
-
-    // const [AvailableTokensQuery] =
     useQueries({
         queries: [
             {
@@ -38,14 +36,11 @@ export default function Dashboard() {
     })
 
     return (
-        <div className="w-full grid grid-cols-10 gap-4">
-            {/* <div className="col-span-2">
-                <AvailablePairs />
-            </div> */}
-            <div className="col-span-7 border-x px-4 border-light-hover">
+        <div className="w-full grid grid-cols-1 md:grid-cols-10 gap-6">
+            <div className="col-span-1 md:col-span-7">
                 <SelectedPairAsOrderbook />
             </div>
-            <div className="col-span-3">
+            <div className="col-span-1 md:col-span-3">
                 <SelectedTrade />
             </div>
         </div>

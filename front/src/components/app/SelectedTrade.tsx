@@ -10,6 +10,7 @@ import { AmmPool } from '@/interfaces'
 import IconWrapper from '../common/IconWrapper'
 import SelectTokenModal from './SelectTokenModal'
 import Link from 'next/link'
+import Image from 'next/image'
 
 export default function SelectedTrade() {
     const { selectedTrade, selectedToken0, selectedToken1 } = useAppStore()
@@ -46,14 +47,20 @@ export default function SelectedTrade() {
             {/* <p className="font-bold mx-auto">Actions</p> */}
             <div className="flex flex-col gap-3 w-full">
                 <div className="flex flex-col rounded-2xl border border-light-hover p-2">
-                    <p className="text-sm font-bold text-secondary">Token in</p>
+                    <p className="text-sm font-bold text-inactive">Token in</p>
                     <div className="flex justify-between">
                         <Link
                             href="/?select-token=true"
-                            className="bg-light-hover px-2 py-1 rounded-xl flex items-center gap-1.5 hover:bg-very-light-hover group shadow-md"
+                            className="bg-light-hover px-2 py-1 rounded-xl flex items-center gap-2 hover:bg-very-light-hover group shadow-md"
                         >
-                            <span className="size-5 rounded-full bg-inactive" />
-                            <p className="text-primary">{tradeSide === OrderbookSide.BID ? selectedToken0.symbol : selectedToken1.symbol}</p>
+                            <Image
+                                src={`https://raw.githubusercontent.com/bgd-labs/web3-icons/main/icons/full/${tradeSide === OrderbookSide.BID ? selectedToken0.symbol.toLowerCase() : selectedToken1.symbol.toLowerCase()}.svg`}
+                                width={20}
+                                height={22}
+                                alt="https://x.com/fberger_xyz/photo"
+                                className="rounded-full"
+                            />
+                            <p className="text-secondary">{tradeSide === OrderbookSide.BID ? selectedToken0.symbol : selectedToken1.symbol}</p>
                             <IconWrapper icon={IconIds.CHEVRON_DOWN} className="size-4 group-hover:text-primary" />
                         </Link>
                         {/* <button
@@ -69,7 +76,7 @@ export default function SelectedTrade() {
                     <p className="ml-auto text-right text-sm text-inactive">~ value in $</p>
                 </div>
                 <div className="flex flex-col rounded-2xl border border-light-hover p-2">
-                    <p className="text-sm font-bold text-secondary">Token out</p>
+                    <p className="text-sm font-bold text-inactive">Token out</p>
                     <div className="flex justify-between">
                         {/* <button
                             onClick={() => {}}
@@ -81,17 +88,23 @@ export default function SelectedTrade() {
                         </button> */}
                         <Link
                             href="/?select-token=true"
-                            className="bg-light-hover px-2 py-1 rounded-xl flex items-center gap-1.5 hover:bg-very-light-hover group shadow-md"
+                            className="bg-light-hover px-2 py-1 rounded-xl flex items-center gap-2 hover:bg-very-light-hover group shadow-md"
                         >
-                            <span className="size-5 rounded-full bg-inactive" />
-                            <p className="text-primary">{tradeSide === OrderbookSide.BID ? selectedToken1.symbol : selectedToken0.symbol}</p>
+                            <Image
+                                src={`https://raw.githubusercontent.com/bgd-labs/web3-icons/main/icons/full/${tradeSide === OrderbookSide.BID ? selectedToken1.symbol.toLowerCase() : selectedToken0.symbol.toLowerCase()}.svg`}
+                                width={20}
+                                height={20}
+                                alt="https://x.com/fberger_xyz/photo"
+                                className="rounded-full"
+                            />
+                            <p className="text-secondary">{tradeSide === OrderbookSide.BID ? selectedToken1.symbol : selectedToken0.symbol}</p>
                             <IconWrapper icon={IconIds.CHEVRON_DOWN} className="size-4 group-hover:text-primary" />
                         </Link>
                         <p>{numeral(selectedToken1Amount).format('0,0.[00000]')}</p>
                     </div>
                     <p className="ml-auto text-right text-sm text-inactive">~ value in $</p>
                 </div>
-                {routes.length && (
+                {routes.length > 0 && (
                     <div className="flex flex-col rounded-2xl border border-light-hover p-2">
                         <p className="text-sm font-bold text-secondary">Route</p>
                         {routes.map((path, pathIndex) => (
@@ -110,10 +123,12 @@ export default function SelectedTrade() {
                         <p className="ml-auto text-right text-sm text-inactive">~ value in $</p>
                     </div>
                 )}
-                <div className="flex flex-col rounded-2xl border border-light-hover p-2">
-                    <p className="text-sm font-bold text-secondary">Fees</p>
-                    <p className="ml-auto text-right text-sm text-inactive">Todo</p>
-                </div>
+                {selectedTrade && (
+                    <div className="flex flex-col rounded-2xl border border-light-hover p-2">
+                        <p className="text-sm font-bold text-secondary">Fees</p>
+                        <p className="ml-auto text-right text-sm text-inactive">Todo</p>
+                    </div>
+                )}
                 {account.isConnected ? (
                     <Button onClickFn={() => {}} text={'Sign transaction'} icons={{ right: IconIds.TRANSACTION }} className="w-full" />
                 ) : (

@@ -1,10 +1,10 @@
 import { NextResponse } from 'next/server'
 import { APIResponse, RustApiLiquidityPool } from '@/interfaces'
-import { RUST_API_ROOT } from '@/config/app.config'
+import { PUBLIC_STREAM_API_URL } from '@/config/app.config'
 
 export async function GET() {
     const res: APIResponse<RustApiLiquidityPool[]> = { data: undefined, error: '' }
-    const url = `${RUST_API_ROOT}/components`
+    const url = `${PUBLIC_STREAM_API_URL}/components`
     try {
         // prepare request
         const controller = new AbortController()

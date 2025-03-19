@@ -9,6 +9,8 @@ import { Backdrop } from '../common/Backdrop'
 import { useRef } from 'react'
 import { useClickOutside } from '@/hooks/useClickOutside'
 import { useAppStore } from '@/stores/app.store'
+import Image from 'next/image'
+import { shortenAddress } from '@/utils'
 
 export default function SelectTokenModal() {
     const { availableTokens } = useAppStore()
@@ -29,21 +31,41 @@ export default function SelectTokenModal() {
                 className="flex max-w-[400px] flex-col gap-5 rounded-xl border border-light-hover bg-background py-3 text-base shadow-lg"
             >
                 <div className="flex w-full items-center justify-between px-6">
-                    <p className="font-bold text-secondary lg:text-lg">Select token</p>
+                    <p className="font-bold text-primary lg:text-lg">Select a token</p>
                     <button
                         onClick={() => router.back()}
-                        className="rounded-xl text-default hover:bg-very-light-hover hover:text-primary focus:outline-none"
+                        className="rounded-xl hover:bg-very-light-hover hover:text-primary focus:outline-none text-primary"
                     >
                         <IconWrapper icon={IconIds.CLOSE} className="size-7" />
                     </button>
                 </div>
-                <div className="w-full border-t border-very-light-hover" />
+                <div className="flex w-full items-center justify-between px-6">
+                    <input
+                        type="text"
+                        className="border-light-hover px-5 bg-transparent border w-full rounded-lg h-12 placeholder:text-inactive"
+                        placeholder="Search a name or paste address"
+                    />
+                </div>
+                {/* <div className="w-full border-t border-very-light-hover" /> */}
                 <div className="px-5 max-h-[300px] overflow-scroll flex flex-col gap-2">
                     {availableTokens.map((token, tokenIndex) => (
-                        <div key={`${token}-${tokenIndex}`} className="flex gap-2 rounded-xl bg-very-light-hover w-min p-2 text-sm">
-                            <p className="text-inactive">{tokenIndex + 1}</p>
-                            <p className="">{token.symbol}</p>
-                        </div>
+                        <button
+                            key={`${token}-${tokenIndex}`}
+                            className="px-2 py-1 rounded-xl flex items-center gap-3 hover:bg-very-light-hover group shadow-md w-full"
+                        >
+                            <p className="text-inactive text-xs">{tokenIndex + 1}</p>
+                            <Image
+                                src={`https://raw.githubusercontent.com/bgd-labs/web3-icons/main/icons/full/${token.symbol.toLowerCase()}.svg`}
+                                width={30}
+                                height={30}
+                                alt="https://x.com/fberger_xyz/photo"
+                                className="rounded-full"
+                            />
+                            <div className="flex flex-col items-start">
+                                <p className="">{token.symbol}</p>
+                                <p className="text-xs text-inactive">{shortenAddress(token.address)}</p>
+                            </div>
+                        </button>
                     ))}
                 </div>
                 {/* <div className="w-full border-t border-very-light-hover" /> */}
