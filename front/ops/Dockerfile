@@ -1,6 +1,7 @@
 FROM node:20-alpine
 WORKDIR /app
 RUN corepack enable && corepack prepare pnpm@latest --activate
+RUN apt-get update && apt-get install -y curl
 COPY package.json pnpm-lock.yaml ./
 RUN pnpm install
 COPY . .
