@@ -408,7 +408,7 @@ export default function DepthChart(props: { orderbook: AmmAsOrderbook }) {
         // LPs provided USDC on AMMs (= makers)
         // LPs are ready to buy WETH against their USDC at a low price expressed in 1 weth per x usdc
         // They made bids to buy WETH with their USDC
-        const bids = props.orderbook.trades0to1
+        const bids = props.orderbook?.trades0to1
             .filter((trade, tradeIndex, trades) => trades.findIndex((_trade) => _trade.input === trade.input) === tradeIndex)
             .sort((curr, next) => curr.ratio - next.ratio) // filter by obtained price
             .map(
@@ -430,7 +430,7 @@ export default function DepthChart(props: { orderbook: AmmAsOrderbook }) {
         // LPs are ready to sell their WETH against USDC at a high price
         // They made asks to buy USDC with their WETH
         // asks
-        const asks = props.orderbook.trades1to0
+        const asks = props.orderbook?.trades1to0
             .filter((trade, tradeIndex, trades) => trades.findIndex((_trade) => _trade.input === trade.input) === tradeIndex)
             .map(
                 (trade) =>

@@ -44,69 +44,81 @@ export default function SelectedTrade() {
     }
     return (
         <div className="flex flex-col gap-3 w-full">
-            {/* <p className="font-bold mx-auto">Actions</p> */}
             <div className="flex flex-col gap-3 w-full">
-                <div className="flex flex-col rounded-2xl border border-light-hover p-2">
-                    <p className="text-sm font-bold text-inactive">Token in</p>
+                {/* buy */}
+                <div className="flex flex-col rounded-3xl border border-light-hover p-4 gap-2 bg-very-light-hover/50">
+                    <p className="text-sm text-inactive">You sell</p>
                     <div className="flex justify-between">
                         <Link
                             href="/?select-token=true"
-                            className="bg-light-hover px-2 py-1 rounded-xl flex items-center gap-2 hover:bg-very-light-hover group shadow-md"
+                            className="bg-light-hover px-2.5 py-1.5 rounded-xl flex items-center gap-2 hover:bg-very-light-hover group shadow-lg"
                         >
                             <Image
                                 src={`https://raw.githubusercontent.com/bgd-labs/web3-icons/main/icons/full/${tradeSide === OrderbookSide.BID ? selectedToken0.symbol.toLowerCase() : selectedToken1.symbol.toLowerCase()}.svg`}
-                                width={20}
-                                height={22}
+                                width={24}
+                                height={24}
                                 alt="https://x.com/fberger_xyz/photo"
                                 className="rounded-full"
                             />
-                            <p className="text-secondary">{tradeSide === OrderbookSide.BID ? selectedToken0.symbol : selectedToken1.symbol}</p>
+                            <p className="text-secondary font-bold">
+                                {tradeSide === OrderbookSide.BID ? selectedToken0.symbol : selectedToken1.symbol}
+                            </p>
                             <IconWrapper icon={IconIds.CHEVRON_DOWN} className="size-4 group-hover:text-primary" />
                         </Link>
-                        {/* <button
-                            onClick={() => {}}
-                            className="bg-light-hover px-2 py-1 rounded-xl flex items-center gap-1.5 hover:bg-very-light-hover group shadow-md"
-                        >
-                            <span className="size-5 rounded-full bg-inactive" />
-                            <p className="text-primary">{tradeSide === OrderbookSide.BID ? selectedToken0.symbol : selectedToken1.symbol}</p>
-                            <IconWrapper icon={IconIds.CHEVRON_DOWN} className="size-4 group-hover:text-primary" />
-                        </button> */}
-                        <p>{numeral(selectedToken0Amount).format('0,0.[00000]')}</p>
+                        <input
+                            type="text"
+                            className="ml-auto bg-transparent text-xl font-bold text-right"
+                            value={numeral(selectedToken0Amount).format('0,0.[00000]')}
+                        />
                     </div>
-                    <p className="ml-auto text-right text-xs text-inactive">~ value in $</p>
+                    <div className="flex w-full justify-between items-center mt-2 text-xs px-2">
+                        <div className="flex gap-1 items-center text-inactive">
+                            <IconWrapper icon={IconIds.WALLET} className="size-3" />
+                            <p>0</p>
+                        </div>
+                        <p className="ml-auto text-right text-inactive">todo ~ value in $</p>
+                    </div>
                 </div>
-                <div className="flex flex-col rounded-2xl border border-light-hover p-2">
-                    <p className="text-sm font-bold text-inactive">Token out</p>
-                    <div className="flex justify-between">
-                        {/* <button
-                            onClick={() => {}}
-                            className="bg-light-hover px-2 py-1 rounded-xl flex items-center gap-1.5 hover:bg-very-light-hover group shadow-md"
-                        >
-                            <span className="size-5 rounded-full bg-inactive" />
-                            <p className="text-primary">{tradeSide === OrderbookSide.BID ? selectedToken1.symbol : selectedToken0.symbol}</p>
-                            <IconWrapper icon={IconIds.CHEVRON_DOWN} className="size-4 group-hover:text-primary" />
-                        </button> */}
+
+                {/* sell */}
+                <div className="flex flex-col rounded-3xl border border-light-hover p-4 gap-2 bg-very-light-hover/50">
+                    <p className="text-sm text-inactive">You buy</p>
+                    <div className="flex justify-between w-full">
                         <Link
                             href="/?select-token=true"
-                            className="bg-light-hover px-2 py-1 rounded-xl flex items-center gap-2 hover:bg-very-light-hover group shadow-md"
+                            className="bg-light-hover px-2.5 py-1.5 rounded-xl flex items-center gap-2 hover:bg-very-light-hover group shadow-lg"
                         >
                             <Image
                                 src={`https://raw.githubusercontent.com/bgd-labs/web3-icons/main/icons/full/${tradeSide === OrderbookSide.BID ? selectedToken1.symbol.toLowerCase() : selectedToken0.symbol.toLowerCase()}.svg`}
-                                width={20}
-                                height={20}
+                                width={24}
+                                height={24}
                                 alt="https://x.com/fberger_xyz/photo"
                                 className="rounded-full"
                             />
-                            <p className="text-secondary">{tradeSide === OrderbookSide.BID ? selectedToken1.symbol : selectedToken0.symbol}</p>
+                            <p className="text-secondary font-bold">
+                                {tradeSide === OrderbookSide.BID ? selectedToken1.symbol : selectedToken0.symbol}
+                            </p>
                             <IconWrapper icon={IconIds.CHEVRON_DOWN} className="size-4 group-hover:text-primary" />
                         </Link>
-                        <p>{numeral(selectedToken1Amount).format('0,0.[00000]')}</p>
+                        <input
+                            type="text"
+                            className="ml-auto bg-transparent text-xl font-bold text-right"
+                            value={numeral(selectedToken1Amount).format('0,0.[00000]')}
+                        />
                     </div>
-                    <p className="ml-auto text-right text-xs text-inactive">~ value in $</p>
+                    <div className="flex w-full justify-between items-center mt-2 text-xs px-2">
+                        <div className="flex gap-1 items-center text-inactive">
+                            <IconWrapper icon={IconIds.WALLET} className="size-3" />
+                            <p>0</p>
+                        </div>
+                        <p className="ml-auto text-right text-inactive">todo ~ value in $</p>
+                    </div>
                 </div>
+
+                {/* routes */}
                 {routes.length > 0 && (
-                    <div className="flex flex-col rounded-2xl border border-light-hover p-2">
-                        <p className="text-sm font-bold text-secondary">Route</p>
+                    <div className="flex flex-col rounded-3xl border border-light-hover p-4 gap-2 bg-very-light-hover/50">
+                        <p className="text-sm text-inactive">Route (todo)</p>
                         {routes.map((path, pathIndex) => (
                             <div key={`${path.pool.id}-${pathIndex}`} className="flex w-full gap-1 text-sm">
                                 {/* hardcoded */}
@@ -120,13 +132,13 @@ export default function SelectedTrade() {
                                 <p>{numeral(path.percent / 100).format('#4#0,0%')}</p>
                             </div>
                         ))}
-                        <p className="ml-auto text-right text-xs text-inactive">~ value in $</p>
                     </div>
                 )}
+
+                {/* fees etc */}
                 {selectedTrade && (
-                    <div className="flex flex-col rounded-2xl border border-light-hover p-2">
-                        <p className="text-sm font-bold text-secondary">Fees</p>
-                        <p className="ml-auto text-right text-xs text-inactive">Todo</p>
+                    <div className="flex flex-col rounded-3xl border border-light-hover p-4 gap-2 bg-very-light-hover/50">
+                        <p className="text-sm text-inactive">Fees (todo)</p>
                     </div>
                 )}
                 {account.isConnected ? (

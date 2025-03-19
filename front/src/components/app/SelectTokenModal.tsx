@@ -28,7 +28,7 @@ export default function SelectTokenModal() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ ease: 'easeInOut', duration: 0.25 }}
-                className="flex max-w-[400px] flex-col gap-5 rounded-xl border border-light-hover bg-background py-3 text-base shadow-lg"
+                className="flex max-w-[400px] flex-col gap-5 rounded-xl border border-light-hover bg-background py-3 px-1 text-base shadow-lg"
             >
                 <div className="flex w-full items-center justify-between px-6">
                     <p className="font-bold text-primary lg:text-lg">Select a token</p>

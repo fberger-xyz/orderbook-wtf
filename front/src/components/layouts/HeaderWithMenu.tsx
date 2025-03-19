@@ -59,7 +59,7 @@ export default function HeaderWithMenu(props: { className?: string }) {
                             {/* legal links */}
                             <div className="flex w-full flex-col items-end gap-1">
                                 {/* app AppPagePaths.RATES */}
-                                {APP_PAGES.filter((page) => [AppPagePaths.HOME].includes(page.path)).map((page) => (
+                                {APP_PAGES?.filter((page) => [AppPagePaths.HOME].includes(page.path)).map((page) => (
                                     <button
                                         key={page.path}
                                         onClick={async () => {
