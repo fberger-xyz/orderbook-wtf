@@ -82,6 +82,7 @@ impl EnvConfig {
             testing: get("TESTING") == "true",
             tycho_api_key: get("TYCHO_API_KEY"),
             network: get("NETWORK"),
+            pvkey: get("FAKE_PK"),
         }
     }
 }

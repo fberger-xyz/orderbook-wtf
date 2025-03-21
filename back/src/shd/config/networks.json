@@ -14,6 +14,7 @@
         "enabled": true,
         "balancer": "0xBA12222222228d8Ba445958a75a0704d566BF2C8",
         "uniswapv4pm": "0x000000000004444c5dc75cb358380d2e3de08a90",
+        "permit2": "0x000000000022D473030F116dDEE9F6B43aC78BA3",
         "port": 42001
     },
     {
@@ -31,6 +32,7 @@
         "enabled": true,
         "balancer": "0xBA12222222228d8Ba445958a75a0704d566BF2C8",
         "uniswapv4pm": "0x498581ff718922c3f8e6a244956af099b2652b2b",
+        "permit2": "0x000000000022D473030F116dDEE9F6B43aC78BA3",
         "port": 42003
     },
     {
@@ -48,6 +50,7 @@
         "enabled": false,
         "balancer": "0xba12222222228d8ba445958a75a0704d566bf2c8",
         "uniswapv4pm": "0x360e68faccca8ca495c1b759fd9eee466db9fb32",
+        "permit2": "0x000000000022D473030F116dDEE9F6B43aC78BA3",
         "port": 42002
     }
 ]

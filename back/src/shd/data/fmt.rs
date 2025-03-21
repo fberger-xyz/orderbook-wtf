@@ -118,32 +118,32 @@ impl From<ProtocolComponent> for SrzProtocolComponent {
             tokens: pc.tokens.into_iter().map(SrzToken::from).collect(),
             protocol_system: pc.protocol_system.clone(),
             protocol_type_name: pc.protocol_type_name.clone(),
-            // chain: pc.chain,
+            // bck_chain: pc.chain, // Backup for reverse ::from
             contract_ids: pc.contract_ids.into_iter().map(|b| b.to_string()).collect(),
             static_attributes: pc.static_attributes.into_iter().map(|(k, v)| (k, v.to_string())).collect(),
             creation_tx: pc.creation_tx.to_string(),
-            // created_at: pc.created_at,
+            // bck_created_at: pc.created_at, // Backup for reverse ::from
             fee: crate::shd::core::amms::feebps(pc.protocol_type_name.to_string().clone(), pc.id.to_string().clone(), fee_value),
         }
     }
 }
 
-// impl From<SrzProtocolComponent> for ProtocolComponent {
-//     fn from(serialized: SrzProtocolComponent) -> Self {
-//         ProtocolComponent {
-//             address: Bytes::from_str(serialized.address.to_lowercase().as_str()).unwrap(),
-//             id: Bytes::from_str(serialized.id.to_lowercase().as_str()).unwrap(),
-//             tokens: serialized.tokens.into_iter().map(Token::from).collect(),
-//             protocol_system: serialized.protocol_system,
-//             protocol_type_name: serialized.protocol_type_name,
-//             // chain: serialized.chain,
-//             contract_ids: serialized.contract_ids.into_iter().map(|s| Bytes::from(s.into_bytes())).collect(),                     // !
-//             static_attributes: serialized.static_attributes.into_iter().map(|(k, v)| (k, Bytes::from(v.into_bytes()))).collect(), // !
-//             creation_tx: Bytes::from(serialized.creation_tx.into_bytes()),                                                        // !
-//             // created_at: serialized.created_at,
-//         }
-//     }
-// }
+impl SrzProtocolComponent {
+    pub fn original(srz: SrzProtocolComponent, chain: tycho_simulation::evm::tycho_models::Chain) -> ProtocolComponent {
+        ProtocolComponent {
+            address: Bytes::from_str(srz.address.to_lowercase().as_str()).unwrap(),
+            id: Bytes::from_str(srz.id.to_lowercase().as_str()).unwrap(),
+            tokens: srz.tokens.into_iter().map(Token::from).collect(),
+            protocol_system: srz.protocol_system,
+            protocol_type_name: srz.protocol_type_name,
+            chain,
+            contract_ids: srz.contract_ids.into_iter().map(|s| Bytes::from(s.into_bytes())).collect(),
+            static_attributes: srz.static_attributes.into_iter().map(|(k, v)| (k, Bytes::from(v.into_bytes()))).collect(),
+            creation_tx: Bytes::from(srz.creation_tx.into_bytes()),
+            created_at: chrono::NaiveDateTime::default(), // ! Importantt
+        }
+    }
+}
 
 // =====================================================================================================================================================================================================
 // Convert a part of a protocol State to a serialized version (and more readable)

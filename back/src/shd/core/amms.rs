@@ -6,22 +6,8 @@ use reqwest::Client;
 use crate::shd::{
     data::fmt::SrzProtocolComponent,
     r#static::maths::BPD,
-    types::{AmmType, Network},
+    types::{AmmType, IBalancer2Vault, Network, IERC20},
 };
-
-alloy::sol!(
-    #[allow(missing_docs)]
-    #[sol(rpc)]
-    IERC20,
-    "src/shd/utils/abis/IERC20.json"
-);
-
-alloy::sol!(
-    #[allow(missing_docs)]
-    #[sol(rpc)]
-    IBalancer2Vault,
-    "src/shd/utils/abis/Balancer2Vault.json"
-);
 
 /**
  * Convert Tycho fee attributes to basis point fee

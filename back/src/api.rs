@@ -1,10 +1,16 @@
-use axum::{extract::Query, response::IntoResponse, routing::get, Extension, Json, Router};
+use axum::{
+    extract::{Json as AxumExJson, Query},
+    response::IntoResponse,
+    routing::{get, post},
+    Extension, Json as AxumJson, Router,
+};
+use env_logger::Env;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use tap2::shd::{
     self,
     data::fmt::{SrzProtocolComponent, SrzToken},
-    types::{EnvConfig, Network, OrderbookQueryParams, PairSimulatedOrderbook, ProtoTychoState, SharedTychoStreamState, SyncState},
+    types::{EnvConfig, ExecutionPayload, ExecutionRequest, Network, OrderbookQueryParams, PairSimulatedOrderbook, ProtoTychoState, SharedTychoStreamState, SyncState},
 };
 
 use utoipa::OpenApi;
@@ -46,7 +52,7 @@ pub struct APIVersion {
 
 // GET / => "Hello, Tycho!"
 async fn root() -> impl IntoResponse {
-    Json(json!({ "data": "HeLLo Tycho" }))
+    AxumJson(json!({ "data": "HeLLo Tycho" }))
 }
 
 /// Version endpoint: returns the API version.
@@ -63,7 +69,7 @@ async fn root() -> impl IntoResponse {
 )]
 async fn version() -> impl IntoResponse {
     log::info!("👾 API: GET /version");
-    Json(APIVersion { version: "0.1.0".into() })
+    AxumJson(APIVersion { version: "0.1.0".into() })
 }
 
 // GET /network => Get network object and its configuration
@@ -80,7 +86,7 @@ async fn version() -> impl IntoResponse {
 )]
 async fn network(Extension(network): Extension<Network>) -> impl IntoResponse {
     log::info!("👾 API: GET /network on {} network", network.name);
-    Json(network)
+    AxumJson(network)
 }
 
 #[derive(Serialize, Deserialize, ToSchema)]
@@ -115,12 +121,12 @@ async fn status(Extension(network): Extension<Network>) -> impl IntoResponse {
     let latest = shd::data::redis::get::<u64>(key2.as_str()).await;
     let updatedcps = shd::data::redis::get::<Vec<String>>(key3.as_str()).await;
     match (status, latest, updatedcps) {
-        (Some(status), Some(latest), Some(updatedcps)) => Json(json!(Status {
+        (Some(status), Some(latest), Some(updatedcps)) => AxumJson(json!(Status {
             status: status.to_string(),
             latest: latest.to_string(),
             updated: updatedcps
         })),
-        _ => Json(json!(Status {
+        _ => AxumJson(json!(Status {
             status: SyncState::Error.to_string(),
             latest: "0".to_string(),
             updated: vec![]
@@ -149,8 +155,8 @@ async fn _tokens(network: Network) -> Option<Vec<SrzToken>> {
 async fn tokens(Extension(network): Extension<Network>) -> impl IntoResponse {
     log::info!("👾 API: GET /tokens on {} network", network.name);
     match _tokens(network.clone()).await {
-        Some(tokens) => Json(json!({ "tokens": tokens })),
-        _ => Json(json!({ "tokens": [] })),
+        Some(tokens) => AxumJson(json!({ "tokens": tokens })),
+        _ => AxumJson(json!({ "tokens": [] })),
     }
 }
 
@@ -178,13 +184,34 @@ async fn components(Extension(network): Extension<Network>) -> impl IntoResponse
     match _components(network).await {
         Some(cps) => {
             log::info!("Returning {} components", cps.len());
-            Json(json!({ "components": cps }))
+            AxumJson(json!({ "components": cps }))
         }
-        _ => Json(json!({ "components": [] })),
+        _ => AxumJson(json!({ "components": [] })),
     }
 }
 
-// GET /orderbook/{0xt0-0xt1} => Get all component & state for a given pair of token, and simulate the orderbook
+// GET /execute => Execute a trade
+#[utoipa::path(
+    get,
+    path = "/execute",
+    summary = "Build transaction for a given orderbook point",
+    request_body = ExecutionRequest,
+    description = "Using Tycho execution engine, build a transaction according to a given orderbook point, split according to distribution",
+    responses(
+        (status = 200, description = "The trade result", body = ExecutionPayload)
+    ),
+    tag = ("API")
+)]
+async fn execute(Extension(network): Extension<Network>, Extension(config): Extension<EnvConfig>, AxumExJson(execution): AxumExJson<ExecutionRequest>) -> impl IntoResponse {
+    log::info!("👾 API: Querying execute endpoint: {:?}", execution);
+    let response = match shd::core::execute::swap(network.clone(), execution.clone(), config.clone()).await {
+        Ok(result) => AxumJson(json!({ "execute": result })),
+        Err(e) => AxumJson(json!({ "execute": e.to_string() })),
+    };
+    response
+}
+
+// GET /orderbook/{0xt0-0xt1} => Simulate the orderbook
 #[utoipa::path(
     get,
     path = "/orderbook",
@@ -210,10 +237,10 @@ async fn orderbook(Extension(shtss): Extension<SharedTychoStreamState>, Extensio
             let srzt1 = atks.iter().find(|x| x.address.to_lowercase() == tokens[1].clone());
             if srzt0.is_none() {
                 log::error!("Couldn't find tokens[0]: {}", tokens[0]);
-                return Json(json!({ "orderbook": "Couldn't find tokens for pair tag given" }));
+                return AxumJson(json!({ "orderbook": "Couldn't find tokens for pair tag given" }));
             } else if srzt1.is_none() {
                 log::error!("Couldn't find  tokens[1]: {}", tokens[1]);
-                return Json(json!({ "orderbook": "Couldn't find tokens for pair tag given" }));
+                return AxumJson(json!({ "orderbook": "Couldn't find tokens for pair tag given" }));
             }
             let srzt0 = srzt0.unwrap();
             let srzt1 = srzt1.unwrap();
@@ -261,7 +288,7 @@ async fn orderbook(Extension(shtss): Extension<SharedTychoStreamState>, Extensio
                     }
                 }
                 if ptss.is_empty() {
-                    return Json(json!({ "orderbook": {} }));
+                    return AxumJson(json!({ "orderbook": {} }));
                 }
                 // Token 0
                 let utk0_ethworth = shd::maths::path::quote(to_eth_ptss.clone(), atks.clone(), t0_to_eth_path.clone()).unwrap_or_default();
@@ -272,55 +299,15 @@ async fn orderbook(Extension(shtss): Extension<SharedTychoStreamState>, Extensio
                 let result = shd::core::orderbook::build(network.clone(), balances.clone(), ptss.clone(), tokens.clone(), params.clone(), utk0_ethworth, utk1_ethworth).await;
                 // let path = format!("misc/data-front-v2/orderbook.{}.{}-{}.json", network.name, srzt0.symbol.to_lowercase(), srzt1.symbol.to_lowercase());
                 // crate::shd::utils::misc::save1(result.clone(), path.as_str());
-                Json(json!({ "orderbook": result.clone() }))
+                AxumJson(json!({ "orderbook": result.clone() }))
             } else {
                 log::error!("Query param Tag must contain only 2 tokens separated by a dash '-'");
-                Json(json!({ "orderbook": "Query param Tag must contain only 2 tokens separated by a dash '-'." }))
+                AxumJson(json!({ "orderbook": "Query param Tag must contain only 2 tokens separated by a dash '-'." }))
             }
         }
         _ => {
             log::error!("Couldn't not read internal components");
-            Json(json!({ "orderbook": "Couldn't not read internal components" }))
-        }
-    }
-}
-
-// GET /liquidity/{0xt0-0xt1} => Get all component & state (= /pool) for a given pair of token, and organize the liquidity across n pools of n AMMs
-async fn liquidity(Extension(shtss): Extension<SharedTychoStreamState>, Extension(network): Extension<Network>, Query(params): Query<OrderbookQueryParams>) -> impl IntoResponse {
-    log::info!("👾 API: Querying liquidity endpoint: {:?}", params.tag);
-    match (_tokens(network.clone()).await, _components(network.clone()).await) {
-        (Some(atks), Some(cps)) => {
-            let target = params.tag.clone();
-            let tokens = target.split("-").map(|x| x.to_string().to_lowercase()).collect::<Vec<String>>();
-            let srzt0 = atks.iter().find(|x| x.address.to_lowercase() == tokens[0].clone()).unwrap();
-            let srzt1 = atks.iter().find(|x| x.address.to_lowercase() == tokens[1].clone()).unwrap();
-            let tokens = vec![srzt0.clone(), srzt1.clone()];
-            if tokens.len() == 2 {
-                let mtx = shtss.read().await;
-                let _balances = mtx.balances.clone();
-                drop(mtx);
-                let mut datapools: Vec<ProtoTychoState> = vec![];
-                for cp in cps.clone() {
-                    let cptks = cp.tokens.clone();
-                    if cptks.len() != 2 {
-                        log::info!("Component {} has {} tokens instead of 2. Component with >2 tokens are not handled yet.", cp.id, cptks.len());
-                    } else if cptks[0].address.to_lowercase() == tokens[0].address.to_lowercase() && cptks[1].address.to_lowercase() == tokens[1].address.to_lowercase() {
-                        let mtx = shtss.read().await;
-                        let protosim = mtx.protosims.get(&cp.id.to_lowercase()).unwrap().clone();
-                        drop(mtx);
-                        datapools.push(ProtoTychoState { component: cp, protosim });
-                    }
-                }
-                shd::core::liquidity::build(network.clone(), datapools.clone(), tokens.clone(), params.clone()).await;
-                Json(json!({ "liquidity": [] })) // !
-            } else {
-                log::error!("Query param Tag must contain only 2 tokens separated by a dash '-'");
-                Json(json!({ "liquidity": "Query param Tag must contain only 2 tokens separated by a dash '-'." }))
-            }
-        }
-        _ => {
-            log::error!("Couldn't not read internal components");
-            Json(json!({ "liquidity": "Couldn't not read internal components" }))
+            AxumJson(json!({ "orderbook": "Couldn't not read internal components" }))
         }
     }
 }
@@ -346,11 +333,12 @@ pub async fn start(n: Network, shared: SharedTychoStreamState, config: EnvConfig
         // .route("/pool/{id}", get(pool))
         .route("/components", get(components))
         .route("/orderbook", get(orderbook))
-        .route("/liquidity", get(liquidity))
+        .route("/execute", get(execute))
         // Swagger
         .merge(SwaggerUi::new("/swagger").url("/api-docs/openapi.json", ApiDoc::openapi()))
+        .layer(Extension(shared.clone())) // Shared state
         .layer(Extension(n.clone()))
-        .layer(Extension(shared.clone())); // Shared state
+        .layer(Extension(config.clone())); // EnvConfig
 
     match tokio::net::TcpListener::bind(format!("0.0.0.0:{}", n.port)).await {
         Ok(listener) => match axum::serve(listener, app).await {

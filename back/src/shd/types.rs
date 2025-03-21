@@ -4,16 +4,33 @@ use std::{
     sync::Arc,
 };
 
+use alloy::{network::TransactionBuilder, rpc::types::TransactionRequest};
+use alloy_primitives::TxKind;
 use serde::{Deserialize, Serialize};
 use tokio::sync::RwLock;
 use utoipa::ToSchema;
 
-#[derive(Debug, Clone)]
+alloy::sol!(
+    #[allow(missing_docs)]
+    #[sol(rpc)]
+    IERC20,
+    "src/shd/utils/abis/IERC20.json"
+);
+
+alloy::sol!(
+    #[allow(missing_docs)]
+    #[sol(rpc)]
+    IBalancer2Vault,
+    "src/shd/utils/abis/Balancer2Vault.json"
+);
+
+#[derive(Debug, Clone, utoipa::ToSchema)]
 pub struct EnvConfig {
     pub testing: bool,
     // pub tycho_url: String,
     pub tycho_api_key: String,
     pub network: String,
+    pub pvkey: String,
 }
 
 #[derive(Default, Debug, Clone, Serialize, Deserialize, utoipa::ToSchema)]
@@ -47,6 +64,9 @@ pub struct Network {
     pub port: u64,
     #[schema(example = "0x")]
     pub balancer: String,
+
+    #[schema(example = "0x")]
+    pub permit2: String,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -316,6 +336,84 @@ pub struct PairSimulatedOrderbook {
     pub aggt1lqdty: Vec<f64>,
     pub pools: Vec<SrzProtocolComponent>,
 }
+
+/// ====================================================================================================================================================================================================
+/// Execution
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
+pub struct ExecutionRequest {
+    pub execute: bool,
+    pub sender: String,
+    pub tag: String,
+    pub input: SrzToken,
+    pub output: SrzToken,
+    pub amount_in: f64,
+    pub expected_amount_out: f64,
+    pub distribution: Vec<f64>, // Percentage distribution per pool (0–100)
+    pub components: Vec<SrzProtocolComponent>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
+pub struct ExecutionContext {
+    pub router: String,
+    pub sender: String,
+    pub fork: bool,
+    pub request: ExecutionRequest,
+}
+
+#[derive(Default, Debug, Clone, Serialize, Deserialize, ToSchema)]
+pub struct ExecutionPayload {
+    // pub hash: String,
+    // pub success: bool,
+    // pub reason: bool,
+    pub approve: SrzTransactionRequest,
+    pub swap: SrzTransactionRequest,
+}
+
+#[derive(Default, Debug, Clone, Serialize, Deserialize, ToSchema)]
+pub struct SrzTransactionRequest {
+    pub from: String,                   // Option<Address>,
+    pub to: String,                     // Option<TxKind>,
+    pub gas_price: u128,                // Option<u128>,
+    pub max_fee_per_gas: u128,          // Option<u128>,
+    pub max_priority_fee_per_gas: u128, // Option<u128>,
+    pub max_fee_per_blob_gas: u128,     // Option<u128>,
+    pub gas: u128,                      // Option<u128>,
+    pub value: u128,                    // Option<U256>,
+    pub input: String,                  // TransactionInput,
+    pub nonce: u128,                    // Option<u64>,
+    pub chain_id: u128,                 // Option<ChainId>,
+}
+
+// Convert Alloy TransactionRequest to a client friendly format
+
+impl From<TransactionRequest> for SrzTransactionRequest {
+    fn from(tr: TransactionRequest) -> Self {
+        let to = tr.to.unwrap_or_default();
+        let to = match to {
+            TxKind::Call(addr) => addr.to_string(),
+            _ => "".to_string(),
+        };
+        let value = tr.value.unwrap_or_default().to_string().parse::<u128>().unwrap_or_default();
+        let nonce = tr.nonce.unwrap_or_default().to_string().parse::<u128>().unwrap_or_default();
+        let chain_id = tr.chain_id.unwrap_or_default().to_string().parse::<u128>().unwrap_or_default();
+        let input = tr.input.input.unwrap_or_default().to_string();
+        SrzTransactionRequest {
+            from: tr.from.map(|addr| addr.to_string()).unwrap_or_default(),
+            to: to.to_string(),
+            gas_price: tr.gas_price.unwrap_or(0),
+            max_fee_per_gas: tr.max_fee_per_gas.unwrap_or(0),
+            max_priority_fee_per_gas: tr.max_priority_fee_per_gas.unwrap_or(0),
+            max_fee_per_blob_gas: tr.max_fee_per_blob_gas.unwrap_or(0),
+            gas: tr.gas.unwrap_or(0),
+            value: value,
+            input: input.clone(),
+            nonce: nonce,
+            chain_id: chain_id,
+        }
+    }
+}
+
+/// ====================================================================================================================================================================================================
 
 #[derive(Debug, Clone)]
 pub struct TickDataRange {

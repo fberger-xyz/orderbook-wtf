@@ -1,6 +1,10 @@
 use std::str::FromStr;
+use std::sync::Arc;
 
+use alloy::providers::RootProvider;
+use alloy::transports::http::Http;
 use num_bigint::BigUint;
+use reqwest::Client;
 use tycho_client::rpc::HttpRPCClient;
 use tycho_client::rpc::RPCClient;
 
@@ -9,6 +13,7 @@ use tycho_simulation::models::Token;
 use crate::shd;
 use crate::shd::types::EnvConfig;
 use crate::shd::types::Network;
+use crate::shd::types::IERC20;
 
 pub async fn get_all_tokens(network: &Network, config: &EnvConfig) -> Option<Vec<Token>> {
     log::info!("Getting all tokens on {}", network.name);
@@ -43,4 +48,26 @@ pub async fn get_all_tokens(network: &Network, config: &EnvConfig) -> Option<Vec
             None
         }
     }
+}
+
+/**
+ * Get the balance of the owner for the specified tokens.
+ */
+pub async fn get_balances(provider: &RootProvider<Http<Client>>, owner: String, tokens: Vec<String>) -> Result<Vec<u128>, String> {
+    let mut balances = vec![];
+    let client = Arc::new(provider);
+    for t in tokens.iter() {
+        let contract = IERC20::new(t.parse().unwrap(), client.clone());
+        match contract.balanceOf(owner.parse().unwrap()).call().await {
+            Ok(res) => {
+                let balance = res.balance.to_string().parse::<u128>().unwrap();
+                balances.push(balance);
+            }
+            Err(e) => {
+                log::error!("Failed to get balance for {}: {:?}", t, e);
+                balances.push(0);
+            }
+        }
+    }
+    Ok(balances)
 }
