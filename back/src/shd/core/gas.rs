@@ -1,4 +1,3 @@
-
 use crate::shd::{
     data::fmt::SrzToken,
     r#static::endpoints::COINGECKO_ETH_USD,
@@ -22,7 +21,7 @@ struct CryptoPrice {
 /**
  * Used to retrieve gas price
  */
-pub async fn gasprice(provider: String) -> u128 {
+pub async fn gas_price(provider: String) -> u128 {
     let provider = ProviderBuilder::new().on_http(provider.parse().unwrap());
     provider.get_gas_price().await.unwrap_or_default()
 }
@@ -30,7 +29,7 @@ pub async fn gasprice(provider: String) -> u128 {
 /**
  * Used to retrieve eth usd price
  */
-pub async fn ethusd() -> f64 {
+pub async fn eth_usd() -> f64 {
     match reqwest::get(COINGECKO_ETH_USD).await {
         Ok(response) => match response.json::<CoinGeckoResponse>().await {
             Ok(data) => data.ethereum.usd,

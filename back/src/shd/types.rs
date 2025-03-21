@@ -250,13 +250,16 @@ pub fn chain_timing(name: String) -> u64 {
 
 // ================================================================ API ================================================================
 
-#[derive(Clone, Debug, Deserialize)]
-pub struct OrderbookQueryParams {
+#[derive(Clone, Debug, Deserialize, ToSchema)]
+pub struct OrderbookRequestBody {
     pub tag: String, // Pair uniq identifier: token0-token1
-    // pub spsq: Option<SinglePointSimulationQuery>,
-    pub single: bool,
-    pub sp_input: String, // 0to1 if input = token0
-    pub sp_amount: f64,
+    pub spsq: Option<SinglePointSimulation>,
+}
+
+#[derive(Clone, Debug, Deserialize, ToSchema)]
+pub struct SinglePointSimulation {
+    pub input: String, // 0to1 if input = token0
+    pub amount: f64,
 }
 
 #[derive(Debug, Deserialize)]
@@ -305,24 +308,31 @@ pub struct LiquidityPoolBook {
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
 pub struct TradeResult {
     #[schema(example = "1.0")]
-    pub input: f64, // e.g. 100 (meaning 100 ETH)
+    pub amount: f64, // e.g. 100 (meaning 100 ETH)
     #[schema(example = "2000.0")]
     pub output: f64, // in token_out human–readable units
     #[schema(example = "[0.42, 0.37, 0.21]")]
     pub distribution: Vec<f64>, // percentage distribution per pool (0–100)
-    #[schema(example = "ToDo")]
+    #[schema(example = "[42000, 37000, 77000]")]
     pub gas_costs: Vec<u128>,
+    #[schema(example = "[0.42, 0.37, 0.77]")]
+    pub gas_costs_usd: Vec<f64>,
+    #[schema(example = "[1.77, 2.42, 2.37]")]
+    pub gas_costs_output: Vec<f64>,
     #[schema(example = "0.0005")]
     pub ratio: f64, // output per unit input (human–readable)
 }
 
-// #[derive(Debug, Clone, Serialize, Deserialize)]
-// struct TradeResult {
-//     pub input: f64,
-//     pub output: f64,
-//     pub distribution: Vec<f64>,
-//     pub unit_price: f64,
-// }
+#[derive(Default, Debug, Clone, Serialize, Deserialize, ToSchema)]
+pub struct MidPriceData {
+    pub best_ask: f64,
+    pub best_bid: f64,
+    pub mid: f64,
+    pub spread: f64,
+    pub spread_pct: f64,
+    // pub inverse_price0t1: f64,
+    // pub inverse_price1t0: f64,
+}
 
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
 pub struct PairSimulatedOrderbook {
@@ -335,6 +345,11 @@ pub struct PairSimulatedOrderbook {
     pub aggt0lqdty: Vec<f64>,
     pub aggt1lqdty: Vec<f64>,
     pub pools: Vec<SrzProtocolComponent>,
+    pub eth_usd: f64,
+    // pub best0to1: TradeResult, // Bid of Ask, it's a pov
+    // pub best1to0: TradeResult, // Bid of Ask, it's a pov
+    pub mpd0to1: MidPriceData,
+    pub mpd1to0: MidPriceData,
 }
 
 /// ====================================================================================================================================================================================================
@@ -414,6 +429,7 @@ impl From<TransactionRequest> for SrzTransactionRequest {
 }
 
 /// ====================================================================================================================================================================================================
+/// Ticks and Liquidity
 
 #[derive(Debug, Clone)]
 pub struct TickDataRange {
@@ -448,5 +464,4 @@ pub struct IncrementationSegment {
 #[derive(Debug)]
 pub struct PairSimuIncrementConfig {
     pub segments: Vec<IncrementationSegment>,
-    // pub price: f64, // For 1 ETH worth 2,000 USDC, price1to0 = 2000.0, so input amounts will be *2000 more than ETH amounts
 }

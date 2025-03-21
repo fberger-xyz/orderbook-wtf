@@ -10,7 +10,7 @@ use serde_json::json;
 use tap2::shd::{
     self,
     data::fmt::{SrzProtocolComponent, SrzToken},
-    types::{EnvConfig, ExecutionPayload, ExecutionRequest, Network, OrderbookQueryParams, PairSimulatedOrderbook, ProtoTychoState, SharedTychoStreamState, SyncState},
+    types::{EnvConfig, ExecutionPayload, ExecutionRequest, Network, OrderbookRequestBody, PairSimulatedOrderbook, ProtoTychoState, SharedTychoStreamState, SyncState},
 };
 
 use utoipa::OpenApi;
@@ -217,9 +217,7 @@ async fn execute(Extension(network): Extension<Network>, Extension(config): Exte
     path = "/orderbook",
     summary = "Orderbook for a given pair of tokens",
     description = "Aggregate liquidity across AMMs, simulates an orderbook (bids/asks). Depending on the number of components (pool having t0 AND t1) and simulation input config, the orderbook can be more or less accurate, and the simulation can take up to severals minutes",
-    params(
-        ("tag" = String, Query, description = "A dash-separated pair of token addresses, e.g. '0xt0-0xt1', no order required", example = "0xt0-0xt1")
-    ),
+    request_body = OrderbookRequestBody,
     responses(
         (status = 200, description = "Contains trade simulations, results and components", body = PairSimulatedOrderbook)
     ),
@@ -227,8 +225,8 @@ async fn execute(Extension(network): Extension<Network>, Extension(config): Exte
         "API"
     )
 )]
-async fn orderbook(Extension(shtss): Extension<SharedTychoStreamState>, Extension(network): Extension<Network>, Query(params): Query<OrderbookQueryParams>) -> impl IntoResponse {
-    log::info!("👾 API: Querying orderbook endpoint: {:?} | OrderbookQueryParams: {:?}", params.tag, params);
+async fn orderbook(Extension(shtss): Extension<SharedTychoStreamState>, Extension(network): Extension<Network>, AxumExJson(params): AxumExJson<OrderbookRequestBody>) -> impl IntoResponse {
+    log::info!("👾 API: Querying orderbook endpoint: {:?} | OrderbookRequestBody: {:?}", params.tag, params);
     match (_tokens(network.clone()).await, _components(network.clone()).await) {
         (Some(atks), Some(acps)) => {
             let target = params.tag.clone();
@@ -297,8 +295,8 @@ async fn orderbook(Extension(shtss): Extension<SharedTychoStreamState>, Extensio
                 log::info!(" - One unit of quote token ({}) quoted to ETH = {}", srzt1.symbol, utk1_ethworth);
                 // let ptss = vec![ptss[0].clone()];
                 let result = shd::core::orderbook::build(network.clone(), balances.clone(), ptss.clone(), tokens.clone(), params.clone(), utk0_ethworth, utk1_ethworth).await;
-                // let path = format!("misc/data-front-v2/orderbook.{}.{}-{}.json", network.name, srzt0.symbol.to_lowercase(), srzt1.symbol.to_lowercase());
-                // crate::shd::utils::misc::save1(result.clone(), path.as_str());
+                let path = format!("misc/data-front-v2/orderbook.{}.{}-{}.json", network.name, srzt0.symbol.to_lowercase(), srzt1.symbol.to_lowercase());
+                crate::shd::utils::misc::save1(result.clone(), path.as_str());
                 AxumJson(json!({ "orderbook": result.clone() }))
             } else {
                 log::error!("Query param Tag must contain only 2 tokens separated by a dash '-'");

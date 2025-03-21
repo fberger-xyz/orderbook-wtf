@@ -44,20 +44,32 @@ echo "Testing API at $API_URL"
 try() {
     local description="$1"
     local url="$2"
+    local body="$3"
     echo "Testing $description"
-    if [ "$LOG" = "true" ]; then
-        curl -s "$url" | jq .
+    if [ -n "$body" ]; then
+        if [ "$LOG" = "true" ]; then
+            curl -s -X GET "$url" -H "Content-Type: application/json" -d "$body" | jq .
+        else
+            status=$(curl -o /dev/null -s -X GET "$url" -H "Content-Type: application/json" -d "$body" -w "%{http_code}")
+            if [ "$status" -eq 200 ]; then
+                echo "Status: 200 OK"
+            else
+                echo "Status: $status (Error)"
+            fi
+        fi
     else
         status=$(curl -o /dev/null -s -w "%{http_code}" "$url")
-        if [ "$status" -eq 200 ]; then
-            echo "Status: 200 OK"
-        else
-            echo "Status: $status (Error)"
-        fi
+    fi
+
+    if [ "$status" -eq 200 ]; then
+        echo "Status: 200 OK"
+    else
+        echo "Status: $status (Error)"
     fi
     echo "--- --- --- --- ---"
 }
 
+# Test endpoints that do not require a body.
 try "GET /" "$API_URL/"
 try "GET /version" "$API_URL/version"
 try "GET /network" "$API_URL/network"
@@ -65,14 +77,16 @@ try "GET /status" "$API_URL/status"
 try "GET /tokens" "$API_URL/tokens"
 try "GET /components" "$API_URL/components"
 
-try "GET /orderbook" "$API_URL/orderbook?tag=$eth-$usdc&single=true&sp_input=$eth&sp_amount=100"
-try "GET /orderbook" "$API_URL/orderbook?tag=$eth-$usdc&single=false&sp_input=0x&sp_amount=0"
-try "GET /orderbook" "$API_URL/orderbook?tag=$eth-$wbtc&single=false&sp_input=0x&sp_amount=0"
-# try "GET /orderbook" "$API_URL/orderbook?tag=$eth-$dai&single=false&sp_input=0x&sp_amount=0"
-# try "GET /orderbook" "$API_URL/orderbook?tag=$eth-$usdt&single=false&sp_input=0x&sp_amount=0"
-# try "GET /orderbook" "$API_URL/orderbook?tag=$usdc-$wbtc&single=false&sp_input=0x&sp_amount=0"
-# try "GET /orderbook" "$API_URL/orderbook?tag=$usdc-$dai&single=false&sp_input=0x&sp_amount=0"
-# try "GET /orderbook" "$API_URL/orderbook?tag=$usdc-$usdt&single=false&sp_input=0x&sp_amount=0"
-# try "GET /orderbook" "$API_URL/orderbook?tag=$wbtc-$dai&single=false&sp_input=0x&sp_amount=0"
-# try "GET /orderbook" "$API_URL/orderbook?tag=$wbtc-$usdt&single=false&sp_input=0x&sp_amount=0"
-# try "GET /orderbook" "$API_URL/orderbook?tag=$dai-$usdt&single=false&sp_input=0x&sp_amount=0"
+# Test simulations
+try "GET /orderbook (simple)" "$API_URL/orderbook" '{"tag": "'"$eth-$usdc"'"}'
+try "GET /orderbook (simple)" "$API_URL/orderbook" '{"tag": "'"$eth-$wbtc"'"}'
+try "GET /orderbook (simple)" "$API_URL/orderbook" '{"tag": "'"$eth-$dai"'"}'
+try "GET /orderbook (simple)" "$API_URL/orderbook" '{"tag": "'"$eth-$usdt"'"}'
+try "GET /orderbook (simple)" "$API_URL/orderbook" '{"tag": "'"$usdc-$wbtc"'"}'
+try "GET /orderbook (simple)" "$API_URL/orderbook" '{"tag": "'"$usdc-$dai"'"}'
+try "GET /orderbook (simple)" "$API_URL/orderbook" '{"tag": "'"$usdc-$usdt"'"}'
+try "GET /orderbook (simple)" "$API_URL/orderbook" '{"tag": "'"$wbtc-$dai"'"}'
+try "GET /orderbook (simple)" "$API_URL/orderbook" '{"tag": "'"$wbtc-$usdt"'"}'
+
+# try "GET /orderbook (with spsq)" "$API_URL/orderbook" '{"tag": "'"$eth-$usdc"'", "spsq": {"input": "'"$eth"'", "amount": 100}}'
+# try "GET /orderbook (with spsq)" "$API_URL/orderbook" '{"tag": "'"$eth-$usdc"'", "spsq": {"input": "'"$usdc"'", "amount": 1000}}'

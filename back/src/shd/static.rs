@@ -2,7 +2,7 @@ pub mod maths {
 
     pub static UNISWAP_Q96: u128 = 1 << 96;
     pub static BPD: f64 = 10_000.0;
-    pub static ONE_MILLIONTH: f64 = 1_000_000.0;
+    pub static TEN_MILLIONTH: f64 = 10_000_000.0;
     pub static ONE_PERCENT_IN_MN: f64 = 10_000.; // 1% in millionths
 
     pub mod simu {

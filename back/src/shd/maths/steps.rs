@@ -75,7 +75,6 @@ pub fn gsteps(segments: Vec<IncrementationSegment>) -> Vec<f64> {
 // IncrementationSegment { start: 101., end: 1000., step: 50. },     // Step is 800 millionths
 // IncrementationSegment { start: 1001., end: 10_000., step: 250. }, // Step is 4000 millionths
 
-/// @notice tb_one_mn = one_millionth_of_total_balance
 pub fn gsegments(tb_one_mn: f64) -> Vec<IncrementationSegment> {
     let mut segments = vec![];
     let s1 = IncrementationSegment {

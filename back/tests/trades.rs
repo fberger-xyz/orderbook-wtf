@@ -27,7 +27,7 @@ fn test_simulations() {
 
                 let mut ratio_violations = 0;
                 for (x, trade) in trades.iter().enumerate() {
-                    assert!(trade.input > last_input, "Inputs should be strictly increasing in {:?}", path);
+                    assert!(trade.amount > last_input, "Inputs should be strictly increasing in {:?}", path);
                     assert!(trade.output > last_output, "Outputs should be strictly increasing in {:?}", path);
 
                     let distribution_sum: f64 = trade.distribution.iter().sum();
@@ -44,7 +44,7 @@ fn test_simulations() {
                             "Warning: trade#{} Ratio is not decreasing in {:?} at trade with input {} | \t Last_ratio: {}, current_ratio: {}, diff: {}, diff_percent: {:.}% | Distribution => {}",
                             x,
                             path,
-                            trade.input,
+                            trade.amount,
                             last_ratio,
                             trade.ratio,
                             diff,
@@ -55,7 +55,7 @@ fn test_simulations() {
                         ratio_violations += 1;
                     }
 
-                    last_input = trade.input;
+                    last_input = trade.amount;
                     last_output = trade.output;
                     last_ratio = trade.ratio;
                 }
