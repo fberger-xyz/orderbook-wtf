@@ -63,7 +63,7 @@ export default function SelectedTrade() {
                             <p className="text-secondary font-bold">
                                 {tradeSide === OrderbookSide.BID ? selectedToken0.symbol : selectedToken1.symbol}
                             </p>
-                            <IconWrapper icon={IconIds.CHEVRON_DOWN} className="size-4 group-hover:text-primary" />
+                            <IconWrapper icon={IconIds.CHEVRON_DOWN} className="min-size-5 group-hover:text-primary" />
                         </Link>
                         <input
                             type="text"
@@ -86,7 +86,7 @@ export default function SelectedTrade() {
                     <div className="flex justify-between w-full">
                         <Link
                             href="/?select-token=true"
-                            className="bg-light-hover px-2.5 py-1.5 rounded-xl flex items-center gap-2 hover:bg-very-light-hover group shadow-lg"
+                            className="bg-light-hover px-2.5 py-1.5 rounded-xl flex items-center gap-2 hover:bg-very-light-hover group shadow-lg w-fit"
                         >
                             <Image
                                 src={`https://raw.githubusercontent.com/bgd-labs/web3-icons/main/icons/full/${tradeSide === OrderbookSide.BID ? selectedToken1.symbol.toLowerCase() : selectedToken0.symbol.toLowerCase()}.svg`}
@@ -98,7 +98,7 @@ export default function SelectedTrade() {
                             <p className="text-secondary font-bold">
                                 {tradeSide === OrderbookSide.BID ? selectedToken1.symbol : selectedToken0.symbol}
                             </p>
-                            <IconWrapper icon={IconIds.CHEVRON_DOWN} className="size-4 group-hover:text-primary" />
+                            <IconWrapper icon={IconIds.CHEVRON_DOWN} className="min-size-5 group-hover:text-primary" />
                         </Link>
                         <input
                             type="text"
@@ -142,7 +142,12 @@ export default function SelectedTrade() {
                     </div>
                 )}
                 {account.isConnected ? (
-                    <Button onClickFn={() => {}} text={'Sign transaction'} icons={{ right: IconIds.TRANSACTION }} className="w-full" />
+                    <Button
+                        onClickFn={() => {}}
+                        text={'Swap'}
+                        icons={{ right: IconIds.ARROW_RIGHT }}
+                        className="w-full rounded-full font-bold text-center"
+                    />
                 ) : (
                     <ConnectOrDisconnect />
                 )}

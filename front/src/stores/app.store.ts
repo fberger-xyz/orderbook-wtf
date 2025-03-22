@@ -39,7 +39,7 @@ export const useAppStore = create<{
             refetchInterval: (IS_DEV ? 60 : 15) * 1000,
             selectedTrade: undefined,
             yAxisType: 'value',
-            yAxisLogBase: 2,
+            yAxisLogBase: 10,
             availablePairs: [],
             selectedPair: undefined,
             selectedToken0: {

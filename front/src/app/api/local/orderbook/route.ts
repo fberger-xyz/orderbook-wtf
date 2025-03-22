@@ -25,9 +25,11 @@ export async function GET(req: NextRequest) {
         // prepare request
         const controller = new AbortController()
         const timeoutId = setTimeout(() => controller.abort(), 60000) // 60 seconds timeout
+        const endpoint = `${url}?tag=${token0}-${token1}&single=false&sp_input=todo&sp_amount=0`
+        console.log(endpoint)
 
         // run req
-        const fetchResponse = await fetch(`${url}?tag=${token0}-${token1}`, {
+        const fetchResponse = await fetch(endpoint, {
             method: 'GET',
             headers: { 'Content-Type': 'application/json' },
             signal: controller.signal,

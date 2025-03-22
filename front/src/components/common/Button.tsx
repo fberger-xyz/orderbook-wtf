@@ -33,7 +33,7 @@ export default function Button(props: InterfaceButtonProps) {
     return (
         <button
             className={cn(
-                `flex items-center gap-2.5 rounded-md border border-transparent bg-light-hover px-2.5 py-1 w-fit`,
+                `flex items-center justify-center gap-2.5 rounded-md border border-transparent bg-light-hover px-3 py-1.5 w-fit`,
                 {
                     'cursor-wait': loading,
                     'cursor-not-allowed text-inactive': props.disabled,

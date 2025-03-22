@@ -61,14 +61,14 @@ const getOptions = (
                     return `- ${numeral(percent / 100).format('#4#0,0%')} in ${protocolName} ${numeral(parseInt(hexaPercent, 16)).divide(100).format('0,0.[0]')}bps`
                 })
                 return [
-                    `<strong>Trader's input</strong>`,
+                    `<strong>You sell</strong>`,
                     `= ${numeral(input).format('0,0.[0000000]')} ${side === OrderbookSide.BID ? token0 : token1}`,
                     ``,
                     `<strong>Simulated price</strong>`,
                     `= ${numeral(price).format('0,0.[0000000]')} ${token1} for 1 ${token0}`,
                     `= ${numeral(1 / price).format('0,0.[0000000]')} ${token0} for 1 ${token1}`,
                     ``,
-                    `<strong>Trader's output</strong>`,
+                    `<strong>You buy</strong>`,
                     `= ${numeral(output).format('0,0.[0000000]')} ${side === OrderbookSide.BID ? token1 : token0}`,
                     ``,
                     `<strong>Distribution</strong>`,

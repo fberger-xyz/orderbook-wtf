@@ -11,6 +11,14 @@ html.light {
     --color-light-hover: 220 15% 92%; /* More visible hover effect */
     --color-very-light-hover: 220 15% 94%; /* Subtle but noticeable */
     --color-light-border: 220 10% 85%; /* Slightly stronger for better definition */
+
+    /* new color set */
+    --color-folly: 340 100% 50%; /* Folly (#ff3366) */
+    --color-jagger: 270 45% 30%; /* Jagger (#380a53f) */
+    --color-gradient-stroke: 0 0% 0%; /* Gradient-stroke (#000000) */
+    --color-jonquil: 48 100% 50%; /* Jonquil (#ffcc00) */
+    --color-aquamarine: 180 100% 50%; /* Aquamarine (#00ffbb) */
+    --color-gradient-stroke-light: 200 40% 55%; /* Gradient Stroke (#7cc4f8) */
 }
 
 html.dark {
@@ -22,6 +30,14 @@ html.dark {
     --color-light-hover: 260 40% 14%; /* Improved hover contrast */
     --color-very-light-hover: 260 35% 11%; /* Subtle highlight */
     --color-light-border: 260 30% 18%; /* More noticeable but subtle */
+
+    /* new color set */
+    --color-folly: 340 100% 50%; /* Folly (#ff3366) */
+    --color-jagger: 270 45% 30%; /* Jagger (#380a53f) */
+    --color-gradient-stroke: 0 0% 0%; /* Gradient-stroke (#000000) */
+    --color-jonquil: 48 100% 50%; /* Jonquil (#ffcc00) */
+    --color-aquamarine: 180 100% 50%; /* Aquamarine (#00ffbb) */
+    --color-gradient-stroke-light: 200 40% 55%; /* Gradient Stroke (#7cc4f8) */
 }
 
 @layer utilities {
@@ -44,4 +60,8 @@ html.dark {
     content: '';
     @apply absolute inset-0 rounded-lg animate-skeleton-move bg-gradient-to-r from-transparent via-inactive to-transparent;
     transform: translateX(-100%);
+}
+
+nextjs-portal {
+    display: none;
 }
