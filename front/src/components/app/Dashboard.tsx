@@ -781,7 +781,7 @@ export default function Dashboard() {
             {/* right */}
             <div className="col-span-1 md:col-span-4 flex flex-col gap-0.5">
                 {/* sell */}
-                <div className="bg-gray-600/20 flex flex-col gap-3 p-4 rounded-xl border-milk-150 w-full">
+                <div className="bg-milk-50/5 flex flex-col gap-3 p-4 rounded-xl border-milk-150 w-full">
                     <p className="text-milk-400 text-sm">Sell</p>
                     <div className="flex justify-between gap-3">
                         <button
@@ -812,7 +812,7 @@ export default function Dashboard() {
                     <div className="size-[44px] rounded-xl bg-background p-1">
                         <button
                             onClick={() => switchSelectedTokens()}
-                            className="size-full rounded-lg bg-gray-600/20 flex items-center justify-center group"
+                            className="size-full rounded-lg bg-milk-50/5 flex items-center justify-center group"
                         >
                             <IconWrapper icon={IconIds.ARROW_DOWN} className="size-5 transition-transform duration-300 group-hover:rotate-180" />
                         </button>
@@ -820,7 +820,7 @@ export default function Dashboard() {
                 </div>
 
                 {/* buy */}
-                <div className="bg-gray-600/20 flex flex-col gap-3 p-4 rounded-xl border-milk-150 w-full">
+                <div className="bg-milk-50/5 flex flex-col gap-3 p-4 rounded-xl border-milk-150 w-full">
                     <p className="text-milk-400 text-sm">Buy</p>
                     <div className="flex justify-between gap-3 w-full">
                         <button
@@ -850,7 +850,7 @@ export default function Dashboard() {
                 <div className="h-0 w-full" />
 
                 {/* fees */}
-                <div className="bg-gray-600/20 flex justify-between p-4 rounded-xl border-milk-150 text-sm">
+                <div className="bg-milk-50/5 flex justify-between p-4 rounded-xl border-milk-150 text-sm">
                     <p className="text-milk-400 truncate">1 WETH = 1984.21 USDC ($1,984.21)</p>
                     <div className="flex gap-1.5 items-center">
                         <IconWrapper icon={IconIds.GAS} className="size-4 text-milk-600" />
