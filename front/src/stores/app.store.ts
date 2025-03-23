@@ -30,6 +30,7 @@ export const useAppStore = create<{
     selectToken1: (selectedToken1?: Token) => void
     setAvailableTokens: (availableTokens: Token[]) => void
     saveLoadedOrderbook: (pair: string, orderbook?: AmmAsOrderbook) => void
+    switchSelectedTokens: () => void
 }>()(
     persist(
         (set) => ({
@@ -68,6 +69,7 @@ export const useAppStore = create<{
             selectToken1: (selectedToken1) => set(() => ({ selectedToken1 })),
             setAvailableTokens: (availableTokens) => set(() => ({ availableTokens })),
             saveLoadedOrderbook: (pair, orderbook) => set((state) => ({ loadedOrderbooks: { ...state.loadedOrderbooks, [pair]: orderbook } })),
+            switchSelectedTokens: () => set((state) => ({ selectedToken0: state.selectedToken1, selectedToken1: state.selectedToken0 })),
         }),
         {
             name: IS_DEV

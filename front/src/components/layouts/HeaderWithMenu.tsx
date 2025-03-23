@@ -11,7 +11,7 @@ import { useRef } from 'react'
 import { Tooltip } from '@nextui-org/tooltip'
 import { useTheme } from 'next-themes'
 import { motion } from 'framer-motion'
-import Logo from './Logo'
+// import Logo from './Logo'
 import { useAppStore } from '@/stores/app.store'
 
 export default function HeaderWithMenu(props: { className?: string }) {
@@ -40,7 +40,8 @@ export default function HeaderWithMenu(props: { className?: string }) {
                     props.className,
                 )}
             >
-                <Logo />
+                {/* todo */}
+                {/* <Logo /> */}
                 <button onClick={() => setShowMobileMenu(!showMobileMenu)} className="z-40 flex w-full grow justify-end">
                     <IconWrapper icon={showMobileMenu ? IconIds.CLOSE : IconIds.MENU} className="size-10 text-primary md:size-12" />
                 </button>

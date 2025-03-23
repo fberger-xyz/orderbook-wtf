@@ -9,24 +9,17 @@ import EchartWrapper from './EchartWrapper'
 import { colors } from '@/config/charts.config'
 import { ChartBackground, CustomFallback, LoadingArea } from './ChartsCommons'
 import { useAppStore } from '@/stores/app.store'
-import { DEFAULT_THEME } from '@/config/app.config'
+import { APP_FONT, DEFAULT_THEME } from '@/config/app.config'
 import { ErrorBoundaryFallback } from '../common/ErrorBoundaryFallback'
-import { formatAmount } from '@/utils'
+import { AppColors, formatAmount } from '@/utils'
 import { AmmAsOrderbook, AmmPool } from '@/interfaces'
 import numeral from 'numeral'
 import { OrderbookDataPoint } from '@/types'
-import Button from '../common/Button'
-import { Lato } from 'next/font/google'
-
-const serie1Name = 'Market Depth'
-const lightGray = 'rgba(150, 150, 150, 0.5)'
-const font = Lato({ weight: ['100', '300', '400', '700', '900'], subsets: ['latin'] })
 
 const getOptions = (
     resolvedTheme: AppThemes,
     token0: string,
     token1: string,
-    spot: number[],
     bids: OrderbookDataPoint[],
     asks: OrderbookDataPoint[],
     pools: AmmPool[],
@@ -87,26 +80,16 @@ const getOptions = (
                 saveAsImage: { show: true },
                 dataView: { show: true, readOnly: false },
             },
-            itemSize: 10,
+            itemSize: 8,
         },
         legend: {
-            top: 20,
-            textStyle: {
-                color: colors.text[resolvedTheme],
-            },
-            data: [{ name: serie1Name }],
+            show: false,
         },
         xAxis: [
             {
                 type: 'value',
                 position: 'bottom',
-                name: `Simulation price`,
                 nameLocation: 'middle',
-                nameGap: 50,
-                nameTextStyle: {
-                    fontWeight: 'bold',
-                    fontSize: 14,
-                },
                 splitLine: {
                     show: false,
                 },
@@ -116,11 +99,16 @@ const getOptions = (
                     showMinLabel: true,
                     showMaxLabel: true,
                     formatter: (value) => `${formatAmount(value)}\n${formatAmount(1 / Number(value))}`,
+                    fontSize: 10,
+                    color: AppColors.milk[200],
                 },
                 axisLine: {
                     lineStyle: {
-                        color: colors.line[resolvedTheme],
+                        color: AppColors.milk[150],
                     },
+                },
+                axisTick: {
+                    show: false,
                 },
                 min: 'dataMin',
                 max: 'dataMax',
@@ -130,49 +118,47 @@ const getOptions = (
             {
                 show: true,
                 type: 'slider',
-                height: 30,
+                height: 25,
                 bottom: '3%',
+                backgroundColor: AppColors.milk[50],
                 fillerColor: 'transparent',
-                backgroundColor: 'transparent',
-                borderColor: colors.line[resolvedTheme],
+                borderColor: AppColors.milk[200],
                 labelFormatter: (index: number) => `${formatAmount(index)} ${token1}\n${formatAmount(1 / Number(index))} ${token0}`,
-                textStyle: { color: colors.text[resolvedTheme], fontSize: 11 },
+                textStyle: { color: AppColors.milk[200], fontSize: 10 },
                 handleLabel: { show: true },
-                dataBackground: { lineStyle: { color: colors.line[resolvedTheme] }, areaStyle: { color: 'transparent' } },
+                dataBackground: { lineStyle: { color: 'transparent' }, areaStyle: { color: 'transparent' } },
+                selectedDataBackground: { lineStyle: { color: AppColors.milk[200] }, areaStyle: { color: AppColors.milk[50] } },
+                brushStyle: { color: 'transparent' }, // unknown
+                handleStyle: { color: AppColors.milk[600] }, // small candles on left and right
+                moveHandleStyle: { color: AppColors.milk[200] }, // top bar
             },
         ],
         yAxis: [
             {
                 type: yAxisType,
                 logBase: yAxisType === 'log' ? yAxisLogBase : undefined,
-                name: `Trader's input in ${token0}`,
                 nameTextStyle: {
                     fontWeight: 'bold',
                     fontSize: 14,
                 },
                 position: 'left',
                 nameLocation: 'middle',
-                nameGap: 55,
                 alignTicks: true,
                 splitLine: {
-                    show: false,
+                    show: true,
+                    lineStyle: { color: AppColors.milk[50], type: 'dashed' },
                 },
                 axisTick: {
-                    show: true,
-                    lineStyle: {
-                        color: colors.line[resolvedTheme],
-                    },
+                    show: false,
                 },
                 axisLabel: {
+                    fontSize: 11,
                     show: true,
-                    color: colors.text[resolvedTheme],
+                    color: AppColors.milk[200],
                     formatter: (value) => formatAmount(value),
                 },
                 axisLine: {
-                    show: true,
-                    lineStyle: {
-                        color: colors.line[resolvedTheme],
-                    },
+                    show: false,
                 },
                 axisPointer: {
                     snap: true,
@@ -183,34 +169,28 @@ const getOptions = (
             {
                 type: yAxisType,
                 logBase: yAxisType === 'log' ? yAxisLogBase : undefined,
-                name: `Trader's input in ${token1}`,
                 nameTextStyle: {
                     fontWeight: 'bold',
                     fontSize: 14,
                 },
                 position: 'right',
                 nameLocation: 'middle',
-                nameGap: 55,
                 alignTicks: true,
                 splitLine: {
-                    show: false,
+                    show: true,
+                    lineStyle: { color: AppColors.milk[50], type: 'dashed' },
                 },
                 axisTick: {
-                    show: true,
-                    lineStyle: {
-                        color: colors.line[resolvedTheme],
-                    },
+                    show: false,
                 },
                 axisLabel: {
+                    fontSize: 11,
                     show: true,
-                    color: colors.text[resolvedTheme],
+                    color: AppColors.milk[200],
                     formatter: (value) => formatAmount(value),
                 },
                 axisLine: {
-                    show: true,
-                    lineStyle: {
-                        color: colors.line[resolvedTheme],
-                    },
+                    show: false,
                 },
                 axisPointer: {
                     snap: true,
@@ -220,14 +200,14 @@ const getOptions = (
             },
         ],
         textStyle: {
-            color: colors.text[resolvedTheme],
-            fontFamily: font.style.fontFamily,
+            color: AppColors.milk[600],
+            fontFamily: APP_FONT.style.fontFamily,
         },
         grid: {
             left: '10%',
             right: '10%',
-            top: '80',
-            bottom: '120',
+            top: '40',
+            bottom: '100',
         },
         // @ts-expect-error: poorly typed
         series: [
@@ -237,72 +217,40 @@ const getOptions = (
                 type: 'line',
                 data: bids,
                 step: 'start',
-                lineStyle: { width: 1.5, color: colors.line[resolvedTheme] },
+                lineStyle: { width: 0.5, color: AppColors.aquamarine, opacity: 0.5 },
                 symbol: 'circle',
                 symbolSize: 4,
                 itemStyle: {
-                    color: 'green',
-                    borderColor: '#0f0',
+                    color: AppColors.aquamarine,
+                    borderColor: AppColors.aquamarine,
                     borderWidth: 1,
                 },
                 emphasis: {
-                    itemStyle: { color: 'green', borderWidth: 4 },
-                },
-                areaStyle: {
-                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                        { offset: 0, color: lightGray },
-                        { offset: 1, color: 'transparent' },
-                    ]),
+                    itemStyle: { color: AppColors.aquamarine, borderWidth: 4 },
                 },
 
                 // best bid
-                markLine: {
-                    animation: false,
-                    symbol: 'none',
-                    data: bids.length
-                        ? [
-                              {
-                                  xAxis: bids[bids.length - 1][0],
-                                  lineStyle: { color: 'green', opacity: 0.5 },
-                                  label: {
-                                      show: true,
-                                      color: 'green',
-                                      formatter: (params) => `Best bid at ${params.value} ${token1}/${token0}`,
-                                      // https://echarts.apache.org/en/option.html#series-bar.markLine.data.0.label.position
-                                      position: 'insideMiddleTop',
-                                      fontSize: 10,
-                                      opacity: 1,
-                                  },
-                              },
-                          ]
-                        : undefined,
-                },
-
-                // bids area
-                markArea: {
-                    data: bids.length
-                        ? [
-                              [
-                                  {
-                                      xAxis: bids[0][0],
-                                      label: {
-                                          show: true,
-                                          // https://echarts.apache.org/en/option.html#series-bar.markArea.data.0.label.position
-                                          position: 'top',
-                                          fontSize: 10,
-                                          color: colors.text[resolvedTheme],
-                                          formatter: () => `LPs' bids in ${token1}\nfor traders to swap ${token0} in ${token1}`,
-                                      },
-                                      itemStyle: {
-                                          color: 'green',
-                                          opacity: 0.05,
-                                      },
-                                  },
-                                  { xAxis: bids[bids.length - 1][0] },
-                              ],
-                          ]
-                        : undefined,
-                },
+                // markLine: {
+                //     animation: false,
+                //     symbol: 'none',
+                //     data: bids.length
+                //         ? [
+                //               {
+                //                   xAxis: bids[bids.length - 1][0],
+                //                   lineStyle: { color: AppColors.aquamarine, opacity: 0.5 },
+                //                   label: {
+                //                       show: true,
+                //                       color: AppColors.aquamarine,
+                //                       formatter: (params) => `Best bid at ${params.value} ${token1}/${token0}`,
+                //                       // https://echarts.apache.org/en/option.html#series-bar.markLine.data.0.label.position
+                //                       position: 'insideMiddleTop',
+                //                       fontSize: 10,
+                //                       opacity: 1,
+                //                   },
+                //               },
+                //           ]
+                //         : undefined,
+                // },
             },
             {
                 yAxisIndex: 1,
@@ -310,71 +258,39 @@ const getOptions = (
                 type: 'line',
                 data: asks,
                 step: 'end',
-                lineStyle: { width: 1.5, color: colors.line[resolvedTheme] },
+                lineStyle: { width: 0.5, color: AppColors.folly, opacity: 0.5 },
                 symbol: 'circle',
                 symbolSize: 4,
                 itemStyle: {
-                    color: 'red',
-                    borderColor: '#f00',
+                    color: AppColors.folly,
+                    borderColor: AppColors.folly,
                     borderWidth: 1,
                 },
                 emphasis: {
-                    itemStyle: { color: 'red', borderWidth: 4 },
-                },
-                areaStyle: {
-                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                        { offset: 0, color: lightGray },
-                        { offset: 1, color: 'transparent' },
-                    ]),
+                    itemStyle: { color: AppColors.folly, borderWidth: 4 },
                 },
 
                 // best ask
-                markLine: {
-                    animation: false,
-                    symbol: 'none',
-                    data: asks.length
-                        ? [
-                              {
-                                  xAxis: asks[0][0],
-                                  lineStyle: { color: 'red', opacity: 0.5 },
-                                  label: {
-                                      show: true,
-                                      color: 'red',
-                                      // formatter: (params) => `Best ask = 1 ${token0} for ${params.value} ${token1}`,
-                                      formatter: (params) => `Best ask at ${params.value} ${token1}/${token0}`,
-                                      position: 'insideMiddleBottom',
-                                      fontSize: 10,
-                                      opacity: 1,
-                                  },
-                              },
-                          ]
-                        : undefined,
-                },
-
-                // asks area
-                markArea: {
-                    data: asks.length
-                        ? [
-                              [
-                                  {
-                                      xAxis: asks[0][0],
-                                      label: {
-                                          show: true,
-                                          position: 'top',
-                                          fontSize: 10,
-                                          color: colors.text[resolvedTheme],
-                                          formatter: () => `LPs' asks in ${token0}\nfor traders to swap ${token1} in ${token0}`,
-                                      },
-                                      itemStyle: {
-                                          color: 'red',
-                                          opacity: 0.05,
-                                      },
-                                  },
-                                  { xAxis: asks[asks.length - 1][0] },
-                              ],
-                          ]
-                        : undefined,
-                },
+                // markLine: {
+                //     animation: false,
+                //     symbol: 'none',
+                //     data: asks.length
+                //         ? [
+                //               {
+                //                   xAxis: asks[0][0],
+                //                   lineStyle: { color: AppColors.folly, opacity: 0.5 },
+                //                   label: {
+                //                       show: true,
+                //                       color: AppColors.folly,
+                //                       formatter: (params) => `Best ask at ${params.value} ${token1}/${token0}`,
+                //                       position: 'insideMiddleBottom',
+                //                       fontSize: 10,
+                //                       opacity: 1,
+                //                   },
+                //               },
+                //           ]
+                //         : undefined,
+                // },
             },
         ],
     }
@@ -382,13 +298,12 @@ const getOptions = (
 
 export default function DepthChart(props: { orderbook: AmmAsOrderbook }) {
     const { resolvedTheme } = useTheme()
-    const { storeRefreshedAt, yAxisType, yAxisLogBase, setYAxisType, selectOrderbookDataPoint } = useAppStore()
+    const { storeRefreshedAt, yAxisType, yAxisLogBase, selectOrderbookDataPoint } = useAppStore()
     const [options, setOptions] = useState<echarts.EChartsOption>(
         getOptions(
             (resolvedTheme ?? DEFAULT_THEME) as AppThemes,
-            '',
-            '',
-            props.orderbook.spot,
+            props.orderbook.token0.symbol,
+            props.orderbook.token1.symbol,
             [],
             [],
             props.orderbook.pools,
@@ -409,16 +324,16 @@ export default function DepthChart(props: { orderbook: AmmAsOrderbook }) {
         // LPs are ready to buy WETH against their USDC at a low price expressed in 1 weth per x usdc
         // They made bids to buy WETH with their USDC
         const bids = props.orderbook?.trades0to1
-            .filter((trade, tradeIndex, trades) => trades.findIndex((_trade) => _trade.input === trade.input) === tradeIndex)
+            .filter((trade, tradeIndex, trades) => trades.findIndex((_trade) => _trade.amount === trade.amount) === tradeIndex)
             .sort((curr, next) => curr.ratio - next.ratio) // filter by obtained price
             .map(
                 (trade) =>
                     [
                         trade.ratio, // 2k
-                        trade.input, // input in ETH
+                        trade.amount, // input in ETH
                         OrderbookSide.BID,
                         trade.distribution,
-                        trade.ratio * trade.input, // output in USDC
+                        trade.ratio * trade.amount, // output in USDC
                     ] as OrderbookDataPoint,
             )
 
@@ -431,15 +346,15 @@ export default function DepthChart(props: { orderbook: AmmAsOrderbook }) {
         // They made asks to buy USDC with their WETH
         // asks
         const asks = props.orderbook?.trades1to0
-            .filter((trade, tradeIndex, trades) => trades.findIndex((_trade) => _trade.input === trade.input) === tradeIndex)
+            .filter((trade, tradeIndex, trades) => trades.findIndex((_trade) => _trade.amount === trade.amount) === tradeIndex)
             .map(
                 (trade) =>
                     [
                         1 / trade.ratio,
-                        trade.input,
+                        trade.amount,
                         OrderbookSide.ASK,
                         trade.distribution,
-                        trade.ratio * trade.input, // output in USDC
+                        trade.ratio * trade.amount, // output in USDC
                     ] as OrderbookDataPoint,
             )
             .sort((curr, next) => Number(curr[0]) - Number(next[0])) // filter by obtained price
@@ -449,7 +364,6 @@ export default function DepthChart(props: { orderbook: AmmAsOrderbook }) {
             theme,
             props.orderbook.token0.symbol,
             props.orderbook.token1.symbol,
-            props.orderbook.spot,
             bids,
             asks,
             props.orderbook.pools,
@@ -484,12 +398,12 @@ export default function DepthChart(props: { orderbook: AmmAsOrderbook }) {
                     )}
                 </ChartBackground>
             </ErrorBoundary>
-            <div className="w-full flex flex-col items-start mt-5 text-sm">
+            {/* <div className="w-full flex flex-col items-start mt-5 text-sm">
                 <div className="flex gap-4 items-center">
                     <Button text={`yAxisType=${yAxisType}`} onClickFn={() => setYAxisType(yAxisType === 'log' ? 'value' : 'log')} />
                     {yAxisType === 'log' && <p>log base={yAxisLogBase}</p>}
                 </div>
-            </div>
+            </div> */}
         </Suspense>
     )
 }

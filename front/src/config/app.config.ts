@@ -1,5 +1,6 @@
 import { AppPagePaths, AppThemes, IconIds } from '@/enums'
 import { InterfaceAppLink } from '@/interfaces'
+import { Inter_Tight } from 'next/font/google'
 
 export const APP_KEYWORD = 'tycho-tap2'
 export const APP_METADATA = {
@@ -43,4 +44,4 @@ export const APP_PAGES: InterfaceAppLink[] = [
     },
 ]
 
-export const MIN_SUPPLIED = 500000 // 1000000
+export const APP_FONT = Inter_Tight({ weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900'], subsets: ['latin'] })

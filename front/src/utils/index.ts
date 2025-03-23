@@ -9,6 +9,7 @@ export * from './date.util'
 export * from './format.util'
 export * from './requests.util'
 export * from './app.util'
+export * from './theme.util'
 
 // misc
 export const copyToClipboard = (value: string) => {
