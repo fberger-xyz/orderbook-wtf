@@ -12,7 +12,7 @@ import { AmmAsOrderbook } from '@/interfaces'
 import SelectTokenModal from './SelectTokenModal'
 
 const OrderbookKeyMetric = (props: { title: string; content: ReactNode }) => (
-    <OrderbookComponentLayout title={<p className="text-milk-600 opacity-50 text-sm">{props.title}</p>} content={props.content} />
+    <OrderbookComponentLayout title={<p className="text-milk-600 opacity-50 text-xs">{props.title}</p>} content={props.content} />
 )
 const OrderbookComponentLayout = (props: { title: ReactNode; content: ReactNode }) => (
     <div className="flex flex-col w-full border-2 rounded-xl px-4 py-3 border-milk-50 gap-1 bg-gray-600/5">
@@ -850,8 +850,8 @@ export default function Dashboard() {
                 <div className="h-0 w-full" />
 
                 {/* fees */}
-                <div className="bg-gray-600/20 flex justify-between p-4 rounded-xl border-milk-150">
-                    <p className="text-milk-400 truncate text-sm">1 WETH = 1984.21 USDC ($1,984.21)</p>
+                <div className="bg-gray-600/20 flex justify-between p-4 rounded-xl border-milk-150 text-sm">
+                    <p className="text-milk-400 truncate">1 WETH = 1984.21 USDC ($1,984.21)</p>
                     <div className="flex gap-1.5 items-center">
                         <IconWrapper icon={IconIds.GAS} className="size-4 text-milk-600" />
                         <ChainImage networkName="ethereum" className="size-4" />
