@@ -6,7 +6,7 @@ export function Backdrop({ children, className }: { children: React.ReactNode; c
     return (
         <motion.div
             className={cn(
-                'fixed inset-0 z-30 flex size-full items-center justify-center overflow-y-auto bg-gray-500/20 px-4 backdrop-blur-sm',
+                'fixed inset-0 z-30 flex size-full items-center justify-center overflow-y-auto bg-background/50 px-4 backdrop-blur-xl',
                 className,
             )}
             initial={{ opacity: 0 }}

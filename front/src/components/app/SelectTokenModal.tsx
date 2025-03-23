@@ -1,6 +1,5 @@
 'use client'
 
-import { useRouter, useSearchParams } from 'next/navigation'
 import { useKeyboardShortcut } from '@/hooks/useKeyboardShortcutArgs'
 import { motion } from 'framer-motion'
 import { IconIds } from '@/enums'
@@ -13,14 +12,10 @@ import Image from 'next/image'
 import { shortenAddress } from '@/utils'
 
 export default function SelectTokenModal() {
-    const { availableTokens } = useAppStore()
+    const { availableTokens, setShowSelectTokenModal } = useAppStore()
     const modalRef = useRef<HTMLDivElement>(null)
-    const router = useRouter()
-    const searchParams = useSearchParams()
-    const showModal = searchParams.get('select-token') === 'true'
-    useKeyboardShortcut({ key: 'Escape', onKeyPressed: () => router.back() })
-    useClickOutside(modalRef, () => router.back())
-    if (!showModal) return null
+    useKeyboardShortcut({ key: 'Escape', onKeyPressed: () => setShowSelectTokenModal(false) })
+    useClickOutside(modalRef, () => setShowSelectTokenModal(false))
     return (
         <Backdrop>
             <motion.div
@@ -28,25 +23,33 @@ export default function SelectTokenModal() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ ease: 'easeInOut', duration: 0.25 }}
-                className="flex max-w-[400px] flex-col gap-5 rounded-xl border border-light-hover bg-background py-3 px-1 text-base shadow-lg"
+                className="flex max-w-[500px] w-full flex-col gap-5 rounded-xl border border-milk-200 bg-background p-6 text-base shadow-lg"
             >
-                <div className="flex w-full items-center justify-between px-6">
-                    <p className="font-bold text-primary lg:text-lg">Select a token</p>
+                {/* 1 header */}
+                <div className="flex w-full items-center justify-between">
+                    <p className="font-semibold text-2xl">Select a token</p>
                     <button
-                        onClick={() => router.back()}
+                        onClick={() => setShowSelectTokenModal(false)}
                         className="rounded-xl hover:bg-very-light-hover hover:text-primary focus:outline-none text-primary"
                     >
                         <IconWrapper icon={IconIds.CLOSE} className="size-7" />
                     </button>
                 </div>
-                <div className="flex w-full items-center justify-between px-6">
+
+                {/* 2 search */}
+                <div className="flex w-full items-center gap-3 border-milk-200 rounded-lg p-2 border hover:border-folly">
+                    <IconWrapper icon={IconIds.SEARCH} className="size-6 text-milk-600" />
                     <input
                         type="text"
-                        className="border-light-hover px-5 bg-transparent border w-full rounded-lg h-12 placeholder:text-inactive"
+                        className="text-lg font-light text-milk-600 border-none w-full rounded-md outline-none ring-0 focus:ring-0 focus:outline-none focus:border-none bg-transparent placeholder:text-milk-200"
                         placeholder="Search a name or paste address"
                     />
+                    <IconWrapper icon={IconIds.CLOSE} className="size-7 text-milk-600" />
                 </div>
-                {/* <div className="w-full border-t border-very-light-hover" /> */}
+
+                {/* suggestions */}
+
+                {/* tokens */}
                 <div className="px-5 max-h-[300px] overflow-scroll flex flex-col gap-2">
                     {availableTokens.map((token, tokenIndex) => (
                         <button
@@ -68,11 +71,6 @@ export default function SelectTokenModal() {
                         </button>
                     ))}
                 </div>
-                {/* <div className="w-full border-t border-very-light-hover" /> */}
-                {/* <div className="flex w-full items-center justify-end gap-3 px-5">
-                    <Button text="Copy (JSON)" icons={{ right: IconIds.COPY }} />
-                    <Button text="Download (CSV)" icons={{ right: IconIds.DOWNLOAD }} />
-                </div> */}
             </motion.div>
         </Backdrop>
     )

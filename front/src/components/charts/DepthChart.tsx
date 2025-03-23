@@ -3,20 +3,20 @@
 import * as echarts from 'echarts'
 import { ErrorBoundary } from 'react-error-boundary'
 import { Suspense, useEffect, useState } from 'react'
-import { AppThemes, OrderbookSide } from '@/enums'
+import { OrderbookSide } from '@/enums'
 import EchartWrapper from './EchartWrapper'
-import { colors } from '@/config/charts.config'
 import { ChartBackground, CustomFallback, LoadingArea } from './ChartsCommons'
 import { useAppStore } from '@/stores/app.store'
-import { APP_FONT, DEFAULT_THEME } from '@/config/app.config'
+import { APP_FONT } from '@/config/app.config'
 import { ErrorBoundaryFallback } from '../common/ErrorBoundaryFallback'
 import { AppColors, formatAmount } from '@/utils'
 import { AmmAsOrderbook, AmmPool } from '@/interfaces'
 import numeral from 'numeral'
 import { OrderbookDataPoint } from '@/types'
+import toast from 'react-hot-toast'
+import { toastStyle } from '@/config/toasts.config'
 
 const getOptions = (
-    resolvedTheme: AppThemes,
     token0: string,
     token1: string,
     bids: OrderbookDataPoint[],
@@ -33,7 +33,7 @@ const getOptions = (
                 type: 'line',
                 snap: true,
                 lineStyle: {
-                    color: colors.line[resolvedTheme],
+                    color: AppColors.milk[600],
                     width: 2,
                     type: 'dotted',
                 },
@@ -128,8 +128,12 @@ const getOptions = (
                 dataBackground: { lineStyle: { color: 'transparent' }, areaStyle: { color: 'transparent' } },
                 selectedDataBackground: { lineStyle: { color: AppColors.milk[200] }, areaStyle: { color: AppColors.milk[50] } },
                 brushStyle: { color: 'transparent' }, // unknown
-                handleStyle: { color: AppColors.milk[600] }, // small candles on left and right
+                handleStyle: { color: AppColors.milk[600], borderColor: AppColors.milk[600] }, // small candles on left and right
                 moveHandleStyle: { color: AppColors.milk[200] }, // top bar
+                emphasis: {
+                    handleLabel: { show: true },
+                    moveHandleStyle: { color: AppColors.milk[400] }, // top bar
+                },
             },
         ],
         yAxis: [
@@ -227,29 +231,6 @@ const getOptions = (
                 emphasis: {
                     itemStyle: { color: AppColors.aquamarine, borderWidth: 4 },
                 },
-
-                // best bid
-                // markLine: {
-                //     animation: false,
-                //     symbol: 'none',
-                //     data: bids.length
-                //         ? [
-                //               {
-                //                   xAxis: bids[bids.length - 1][0],
-                //                   lineStyle: { color: AppColors.aquamarine, opacity: 0.5 },
-                //                   label: {
-                //                       show: true,
-                //                       color: AppColors.aquamarine,
-                //                       formatter: (params) => `Best bid at ${params.value} ${token1}/${token0}`,
-                //                       // https://echarts.apache.org/en/option.html#series-bar.markLine.data.0.label.position
-                //                       position: 'insideMiddleTop',
-                //                       fontSize: 10,
-                //                       opacity: 1,
-                //                   },
-                //               },
-                //           ]
-                //         : undefined,
-                // },
             },
             {
                 yAxisIndex: 1,
@@ -268,54 +249,19 @@ const getOptions = (
                 emphasis: {
                     itemStyle: { color: AppColors.folly, borderWidth: 4 },
                 },
-
-                // best ask
-                // markLine: {
-                //     animation: false,
-                //     symbol: 'none',
-                //     data: asks.length
-                //         ? [
-                //               {
-                //                   xAxis: asks[0][0],
-                //                   lineStyle: { color: AppColors.folly, opacity: 0.5 },
-                //                   label: {
-                //                       show: true,
-                //                       color: AppColors.folly,
-                //                       formatter: (params) => `Best ask at ${params.value} ${token1}/${token0}`,
-                //                       position: 'insideMiddleBottom',
-                //                       fontSize: 10,
-                //                       opacity: 1,
-                //                   },
-                //               },
-                //           ]
-                //         : undefined,
-                // },
             },
         ],
     }
 }
 
 export default function DepthChart(props: { orderbook: AmmAsOrderbook }) {
-    const { resolvedTheme } = useTheme()
     const { storeRefreshedAt, yAxisType, yAxisLogBase, selectOrderbookDataPoint } = useAppStore()
     const [options, setOptions] = useState<echarts.EChartsOption>(
-        getOptions(
-            (resolvedTheme ?? DEFAULT_THEME) as AppThemes,
-            props.orderbook.token0.symbol,
-            props.orderbook.token1.symbol,
-            [],
-            [],
-            props.orderbook.pools,
-            yAxisType,
-            yAxisLogBase,
-        ),
+        getOptions(props.orderbook.token0.symbol, props.orderbook.token1.symbol, [], [], props.orderbook.pools, yAxisType, yAxisLogBase),
     )
 
     // load/refresh chart
     useEffect(() => {
-        // prepare
-        const theme = (resolvedTheme ?? DEFAULT_THEME) as AppThemes
-
         // example: 0 = WETH, 1 = usdc
         // trades0to1 = traders swap WETH into USDC
         // so traders need USDC liquidity from LPs
@@ -324,7 +270,7 @@ export default function DepthChart(props: { orderbook: AmmAsOrderbook }) {
         // They made bids to buy WETH with their USDC
         const bids = props.orderbook?.trades0to1
             .filter((trade, tradeIndex, trades) => trades.findIndex((_trade) => _trade.amount === trade.amount) === tradeIndex)
-            .sort((curr, next) => curr.ratio - next.ratio) // filter by obtained price
+            .sort((curr, next) => curr.ratio - next.ratio) // filter asc by obtained price
             .map(
                 (trade) =>
                     [
@@ -335,6 +281,11 @@ export default function DepthChart(props: { orderbook: AmmAsOrderbook }) {
                         trade.ratio * trade.amount, // output in USDC
                     ] as OrderbookDataPoint,
             )
+        // todo later
+        // .filter((bid, bidIndex, bids) => {
+        //     if (bidIndex === 0) return true
+        //     return bid[0] > bids[bidIndex - 1][0]
+        // })
 
         // example: 0 = weth, 1 = usdc
         // trades1to0 = traders swap USDC into WETH
@@ -356,11 +307,15 @@ export default function DepthChart(props: { orderbook: AmmAsOrderbook }) {
                         trade.ratio * trade.amount, // output in USDC
                     ] as OrderbookDataPoint,
             )
+            // todo later
             .sort((curr, next) => Number(curr[0]) - Number(next[0])) // filter by obtained price
+        // .filter((ask, askIndex, asks) => {
+        //     if (askIndex === 0) return true
+        //     return ask[0] > asks[askIndex - 1][0]
+        // })
 
         // options
         const newOptions = getOptions(
-            theme,
             props.orderbook.token0.symbol,
             props.orderbook.token1.symbol,
             bids,
@@ -372,8 +327,9 @@ export default function DepthChart(props: { orderbook: AmmAsOrderbook }) {
 
         // update
         setOptions(newOptions)
+
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [storeRefreshedAt, yAxisType, yAxisLogBase, resolvedTheme])
+    }, [storeRefreshedAt, yAxisType, yAxisLogBase])
 
     // methods
     const handlePointClick = (params: { value: undefined | OrderbookDataPoint }) => {
@@ -384,25 +340,22 @@ export default function DepthChart(props: { orderbook: AmmAsOrderbook }) {
     return (
         <Suspense fallback={<CustomFallback />}>
             <ErrorBoundary FallbackComponent={ErrorBoundaryFallback}>
-                <ChartBackground className="relative h-[500px]">
+                <ChartBackground className="relative h-[450px]">
                     {!storeRefreshedAt ? (
                         <LoadingArea message="Loading your assets" />
                     ) : Array.isArray(options.series) && options.series?.length > 0 && options.series[0].data ? (
                         <EchartWrapper
                             options={options}
-                            onPointClick={(params) => handlePointClick(params as { value: undefined | OrderbookDataPoint })}
+                            onPointClick={(params) => {
+                                toast.success(`Email copied`, { style: toastStyle })
+                                handlePointClick(params as { value: undefined | OrderbookDataPoint })
+                            }}
                         />
                     ) : (
                         <LoadingArea message="Contact support" />
                     )}
                 </ChartBackground>
             </ErrorBoundary>
-            {/* <div className="w-full flex flex-col items-start mt-5 text-sm">
-                <div className="flex gap-4 items-center">
-                    <Button text={`yAxisType=${yAxisType}`} onClickFn={() => setYAxisType(yAxisType === 'log' ? 'value' : 'log')} />
-                    {yAxisType === 'log' && <p>log base={yAxisLogBase}</p>}
-                </div>
-            </div> */}
         </Suspense>
     )
 }

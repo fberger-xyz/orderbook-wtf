@@ -7,7 +7,7 @@ export default function Footer(props: { className?: string }) {
                 <p>2024 © PropellerHeads</p>
                 <p>Alpha Version Notice</p>
             </div>
-            <p>Made by PropellerHeads, @fberger_xyz and @xMerso</p>
+            <p>Made by PropellerHeads</p>
         </div>
     )
 }

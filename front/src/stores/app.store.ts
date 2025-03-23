@@ -18,6 +18,7 @@ export const useAppStore = create<{
     selectedToken1?: Token
     availableTokens: Token[]
     loadedOrderbooks: Record<string, undefined | AmmAsOrderbook>
+    showSelectTokenModal: boolean
     setShowMobileMenu: (showMobileMenu: boolean) => void
     setHasHydrated: (hasHydrated: boolean) => void
     setStoreRefreshedAt: (storeRefreshedAt: number) => void
@@ -31,6 +32,7 @@ export const useAppStore = create<{
     setAvailableTokens: (availableTokens: Token[]) => void
     saveLoadedOrderbook: (pair: string, orderbook?: AmmAsOrderbook) => void
     switchSelectedTokens: () => void
+    setShowSelectTokenModal: (showSelectTokenModal: boolean) => void
 }>()(
     persist(
         (set) => ({
@@ -57,6 +59,7 @@ export const useAppStore = create<{
             },
             availableTokens: [],
             loadedOrderbooks: {},
+            showSelectTokenModal: true,
             setShowMobileMenu: (showMobileMenu) => set(() => ({ showMobileMenu })),
             setHasHydrated: (hasHydrated) => set(() => ({ hasHydrated })),
             setStoreRefreshedAt: (storeRefreshedAt) => set(() => ({ storeRefreshedAt })),
@@ -70,6 +73,7 @@ export const useAppStore = create<{
             setAvailableTokens: (availableTokens) => set(() => ({ availableTokens })),
             saveLoadedOrderbook: (pair, orderbook) => set((state) => ({ loadedOrderbooks: { ...state.loadedOrderbooks, [pair]: orderbook } })),
             switchSelectedTokens: () => set((state) => ({ selectedToken0: state.selectedToken1, selectedToken1: state.selectedToken0 })),
+            setShowSelectTokenModal: (showSelectTokenModal) => set(() => ({ showSelectTokenModal })),
         }),
         {
             name: IS_DEV

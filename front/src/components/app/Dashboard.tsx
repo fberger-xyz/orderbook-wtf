@@ -9,6 +9,7 @@ import TokenImage from './TokenImage'
 import ChainImage from './ChainImage'
 import DepthChart from '../charts/DepthChart'
 import { AmmAsOrderbook } from '@/interfaces'
+import SelectTokenModal from './SelectTokenModal'
 
 const OrderbookKeyMetric = (props: { title: string; content: ReactNode }) => (
     <OrderbookComponentLayout title={<p className="text-milk-600 opacity-50 text-sm">{props.title}</p>} content={props.content} />
@@ -703,7 +704,7 @@ const orderbookHardcoded: AmmAsOrderbook = {
 }
 
 export default function Dashboard() {
-    const { selectedToken0, selectedToken1, switchSelectedTokens } = useAppStore()
+    const { selectedToken0, selectedToken1, showSelectTokenModal, switchSelectedTokens, setShowSelectTokenModal } = useAppStore()
     if (!selectedToken0 || !selectedToken1) return
     // useQueries({
     //     queries: [
@@ -783,7 +784,10 @@ export default function Dashboard() {
                 <div className="bg-gray-600/20 flex flex-col gap-3 p-4 rounded-xl border-milk-150 w-full">
                     <p className="text-milk-600">Sell</p>
                     <div className="flex justify-between gap-3">
-                        <button className="flex rounded-full bg-gray-600/30 transition-colors duration-300 hover:bg-gray-600/50 items-center gap-1.5 pl-1.5 pr-2 py-1.5 min-w-fit">
+                        <button
+                            onClick={() => setShowSelectTokenModal(true)}
+                            className="flex rounded-full bg-gray-600/30 transition-colors duration-300 hover:bg-gray-600/50 items-center gap-1.5 pl-1.5 pr-2 py-1.5 min-w-fit"
+                        >
                             <TokenImage size={24} tokenSymbol={selectedToken0.symbol.toLowerCase()} />
                             <p className="font-semibold tracking-wide">{selectedToken0.symbol}</p>
                             <IconWrapper icon={IconIds.TRIANGLE_DOWN} className="size-4" />
@@ -819,7 +823,10 @@ export default function Dashboard() {
                 <div className="bg-gray-600/20 flex flex-col gap-3 p-4 rounded-xl border-milk-150 w-full">
                     <p className="text-milk-600">Buy</p>
                     <div className="flex justify-between gap-3 w-full">
-                        <button className="flex rounded-full bg-gray-600/30 transition-colors duration-300 hover:bg-gray-600/50 items-center gap-1.5 pl-1.5 pr-2 py-1.5 min-w-fit">
+                        <button
+                            onClick={() => setShowSelectTokenModal(true)}
+                            className="flex rounded-full bg-gray-600/30 transition-colors duration-300 hover:bg-gray-600/50 items-center gap-1.5 pl-1.5 pr-2 py-1.5 min-w-fit"
+                        >
                             <TokenImage size={24} tokenSymbol={selectedToken1.symbol.toLowerCase()} />
                             <p className="font-semibold tracking-wide">{selectedToken1.symbol}</p>
                             <IconWrapper icon={IconIds.TRIANGLE_DOWN} className="size-4" />
@@ -861,6 +868,8 @@ export default function Dashboard() {
                     <p className="font-bold">Swap</p>
                 </button>
             </div>
+
+            {showSelectTokenModal && <SelectTokenModal />}
         </div>
     )
 }

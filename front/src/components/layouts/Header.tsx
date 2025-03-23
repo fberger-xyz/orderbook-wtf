@@ -10,8 +10,8 @@ import ChainImage from '../app/ChainImage'
 import { useRef, useState } from 'react'
 import { useClickOutside } from '@/hooks/useClickOutside'
 
-export default function HeaderDesktop(props: { className?: string }) {
-    const [openNetworkDropown, setOpenNetworkDropown] = useState(true)
+export default function Header(props: { className?: string }) {
+    const [openNetworkDropown, setOpenNetworkDropown] = useState(false)
     const networkDropown = useRef<HTMLDivElement>(null)
     useClickOutside(networkDropown, () => setOpenNetworkDropown(false))
     return (
@@ -20,11 +20,11 @@ export default function HeaderDesktop(props: { className?: string }) {
                 <TychoSVG className="h-5" />
                 <p className="text-milk-600 font-light opacity-50">Orderbook</p>
             </div>
-            <div className="z-40 flex justify-end gap-2">
+            <div className="flex justify-end gap-2">
                 {/* docs */}
-                <LinkWrapper href="https://docs.propellerheads.xyz/tycho" className="flex items-center gap-1 px-2.5">
-                    <p className="text-milk">Docs</p>
-                    <IconWrapper icon={IconIds.OPEN_LINK_IN_NEW_TAB} className="size-3" />
+                <LinkWrapper href="https://github.com/propeller-heads/tycho-x/blob/main/TAP-2.md" className="flex items-center gap-1 px-2.5">
+                    <p className="text-milk text-sm">Docs</p>
+                    <IconWrapper icon={IconIds.OPEN_LINK_IN_NEW_TAB} className="size-4" />
                 </LinkWrapper>
 
                 {/* networks */}
