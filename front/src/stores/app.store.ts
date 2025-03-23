@@ -59,7 +59,7 @@ export const useAppStore = create<{
             },
             availableTokens: [],
             loadedOrderbooks: {},
-            showSelectTokenModal: true,
+            showSelectTokenModal: false,
             setShowMobileMenu: (showMobileMenu) => set(() => ({ showMobileMenu })),
             setHasHydrated: (hasHydrated) => set(() => ({ hasHydrated })),
             setStoreRefreshedAt: (storeRefreshedAt) => set(() => ({ storeRefreshedAt })),

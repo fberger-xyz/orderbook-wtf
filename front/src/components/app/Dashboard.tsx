@@ -782,7 +782,7 @@ export default function Dashboard() {
             <div className="col-span-1 md:col-span-4 flex flex-col gap-0.5">
                 {/* sell */}
                 <div className="bg-gray-600/20 flex flex-col gap-3 p-4 rounded-xl border-milk-150 w-full">
-                    <p className="text-milk-600">Sell</p>
+                    <p className="text-milk-400 text-sm">Sell</p>
                     <div className="flex justify-between gap-3">
                         <button
                             onClick={() => setShowSelectTokenModal(true)}
@@ -801,9 +801,9 @@ export default function Dashboard() {
                     <div className="flex justify-between items-center">
                         <div className="flex justify-between gap-1 items-center">
                             <IconWrapper icon={IconIds.WALLET} className="size-4 text-milk-400" />
-                            <p className="text-milk-400">0.1025</p>
+                            <p className="text-milk-400 text-xs">0.1025</p>
                         </div>
-                        <p className="text-milk-400">$1,984.21</p>
+                        <p className="text-milk-400 text-xs">$1,984.21</p>
                     </div>
                 </div>
 
@@ -821,7 +821,7 @@ export default function Dashboard() {
 
                 {/* buy */}
                 <div className="bg-gray-600/20 flex flex-col gap-3 p-4 rounded-xl border-milk-150 w-full">
-                    <p className="text-milk-600">Buy</p>
+                    <p className="text-milk-400 text-sm">Buy</p>
                     <div className="flex justify-between gap-3 w-full">
                         <button
                             onClick={() => setShowSelectTokenModal(true)}
@@ -840,9 +840,9 @@ export default function Dashboard() {
                     <div className="flex justify-between items-center">
                         <div className="flex justify-between gap-1 items-center">
                             <IconWrapper icon={IconIds.WALLET} className="size-4 text-milk-400" />
-                            <p className="text-milk-400">0.1025</p>
+                            <p className="text-milk-400 text-xs">0.1025</p>
                         </div>
-                        <p className="text-milk-400">$ 1987.92</p>
+                        <p className="text-milk-400 text-xs">$ 1987.92</p>
                     </div>
                 </div>
 
@@ -851,7 +851,7 @@ export default function Dashboard() {
 
                 {/* fees */}
                 <div className="bg-gray-600/20 flex justify-between p-4 rounded-xl border-milk-150">
-                    <p className="text-milk-400 truncate">1 WETH = 1984.21 USDC ($1,984.21)</p>
+                    <p className="text-milk-400 truncate text-sm">1 WETH = 1984.21 USDC ($1,984.21)</p>
                     <div className="flex gap-1.5 items-center">
                         <IconWrapper icon={IconIds.GAS} className="size-4 text-milk-600" />
                         <ChainImage networkName="ethereum" className="size-4" />

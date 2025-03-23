@@ -347,7 +347,7 @@ export default function DepthChart(props: { orderbook: AmmAsOrderbook }) {
                         <EchartWrapper
                             options={options}
                             onPointClick={(params) => {
-                                toast.success(`Email copied`, { style: toastStyle })
+                                toast.success(`Datapoint selected [toast design wip]`, { style: toastStyle })
                                 handlePointClick(params as { value: undefined | OrderbookDataPoint })
                             }}
                         />
