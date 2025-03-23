@@ -1,10 +1,4 @@
 {
-  "projects": [
-    {
-      "src": "front/",
-      "use": "@vercel/next"
-    }
-  ],
   "builds": [
     {
       "src": "front/next.config.ts",
