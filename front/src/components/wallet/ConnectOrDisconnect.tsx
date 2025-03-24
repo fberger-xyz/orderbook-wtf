@@ -37,8 +37,8 @@ export function ConnectOrDisconnect() {
 
     return account.isConnected ? (
         <div className="flex items-center gap-2 bg-milk-100/5 rounded-xl h-10 pl-2.5 pr-1 text-milk-600">
-            <IconWrapper icon={IconIds.WALLET} className="size-4" />
-            <p>0.0449 ETH</p>
+            <IconWrapper icon={IconIds.WALLET} className="size-5" />
+            <p className="text-sm">0.0449 ETH</p>
             <button
                 className="transition-colors duration-300 bg-milk-100/5 hover:bg-milk-100/10 rounded-lg h-8 px-2.5 text-milk-600"
                 onClick={async () => {
@@ -49,7 +49,7 @@ export function ConnectOrDisconnect() {
                     }
                 }}
             >
-                <p className="group-hover:text-inactive">{shortenAddress(String(account.address))}</p>
+                <p className="group-hover:text-inactive text-sm">{shortenAddress(String(account.address))}</p>
             </button>
         </div>
     ) : (

@@ -3,6 +3,7 @@ import { persist, createJSONStorage } from 'zustand/middleware'
 import { APP_METADATA, IS_DEV } from '@/config/app.config'
 import { OrderbookDataPoint } from '@/types'
 import { AmmAsOrderbook, AmmPool, Token } from '@/interfaces'
+import { tokensListFromBackend } from '@/data/back-tokens'
 
 export const useAppStore = create<{
     showMobileMenu: boolean
@@ -14,11 +15,15 @@ export const useAppStore = create<{
     yAxisLogBase: number
     availablePairs: string[]
     selectedPair?: string
-    selectedToken0?: Token
-    selectedToken1?: Token
+    sellToken?: Token
+    sellTokenAmountInput?: number
+    buyToken?: Token
+    buyTokenAmountInput?: number
     availableTokens: Token[]
     loadedOrderbooks: Record<string, undefined | AmmAsOrderbook>
     showSelectTokenModal: boolean
+    selectTokenModalFor: 'buy' | 'sell'
+    selectTokenModalSearch: string
     setShowMobileMenu: (showMobileMenu: boolean) => void
     setHasHydrated: (hasHydrated: boolean) => void
     setStoreRefreshedAt: (storeRefreshedAt: number) => void
@@ -27,12 +32,14 @@ export const useAppStore = create<{
     setYAxisLogBase: (yAxisLogBase: number) => void
     setAvailablePairs: (availablePairs: string[]) => void
     selectPair: (selectedPair?: string) => void
-    selectToken0: (selectedToken0?: Token) => void
-    selectToken1: (selectedToken1?: Token) => void
+    selectSellToken: (sellToken?: Token) => void
+    selectBuyToken: (buyToken?: Token) => void
     setAvailableTokens: (availableTokens: Token[]) => void
     saveLoadedOrderbook: (pair: string, orderbook?: AmmAsOrderbook) => void
     switchSelectedTokens: () => void
     setShowSelectTokenModal: (showSelectTokenModal: boolean) => void
+    setSelectTokenModalFor: (selectTokenModalFor: 'buy' | 'sell') => void
+    setSelectTokenModalSearch: (selectTokenModalSearch: string) => void
 }>()(
     persist(
         (set) => ({
@@ -45,21 +52,15 @@ export const useAppStore = create<{
             yAxisLogBase: 10,
             availablePairs: [],
             selectedPair: undefined,
-            selectedToken0: {
-                address: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
-                decimals: 18,
-                symbol: 'WETH',
-                gas: '29962',
-            },
-            selectedToken1: {
-                address: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
-                decimals: 6,
-                symbol: 'USDC',
-                gas: '40652',
-            },
+            sellToken: tokensListFromBackend[1],
+            sellTokenAmountInput: 2000,
+            buyToken: tokensListFromBackend[0],
+            buyTokenAmountInput: 1,
             availableTokens: [],
             loadedOrderbooks: {},
             showSelectTokenModal: false,
+            selectTokenModalFor: 'buy',
+            selectTokenModalSearch: '',
             setShowMobileMenu: (showMobileMenu) => set(() => ({ showMobileMenu })),
             setHasHydrated: (hasHydrated) => set(() => ({ hasHydrated })),
             setStoreRefreshedAt: (storeRefreshedAt) => set(() => ({ storeRefreshedAt })),
@@ -68,12 +69,14 @@ export const useAppStore = create<{
             setYAxisLogBase: (yAxisLogBase) => set(() => ({ yAxisLogBase })),
             setAvailablePairs: (availablePairs) => set(() => ({ availablePairs })),
             selectPair: (selectedPair) => set(() => ({ selectedPair })),
-            selectToken0: (selectedToken0) => set(() => ({ selectedToken0 })),
-            selectToken1: (selectedToken1) => set(() => ({ selectedToken1 })),
+            selectSellToken: (sellToken) => set(() => ({ sellToken })),
+            selectBuyToken: (buyToken) => set(() => ({ buyToken })),
             setAvailableTokens: (availableTokens) => set(() => ({ availableTokens })),
             saveLoadedOrderbook: (pair, orderbook) => set((state) => ({ loadedOrderbooks: { ...state.loadedOrderbooks, [pair]: orderbook } })),
-            switchSelectedTokens: () => set((state) => ({ selectedToken0: state.selectedToken1, selectedToken1: state.selectedToken0 })),
+            switchSelectedTokens: () => set((state) => ({ sellToken: state.buyToken, buyToken: state.sellToken })),
             setShowSelectTokenModal: (showSelectTokenModal) => set(() => ({ showSelectTokenModal })),
+            setSelectTokenModalFor: (selectTokenModalFor) => set(() => ({ selectTokenModalFor })),
+            setSelectTokenModalSearch: (selectTokenModalSearch) => set(() => ({ selectTokenModalSearch })),
         }),
         {
             name: IS_DEV

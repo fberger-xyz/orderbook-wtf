@@ -49,7 +49,10 @@ export default async function RootLayout({
             <body className={cn(APP_FONT.className, 'h-screen w-screen overflow-auto text-base text-milk bg-background')}>
                 <WagmiAndReactQueryProviders>
                     <main className="relative flex min-h-screen w-screen flex-col">
-                        <div className="absolute w-full -top-[600px] h-[800px] rounded-full bg-gradient-stroke blur-3xl opacity-[0.05]" />
+                        <div
+                            className="absolute w-full -top-[600px] h-[800px] rounded-full bg-gradient-stroke blur-3xl opacity-[0.05]"
+                            style={{ zIndex: -1 }}
+                        />
                         <Header />
                         <Suspense fallback={<DefaultFallback />}>
                             <ErrorBoundary FallbackComponent={ErrorBoundaryFallback}>{children}</ErrorBoundary>

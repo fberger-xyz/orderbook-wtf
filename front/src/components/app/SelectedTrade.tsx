@@ -13,9 +13,9 @@ import Link from 'next/link'
 import Image from 'next/image'
 
 export default function SelectedTrade() {
-    const { selectedTrade, selectedToken0, selectedToken1 } = useAppStore()
+    const { selectedTrade, sellToken, buyToken } = useAppStore()
     const account = useAccount()
-    if (!selectedToken0 || !selectedToken1)
+    if (!sellToken || !buyToken)
         return (
             <div className="flex flex-col gap-3 w-full">
                 {/* <p className="font-bold mx-auto">Actions</p> */}
@@ -54,15 +54,13 @@ export default function SelectedTrade() {
                             className="bg-light-hover px-2.5 py-1.5 rounded-xl flex items-center gap-2 hover:bg-very-light-hover group shadow-lg"
                         >
                             <Image
-                                src={`https://raw.githubusercontent.com/bgd-labs/web3-icons/main/icons/full/${tradeSide === OrderbookSide.BID ? selectedToken0.symbol.toLowerCase() : selectedToken1.symbol.toLowerCase()}.svg`}
+                                src={`https://raw.githubusercontent.com/bgd-labs/web3-icons/main/icons/full/${tradeSide === OrderbookSide.BID ? sellToken.symbol.toLowerCase() : buyToken.symbol.toLowerCase()}.svg`}
                                 width={24}
                                 height={24}
                                 alt="https://x.com/fberger_xyz/photo"
                                 className="rounded-full"
                             />
-                            <p className="text-secondary font-bold">
-                                {tradeSide === OrderbookSide.BID ? selectedToken0.symbol : selectedToken1.symbol}
-                            </p>
+                            <p className="text-secondary font-bold">{tradeSide === OrderbookSide.BID ? sellToken.symbol : buyToken.symbol}</p>
                             <IconWrapper icon={IconIds.CHEVRON_DOWN} className="min-size-5 group-hover:text-primary" />
                         </Link>
                         <input
@@ -89,15 +87,13 @@ export default function SelectedTrade() {
                             className="bg-light-hover px-2.5 py-1.5 rounded-xl flex items-center gap-2 hover:bg-very-light-hover group shadow-lg w-fit"
                         >
                             <Image
-                                src={`https://raw.githubusercontent.com/bgd-labs/web3-icons/main/icons/full/${tradeSide === OrderbookSide.BID ? selectedToken1.symbol.toLowerCase() : selectedToken0.symbol.toLowerCase()}.svg`}
+                                src={`https://raw.githubusercontent.com/bgd-labs/web3-icons/main/icons/full/${tradeSide === OrderbookSide.BID ? buyToken.symbol.toLowerCase() : sellToken.symbol.toLowerCase()}.svg`}
                                 width={24}
                                 height={24}
                                 alt="https://x.com/fberger_xyz/photo"
                                 className="rounded-full"
                             />
-                            <p className="text-secondary font-bold">
-                                {tradeSide === OrderbookSide.BID ? selectedToken1.symbol : selectedToken0.symbol}
-                            </p>
+                            <p className="text-secondary font-bold">{tradeSide === OrderbookSide.BID ? buyToken.symbol : sellToken.symbol}</p>
                             <IconWrapper icon={IconIds.CHEVRON_DOWN} className="min-size-5 group-hover:text-primary" />
                         </Link>
                         <input

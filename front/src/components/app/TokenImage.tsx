@@ -1,13 +1,14 @@
 'use client'
 
+import { Token } from '@/interfaces'
 import ImageWrapper from '../common/ImageWrapper'
 
-export default function TokenImage(props: { tokenSymbol: string; size?: number; className?: string }) {
+export default function TokenImage(props: { token: Token; size?: number; className?: string }) {
     return (
         <ImageWrapper
-            src={`https://raw.githubusercontent.com/bgd-labs/web3-icons/main/icons/full/${props.tokenSymbol.toLowerCase()}.svg`}
+            src={`https://raw.githubusercontent.com/bgd-labs/web3-icons/main/icons/full/${props.token.symbol.toLowerCase() ?? ''}.svg`}
             size={props.size ?? 20}
-            alt={`Logo of ${props.tokenSymbol}`}
+            alt={`Logo of ${props.token.symbol.toLowerCase() ?? 'unknown'}`}
             className={props.className}
         />
     )

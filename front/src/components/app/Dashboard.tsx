@@ -10,6 +10,8 @@ import ChainImage from './ChainImage'
 import DepthChart from '../charts/DepthChart'
 import { AmmAsOrderbook } from '@/interfaces'
 import SelectTokenModal from './SelectTokenModal'
+import { useModal } from 'connectkit'
+import { useAccount } from 'wagmi'
 
 const OrderbookKeyMetric = (props: { title: string; content: ReactNode }) => (
     <OrderbookComponentLayout title={<p className="text-milk-600 opacity-50 text-xs">{props.title}</p>} content={props.content} />
@@ -704,8 +706,11 @@ const orderbookHardcoded: AmmAsOrderbook = {
 }
 
 export default function Dashboard() {
-    const { selectedToken0, selectedToken1, showSelectTokenModal, switchSelectedTokens, setShowSelectTokenModal } = useAppStore()
-    if (!selectedToken0 || !selectedToken1) return
+    console.log('render dashboard')
+    const account = useAccount()
+    const { setOpen } = useModal()
+    const { sellToken, buyToken, switchSelectedTokens, setShowSelectTokenModal, setSelectTokenModalFor } = useAppStore()
+    if (!sellToken || !buyToken) return
     // useQueries({
     //     queries: [
     //         {
@@ -733,10 +738,10 @@ export default function Dashboard() {
                 <div className="w-full grid grid-cols-2 md:grid-cols-4 gap-2">
                     {/* mid price */}
                     <OrderbookKeyMetric
-                        title="Mid-price 1 WETH"
+                        title={`Mid-price 1 ${sellToken.symbol}`}
                         content={
                             <div className="flex gap-1.5 items-center flex-wrap">
-                                <TokenImage size={20} tokenSymbol={selectedToken1.symbol.toLowerCase()} />
+                                <TokenImage size={20} token={buyToken} />
                                 <p className="text-milk font-bold text-base">1984.21</p>
                             </div>
                         }
@@ -747,7 +752,7 @@ export default function Dashboard() {
                         title="Best bid"
                         content={
                             <div className="flex gap-1.5 items-center flex-wrap">
-                                <TokenImage size={20} tokenSymbol={selectedToken1.symbol.toLowerCase()} />
+                                <TokenImage size={20} token={buyToken} />
                                 <p className="text-milk font-bold text-base">1984.21</p>
                             </div>
                         }
@@ -758,7 +763,7 @@ export default function Dashboard() {
                         title="Best ask"
                         content={
                             <div className="flex gap-1.5 items-center flex-wrap">
-                                <TokenImage size={20} tokenSymbol={selectedToken1.symbol.toLowerCase()} />
+                                <TokenImage size={20} token={buyToken} />
                                 <p className="text-milk font-bold text-base">1987.34</p>
                             </div>
                         }
@@ -785,17 +790,23 @@ export default function Dashboard() {
                     <p className="text-milk-400 text-sm">Sell</p>
                     <div className="flex justify-between gap-3">
                         <button
-                            onClick={() => setShowSelectTokenModal(true)}
+                            onClick={() => {
+                                setSelectTokenModalFor('sell')
+                                setShowSelectTokenModal(true)
+                            }}
                             className="flex rounded-full bg-gray-600/30 transition-colors duration-300 hover:bg-gray-600/50 items-center gap-1.5 pl-1.5 pr-2 py-1.5 min-w-fit"
                         >
-                            <TokenImage size={24} tokenSymbol={selectedToken0.symbol.toLowerCase()} />
-                            <p className="font-semibold tracking-wide">{selectedToken0.symbol}</p>
+                            <TokenImage size={24} token={sellToken} />
+                            <p className="font-semibold tracking-wide">{sellToken.symbol}</p>
                             <IconWrapper icon={IconIds.TRIANGLE_DOWN} className="size-4" />
                         </button>
                         <input
                             type="text"
                             className="text-xl font-bold text-right border-none outline-none ring-0 focus:ring-0 focus:outline-none focus:border-none bg-transparent w-40"
                             value={numeral(1).format('0,0.[00000]')}
+                            onChange={(e) => {
+                                console.log(e)
+                            }}
                         />
                     </div>
                     <div className="flex justify-between items-center">
@@ -824,17 +835,23 @@ export default function Dashboard() {
                     <p className="text-milk-400 text-sm">Buy</p>
                     <div className="flex justify-between gap-3 w-full">
                         <button
-                            onClick={() => setShowSelectTokenModal(true)}
+                            onClick={() => {
+                                setSelectTokenModalFor('buy')
+                                setShowSelectTokenModal(true)
+                            }}
                             className="flex rounded-full bg-gray-600/30 transition-colors duration-300 hover:bg-gray-600/50 items-center gap-1.5 pl-1.5 pr-2 py-1.5 min-w-fit"
                         >
-                            <TokenImage size={24} tokenSymbol={selectedToken1.symbol.toLowerCase()} />
-                            <p className="font-semibold tracking-wide">{selectedToken1.symbol}</p>
+                            <TokenImage size={24} token={buyToken} />
+                            <p className="font-semibold tracking-wide">{buyToken.symbol}</p>
                             <IconWrapper icon={IconIds.TRIANGLE_DOWN} className="size-4" />
                         </button>
                         <input
                             type="text"
                             className="text-xl font-bold text-right border-none outline-none ring-0 focus:ring-0 focus:outline-none focus:border-none bg-transparent w-40"
                             value={numeral(1979.76).format('0,0.[00000]')}
+                            onChange={(e) => {
+                                console.log(e)
+                            }}
                         />
                     </div>
                     <div className="flex justify-between items-center">
@@ -864,12 +881,20 @@ export default function Dashboard() {
                 <div className="h-0 w-full" />
 
                 {/* fees */}
-                <button className="bg-folly flex justify-center p-4 rounded-xl border-milk-150 transition-all duration-300 hover:opacity-90">
-                    <p className="font-bold">Swap</p>
-                </button>
+                {account.isConnected ? (
+                    <button className="bg-folly flex justify-center p-4 rounded-xl border-milk-150 transition-all duration-300 hover:opacity-90">
+                        <p className="font-bold">Swap</p>
+                    </button>
+                ) : (
+                    <button
+                        onClick={() => setOpen(true)}
+                        className="bg-folly flex justify-center p-4 rounded-xl border-milk-150 transition-all duration-300 hover:opacity-90"
+                    >
+                        <p className="font-bold">Connect wallet</p>
+                    </button>
+                )}
             </div>
-
-            {showSelectTokenModal && <SelectTokenModal />}
+            <SelectTokenModal />
         </div>
     )
 }

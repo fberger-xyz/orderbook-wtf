@@ -20,7 +20,7 @@ export default function Header(props: { className?: string }) {
                 <TychoSVG className="h-5" />
                 <p className="text-milk-600 font-light opacity-50">Orderbook</p>
             </div>
-            <div className="flex justify-end gap-2 z-10">
+            <div className="flex justify-end gap-2 z-20">
                 {/* docs */}
                 <LinkWrapper
                     href="https://github.com/propeller-heads/tycho-x/blob/main/TAP-2.md"
@@ -50,10 +50,10 @@ export default function Header(props: { className?: string }) {
                         )}
                     >
                         {/* Ethereum */}
-                        <button className="flex items-center gap-2 w-full px-4 py-2 text-white hover:bg-gray-600/20 rounded-lg transition">
+                        <div className="flex items-center gap-2 w-full px-4 py-2 text-white hover:bg-gray-600/20 rounded-lg transition">
                             <ChainImage networkName="ethereum" className="size-6" />
                             <p className="text-milk-600">Ethereum</p>
-                        </button>
+                        </div>
 
                         {/* Disabled */}
                         <div className="flex items-center gap-2 px-4 py-2 text-gray-500 cursor-not-allowed mt-1 rounded-lg">

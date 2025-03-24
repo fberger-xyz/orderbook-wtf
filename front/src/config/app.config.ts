@@ -4,24 +4,15 @@ import { Inter_Tight } from 'next/font/google'
 
 export const APP_KEYWORD = 'tycho-tap2'
 export const APP_METADATA = {
-    SITE_AUTHOR: 'fberger.xyz',
-    SITE_NAME: 'tycho-tap2',
+    SITE_NAME: 'Tycho Orderbook | WIP 🚧',
     SITE_DOMAIN: `${APP_KEYWORD}.fberger.xyz`,
-    SITE_DESCRIPTION: 'Work in progress 🚧',
+    SITE_DESCRIPTION:
+        'On-chain liquidity in a familiar limit orderbook interface to read (ticks and depth per tick) and write (execute, confirmation) to',
     SITE_URL: `https://${APP_KEYWORD}.fberger.xyz`,
-    SOCIALS: {
-        X: 'fberger_xyz',
-        TELEGRAM: 'fberger_xyz',
-        GITHUB: 'fberger-xyz',
-        LINKEDIN: 'francis-berger-a2404094',
-    },
-    PROFILE_PICTURE: 'https://pbs.twimg.com/profile_images/1876521476062412800/QJGGbg2j_400x400.jpg',
 }
 
-export const FBERGER_XYZ_ID = process.env.FBERGER_XYZ_ID
 export const IS_DEV = process.env.NODE_ENV === 'development'
-export const root = IS_DEV ? 'http://localhost:3000' : APP_METADATA.SITE_URL
-export const ngrokInDevOrDomainInProd = IS_DEV ? process.env.NGROK_ENDPOINT : APP_METADATA.SITE_URL
+export const APP_ROUTE = IS_DEV ? 'http://localhost:3000' : APP_METADATA.SITE_URL
 export const PUBLIC_STREAM_API_URL = process.env.NEXT_PUBLIC_STREAM_API_URL ? process.env.NEXT_PUBLIC_STREAM_API_URL : 'http://localhost:42001'
 export const DEBUG = false
 export const DATE_FORMAT = 'ddd. D MMM. YYYY'

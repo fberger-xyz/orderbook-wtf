@@ -1,7 +1,7 @@
 'use client'
 
 import { useQueries } from '@tanstack/react-query'
-import { root } from '@/config/app.config'
+import { APP_ROUTE } from '@/config/app.config'
 import Pair from './Pair'
 import { APIResponse, Token } from '@/interfaces'
 import { useAppStore } from '@/stores/app.store'
@@ -15,7 +15,7 @@ export default function AvailablePairs() {
                 enabled: true,
                 queryFn: async () => {
                     const [tokensResponse] = await Promise.all([
-                        fetch(`${root}/api/local/tokens`, { method: 'GET', headers: { 'Content-Type': 'application/json' } }),
+                        fetch(`${APP_ROUTE}/api/local/tokens`, { method: 'GET', headers: { 'Content-Type': 'application/json' } }),
                     ])
                     const [tokensResponseJson] = (await Promise.all([tokensResponse.json()])) as [APIResponse<Token[]>]
                     if (tokensResponseJson?.data) setAvailableTokens(tokensResponseJson.data)
