@@ -33,7 +33,9 @@ export const useAppStore = create<{
     setAvailablePairs: (availablePairs: string[]) => void
     selectPair: (selectedPair?: string) => void
     selectSellToken: (sellToken?: Token) => void
+    setSellTokenAmountInput: (sellTokenAmountInput: number) => void
     selectBuyToken: (buyToken?: Token) => void
+    setBuyTokenAmountInput: (buyTokenAmountInput: number) => void
     setAvailableTokens: (availableTokens: Token[]) => void
     saveLoadedOrderbook: (pair: string, orderbook?: AmmAsOrderbook) => void
     switchSelectedTokens: () => void
@@ -70,7 +72,9 @@ export const useAppStore = create<{
             setAvailablePairs: (availablePairs) => set(() => ({ availablePairs })),
             selectPair: (selectedPair) => set(() => ({ selectedPair })),
             selectSellToken: (sellToken) => set(() => ({ sellToken })),
+            setSellTokenAmountInput: (sellTokenAmountInput) => set(() => ({ sellTokenAmountInput })),
             selectBuyToken: (buyToken) => set(() => ({ buyToken })),
+            setBuyTokenAmountInput: (buyTokenAmountInput) => set(() => ({ buyTokenAmountInput })),
             setAvailableTokens: (availableTokens) => set(() => ({ availableTokens })),
             saveLoadedOrderbook: (pair, orderbook) => set((state) => ({ loadedOrderbooks: { ...state.loadedOrderbooks, [pair]: orderbook } })),
             switchSelectedTokens: () => set((state) => ({ sellToken: state.buyToken, buyToken: state.sellToken })),

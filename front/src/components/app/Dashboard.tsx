@@ -709,7 +709,17 @@ export default function Dashboard() {
     console.log('render dashboard')
     const account = useAccount()
     const { setOpen } = useModal()
-    const { sellToken, buyToken, switchSelectedTokens, setShowSelectTokenModal, setSelectTokenModalFor } = useAppStore()
+    const {
+        sellToken,
+        sellTokenAmountInput,
+        buyToken,
+        buyTokenAmountInput,
+        switchSelectedTokens,
+        setShowSelectTokenModal,
+        setSelectTokenModalFor,
+        setSellTokenAmountInput,
+        setBuyTokenAmountInput,
+    } = useAppStore()
     if (!sellToken || !buyToken) return
     // useQueries({
     //     queries: [
@@ -786,8 +796,8 @@ export default function Dashboard() {
             {/* right */}
             <div className="col-span-1 md:col-span-4 flex flex-col gap-0.5">
                 {/* sell */}
-                <div className="bg-milk-50/5 flex flex-col gap-3 p-4 rounded-xl border-milk-150 w-full">
-                    <p className="text-milk-400 text-sm">Sell</p>
+                <div className="bg-milk-600/5 flex flex-col gap-3 p-4 rounded-xl border-milk-150 w-full">
+                    <p className="text-milk-400 text-xs">Sell</p>
                     <div className="flex justify-between gap-3">
                         <button
                             onClick={() => {
@@ -803,9 +813,11 @@ export default function Dashboard() {
                         <input
                             type="text"
                             className="text-xl font-bold text-right border-none outline-none ring-0 focus:ring-0 focus:outline-none focus:border-none bg-transparent w-40"
-                            value={numeral(1).format('0,0.[00000]')}
+                            value={numeral(sellTokenAmountInput).format('0,0.[00000]')}
                             onChange={(e) => {
-                                console.log(e)
+                                const parsedNumber = Number(numeral(e.target.value ?? 0).value())
+                                if (isNaN(parsedNumber)) return
+                                setSellTokenAmountInput(parsedNumber)
                             }}
                         />
                     </div>
@@ -823,7 +835,7 @@ export default function Dashboard() {
                     <div className="size-[44px] rounded-xl bg-background p-1">
                         <button
                             onClick={() => switchSelectedTokens()}
-                            className="size-full rounded-lg bg-milk-50/5 flex items-center justify-center group"
+                            className="size-full rounded-lg bg-milk-600/5 flex items-center justify-center group"
                         >
                             <IconWrapper icon={IconIds.ARROW_DOWN} className="size-5 transition-transform duration-300 group-hover:rotate-180" />
                         </button>
@@ -831,8 +843,8 @@ export default function Dashboard() {
                 </div>
 
                 {/* buy */}
-                <div className="bg-milk-50/5 flex flex-col gap-3 p-4 rounded-xl border-milk-150 w-full">
-                    <p className="text-milk-400 text-sm">Buy</p>
+                <div className="bg-milk-600/5 flex flex-col gap-3 p-4 rounded-xl border-milk-150 w-full">
+                    <p className="text-milk-400 text-xs">Buy</p>
                     <div className="flex justify-between gap-3 w-full">
                         <button
                             onClick={() => {
@@ -848,9 +860,11 @@ export default function Dashboard() {
                         <input
                             type="text"
                             className="text-xl font-bold text-right border-none outline-none ring-0 focus:ring-0 focus:outline-none focus:border-none bg-transparent w-40"
-                            value={numeral(1979.76).format('0,0.[00000]')}
+                            value={numeral(buyTokenAmountInput).format('0,0.[00000]')}
                             onChange={(e) => {
-                                console.log(e)
+                                const parsedNumber = Number(numeral(e.target.value ?? 0).value())
+                                if (isNaN(parsedNumber)) return
+                                setBuyTokenAmountInput(parsedNumber)
                             }}
                         />
                     </div>
@@ -867,7 +881,7 @@ export default function Dashboard() {
                 <div className="h-0 w-full" />
 
                 {/* fees */}
-                <div className="bg-milk-50/5 flex justify-between p-4 rounded-xl border-milk-150 text-sm">
+                <div className="bg-milk-600/5 flex justify-between p-4 rounded-xl border-milk-150 text-sm">
                     <p className="text-milk-400 truncate">1 WETH = 1984.21 USDC ($1,984.21)</p>
                     <div className="flex gap-1.5 items-center">
                         <IconWrapper icon={IconIds.GAS} className="size-4 text-milk-600" />

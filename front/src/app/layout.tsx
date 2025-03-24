@@ -24,14 +24,13 @@ export const metadata: Metadata = {
     },
     openGraph: {
         type: 'website',
-        title: APP_METADATA.SITE_NAME,
-        siteName: APP_METADATA.SITE_URL,
+        title: APP_METADATA.SITE_URL.replace('https', ''),
+        siteName: APP_METADATA.SITE_NAME,
         description: APP_METADATA.SITE_DESCRIPTION,
         url: APP_METADATA.SITE_URL,
-        locale: 'en_GB',
         images: [
             {
-                url: 'https://github.com/propeller-heads/tycho-x/blob/19c454303ad279419c9eae38f2c818d20220a0c5/assets/orderbook-header.png',
+                url: 'https://raw.githubusercontent.com/propeller-heads/tycho-x/19c454303ad279419c9eae38f2c818d20220a0c5/assets/orderbook-header.png',
                 width: 1100,
                 height: 400,
                 alt: 'Tycho X ORDERBOOK visual header — abstract dark background with teal and purple liquidity chart textures and bold orderbook title.',
@@ -45,7 +44,7 @@ export const metadata: Metadata = {
         description: APP_METADATA.SITE_DESCRIPTION,
         images: [
             {
-                url: 'https://github.com/propeller-heads/tycho-x/blob/19c454303ad279419c9eae38f2c818d20220a0c5/assets/orderbook-header.png',
+                url: 'https://raw.githubusercontent.com/propeller-heads/tycho-x/19c454303ad279419c9eae38f2c818d20220a0c5/assets/orderbook-header.png',
                 width: 1100,
                 height: 400,
                 alt: 'Tycho X ORDERBOOK visual header — abstract dark background with teal and purple liquidity chart textures and bold orderbook title.',
