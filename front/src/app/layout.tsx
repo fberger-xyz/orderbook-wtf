@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     },
     openGraph: {
         type: 'website',
-        title: APP_METADATA.SITE_URL.replace('https', ''),
+        title: APP_METADATA.SITE_URL.replace('https://', ''),
         siteName: APP_METADATA.SITE_NAME,
         description: APP_METADATA.SITE_DESCRIPTION,
         url: APP_METADATA.SITE_URL,
