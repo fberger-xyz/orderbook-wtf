@@ -255,7 +255,7 @@ const getOptions = (
 }
 
 export default function DepthChart(props: { orderbook: AmmAsOrderbook }) {
-    const { storeRefreshedAt, yAxisType, yAxisLogBase, selectOrderbookDataPoint } = useAppStore()
+    const { buyToken, sellToken, storeRefreshedAt, yAxisType, yAxisLogBase, selectOrderbookDataPoint } = useAppStore()
     const [options, setOptions] = useState<echarts.EChartsOption>(
         getOptions(props.orderbook.token0.symbol, props.orderbook.token1.symbol, [], [], props.orderbook.pools, yAxisType, yAxisLogBase),
     )
@@ -329,7 +329,7 @@ export default function DepthChart(props: { orderbook: AmmAsOrderbook }) {
         setOptions(newOptions)
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [storeRefreshedAt, yAxisType, yAxisLogBase])
+    }, [buyToken, sellToken, storeRefreshedAt, yAxisType, yAxisLogBase])
 
     // methods
     const handlePointClick = (params: { value: undefined | OrderbookDataPoint }) => {
@@ -347,7 +347,7 @@ export default function DepthChart(props: { orderbook: AmmAsOrderbook }) {
                         <EchartWrapper
                             options={options}
                             onPointClick={(params) => {
-                                toast.success(`Datapoint selected [toast design wip]`, { style: toastStyle })
+                                toast.success(`Trade selected`, { style: toastStyle })
                                 handlePointClick(params as { value: undefined | OrderbookDataPoint })
                             }}
                         />

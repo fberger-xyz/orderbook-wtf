@@ -95,6 +95,7 @@ export default function SelectTokenModal() {
                                 onClick={() => {
                                     if (selectTokenModalFor === 'buy') selectBuyToken(token)
                                     else selectSellToken(token)
+                                    setShowSelectTokenModal(false)
                                 }}
                                 className={cn('flex gap-2 border border-milk-200 py-2.5 px-3 rounded-lg items-center', {
                                     'border-folly': [
@@ -119,6 +120,7 @@ export default function SelectTokenModal() {
                                 onClick={() => {
                                     if (selectTokenModalFor === 'buy') selectBuyToken(token)
                                     else selectSellToken(token)
+                                    setShowSelectTokenModal(false)
                                 }}
                                 className={cn('p-3 rounded-xl flex justify-between hover:bg-very-light-hover group hover:bg-milk-600/5', {
                                     'bg-milk-600/5': [
