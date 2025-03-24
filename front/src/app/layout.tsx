@@ -14,7 +14,7 @@ import Header from '@/components/layouts/Header'
 export const metadata: Metadata = {
     title: APP_METADATA.SITE_NAME,
     description: APP_METADATA.SITE_DESCRIPTION,
-    applicationName: APP_METADATA.SITE_NAME,
+    // applicationName: APP_METADATA.SITE_NAME,
     metadataBase: new URL(APP_METADATA.SITE_URL),
     manifest: '/manifest.json',
     appleWebApp: {
@@ -25,17 +25,36 @@ export const metadata: Metadata = {
     openGraph: {
         type: 'website',
         title: APP_METADATA.SITE_NAME,
-        siteName: APP_METADATA.SITE_NAME,
+        siteName: APP_METADATA.SITE_URL,
         description: APP_METADATA.SITE_DESCRIPTION,
         url: APP_METADATA.SITE_URL,
-        images: '/opengraph-image',
+        locale: 'en_GB',
+        images: [
+            {
+                url: 'https://github.com/propeller-heads/tycho-x/blob/19c454303ad279419c9eae38f2c818d20220a0c5/assets/orderbook-header.png',
+                width: 1100,
+                height: 400,
+                alt: 'Tycho X ORDERBOOK visual header — abstract dark background with teal and purple liquidity chart textures and bold orderbook title.',
+            },
+        ],
     },
     twitter: {
         card: 'summary_large_image',
         site: 'fberger_xyz',
         title: APP_METADATA.SITE_NAME,
         description: APP_METADATA.SITE_DESCRIPTION,
-        images: '/opengraph-image',
+        images: [
+            {
+                url: 'https://github.com/propeller-heads/tycho-x/blob/19c454303ad279419c9eae38f2c818d20220a0c5/assets/orderbook-header.png',
+                width: 1100,
+                height: 400,
+                alt: 'Tycho X ORDERBOOK visual header — abstract dark background with teal and purple liquidity chart textures and bold orderbook title.',
+            },
+        ],
+        // label1: 'Coded by',
+        // data1: 'PropellerHeads',
+        // label2: 'Reading time',
+        // data2: '3 minutes',
     },
 }
 
