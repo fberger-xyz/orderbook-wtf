@@ -42,6 +42,10 @@ type LineDataPoint = {
         }
     }
 }
+
+const customSymbolPath =
+    'path://M21.9583 31.4167H19.75C19.2917 31.4167 18.8993 31.2535 18.5729 30.9271C18.2465 30.6007 18.0833 30.2083 18.0833 29.75V27.5417L16.4792 25.9167C16.3264 25.75 16.2083 25.566 16.125 25.3646C16.0417 25.1632 16 24.9583 16 24.75C16 24.5417 16.0417 24.3368 16.125 24.1354C16.2083 23.934 16.3264 23.75 16.4792 23.5833L18.0833 21.9583V19.75C18.0833 19.2917 18.2465 18.8993 18.5729 18.5729C18.8993 18.2465 19.2917 18.0833 19.75 18.0833H21.9583L23.5833 16.4792C23.75 16.3264 23.934 16.2083 24.1354 16.125C24.3368 16.0417 24.5417 16 24.75 16C24.9583 16 25.1632 16.0417 25.3646 16.125C25.566 16.2083 25.75 16.3264 25.9167 16.4792L27.5417 18.0833H29.75C30.2083 18.0833 30.6007 18.2465 30.9271 18.5729C31.2535 18.8993 31.4167 19.2917 31.4167 19.75V21.9583L33.0208 23.5833C33.1736 23.75 33.2917 23.934 33.375 24.1354C33.4583 24.3368 33.5 24.5417 33.5 24.75C33.5 24.9583 33.4583 25.1632 33.375 25.3646C33.2917 25.566 33.1736 25.75 33.0208 25.9167L31.4167 27.5417V29.75C31.4167 30.2083 31.2535 30.6007 30.9271 30.9271C30.6007 31.2535 30.2083 31.4167 29.75 31.4167H27.5417L25.9167 33.0208C25.75 33.1736 25.566 33.2917 25.3646 33.375C25.1632 33.4583 24.9583 33.5 24.75 33.5C24.5417 33.5 24.3368 33.4583 24.1354 33.375C23.934 33.2917 23.75 33.1736 23.5833 33.0208L21.9583 31.4167Z'
+
 const getOptions = (
     token0: string,
     token1: string,
@@ -311,13 +315,12 @@ export default function DepthChart(props: { orderbook: AmmAsOrderbook }) {
                     },
                 }
                 if (trade === highestBid) {
-                    point.symbol = 'diamond'
-                    // point.symbol =
-                    //     'path://M30.9,53.2C16.8,53.2,5.3,41.7,5.3,27.6S16.8,2,30.9,2C45,2,56.4,13.5,56.4,27.6S45,53.2,30.9,53.2z M30.9,3.5C17.6,3.5,6.8,14.4,6.8,27.6c0,13.3,10.8,24.1,24.101,24.1C44.2,51.7,55,40.9,55,27.6C54.9,14.4,44.1,3.5,30.9,3.5z M36.9,35.8c0,0.601-0.4,1-0.9,1h-1.3c-0.5,0-0.9-0.399-0.9-1V19.5c0-0.6,0.4-1,0.9-1H36c0.5,0,0.9,0.4,0.9,1V35.8z M27.8,35.8 c0,0.601-0.4,1-0.9,1h-1.3c-0.5,0-0.9-0.399-0.9-1V19.5c0-0.6,0.4-1,0.9-1H27c0.5,0,0.9,0.4,0.9,1L27.8,35.8L27.8,35.8z'
+                    // point.symbol = 'diamond'
+                    point.symbol = customSymbolPath
                     point.symbolSize = 14
                     point.itemStyle = {
                         borderWidth: 1,
-                        borderColor: AppColors.background,
+                        borderColor: AppColors.jagger[500],
                         color: AppColors.aquamarine,
                         shadowBlur: 15, // the intensity of the glow
                         shadowColor: AppColors.aquamarine,
@@ -325,9 +328,9 @@ export default function DepthChart(props: { orderbook: AmmAsOrderbook }) {
                     point.emphasis = {
                         symbolSize: 15,
                         itemStyle: {
-                            shadowBlur: 30,
+                            shadowBlur: 10,
                             borderWidth: 0.5,
-                            shadowColor: 'rgba(255, 0, 128, 1)', // hot pink
+                            shadowColor: 'rgba(255, 0, 128, 1)',
                         },
                     }
                 }
@@ -348,21 +351,20 @@ export default function DepthChart(props: { orderbook: AmmAsOrderbook }) {
                     },
                 }
                 if (trade === lowestAsk) {
-                    point.symbol = 'diamond'
+                    point.symbol = customSymbolPath
                     point.symbolSize = 14
                     point.itemStyle = {
                         borderWidth: 1,
-                        borderColor: AppColors.background,
+                        borderColor: AppColors.jagger[500],
                         color: AppColors.folly,
                         shadowBlur: 15, // the intensity of the glow
-                        shadowColor: 'rgba(255, 0, 128, 1)', // hot pink
+                        shadowColor: 'rgba(255, 0, 128, 1)',
                     }
                     point.emphasis = {
                         symbolSize: 15,
                         itemStyle: {
-                            shadowBlur: 30,
+                            shadowBlur: 10,
                             shadowColor: 'rgba(255, 0, 128, 1)', // hot pink
-
                             borderWidth: 0.5,
                         },
                     }
