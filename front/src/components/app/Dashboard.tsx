@@ -820,7 +820,7 @@ export default function Dashboard() {
                                 <div
                                     ref={chartOptionsDropdown}
                                     className={cn(
-                                        `z-20 absolute mt-2 w-52 rounded-2xl backdrop-blur-lg border border-milk-150 shadow-lg p-2.5 transition-all origin-top-right`,
+                                        `z-20 absolute mt-2 w-52 rounded-2xl backdrop-blur-lg border border-milk-150 shadow-lg p-2.5 transition-all origin-top-left`,
                                         {
                                             'scale-100 opacity-100': openChartOptions,
                                             'scale-95 opacity-0 pointer-events-none': !openChartOptions,
@@ -836,7 +836,7 @@ export default function Dashboard() {
                                             })}
                                             onClick={() => setYAxisType(type)}
                                         >
-                                            <p className="text-milk text-sm">{type === 'value' ? 'Linear' : `Log ${yAxisLogBase}`}</p>
+                                            <p className="text-sm">{type === 'value' ? 'Linear' : `Log ${yAxisLogBase}`}</p>
                                         </div>
                                     ))}
                                 </div>
