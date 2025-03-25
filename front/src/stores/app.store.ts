@@ -4,6 +4,7 @@ import { APP_METADATA, IS_DEV } from '@/config/app.config'
 import { OrderbookDataPoint } from '@/types'
 import { AmmAsOrderbook, AmmPool, Token } from '@/interfaces'
 import { tokensListFromBackend } from '@/data/back-tokens'
+import { OrderbookAxisScale } from '@/enums'
 
 export const useAppStore = create<{
     showMobileMenu: boolean
@@ -11,7 +12,7 @@ export const useAppStore = create<{
     storeRefreshedAt: number
     refetchInterval: number
     selectedTrade?: { datapoint: OrderbookDataPoint; bidsPools: AmmPool[]; asksPools: AmmPool[] }
-    yAxisType: 'value' | 'log'
+    yAxisType: OrderbookAxisScale
     yAxisLogBase: number
     availablePairs: string[]
     selectedPair?: string
@@ -28,7 +29,7 @@ export const useAppStore = create<{
     setHasHydrated: (hasHydrated: boolean) => void
     setStoreRefreshedAt: (storeRefreshedAt: number) => void
     selectOrderbookDataPoint: (selectedTrade?: { datapoint: OrderbookDataPoint; bidsPools: AmmPool[]; asksPools: AmmPool[] }) => void
-    setYAxisType: (yAxisType: 'value' | 'log') => void
+    setYAxisType: (yAxisType: OrderbookAxisScale) => void
     setYAxisLogBase: (yAxisLogBase: number) => void
     setAvailablePairs: (availablePairs: string[]) => void
     selectPair: (selectedPair?: string) => void
@@ -50,7 +51,7 @@ export const useAppStore = create<{
             storeRefreshedAt: -1,
             refetchInterval: (IS_DEV ? 60 : 15) * 1000,
             selectedTrade: undefined,
-            yAxisType: 'value',
+            yAxisType: OrderbookAxisScale.VALUE,
             yAxisLogBase: 10,
             availablePairs: [],
             selectedPair: undefined,

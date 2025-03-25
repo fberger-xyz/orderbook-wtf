@@ -8,7 +8,7 @@ import { Backdrop } from '../common/Backdrop'
 import { useEffect, useRef } from 'react'
 import { useClickOutside } from '@/hooks/useClickOutside'
 import { useAppStore } from '@/stores/app.store'
-import { cn, shortenAddress } from '@/utils'
+import { cn, shortenAddress, sleep } from '@/utils'
 import TokenImage from './TokenImage'
 import { tokensListFromBackend } from '@/data/back-tokens'
 import { useAccount } from 'wagmi'
@@ -94,9 +94,10 @@ export default function SelectTokenModal() {
                         .map((token) => (
                             <button
                                 key={token.symbol}
-                                onClick={() => {
+                                onClick={async () => {
                                     if (selectTokenModalFor === 'buy') selectBuyToken(token)
                                     else selectSellToken(token)
+                                    await sleep(200)
                                     setShowSelectTokenModal(false)
                                 }}
                                 className={cn('flex gap-2 border border-milk-200 py-2.5 px-3 rounded-lg items-center', {
@@ -122,9 +123,10 @@ export default function SelectTokenModal() {
                                 .map((token, tokenIndex) => (
                                     <button
                                         key={`${token}-${tokenIndex}`}
-                                        onClick={() => {
+                                        onClick={async () => {
                                             if (selectTokenModalFor === 'buy') selectBuyToken(token)
                                             else selectSellToken(token)
+                                            await sleep(200)
                                             setShowSelectTokenModal(false)
                                         }}
                                         className={cn(
@@ -159,9 +161,10 @@ export default function SelectTokenModal() {
                         .map((token, tokenIndex) => (
                             <button
                                 key={`${token}-${tokenIndex}`}
-                                onClick={() => {
+                                onClick={async () => {
                                     if (selectTokenModalFor === 'buy') selectBuyToken(token)
                                     else selectSellToken(token)
+                                    await sleep(200)
                                     setShowSelectTokenModal(false)
                                 }}
                                 className={cn('px-2.5 py-2 rounded-xl flex justify-between hover:bg-very-light-hover group hover:bg-milk-600/5', {

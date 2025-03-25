@@ -1,9 +1,9 @@
 'use client'
 
-import { IconIds } from '@/enums'
+import { IconIds, OrderbookAxisScale } from '@/enums'
 import numeral from 'numeral'
 import { useAppStore } from '@/stores/app.store'
-import { ReactNode } from 'react'
+import { ReactNode, useRef, useState } from 'react'
 import IconWrapper from '../common/IconWrapper'
 import TokenImage from './TokenImage'
 import ChainImage from './ChainImage'
@@ -12,6 +12,8 @@ import { AmmAsOrderbook } from '@/interfaces'
 import SelectTokenModal from './SelectTokenModal'
 import { useModal } from 'connectkit'
 import { useAccount } from 'wagmi'
+import { useClickOutside } from '@/hooks/useClickOutside'
+import { cn } from '@/utils'
 
 const OrderbookKeyMetric = (props: { title: string; content: ReactNode }) => (
     <OrderbookComponentLayout title={<p className="text-milk-600 text-xs">{props.title}</p>} content={props.content} />
@@ -714,12 +716,18 @@ export default function Dashboard() {
         sellTokenAmountInput,
         buyToken,
         buyTokenAmountInput,
+        yAxisType,
+        yAxisLogBase,
         switchSelectedTokens,
         setShowSelectTokenModal,
         setSelectTokenModalFor,
         setSellTokenAmountInput,
         setBuyTokenAmountInput,
+        setYAxisType,
     } = useAppStore()
+    const [openChartOptions, showChartOptions] = useState(false)
+    const chartOptionsDropdown = useRef<HTMLDivElement>(null)
+    useClickOutside(chartOptionsDropdown, () => showChartOptions(false))
     if (!sellToken || !buyToken) return
     // useQueries({
     //     queries: [
@@ -783,7 +791,6 @@ export default function Dashboard() {
                     <OrderbookKeyMetric title="Spread" content={<p className="text-milk font-bold text-base">0.16%</p>} />
 
                     {/* last block */}
-                    {/* <OrderbookKeyMetric title="Last block" content={<p className="text-milk font-bold text-base">20773013</p>} /> */}
                     <OrderbookComponentLayout
                         title={
                             <div className="w-full flex justify-between">
@@ -798,9 +805,44 @@ export default function Dashboard() {
                     <OrderbookKeyMetric title="Total TVL" content={<p className="text-milk font-bold text-base">$5.4B</p>} />
                 </div>
 
-                {/* chart */}
                 <OrderbookComponentLayout
-                    title={<p className="text-milk text-base font-bold">Market depth</p>}
+                    title={
+                        <div className="w-full flex justify-between">
+                            {/* title */}
+                            <p className="text-milk text-base font-bold">Market depth</p>
+                            <button onClick={() => showChartOptions(!openChartOptions)} className="relative">
+                                <div className="flex items-center gap-1 hover:bg-milk-100/5 transition-colors duration-300 rounded-lg px-2.5 py-1.5">
+                                    <p className="text-milk text-sm">{yAxisType === 'value' ? 'Linear' : `Log ${yAxisLogBase}`}</p>
+                                    <IconWrapper icon={IconIds.TRIANGLE_DOWN} className="size-4" />
+                                </div>
+
+                                {/* options dropdown */}
+                                <div
+                                    ref={chartOptionsDropdown}
+                                    className={cn(
+                                        `z-20 absolute mt-2 w-52 rounded-2xl backdrop-blur-lg border border-milk-150 shadow-lg p-2.5 transition-all origin-top-right`,
+                                        {
+                                            'scale-100 opacity-100': openChartOptions,
+                                            'scale-95 opacity-0 pointer-events-none': !openChartOptions,
+                                        },
+                                    )}
+                                >
+                                    {[OrderbookAxisScale.VALUE, OrderbookAxisScale.LOG].map((type, typeIndex) => (
+                                        <div
+                                            key={`${type}-${typeIndex}`}
+                                            className={cn('flex items-center gap-2 w-full px-4 py-2 rounded-lg transition mt-1', {
+                                                'text-white bg-gray-600/20': yAxisType === type,
+                                                'text-milk-600 hover:bg-gray-600/20': yAxisType !== type,
+                                            })}
+                                            onClick={() => setYAxisType(type)}
+                                        >
+                                            <p className="text-milk text-sm">{type === 'value' ? 'Linear' : `Log ${yAxisLogBase}`}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                            </button>
+                        </div>
+                    }
                     content={<DepthChart orderbook={orderbookHardcoded} />}
                 />
 
@@ -811,12 +853,12 @@ export default function Dashboard() {
             {/* right */}
             <div className="col-span-1 md:col-span-4 flex flex-col gap-0.5">
                 {/* sell */}
-                <div className="bg-milk-600/5 flex flex-col gap-3 p-4 rounded-xl border-milk-150 w-full">
+                <div className="bg-milk-600/5 flex flex-col gap-1 p-4 rounded-xl border-milk-150 w-full">
                     <div className="flex justify-between">
                         <p className="text-milk-600 text-xs">Sell</p>
                         <button
                             onClick={() => {}}
-                            className="flex transition-colors duration-300 opacity-80 hover:opacity-100 hover:bg-milk-600/20 px-1.5 py-0.5 rounded-lg"
+                            className="flex transition-colors duration-300 opacity-80 hover:opacity-100 hover:hover:bg-milk-100/5 px-2.5 py-1.5 rounded-lg"
                         >
                             <p className="font-bold text-folly text-xs">Best bid</p>
                         </button>
@@ -844,7 +886,7 @@ export default function Dashboard() {
                             }}
                         />
                     </div>
-                    <div className="flex justify-between items-center">
+                    <div className="mt-2 flex justify-between items-center">
                         <div className="flex justify-between gap-1 items-center">
                             <IconWrapper icon={IconIds.WALLET} className="size-4 text-milk-400" />
                             <p className="text-milk-600 text-xs">{account.isConnected ? 0.1025 : '-'}</p>

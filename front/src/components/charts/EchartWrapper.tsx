@@ -15,7 +15,15 @@ interface InterfaceEchartWrapperProps {
 export default function EchartWrapper(props: InterfaceEchartWrapperProps) {
     const chartRef = useRef<HTMLDivElement>(null)
     const myChart = useRef<echarts.ECharts | null>(null)
+
     const handleChartResize = () => myChart.current?.resize()
+    const toggleToolbox = (show: boolean) => {
+        myChart.current?.setOption({
+            toolbox: {
+                show: show,
+            },
+        })
+    }
 
     useEffect(() => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -27,6 +35,10 @@ export default function EchartWrapper(props: InterfaceEchartWrapperProps) {
             // if (!myChart.current) myChart.current = echarts.init(chartRef.current)
             myChart.current = echarts.init(chartRef.current, undefined, { renderer: 'svg' })
             window.addEventListener('resize', handleChartResize, { passive: true })
+
+            // handle toolbox
+            chartRef.current.addEventListener('mouseenter', () => toggleToolbox(true))
+            chartRef.current.addEventListener('mouseleave', () => toggleToolbox(false))
 
             // preserve grid3D view settings if they exist
             const currentOptions = myChart.current.getOption()

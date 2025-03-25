@@ -108,6 +108,8 @@ const getOptions = (
             },
         },
         toolbox: {
+            top: 5,
+            show: false,
             feature: {
                 dataZoom: {
                     yAxisIndex: 'none',
@@ -246,7 +248,7 @@ const getOptions = (
         grid: {
             left: '10%',
             right: '10%',
-            top: '40',
+            top: '20',
             bottom: '100',
         },
 
@@ -323,14 +325,14 @@ export default function DepthChart(props: { orderbook: AmmAsOrderbook }) {
                         borderColor: AppColors.jagger[500],
                         color: AppColors.aquamarine,
                         shadowBlur: 15, // the intensity of the glow
-                        shadowColor: AppColors.aquamarine,
+                        shadowColor: 'rgba(144, 238, 144, 1)',
                     }
                     point.emphasis = {
                         symbolSize: 30,
                         itemStyle: {
                             shadowBlur: 10,
                             borderWidth: 0.5,
-                            shadowColor: 'rgba(255, 0, 128, 1)',
+                            shadowColor: 'rgba(144, 238, 144, 1)',
                         },
                     }
                 }
