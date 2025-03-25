@@ -258,7 +258,8 @@ const getOptions = (
                 name: 'Bids',
                 type: 'line',
                 data: bids,
-                step: 'start',
+                // step: 'start',
+                smooth: true,
                 lineStyle: { width: 0.5, color: AppColors.aquamarine, opacity: 0.5 },
                 symbol: 'circle',
                 symbolSize: 4,
@@ -276,7 +277,8 @@ const getOptions = (
                 name: 'Asks',
                 type: 'line',
                 data: asks,
-                step: 'end',
+                // step: 'end',
+                smooth: true,
                 lineStyle: { width: 0.5, color: AppColors.folly, opacity: 0.5 },
                 symbol: 'circle',
                 symbolSize: 4,
@@ -306,7 +308,7 @@ export default function DepthChart(props: { orderbook: AmmAsOrderbook }) {
 
         const bids: LineDataPoint[] = props.orderbook?.trades0to1
             .filter((trade, tradeIndex, trades) => trades.findIndex((_trade) => _trade.amount === trade.amount) === tradeIndex)
-            .sort((curr, next) => curr.ratio - next.ratio)
+            .sort((curr, next) => curr.ratio * curr.amount - next.ratio * next.amount)
             .map((trade) => {
                 const point: LineDataPoint = {
                     value: [trade.ratio, trade.amount],
@@ -341,7 +343,7 @@ export default function DepthChart(props: { orderbook: AmmAsOrderbook }) {
 
         const asks: LineDataPoint[] = props.orderbook?.trades1to0
             .filter((trade, tradeIndex, trades) => trades.findIndex((_trade) => _trade.amount === trade.amount) === tradeIndex)
-            .sort((curr, next) => Number(curr.ratio) - Number(next.ratio))
+            .sort((curr, next) => curr.ratio * curr.amount - next.ratio * next.amount)
             .map((trade) => {
                 const price = 1 / trade.ratio
                 const point: LineDataPoint = {
