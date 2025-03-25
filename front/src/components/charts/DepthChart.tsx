@@ -326,7 +326,7 @@ export default function DepthChart(props: { orderbook: AmmAsOrderbook }) {
                         shadowColor: AppColors.aquamarine,
                     }
                     point.emphasis = {
-                        symbolSize: 20,
+                        symbolSize: 30,
                         itemStyle: {
                             shadowBlur: 10,
                             borderWidth: 0.5,
@@ -361,7 +361,7 @@ export default function DepthChart(props: { orderbook: AmmAsOrderbook }) {
                         shadowColor: 'rgba(255, 0, 128, 1)',
                     }
                     point.emphasis = {
-                        symbolSize: 20,
+                        symbolSize: 30,
                         itemStyle: {
                             shadowBlur: 10,
                             shadowColor: 'rgba(255, 0, 128, 1)', // hot pink
