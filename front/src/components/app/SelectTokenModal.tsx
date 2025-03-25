@@ -11,6 +11,7 @@ import { useAppStore } from '@/stores/app.store'
 import { cn, shortenAddress } from '@/utils'
 import TokenImage from './TokenImage'
 import { tokensListFromBackend } from '@/data/back-tokens'
+import { useAccount } from 'wagmi'
 
 export default function SelectTokenModal() {
     const {
@@ -24,6 +25,7 @@ export default function SelectTokenModal() {
         setShowSelectTokenModal,
         setSelectTokenModalSearch,
     } = useAppStore()
+    const account = useAccount()
     const modalRef = useRef<HTMLDivElement>(null)
     const searchInput = useRef<HTMLInputElement>(null)
     useEffect(() => searchInput.current?.focus(), [showSelectTokenModal])
@@ -68,7 +70,7 @@ export default function SelectTokenModal() {
                             value={selectTokenModalSearch}
                             onChange={(e) => setSelectTokenModalSearch(e.target.value)}
                             type="text"
-                            className="text-base font-light text-milk-600 grow bg-transparent outline-none placeholder:text-milk-200"
+                            className="text-base font-light text-milk-600 grow bg-transparent outline-none placeholder:text-milk-400"
                             placeholder="Search a name or paste address"
                         />
                         {selectTokenModalSearch && (
@@ -104,15 +106,55 @@ export default function SelectTokenModal() {
                                 })}
                             >
                                 <TokenImage token={token} size={20} className="size-fit h-5" />
-                                <p className="text-milk-600 text-sm">{token.symbol.toUpperCase()}</p>
+                                <p className="text-milk text-sm">{token.symbol.toUpperCase()}</p>
                             </button>
                         ))}
                 </div>
 
                 {/* tokens */}
-                <div className="px-3 max-h-[300px] overflow-scroll flex flex-col border-t border-milk-150 pt-2 mt-4">
+                <div className="px-3 max-h-[400px] overflow-scroll flex flex-col border-t border-milk-150 mt-4">
+                    {account.isConnected && (
+                        <>
+                            <p className="p-4 text-base text-milk-400">Your tokens</p>
+                            {tokensListFromBackend
+                                .slice(0, 3)
+                                .filter((token) => token.symbol.toLowerCase().includes(selectTokenModalSearch.toLowerCase()))
+                                .map((token, tokenIndex) => (
+                                    <button
+                                        key={`${token}-${tokenIndex}`}
+                                        onClick={() => {
+                                            if (selectTokenModalFor === 'buy') selectBuyToken(token)
+                                            else selectSellToken(token)
+                                            setShowSelectTokenModal(false)
+                                        }}
+                                        className={cn(
+                                            'px-2.5 py-2 rounded-xl flex justify-between hover:bg-very-light-hover group hover:bg-milk-600/5',
+                                            {
+                                                'bg-milk-600/5': [
+                                                    selectTokenModalFor === 'buy' ? buyToken?.symbol.toLowerCase() : sellToken?.symbol.toLowerCase(),
+                                                ].includes(token.symbol.toLowerCase()),
+                                            },
+                                        )}
+                                    >
+                                        <div className="flex items-center gap-4">
+                                            <TokenImage token={token} size={36} className="size-fit h-9" />
+                                            <div className="flex flex-col items-start">
+                                                <p className="text-sm text-milk">{token.symbol.toUpperCase()}</p>
+                                                <p className="text-xs text-milk-400">{shortenAddress(token.address)}</p>
+                                            </div>
+                                        </div>
+                                        <div className="flex flex-col items-end">
+                                            <p className="text-sm text-milk">0.000000</p>
+                                            <p className="text-xs text-milk-400">$0.00</p>
+                                        </div>
+                                    </button>
+                                ))}
+                        </>
+                    )}
+
+                    <p className="p-4 text-base text-milk-400">Popular tokens</p>
                     {tokensListFromBackend
-                        .slice(0, 200)
+                        .slice(account.isConnected ? 3 : 0, 200)
                         .filter((token) => token.symbol.toLowerCase().includes(selectTokenModalSearch.toLowerCase()))
                         .map((token, tokenIndex) => (
                             <button
@@ -122,7 +164,7 @@ export default function SelectTokenModal() {
                                     else selectSellToken(token)
                                     setShowSelectTokenModal(false)
                                 }}
-                                className={cn('p-3 rounded-xl flex justify-between hover:bg-very-light-hover group hover:bg-milk-600/5', {
+                                className={cn('px-2.5 py-2 rounded-xl flex justify-between hover:bg-very-light-hover group hover:bg-milk-600/5', {
                                     'bg-milk-600/5': [
                                         selectTokenModalFor === 'buy' ? buyToken?.symbol.toLowerCase() : sellToken?.symbol.toLowerCase(),
                                     ].includes(token.symbol.toLowerCase()),
@@ -132,7 +174,7 @@ export default function SelectTokenModal() {
                                     <TokenImage token={token} size={36} className="size-fit h-9" />
                                     <div className="flex flex-col items-start">
                                         <p className="text-sm text-milk-600">{token.symbol.toUpperCase()}</p>
-                                        <p className="text-xs text-milk-200">{shortenAddress(token.address)}</p>
+                                        <p className="text-xs text-milk-400">{shortenAddress(token.address)}</p>
                                     </div>
                                 </div>
                                 {[selectTokenModalFor === 'buy' ? buyToken?.symbol.toLowerCase() : sellToken?.symbol.toLowerCase()].includes(
@@ -140,7 +182,7 @@ export default function SelectTokenModal() {
                                 ) && (
                                     <div className="flex flex-col items-end">
                                         <p className="text-sm text-milk-600">0.000000</p>
-                                        <p className="text-xs text-milk-200">$0.00</p>
+                                        <p className="text-xs text-milk-400">$0.00</p>
                                     </div>
                                 )}
                             </button>

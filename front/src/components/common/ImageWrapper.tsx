@@ -4,7 +4,7 @@ import { cn } from '@/utils'
 import Image from 'next/image'
 import { useState } from 'react'
 
-export default function ImageWrapper({ src, alt = 'avatar', size, className }: { src: string; alt?: string; size: number; className?: string }) {
+export default function ImageWrapper({ src, alt = 'missing alt', size, className }: { src: string; alt?: string; size: number; className?: string }) {
     // handle invalid src
     const [imgError, setImgError] = useState(false)
     if (imgError || !src) return <span className={cn('rounded-full bg-gray-500', className)} style={{ width: size, height: size }} />

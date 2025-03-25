@@ -15,12 +15,38 @@ import numeral from 'numeral'
 import { OrderbookDataPoint } from '@/types'
 import toast from 'react-hot-toast'
 import { toastStyle } from '@/config/toasts.config'
-
+type LineDataPoint = {
+    value: [number, number]
+    symbol?: string
+    symbolSize?: number
+    customData?: {
+        side: OrderbookSide
+        distribution: number[]
+        output: number
+    }
+    itemStyle?: {
+        borderWidth: number
+        borderColor: string
+        color: string
+        shadowBlur: number
+        shadowColor: string
+    }
+    emphasis?: {
+        symbolSize?: number
+        itemStyle?: {
+            borderWidth?: number
+            borderColor?: string
+            color?: string
+            shadowBlur?: number
+            shadowColor?: string
+        }
+    }
+}
 const getOptions = (
     token0: string,
     token1: string,
-    bids: OrderbookDataPoint[],
-    asks: OrderbookDataPoint[],
+    bids: LineDataPoint[],
+    asks: LineDataPoint[],
     pools: AmmPool[],
     yAxisType: 'value' | 'log',
     yAxisLogBase: number,
@@ -42,16 +68,23 @@ const getOptions = (
                 fontSize: 11,
             },
             formatter: (params) => {
-                // ensure params is an array
                 const [firstSerieDataPoints] = Array.isArray(params) ? params : [params]
-                const [price, input, side, distribution, output] = firstSerieDataPoints.data as OrderbookDataPoint
+
+                const { value, data } = firstSerieDataPoints
+                const [price, input] = value as [number, number]
+
+                const custom = (data as LineDataPoint).customData
+                const side = custom?.side
+                const distribution = custom?.distribution ?? []
+                const output = custom?.output ?? 0
+
                 const distributionLines = distribution.map((percent, percentIndex) => {
-                    const protocolName = pools[percentIndex].protocol_system
-                    const attributes = pools[percentIndex].static_attributes
+                    const protocolName = pools[percentIndex]?.protocol_system ?? 'Unknown'
+                    const attributes = pools[percentIndex]?.static_attributes ?? []
                     const hexaPercent = attributes.find((entry) => entry[0].toLowerCase() === 'fee')?.[1] ?? '0'
-                    // https://github.com/adamwdraper/Numeral-js/issues/123
                     return `- ${numeral(percent / 100).format('#4#0,0%')} in ${protocolName} ${numeral(parseInt(hexaPercent, 16)).divide(100).format('0,0.[0]')}bps`
                 })
+
                 return [
                     `<strong>You sell</strong>`,
                     `= ${numeral(input).format('0,0.[0000000]')} ${side === OrderbookSide.BID ? token0 : token1}`,
@@ -66,7 +99,7 @@ const getOptions = (
                     `<strong>Distribution</strong>`,
                     ...distributionLines,
                 ]
-                    .filter((line) => !!line)
+                    .filter(Boolean)
                     .join('<br/>')
             },
         },
@@ -212,7 +245,7 @@ const getOptions = (
             top: '40',
             bottom: '100',
         },
-        // @ts-expect-error: poorly typed
+
         series: [
             {
                 yAxisIndex: 0,
@@ -262,57 +295,80 @@ export default function DepthChart(props: { orderbook: AmmAsOrderbook }) {
 
     // load/refresh chart
     useEffect(() => {
-        // example: 0 = WETH, 1 = usdc
-        // trades0to1 = traders swap WETH into USDC
-        // so traders need USDC liquidity from LPs
-        // LPs provided USDC on AMMs (= makers)
-        // LPs are ready to buy WETH against their USDC at a low price expressed in 1 weth per x usdc
-        // They made bids to buy WETH with their USDC
-        const bids = props.orderbook?.trades0to1
-            .filter((trade, tradeIndex, trades) => trades.findIndex((_trade) => _trade.amount === trade.amount) === tradeIndex)
-            .sort((curr, next) => curr.ratio - next.ratio) // filter asc by obtained price
-            .map(
-                (trade) =>
-                    [
-                        trade.ratio, // 2k
-                        trade.amount, // input in ETH
-                        OrderbookSide.BID,
-                        trade.distribution,
-                        trade.ratio * trade.amount, // output in USDC
-                    ] as OrderbookDataPoint,
-            )
-        // todo later
-        // .filter((bid, bidIndex, bids) => {
-        //     if (bidIndex === 0) return true
-        //     return bid[0] > bids[bidIndex - 1][0]
-        // })
+        const highestBid = props.orderbook?.trades0to1.reduce((max, t) => (t.ratio > max.ratio ? t : max), props.orderbook.trades0to1[0])
+        const lowestAsk = props.orderbook?.trades1to0.reduce((min, t) => (1 / t.ratio < 1 / min.ratio ? t : min), props.orderbook.trades1to0[0])
 
-        // example: 0 = weth, 1 = usdc
-        // trades1to0 = traders swap USDC into WETH
-        // so traders need WETH liquidity from LPs
-        // LPs provided WETH on AMMs (= makers)
-        // LPs are ready to buy USDC against WETH at a low price expressed in 1 usdc per x weth
-        // LPs are ready to sell their WETH against USDC at a high price
-        // They made asks to buy USDC with their WETH
-        // asks
-        const asks = props.orderbook?.trades1to0
+        const bids: LineDataPoint[] = props.orderbook?.trades0to1
             .filter((trade, tradeIndex, trades) => trades.findIndex((_trade) => _trade.amount === trade.amount) === tradeIndex)
-            .map(
-                (trade) =>
-                    [
-                        1 / trade.ratio,
-                        trade.amount,
-                        OrderbookSide.ASK,
-                        trade.distribution,
-                        trade.ratio * trade.amount, // output in USDC
-                    ] as OrderbookDataPoint,
-            )
-            // todo later
-            .sort((curr, next) => Number(curr[0]) - Number(next[0])) // filter by obtained price
-        // .filter((ask, askIndex, asks) => {
-        //     if (askIndex === 0) return true
-        //     return ask[0] > asks[askIndex - 1][0]
-        // })
+            .sort((curr, next) => curr.ratio - next.ratio)
+            .map((trade) => {
+                const point: LineDataPoint = {
+                    value: [trade.ratio, trade.amount],
+                    customData: {
+                        side: OrderbookSide.BID,
+                        distribution: trade.distribution,
+                        output: trade.ratio * trade.amount,
+                    },
+                }
+                if (trade === highestBid) {
+                    point.symbol = 'diamond'
+                    // point.symbol =
+                    //     'path://M30.9,53.2C16.8,53.2,5.3,41.7,5.3,27.6S16.8,2,30.9,2C45,2,56.4,13.5,56.4,27.6S45,53.2,30.9,53.2z M30.9,3.5C17.6,3.5,6.8,14.4,6.8,27.6c0,13.3,10.8,24.1,24.101,24.1C44.2,51.7,55,40.9,55,27.6C54.9,14.4,44.1,3.5,30.9,3.5z M36.9,35.8c0,0.601-0.4,1-0.9,1h-1.3c-0.5,0-0.9-0.399-0.9-1V19.5c0-0.6,0.4-1,0.9-1H36c0.5,0,0.9,0.4,0.9,1V35.8z M27.8,35.8 c0,0.601-0.4,1-0.9,1h-1.3c-0.5,0-0.9-0.399-0.9-1V19.5c0-0.6,0.4-1,0.9-1H27c0.5,0,0.9,0.4,0.9,1L27.8,35.8L27.8,35.8z'
+                    point.symbolSize = 14
+                    point.itemStyle = {
+                        borderWidth: 1,
+                        borderColor: AppColors.background,
+                        color: AppColors.aquamarine,
+                        shadowBlur: 15, // the intensity of the glow
+                        shadowColor: AppColors.aquamarine,
+                    }
+                    point.emphasis = {
+                        symbolSize: 15,
+                        itemStyle: {
+                            shadowBlur: 30,
+                            borderWidth: 0.5,
+                            shadowColor: 'rgba(255, 0, 128, 1)', // hot pink
+                        },
+                    }
+                }
+                return point
+            })
+
+        const asks: LineDataPoint[] = props.orderbook?.trades1to0
+            .filter((trade, tradeIndex, trades) => trades.findIndex((_trade) => _trade.amount === trade.amount) === tradeIndex)
+            .sort((curr, next) => Number(curr.ratio) - Number(next.ratio))
+            .map((trade) => {
+                const price = 1 / trade.ratio
+                const point: LineDataPoint = {
+                    value: [price, trade.amount],
+                    customData: {
+                        side: OrderbookSide.ASK,
+                        distribution: trade.distribution,
+                        output: trade.ratio * trade.amount,
+                    },
+                }
+                if (trade === lowestAsk) {
+                    point.symbol = 'diamond'
+                    point.symbolSize = 14
+                    point.itemStyle = {
+                        borderWidth: 1,
+                        borderColor: AppColors.background,
+                        color: AppColors.folly,
+                        shadowBlur: 15, // the intensity of the glow
+                        shadowColor: 'rgba(255, 0, 128, 1)', // hot pink
+                    }
+                    point.emphasis = {
+                        symbolSize: 15,
+                        itemStyle: {
+                            shadowBlur: 30,
+                            shadowColor: 'rgba(255, 0, 128, 1)', // hot pink
+
+                            borderWidth: 0.5,
+                        },
+                    }
+                }
+                return point
+            })
 
         // options
         const newOptions = getOptions(

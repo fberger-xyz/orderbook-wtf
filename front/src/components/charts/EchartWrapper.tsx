@@ -25,7 +25,7 @@ export default function EchartWrapper(props: InterfaceEchartWrapperProps) {
         if (chartRef?.current) {
             // ensure chart has been initialised
             // if (!myChart.current) myChart.current = echarts.init(chartRef.current)
-            myChart.current = echarts.init(chartRef.current)
+            myChart.current = echarts.init(chartRef.current, undefined, { renderer: 'svg' })
             window.addEventListener('resize', handleChartResize, { passive: true })
 
             // preserve grid3D view settings if they exist
