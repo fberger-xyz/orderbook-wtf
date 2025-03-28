@@ -24,7 +24,6 @@ export default function SelectedPairAsOrderbook() {
                         }),
                     ])
                     const [responseJson] = (await Promise.all([response.json()])) as [APIResponse<AmmAsOrderbook>]
-                    console.log({ responseJson })
                     const pair = `${sellToken.address}-${buyToken.address}`
                     saveLoadedOrderbook(pair, responseJson.data)
                     return { responseJson }
@@ -55,7 +54,7 @@ export default function SelectedPairAsOrderbook() {
                 <ChartLayout
                     title={`Ethereum ${sellToken.symbol}/${buyToken.symbol} - market depth`}
                     // subtitle={`Work in progress 🚧`}
-                    chart={<DepthChart orderbook={loadedOrderbooks[`${sellToken.address}-${buyToken.address}`] as AmmAsOrderbook} />}
+                    chart={<DepthChart />}
                 />
             )}
         </div>

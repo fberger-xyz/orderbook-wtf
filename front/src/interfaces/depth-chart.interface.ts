@@ -5,19 +5,51 @@ export interface Token {
     gas: string
 }
 
+// old
+// export interface AmmAsOrderbook {
+//     token0: Token
+//     token1: Token
+//     prices0to1: number[]
+//     prices1to0: number[]
+//     trades0to1: AmmTrade[]
+//     trades1to0: AmmTrade[]
+//     aggt0lqdty: number[]
+//     aggt1lqdty: number[]
+//     mpd0to1: OrderbookKeyMetrics
+//     mpd1to0: OrderbookKeyMetrics
+//     pools: AmmPool[]
+//     eth_usd: number
+// }
+
 export interface AmmAsOrderbook {
-    token0: Token
-    token1: Token
-    prices0to1: number[]
-    prices1to0: number[]
-    trades0to1: AmmTrade[]
-    trades1to0: AmmTrade[]
-    aggt0lqdty: number[]
-    aggt1lqdty: number[]
-    mpd0to1: OrderbookKeyMetrics
-    mpd1to0: OrderbookKeyMetrics
-    pools: AmmPool[]
+    block: number
+    timestamp: number
+
+    // tokens
+    base: Token // token0
+    quote: Token // quote
+
+    // prices
+    prices_base_to_quote: number[]
+    prices_quote_to_base: number[]
     eth_usd: number
+
+    // trades
+    bids: AmmTrade[]
+    asks: AmmTrade[]
+    pools: AmmPool[]
+
+    // liquidity ?
+    base_lqdty: number[]
+    quote_lqdty: number[]
+
+    // mdp ?
+    mpd_base_to_quote: OrderbookKeyMetrics
+    mpd_quote_to_base: OrderbookKeyMetrics
+
+    // ?
+    base_worth_eth: number
+    quote_worth_eth: number
 }
 
 export interface AmmPool {
@@ -38,8 +70,7 @@ export interface AmmTrade {
     distribution: number[]
     gas_costs: number[]
     gas_costs_usd: number[]
-    gas_costs_output: number[]
-    ratio: number
+    average_sell_price: number
 }
 
 export interface OrderbookKeyMetrics {

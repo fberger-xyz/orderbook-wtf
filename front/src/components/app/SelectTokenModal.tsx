@@ -10,8 +10,9 @@ import { useClickOutside } from '@/hooks/useClickOutside'
 import { useAppStore } from '@/stores/app.store'
 import { cn, shortenAddress, sleep } from '@/utils'
 import TokenImage from './TokenImage'
-import { tokensListFromBackend } from '@/data/back-tokens'
+import { hardcodedTokensList } from '@/data/back-tokens'
 import { useAccount } from 'wagmi'
+import { useApiStore } from '@/stores/api.store'
 
 export default function SelectTokenModal() {
     const {
@@ -25,21 +26,14 @@ export default function SelectTokenModal() {
         setShowSelectTokenModal,
         setSelectTokenModalSearch,
     } = useAppStore()
+    const { apiTokens } = useApiStore()
     const account = useAccount()
     const modalRef = useRef<HTMLDivElement>(null)
     const searchInput = useRef<HTMLInputElement>(null)
     useEffect(() => searchInput.current?.focus(), [showSelectTokenModal])
-    useKeyboardShortcut({
-        key: 'Escape',
-        onKeyPressed: () => {
-            setShowSelectTokenModal(false)
-            // setSelectTokenModalSearch('')
-        },
-    })
-    useClickOutside(modalRef, () => {
-        setShowSelectTokenModal(false)
-        // setSelectTokenModalSearch('')
-    })
+    useKeyboardShortcut({ key: 'Escape', onKeyPressed: () => setShowSelectTokenModal(false) })
+    useClickOutside(modalRef, () => setShowSelectTokenModal(false))
+    const tokensList = apiTokens.length ? apiTokens : hardcodedTokensList
     if (!showSelectTokenModal) return null
     return (
         <Backdrop>
@@ -83,13 +77,12 @@ export default function SelectTokenModal() {
 
                 {/* suggestions */}
                 <div className="px-4 flex flex-wrap gap-2">
-                    {[sellToken, buyToken, ...tokensListFromBackend.slice(0, 7)]
+                    {[sellToken, buyToken, ...tokensList.slice(0, 7)]
                         .filter((token) => !!token)
                         .filter((token, tokenIndex, tokens) => tokens.findIndex((_t) => _t?.address === token.address) === tokenIndex)
                         .sort(
                             (curr, next) =>
-                                tokensListFromBackend.findIndex((_t) => _t.address === curr.address) -
-                                tokensListFromBackend.findIndex((_t) => _t.address === next.address),
+                                tokensList.findIndex((_t) => _t.address === curr.address) - tokensList.findIndex((_t) => _t.address === next.address),
                         )
                         .map((token) => (
                             <button
@@ -117,7 +110,7 @@ export default function SelectTokenModal() {
                     {account.isConnected && (
                         <>
                             <p className="p-4 text-base text-milk-400">Your tokens</p>
-                            {tokensListFromBackend
+                            {tokensList
                                 .slice(0, 3)
                                 .filter((token) => token.symbol.toLowerCase().includes(selectTokenModalSearch.toLowerCase()))
                                 .map((token, tokenIndex) => (
@@ -155,7 +148,7 @@ export default function SelectTokenModal() {
                     )}
 
                     <p className="p-4 text-base text-milk-400">Popular tokens</p>
-                    {tokensListFromBackend
+                    {tokensList
                         .slice(account.isConnected ? 3 : 0, 200)
                         .filter((token) => token.symbol.toLowerCase().includes(selectTokenModalSearch.toLowerCase()))
                         .map((token, tokenIndex) => (

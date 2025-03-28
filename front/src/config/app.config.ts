@@ -13,7 +13,7 @@ export const APP_METADATA = {
 
 export const IS_DEV = process.env.NODE_ENV === 'development'
 export const APP_ROUTE = IS_DEV ? 'http://localhost:3000' : APP_METADATA.SITE_URL
-export const PUBLIC_STREAM_API_URL = process.env.NEXT_PUBLIC_STREAM_API_URL ? process.env.NEXT_PUBLIC_STREAM_API_URL : 'http://localhost:42001'
+export const PUBLIC_STREAM_API_URL = process.env.NEXT_PUBLIC_STREAM_API_URL ? process.env.NEXT_PUBLIC_STREAM_API_URL : 'http://localhost:42001/api'
 export const DEBUG = false
 export const DATE_FORMAT = 'ddd. D MMM. YYYY'
 export const TIME_FORMAT = 'hh:mm A'

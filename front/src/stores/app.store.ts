@@ -3,7 +3,7 @@ import { persist, createJSONStorage } from 'zustand/middleware'
 import { APP_METADATA, IS_DEV } from '@/config/app.config'
 import { OrderbookDataPoint } from '@/types'
 import { AmmAsOrderbook, AmmPool, Token } from '@/interfaces'
-import { tokensListFromBackend } from '@/data/back-tokens'
+import { hardcodedTokensList } from '@/data/back-tokens'
 import { OrderbookAxisScale } from '@/enums'
 
 export const useAppStore = create<{
@@ -55,9 +55,9 @@ export const useAppStore = create<{
             yAxisLogBase: 10,
             availablePairs: [],
             selectedPair: undefined,
-            sellToken: tokensListFromBackend[1],
+            sellToken: hardcodedTokensList[1],
             sellTokenAmountInput: 2000,
-            buyToken: tokensListFromBackend[0],
+            buyToken: hardcodedTokensList[0],
             buyTokenAmountInput: 1,
             availableTokens: [],
             loadedOrderbooks: {},
@@ -86,9 +86,9 @@ export const useAppStore = create<{
         {
             name: IS_DEV
                 ? // always keep state in dev
-                  `${APP_METADATA.SITE_DOMAIN}-store-dev`
+                  `${APP_METADATA.SITE_DOMAIN}-app-store-dev`
                 : // refresh at each new deployment
-                  `${APP_METADATA.SITE_DOMAIN}-store-prod-${process.env.NEXT_PUBLIC_COMMIT_TIMESTAMP}`,
+                  `${APP_METADATA.SITE_DOMAIN}-app-store-prod-${process.env.NEXT_PUBLIC_COMMIT_TIMESTAMP}`,
             storage: createJSONStorage(() => sessionStorage),
             skipHydration: false,
             onRehydrateStorage: () => (state) => {

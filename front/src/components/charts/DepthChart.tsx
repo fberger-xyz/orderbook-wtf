@@ -10,11 +10,12 @@ import { useAppStore } from '@/stores/app.store'
 import { APP_FONT } from '@/config/app.config'
 import { ErrorBoundaryFallback } from '../common/ErrorBoundaryFallback'
 import { AppColors, formatAmount } from '@/utils'
-import { AmmAsOrderbook, AmmPool } from '@/interfaces'
+import { AmmAsOrderbook } from '@/interfaces'
 import numeral from 'numeral'
 import { OrderbookDataPoint } from '@/types'
 import toast from 'react-hot-toast'
 import { toastStyle } from '@/config/toasts.config'
+import { useApiStore } from '@/stores/api.store'
 type LineDataPoint = {
     value: [number, number]
     symbol?: string
@@ -47,14 +48,15 @@ const customSymbolPath =
     'path://M21.9583 31.4167H19.75C19.2917 31.4167 18.8993 31.2535 18.5729 30.9271C18.2465 30.6007 18.0833 30.2083 18.0833 29.75V27.5417L16.4792 25.9167C16.3264 25.75 16.2083 25.566 16.125 25.3646C16.0417 25.1632 16 24.9583 16 24.75C16 24.5417 16.0417 24.3368 16.125 24.1354C16.2083 23.934 16.3264 23.75 16.4792 23.5833L18.0833 21.9583V19.75C18.0833 19.2917 18.2465 18.8993 18.5729 18.5729C18.8993 18.2465 19.2917 18.0833 19.75 18.0833H21.9583L23.5833 16.4792C23.75 16.3264 23.934 16.2083 24.1354 16.125C24.3368 16.0417 24.5417 16 24.75 16C24.9583 16 25.1632 16.0417 25.3646 16.125C25.566 16.2083 25.75 16.3264 25.9167 16.4792L27.5417 18.0833H29.75C30.2083 18.0833 30.6007 18.2465 30.9271 18.5729C31.2535 18.8993 31.4167 19.2917 31.4167 19.75V21.9583L33.0208 23.5833C33.1736 23.75 33.2917 23.934 33.375 24.1354C33.4583 24.3368 33.5 24.5417 33.5 24.75C33.5 24.9583 33.4583 25.1632 33.375 25.3646C33.2917 25.566 33.1736 25.75 33.0208 25.9167L31.4167 27.5417V29.75C31.4167 30.2083 31.2535 30.6007 30.9271 30.9271C30.6007 31.2535 30.2083 31.4167 29.75 31.4167H27.5417L25.9167 33.0208C25.75 33.1736 25.566 33.2917 25.3646 33.375C25.1632 33.4583 24.9583 33.5 24.75 33.5C24.5417 33.5 24.3368 33.4583 24.1354 33.375C23.934 33.2917 23.75 33.1736 23.5833 33.0208L21.9583 31.4167Z'
 
 const getOptions = (
-    token0: string,
-    token1: string,
+    orderbook: AmmAsOrderbook,
     bids: LineDataPoint[],
     asks: LineDataPoint[],
-    pools: AmmPool[],
     yAxisType: 'value' | 'log',
     yAxisLogBase: number,
 ): echarts.EChartsOption => {
+    const startValue = bids.sort((curr, next) => curr.value[0] - next.value[0])[Math.max(0, bids.length - 6)].value[0]
+    const endValue = asks.sort((curr, next) => curr.value[0] - next.value[0])[Math.min(6, asks.length - 1)].value[0]
+    console.log({ startValue, endValue })
     return {
         tooltip: {
             trigger: 'axis',
@@ -83,22 +85,22 @@ const getOptions = (
                 const output = custom?.output ?? 0
 
                 const distributionLines = distribution.map((percent, percentIndex) => {
-                    const protocolName = pools[percentIndex]?.protocol_system ?? 'Unknown'
-                    const attributes = pools[percentIndex]?.static_attributes ?? []
+                    const protocolName = orderbook.pools[percentIndex]?.protocol_system ?? 'Unknown'
+                    const attributes = orderbook.pools[percentIndex]?.static_attributes ?? []
                     const hexaPercent = attributes.find((entry) => entry[0].toLowerCase() === 'fee')?.[1] ?? '0'
                     return `- ${numeral(percent / 100).format('#4#0,0%')} in ${protocolName} ${numeral(parseInt(hexaPercent, 16)).divide(100).format('0,0.[0]')}bps`
                 })
 
                 return [
                     `<strong>You sell</strong>`,
-                    `= ${numeral(input).format('0,0.[0000000]')} ${side === OrderbookSide.BID ? token0 : token1}`,
+                    `= ${numeral(input).format('0,0.[0000000]')} ${side === OrderbookSide.BID ? orderbook.base.symbol : orderbook.quote.symbol}`,
                     ``,
                     `<strong>Simulated price</strong>`,
-                    `= ${numeral(price).format('0,0.[0000000]')} ${token1} for 1 ${token0}`,
-                    `= ${numeral(1 / price).format('0,0.[0000000]')} ${token0} for 1 ${token1}`,
+                    `= ${numeral(price).format('0,0.[0000000]')} ${orderbook.quote.symbol} for 1 ${orderbook.base.symbol}`,
+                    `= ${numeral(1 / price).format('0,0.[0000000]')} ${orderbook.base.symbol} for 1 ${orderbook.quote.symbol}`,
                     ``,
                     `<strong>You buy</strong>`,
-                    `= ${numeral(output).format('0,0.[0000000]')} ${side === OrderbookSide.BID ? token1 : token0}`,
+                    `= ${numeral(output).format('0,0.[0000000]')} ${side === OrderbookSide.BID ? orderbook.quote.symbol : orderbook.base.symbol}`,
                     ``,
                     `<strong>Distribution</strong>`,
                     ...distributionLines,
@@ -108,7 +110,7 @@ const getOptions = (
             },
         },
         toolbox: {
-            top: 5,
+            top: -5,
             show: false,
             feature: {
                 dataZoom: {
@@ -123,37 +125,38 @@ const getOptions = (
         legend: {
             show: false,
         },
-        xAxis: [
-            {
-                type: 'value',
-                position: 'bottom',
-                nameLocation: 'middle',
-                splitLine: {
-                    show: false,
-                },
-                axisLabel: {
-                    margin: 15,
-                    hideOverlap: true,
-                    showMinLabel: true,
-                    showMaxLabel: true,
-                    formatter: (value) => `${formatAmount(value)}\n${formatAmount(1 / Number(value))}`,
-                    fontSize: 10,
-                    color: AppColors.milk[200],
-                },
-                axisLine: {
-                    lineStyle: {
-                        color: AppColors.milk[150],
-                    },
-                },
-                axisTick: {
-                    show: false,
-                },
-                min: 'dataMin',
-                max: 'dataMax',
+        xAxis: {
+            type: 'value',
+            position: 'bottom',
+            nameLocation: 'middle',
+            splitLine: {
+                show: false,
             },
-        ],
+            axisLabel: {
+                margin: 15,
+                hideOverlap: true,
+                showMinLabel: true,
+                showMaxLabel: true,
+                formatter: (value) => `${formatAmount(value)}\n${formatAmount(1 / Number(value))}`,
+                fontSize: 10,
+                color: AppColors.milk[200],
+            },
+            axisLine: {
+                lineStyle: {
+                    color: AppColors.milk[150],
+                },
+            },
+            axisTick: {
+                show: false,
+            },
+            min: 'dataMin',
+            max: 'dataMax',
+        },
+
+        // interesting: https://stackoverflow.com/questions/67622021/getting-values-instead-of-percentages-of-datazoom-in-apache-echarts
         dataZoom: [
             {
+                xAxisIndex: 0,
                 show: true,
                 type: 'slider',
                 height: 25,
@@ -161,7 +164,8 @@ const getOptions = (
                 backgroundColor: AppColors.milk[50],
                 fillerColor: 'transparent',
                 borderColor: AppColors.milk[200],
-                labelFormatter: (index: number) => `${formatAmount(index)} ${token1}\n${formatAmount(1 / Number(index))} ${token0}`,
+                labelFormatter: (basePriceInQuote: number) =>
+                    `${formatAmount(basePriceInQuote)} ${orderbook.quote.symbol}\n${formatAmount(1 / Number(basePriceInQuote))} ${orderbook.base.symbol}`,
                 textStyle: { color: AppColors.milk[200], fontSize: 10 },
                 handleLabel: { show: true },
                 dataBackground: { lineStyle: { color: 'transparent' }, areaStyle: { color: 'transparent' } },
@@ -173,6 +177,13 @@ const getOptions = (
                     handleLabel: { show: true },
                     moveHandleStyle: { color: AppColors.milk[400] }, // top bar
                 },
+                rangeMode: ['value', 'value'],
+                startValue,
+                endValue,
+            },
+            {
+                xAxisIndex: 0, // make this x axis zoomable
+                type: 'inside',
             },
         ],
         yAxis: [
@@ -205,7 +216,7 @@ const getOptions = (
                 axisPointer: {
                     snap: true,
                 },
-                min: 'dataMin',
+                min: 0,
                 max: 'dataMax',
             },
             {
@@ -237,7 +248,7 @@ const getOptions = (
                 axisPointer: {
                     snap: true,
                 },
-                min: 'dataMin',
+                min: 0,
                 max: 'dataMax',
             },
         ],
@@ -295,31 +306,38 @@ const getOptions = (
     }
 }
 
-export default function DepthChart(props: { orderbook: AmmAsOrderbook }) {
+export default function DepthChart() {
     const { buyToken, sellToken, storeRefreshedAt, yAxisType, yAxisLogBase, selectOrderbookDataPoint } = useAppStore()
-    const [options, setOptions] = useState<echarts.EChartsOption>(
-        getOptions(props.orderbook.token0.symbol, props.orderbook.token1.symbol, [], [], props.orderbook.pools, yAxisType, yAxisLogBase),
-    )
+    const { apiStoreRefreshedAt, getOrderbook } = useApiStore()
+    const [options, setOptions] = useState<null | echarts.EChartsOption>(null)
 
     // load/refresh chart
     useEffect(() => {
-        const highestBid = props.orderbook?.trades0to1.reduce((max, t) => (t.ratio > max.ratio ? t : max), props.orderbook.trades0to1[0])
-        const lowestAsk = props.orderbook?.trades1to0.reduce((min, t) => (1 / t.ratio < 1 / min.ratio ? t : min), props.orderbook.trades1to0[0])
-
-        const bids: LineDataPoint[] = props.orderbook?.trades0to1
+        const key = `${sellToken?.address}-${buyToken?.address}`
+        const orderbook = getOrderbook(key)
+        const highestBid = orderbook.bids.reduce((max, t) => (t.average_sell_price > max.average_sell_price ? t : max), orderbook.bids[0])
+        const lowestAsk = orderbook.asks.reduce((min, t) => (1 / t.average_sell_price < 1 / min.average_sell_price ? t : min), orderbook.asks[0])
+        const bids: LineDataPoint[] = orderbook?.bids
             .filter((trade, tradeIndex, trades) => trades.findIndex((_trade) => _trade.amount === trade.amount) === tradeIndex)
-            .sort((curr, next) => curr.ratio * curr.amount - next.ratio * next.amount)
+            .sort((curr, next) => curr.average_sell_price * curr.amount - next.average_sell_price * next.amount)
             .map((trade) => {
                 const point: LineDataPoint = {
-                    value: [trade.ratio, trade.amount],
+                    value: [trade.average_sell_price, trade.amount],
                     customData: {
                         side: OrderbookSide.BID,
                         distribution: trade.distribution,
-                        output: trade.ratio * trade.amount,
+                        output: trade.average_sell_price * trade.amount,
+                    },
+                    emphasis: {
+                        symbolSize: 30,
+                        itemStyle: {
+                            shadowBlur: 10,
+                            borderWidth: 0.5,
+                            shadowColor: 'rgba(144, 238, 144, 1)',
+                        },
                     },
                 }
                 if (trade === highestBid) {
-                    // point.symbol = 'diamond'
                     point.symbol = customSymbolPath
                     point.symbolSize = 14
                     point.itemStyle = {
@@ -329,29 +347,19 @@ export default function DepthChart(props: { orderbook: AmmAsOrderbook }) {
                         shadowBlur: 15, // the intensity of the glow
                         shadowColor: 'rgba(144, 238, 144, 1)',
                     }
-                    point.emphasis = {
-                        symbolSize: 30,
-                        itemStyle: {
-                            shadowBlur: 10,
-                            borderWidth: 0.5,
-                            shadowColor: 'rgba(144, 238, 144, 1)',
-                        },
-                    }
                 }
                 return point
             })
-
-        const asks: LineDataPoint[] = props.orderbook?.trades1to0
+        const asks: LineDataPoint[] = orderbook?.asks
             .filter((trade, tradeIndex, trades) => trades.findIndex((_trade) => _trade.amount === trade.amount) === tradeIndex)
-            .sort((curr, next) => curr.ratio * curr.amount - next.ratio * next.amount)
+            .sort((curr, next) => curr.average_sell_price * curr.amount - next.average_sell_price * next.amount)
             .map((trade) => {
-                const price = 1 / trade.ratio
                 const point: LineDataPoint = {
-                    value: [price, trade.amount],
+                    value: [1 / trade.average_sell_price, trade.amount],
                     customData: {
                         side: OrderbookSide.ASK,
                         distribution: trade.distribution,
-                        output: trade.ratio * trade.amount,
+                        output: trade.average_sell_price * trade.amount,
                     },
                 }
                 if (trade === lowestAsk) {
@@ -376,27 +384,24 @@ export default function DepthChart(props: { orderbook: AmmAsOrderbook }) {
                 return point
             })
 
+        // debug
+        console.log('bids.length', bids.length, 'highestBid', highestBid.average_sell_price)
+        console.log('asks.length', asks.length, 'lowestAsk', 1 / lowestAsk.average_sell_price)
+
         // options
-        const newOptions = getOptions(
-            props.orderbook.token0.symbol,
-            props.orderbook.token1.symbol,
-            bids,
-            asks,
-            props.orderbook.pools,
-            yAxisType,
-            yAxisLogBase,
-        )
+        const newOptions = getOptions(orderbook, bids, asks, yAxisType, yAxisLogBase)
 
         // update
         setOptions(newOptions)
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [buyToken, sellToken, storeRefreshedAt, yAxisType, yAxisLogBase])
+    }, [sellToken, buyToken, apiStoreRefreshedAt, yAxisType, yAxisLogBase])
 
     // methods
     const handlePointClick = (params: { value: undefined | OrderbookDataPoint }) => {
         if (params.value && Array.isArray(params.value))
-            selectOrderbookDataPoint({ datapoint: params.value, bidsPools: props.orderbook.pools, asksPools: props.orderbook.pools })
+            // selectOrderbookDataPoint({ datapoint: params.value, bidsPools: getOrderbook().pools, asksPools: getOrderbook().pools })
+            selectOrderbookDataPoint({ datapoint: params.value, bidsPools: [], asksPools: [] })
     }
 
     return (
@@ -405,7 +410,7 @@ export default function DepthChart(props: { orderbook: AmmAsOrderbook }) {
                 <ChartBackground className="relative h-[450px]">
                     {!storeRefreshedAt ? (
                         <LoadingArea message="Loading your assets" />
-                    ) : Array.isArray(options.series) && options.series?.length > 0 && options.series[0].data ? (
+                    ) : options && Array.isArray(options.series) && options.series?.length > 0 && options.series[0].data ? (
                         <EchartWrapper
                             options={options}
                             onPointClick={(params) => {

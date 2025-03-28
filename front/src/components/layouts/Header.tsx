@@ -15,12 +15,12 @@ export default function Header(props: { className?: string }) {
     const networkDropown = useRef<HTMLDivElement>(null)
     useClickOutside(networkDropown, () => setOpenNetworkDropown(false))
     return (
-        <div className={cn('flex justify-between w-full px-7 py-4', props.className)}>
-            <div className="flex gap-2 items-center">
+        <div className={cn('flex justify-between items-start w-full px-7 py-4', props.className)}>
+            <div className="flex gap-2 items-center flex-col md:flex-row">
                 <TychoSVG className="h-5" />
                 <p className="text-milk-600 font-light opacity-50">Orderbook</p>
             </div>
-            <div className="flex justify-end gap-2 z-20">
+            <div className="flex justify-end items-center gap-2 z-20">
                 {/* docs */}
                 <LinkWrapper
                     href="https://github.com/propeller-heads/tycho-x/blob/main/TAP-2.md"

@@ -21,44 +21,52 @@ export const formatNumberWithDecimals = (numberAsString: string | number, decima
     }
 }
 
+const unknownFormatMap = [
+    { limit: 2, format: '0,0.[000000000]' },
+    { limit: 10, format: '0,0.[0000]' },
+    { limit: 100, format: '0,0.[000]' },
+    { limit: 1000, format: '0,0.[00]' },
+    { limit: 10000, format: '0,0.[00]' },
+    { limit: 1000000, format: '0,0.[0]a' },
+    { limit: 1000000000, format: '0,0a' },
+]
 export const formatAmount = (amount: number | string) => {
     try {
-        const isNegative = Number(amount) < 0
-        const absAmount = Math.abs(Number(amount))
-        if (absAmount < 1)
-            return `${numeral(absAmount)
-                .multiply(isNegative ? -1 : 1)
-                .format('0,0.[00000]')}`
-        if (absAmount < 1000)
-            return `${numeral(absAmount)
-                .multiply(isNegative ? -1 : 1)
-                .format('0,0')}`
-        if (absAmount < 10000)
-            return `${numeral(absAmount)
-                .multiply(isNegative ? -1 : 1)
-                .format('0,0.[00]a')}`
-        return `${numeral(absAmount)
-            .multiply(isNegative ? -1 : 1)
-            .format('0,0.[0]a')}`
-    } catch (error) {
+        const num = Number(amount)
+        if (isNaN(num) || num < 0) return 'n/a'
+        const absAmount = Math.abs(num)
+
+        // map
+        for (const { limit, format } of unknownFormatMap)
+            if (absAmount < limit) {
+                const output = numeral(absAmount).format(format)
+                if (String(output).toLowerCase().includes('nan')) return 'n/a'
+                return output
+            }
+
+        // else
+        const output = numeral(absAmount).format('0,0.[0]a')
+        if (String(output).toLowerCase().includes('nan')) return 'n/a'
+        return output
+    } catch {
         return `error ${amount}`
     }
 }
 
-const formatMap = [
+const usdFormatMap = [
     { limit: 2, format: '0,0.[0000]$' },
     { limit: 10, format: '0,0.[000]$' },
     { limit: 100, format: '0,0.[00]$' },
     { limit: 1000, format: '0,0.[0]$' },
-    { limit: 1000000, format: '0,0k$' },
-    { limit: 1000000000, format: '0,0m$' },
+    { limit: 1000000, format: '0,0a$' },
+    { limit: 1000000000, format: '0,0a$' },
 ]
 export const formatUsdAmount = (amount: number | string) => {
     try {
         const num = Number(amount)
         if (isNaN(num) || num < 0) return 'n/a'
         const absAmount = Math.abs(num)
-        for (const { limit, format } of formatMap) if (absAmount < limit) return numeral(absAmount).format(format)
+        for (const { limit, format } of usdFormatMap) if (absAmount < limit) return numeral(absAmount).format(format)
         return numeral(absAmount).format('0,0.[0]a$')
     } catch {
         return `error ${amount}`

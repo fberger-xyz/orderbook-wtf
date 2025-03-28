@@ -32,8 +32,8 @@ export default function EchartWrapper(props: InterfaceEchartWrapperProps) {
         // only if ref mounted in dom
         if (chartRef?.current) {
             // ensure chart has been initialised
-            // if (!myChart.current) myChart.current = echarts.init(chartRef.current)
-            myChart.current = echarts.init(chartRef.current, undefined, { renderer: 'svg' })
+            if (!myChart.current) myChart.current = echarts.init(chartRef.current)
+            // myChart.current = echarts.init(chartRef.current, undefined, { renderer: 'svg' })
             window.addEventListener('resize', handleChartResize, { passive: true })
 
             // handle toolbox
@@ -45,15 +45,23 @@ export default function EchartWrapper(props: InterfaceEchartWrapperProps) {
 
             // @ts-expect-error: poorly typed
             const grid3DOptions = currentOptions?.grid3D ? { grid3D: currentOptions.grid3D } : {}
+            const dataZoomOptions = currentOptions?.dataZoom ? { grid3D: currentOptions.dataZoom } : {}
 
             // set option
             // @ts-expect-error: poorly typed
-            myChart.current.setOption({ ...props.options, ...grid3DOptions }, { notMerge: true })
+            myChart.current.setOption({ ...props.options, ...dataZoomOptions, ...grid3DOptions }, { notMerge: true })
 
             // attach click event listener
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             myChart.current.on('click', (params: unknown) => {
                 if (props.onPointClick) props.onPointClick(params)
+            })
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            myChart.current.on('dataZoom', (params: unknown) => {
+                const options = myChart.current?.getOption()
+                if (options) {
+                    console.log('dataZoom', 'options?.dataZoom', options?.dataZoom)
+                } else console.log('dataZoom', { params })
             })
         }
 
@@ -64,6 +72,7 @@ export default function EchartWrapper(props: InterfaceEchartWrapperProps) {
                 myChart.current.off('click')
             }
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [props.options])
 
     return <div ref={chartRef} className={cn('m-0 p-0', props.className)} style={{ width: '100%', height: '100%', zIndex: -1 }}></div>
