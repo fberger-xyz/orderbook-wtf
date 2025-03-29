@@ -1,9 +1,9 @@
 import { AppColors } from '@/utils'
 
 export const toastStyle = {
-    borderRadius: '8px',
+    borderRadius: '10px',
     background: AppColors.background,
-    borderColor: AppColors.milk[200],
-    border: 1,
-    color: AppColors.milk.DEFAULT,
+    borderColor: AppColors.milk[400],
+    border: 2,
+    color: AppColors.aquamarine,
 }
