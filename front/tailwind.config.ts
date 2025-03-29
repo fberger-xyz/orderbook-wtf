@@ -4,9 +4,6 @@ const config: Config = {
     content: ['./src/pages/**/*.{js,ts,jsx,tsx,mdx}', './src/components/**/*.{js,ts,jsx,tsx,mdx}', './src/app/**/*.{js,ts,jsx,tsx,mdx}'],
     theme: {
         extend: {
-            backgroundImage: {
-                'gradient-stroke': 'linear-gradient(90deg, #FF3366 0%, #FFD11B 100%)',
-            },
             colors: {
                 background: '#190A35',
                 jagger: {
@@ -24,6 +21,15 @@ const config: Config = {
                     150: '#fff4e01a', // border of routing
                     100: '#fff4e012', // borders, also background of inactive buttons
                     50: '#fff4e005', // borders too ?
+                },
+            },
+            animation: {
+                'skeleton-move': 'skeleton-move 2s infinite',
+            },
+            keyframes: {
+                'skeleton-move': {
+                    '0%': { transform: 'translateX(-100%)' },
+                    '100%': { transform: 'translateX(100%)' },
                 },
             },
         },

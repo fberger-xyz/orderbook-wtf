@@ -3,12 +3,11 @@ import { cn } from '@/utils'
 import IconWrapper from '../common/IconWrapper'
 import { ReactNode } from 'react'
 
-export function LoadingArea({ message = 'Loading...' }: { message?: string }) {
-    if (!message) console.log(message)
+export function LoadingArea() {
     return (
-        <div className="flex size-full items-center justify-center rounded-xl bg-very-light-hover px-2">
+        <div className="flex size-full bg-very-light-hover px-2 skeleton-loading items-center justify-center rounded-xl">
             <div className="flex flex-col gap-2">
-                <IconWrapper icon={IconIds.LOADING} className={cn('text-inactive mx-auto size-14')} />
+                <IconWrapper icon={IconIds.LOADING} className="text-inactive mx-auto size-10 text-milk-400" />
             </div>
         </div>
     )

@@ -92,10 +92,26 @@ export const useAppStore = create<{
             storage: createJSONStorage(() => sessionStorage),
             skipHydration: false,
             onRehydrateStorage: () => (state) => {
-                if (!state?.hasHydrated) {
-                    state?.setHasHydrated(true)
-                    state?.setAvailablePairs([]) // reset
-                    state?.selectOrderbookDataPoint(undefined) // reset
+                if (state && !state.hasHydrated) {
+                    state.setHasHydrated(true)
+                    state.setAvailablePairs([]) // reset
+                    state.selectOrderbookDataPoint(undefined) // reset
+
+                    // pre select default tokens if need be
+                    if (!state.buyToken)
+                        state.selectBuyToken({
+                            address: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+                            decimals: 18,
+                            symbol: 'WETH',
+                            gas: '29962',
+                        })
+                    if (!state.sellToken)
+                        state.selectSellToken({
+                            address: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+                            decimals: 18,
+                            symbol: 'WETH',
+                            gas: '29962',
+                        })
                 }
             },
         },

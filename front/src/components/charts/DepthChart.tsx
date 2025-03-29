@@ -154,6 +154,7 @@ const getOptions = (
         },
 
         // interesting: https://stackoverflow.com/questions/67622021/getting-values-instead-of-percentages-of-datazoom-in-apache-echarts
+        // + this https://echarts.apache.org/en/option.html#dataZoom-slider
         dataZoom: [
             {
                 xAxisIndex: 0,
@@ -315,84 +316,86 @@ export default function DepthChart() {
     useEffect(() => {
         const key = `${sellToken?.address}-${buyToken?.address}`
         const orderbook = getOrderbook(key)
-        const highestBid = orderbook.bids.reduce((max, t) => (t.average_sell_price > max.average_sell_price ? t : max), orderbook.bids[0])
-        const lowestAsk = orderbook.asks.reduce((min, t) => (1 / t.average_sell_price < 1 / min.average_sell_price ? t : min), orderbook.asks[0])
-        const bids: LineDataPoint[] = orderbook?.bids
-            .filter((trade, tradeIndex, trades) => trades.findIndex((_trade) => _trade.amount === trade.amount) === tradeIndex)
-            .sort((curr, next) => curr.average_sell_price * curr.amount - next.average_sell_price * next.amount)
-            .map((trade) => {
-                const point: LineDataPoint = {
-                    value: [trade.average_sell_price, trade.amount],
-                    customData: {
-                        side: OrderbookSide.BID,
-                        distribution: trade.distribution,
-                        output: trade.average_sell_price * trade.amount,
-                    },
-                    emphasis: {
-                        symbolSize: 30,
-                        itemStyle: {
-                            shadowBlur: 10,
-                            borderWidth: 0.5,
+        if (orderbook) {
+            const highestBid = orderbook.bids.reduce((max, t) => (t.average_sell_price > max.average_sell_price ? t : max), orderbook.bids[0])
+            const lowestAsk = orderbook.asks.reduce((min, t) => (1 / t.average_sell_price < 1 / min.average_sell_price ? t : min), orderbook.asks[0])
+            const bids: LineDataPoint[] = orderbook?.bids
+                .filter((trade, tradeIndex, trades) => trades.findIndex((_trade) => _trade.amount === trade.amount) === tradeIndex)
+                .sort((curr, next) => curr.average_sell_price * curr.amount - next.average_sell_price * next.amount)
+                .map((trade) => {
+                    const point: LineDataPoint = {
+                        value: [trade.average_sell_price, trade.amount],
+                        customData: {
+                            side: OrderbookSide.BID,
+                            distribution: trade.distribution,
+                            output: trade.average_sell_price * trade.amount,
+                        },
+                        emphasis: {
+                            symbolSize: 30,
+                            itemStyle: {
+                                shadowBlur: 10,
+                                borderWidth: 0.5,
+                                shadowColor: 'rgba(144, 238, 144, 1)',
+                            },
+                        },
+                    }
+                    if (trade === highestBid) {
+                        point.symbol = customSymbolPath
+                        point.symbolSize = 14
+                        point.itemStyle = {
+                            borderWidth: 1,
+                            borderColor: AppColors.jagger[500],
+                            color: AppColors.aquamarine,
+                            shadowBlur: 15, // the intensity of the glow
                             shadowColor: 'rgba(144, 238, 144, 1)',
-                        },
-                    },
-                }
-                if (trade === highestBid) {
-                    point.symbol = customSymbolPath
-                    point.symbolSize = 14
-                    point.itemStyle = {
-                        borderWidth: 1,
-                        borderColor: AppColors.jagger[500],
-                        color: AppColors.aquamarine,
-                        shadowBlur: 15, // the intensity of the glow
-                        shadowColor: 'rgba(144, 238, 144, 1)',
+                        }
                     }
-                }
-                return point
-            })
-        const asks: LineDataPoint[] = orderbook?.asks
-            .filter((trade, tradeIndex, trades) => trades.findIndex((_trade) => _trade.amount === trade.amount) === tradeIndex)
-            .sort((curr, next) => curr.average_sell_price * curr.amount - next.average_sell_price * next.amount)
-            .map((trade) => {
-                const point: LineDataPoint = {
-                    value: [1 / trade.average_sell_price, trade.amount],
-                    customData: {
-                        side: OrderbookSide.ASK,
-                        distribution: trade.distribution,
-                        output: trade.average_sell_price * trade.amount,
-                    },
-                }
-                if (trade === lowestAsk) {
-                    point.symbol = customSymbolPath
-                    point.symbolSize = 14
-                    point.itemStyle = {
-                        borderWidth: 1,
-                        borderColor: AppColors.jagger[500],
-                        color: AppColors.folly,
-                        shadowBlur: 15, // the intensity of the glow
-                        shadowColor: 'rgba(255, 0, 128, 1)',
-                    }
-                    point.emphasis = {
-                        symbolSize: 30,
-                        itemStyle: {
-                            shadowBlur: 10,
-                            shadowColor: 'rgba(255, 0, 128, 1)', // hot pink
-                            borderWidth: 0.5,
+                    return point
+                })
+            const asks: LineDataPoint[] = orderbook?.asks
+                .filter((trade, tradeIndex, trades) => trades.findIndex((_trade) => _trade.amount === trade.amount) === tradeIndex)
+                .sort((curr, next) => curr.average_sell_price * curr.amount - next.average_sell_price * next.amount)
+                .map((trade) => {
+                    const point: LineDataPoint = {
+                        value: [1 / trade.average_sell_price, trade.amount],
+                        customData: {
+                            side: OrderbookSide.ASK,
+                            distribution: trade.distribution,
+                            output: trade.average_sell_price * trade.amount,
                         },
                     }
-                }
-                return point
-            })
+                    if (trade === lowestAsk) {
+                        point.symbol = customSymbolPath
+                        point.symbolSize = 14
+                        point.itemStyle = {
+                            borderWidth: 1,
+                            borderColor: AppColors.jagger[500],
+                            color: AppColors.folly,
+                            shadowBlur: 15, // the intensity of the glow
+                            shadowColor: 'rgba(255, 0, 128, 1)',
+                        }
+                        point.emphasis = {
+                            symbolSize: 30,
+                            itemStyle: {
+                                shadowBlur: 10,
+                                shadowColor: 'rgba(255, 0, 128, 1)', // hot pink
+                                borderWidth: 0.5,
+                            },
+                        }
+                    }
+                    return point
+                })
 
-        // debug
-        console.log('bids.length', bids.length, 'highestBid', highestBid.average_sell_price)
-        console.log('asks.length', asks.length, 'lowestAsk', 1 / lowestAsk.average_sell_price)
+            // debug
+            console.log('bids.length', bids.length, 'highestBid', highestBid.average_sell_price)
+            console.log('asks.length', asks.length, 'lowestAsk', 1 / lowestAsk.average_sell_price)
 
-        // options
-        const newOptions = getOptions(orderbook, bids, asks, yAxisType, yAxisLogBase)
+            // options
+            const newOptions = getOptions(orderbook, bids, asks, yAxisType, yAxisLogBase)
 
-        // update
-        setOptions(newOptions)
+            // update
+            setOptions(newOptions)
+        }
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [sellToken, buyToken, apiStoreRefreshedAt, yAxisType, yAxisLogBase])
@@ -407,9 +410,9 @@ export default function DepthChart() {
     return (
         <Suspense fallback={<CustomFallback />}>
             <ErrorBoundary FallbackComponent={ErrorBoundaryFallback}>
-                <ChartBackground className="relative h-[450px]">
+                <ChartBackground className="relative h-[400px]">
                     {!storeRefreshedAt ? (
-                        <LoadingArea message="Loading your assets" />
+                        <LoadingArea />
                     ) : options && Array.isArray(options.series) && options.series?.length > 0 && options.series[0].data ? (
                         <EchartWrapper
                             options={options}
@@ -419,7 +422,7 @@ export default function DepthChart() {
                             }}
                         />
                     ) : (
-                        <LoadingArea message="Contact support" />
+                        <LoadingArea />
                     )}
                 </ChartBackground>
             </ErrorBoundary>

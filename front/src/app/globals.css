@@ -20,3 +20,13 @@
 nextjs-portal {
     display: none;
 }
+
+.skeleton-loading {
+    @apply relative overflow-hidden rounded-lg bg-milk-50;
+}
+
+.skeleton-loading::before {
+    content: '';
+    @apply absolute inset-0 rounded-lg animate-skeleton-move bg-gradient-to-r from-transparent via-milk-150 to-transparent opacity-50;
+    transform: translateX(-100%);
+}
