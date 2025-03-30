@@ -1,6 +1,6 @@
-export type FunctionReturn<T> = {
+export type StructuredOutput<T> = {
     ts: number
     success: boolean
     error: string
-    data: null | T
+    data?: T
 }

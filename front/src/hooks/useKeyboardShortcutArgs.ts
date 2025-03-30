@@ -12,5 +12,6 @@ export function useKeyboardShortcut({ key, onKeyPressed }: { key: string; onKeyP
         return () => {
             document.removeEventListener('keydown', keyDownHandler)
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 }

@@ -22,10 +22,10 @@ export const formatNumberWithDecimals = (numberAsString: string | number, decima
 }
 
 const unknownFormatMap = [
-    { limit: 2, format: '0,0.[0000000]' },
-    { limit: 10, format: '0,0.[0000]' },
-    { limit: 100, format: '0,0.[000]' },
-    { limit: 1000, format: '0,0.[00]' },
+    { limit: 2, format: '0,0.[000000]' },
+    { limit: 10, format: '0,0.[00000]' },
+    { limit: 100, format: '0,0.[0000]' },
+    { limit: 1000, format: '0,0.[000]' },
     { limit: 10000, format: '0,0.[00]' },
     { limit: 1000000, format: '0,0.[0]a' },
     { limit: 1000000000, format: '0,0a' },
@@ -33,7 +33,7 @@ const unknownFormatMap = [
 export const formatAmount = (amount: number | string) => {
     try {
         const num = Number(amount)
-        if (isNaN(num) || num < 0) return 'n/a'
+        if (isNaN(num) || num < 0) return amount
         const absAmount = Math.abs(num)
 
         // map

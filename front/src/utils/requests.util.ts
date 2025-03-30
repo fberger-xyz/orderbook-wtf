@@ -1,8 +1,8 @@
-import { FunctionReturn } from '@/types'
+import { StructuredOutput } from '@/types'
 
-export const generateResponseBody = <T>(): FunctionReturn<T> => ({
+export const initOutput = <T>(): StructuredOutput<T> => ({
     ts: Date.now(),
     success: false,
     error: '',
-    data: null,
+    data: undefined,
 })

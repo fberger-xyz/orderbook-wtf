@@ -1,6 +1,6 @@
 'use client'
 
-import { IconIds, OrderbookAxisScale } from '@/enums'
+import { IconIds, OrderbookAreaColor, OrderbookAxisScale } from '@/enums'
 import numeral from 'numeral'
 import { useAppStore } from '@/stores/app.store'
 import { ReactNode, useEffect, useRef, useState } from 'react'
@@ -8,12 +8,12 @@ import IconWrapper from '../common/IconWrapper'
 import TokenImage from './TokenImage'
 import ChainImage from './ChainImage'
 import DepthChart from '../charts/DepthChart'
-import { AmmAsOrderbook, AmmTrade, APIResponse, Token } from '@/interfaces'
+import { AmmAsOrderbook, AmmTrade, StructuredOutput, Token } from '@/interfaces'
 import SelectTokenModal from './SelectTokenModal'
 import { useModal } from 'connectkit'
 import { useAccount } from 'wagmi'
 import { useClickOutside } from '@/hooks/useClickOutside'
-import { cn, formatAmount } from '@/utils'
+import { cn, fetchBalance, formatAmount } from '@/utils'
 import { useQueries } from '@tanstack/react-query'
 import { useApiStore } from '@/stores/api.store'
 import { APP_ROUTE } from '@/config/app.config'
@@ -35,11 +35,13 @@ export default function Dashboard() {
     const { setOpen } = useModal()
     const {
         sellToken,
-        // sellTokenAmountInput,
+        sellTokenAmountInput,
         buyToken,
         // buyTokenAmountInput,
         yAxisType,
         yAxisLogBase,
+        coloredAreas,
+        setColoredAreas,
         switchSelectedTokens,
         setShowSelectTokenModal,
         setSelectTokenModalFor,
@@ -49,8 +51,23 @@ export default function Dashboard() {
     } = useAppStore()
     const { orderBookRefreshIntervalMs, setApiTokens, setApiOrderbook, setApiStoreRefreshedAt, getOrderbook } = useApiStore()
     const [openChartOptions, showChartOptions] = useState(false)
+    const [openTradeDetails, showTradeDetails] = useState(false)
     const chartOptionsDropdown = useRef<HTMLDivElement>(null)
     useClickOutside(chartOptionsDropdown, () => showChartOptions(false))
+    const [buyTokenBalance, setBuyTokenBalance] = useState(-1)
+    const [sellTokenBalance, setSellTokenBalance] = useState(-1)
+    useEffect(() => {
+        if (account.status === 'connected' && account.address && account.chainId) {
+            if (buyToken?.address)
+                fetchBalance(account.address, account.chainId, buyToken.address as `0x${string}`).then((balance) =>
+                    setBuyTokenBalance(isNaN(balance) ? -1 : balance),
+                )
+            if (sellToken?.address)
+                fetchBalance(account.address, account.chainId, sellToken.address as `0x${string}`).then((balance) =>
+                    setSellTokenBalance(isNaN(balance) ? -1 : balance),
+                )
+        }
+    }, [account.address, account.chainId, account.status, buyToken?.address, sellToken?.address])
 
     // load data from rust api
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -67,7 +84,7 @@ export default function Dashboard() {
                     ])
 
                     // parse
-                    const [tokensResponseJson] = (await Promise.all([tokensResponse.json()])) as [APIResponse<Token[]>]
+                    const [tokensResponseJson] = (await Promise.all([tokensResponse.json()])) as [StructuredOutput<Token[]>]
 
                     // store
                     if (tokensResponseJson?.data) {
@@ -90,7 +107,7 @@ export default function Dashboard() {
                     toast(`Refreshing ${sellToken.symbol}-${buyToken.symbol} orderbook data...`, { style: toastStyle })
                     const url = `${APP_ROUTE}/api/local/orderbook?token0=${sellToken.address}&token1=${buyToken.address}`
                     const [response] = await Promise.all([fetch(url, { method: 'GET', headers: { 'Content-Type': 'application/json' } })])
-                    const [responseJson] = (await Promise.all([response.json()])) as [APIResponse<AmmAsOrderbook>]
+                    const [responseJson] = (await Promise.all([response.json()])) as [StructuredOutput<AmmAsOrderbook>]
                     const pair = `${sellToken.address}-${buyToken.address}`
 
                     // handle errors
@@ -108,7 +125,13 @@ export default function Dashboard() {
                         setApiOrderbook(pair, responseJson.data)
                         toast.success(`Latest ${sellToken.symbol}-${buyToken.symbol} orderbook data loaded`, { style: toastStyle })
                         setApiStoreRefreshedAt(Date.now())
-                        // todo set current trade as best bid
+                        if (responseJson.data.bids) {
+                            const highestBid = responseJson.data.bids.reduce(
+                                (max, t) => (t.average_sell_price > max.average_sell_price ? t : max),
+                                responseJson.data.bids[0],
+                            )
+                            if (highestBid) setSellTokenAmountInput(highestBid.amount)
+                        }
                     }
 
                     // -
@@ -122,6 +145,7 @@ export default function Dashboard() {
 
     useEffect(() => {
         if (!ApiOrderbookQuery.isFetching || !ApiOrderbookQuery.isLoading) ApiOrderbookQuery.refetch()
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [sellToken, buyToken])
 
     // prepare
@@ -270,7 +294,15 @@ export default function Dashboard() {
                                 <p className="text-milk font-bold text-base">
                                     {numeral(
                                         (1 / metrics.lowestAsk.average_sell_price - metrics.highestBid.average_sell_price) / metrics.midPrice,
-                                    ).format('0,0.[0000]%')}
+                                    ).format('0,0.[0000]%')}{' '}
+                                    <span className="pl-2 text-milk-150">
+                                        {numeral(
+                                            (1 / metrics.lowestAsk.average_sell_price - metrics.highestBid.average_sell_price) / metrics.midPrice,
+                                        )
+                                            .multiply(10000)
+                                            .format('0,0.[00]')}{' '}
+                                        bps
+                                    </span>
                                 </p>
                             }
                         />
@@ -316,15 +348,15 @@ export default function Dashboard() {
                         <OrderbookKeyMetric
                             title="Total TVL"
                             content={
-                                <p className="text-milk font-bold text-base">${formatAmount(metrics.totalBaseTvlUsd + metrics.totalQuoteTvlUsd)}</p>
+                                <p className="text-milk font-bold text-base">$ {formatAmount(metrics.totalBaseTvlUsd + metrics.totalQuoteTvlUsd)}</p>
                             }
                         />
                     ) : (
                         <OrderbookKeyMetric
                             title="Total TVL"
                             content={
-                                <div className="flex gap-1.5 items-center flex-wrap skeleton-loading p-1">
-                                    <p className="text-milk-100 font-bold text-base">$100m</p>
+                                <div className="flex gap-1.5 items-center flex-wrap skeleton-loading p-1 w-40">
+                                    <p className="text-milk-100 font-bold text-base">$ 100m</p>
                                 </div>
                             }
                         />
@@ -338,7 +370,7 @@ export default function Dashboard() {
                             <p className="text-milk text-base font-bold">Market depth</p>
                             <button onClick={() => showChartOptions(!openChartOptions)} className="relative">
                                 <div className="flex items-center gap-1 hover:bg-milk-100/5 transition-colors duration-300 rounded-lg px-2.5 py-1.5">
-                                    <p className="text-milk text-sm">{yAxisType === 'value' ? 'Linear' : `Log ${yAxisLogBase}`}</p>
+                                    <p className="text-milk text-sm">Options</p>
                                     <IconWrapper icon={IconIds.TRIANGLE_DOWN} className="size-4" />
                                 </div>
 
@@ -346,25 +378,49 @@ export default function Dashboard() {
                                 <div
                                     ref={chartOptionsDropdown}
                                     className={cn(
-                                        `z-20 absolute mt-2 w-52 rounded-2xl backdrop-blur-lg border border-milk-150 shadow-lg p-2.5 transition-all origin-top-left`,
+                                        `z-20 absolute mt-2 w-52 rounded-2xl backdrop-blur-lg border border-milk-150 shadow-lg p-2.5 transition-all origin-top-left flex flex-col gap-5`,
                                         {
                                             'scale-100 opacity-100': openChartOptions,
                                             'scale-95 opacity-0 pointer-events-none': !openChartOptions,
                                         },
                                     )}
                                 >
-                                    {[OrderbookAxisScale.VALUE, OrderbookAxisScale.LOG].map((type, typeIndex) => (
-                                        <div
-                                            key={`${type}-${typeIndex}`}
-                                            className={cn('flex items-center gap-2 w-full px-4 py-2 rounded-lg transition mt-1', {
-                                                'text-white bg-gray-600/20': yAxisType === type,
-                                                'text-milk-600 hover:bg-gray-600/20': yAxisType !== type,
-                                            })}
-                                            onClick={() => setYAxisType(type)}
-                                        >
-                                            <p className="text-sm">{type === 'value' ? 'Linear' : `Log ${yAxisLogBase}`}</p>
-                                        </div>
-                                    ))}
+                                    {/* y axis scale */}
+                                    <div className="flex flex-col w-full items-start gap-0.5">
+                                        <p className="text-milk-400 text-sm font-bold">Y Axis scale</p>
+                                        {[OrderbookAxisScale.VALUE, OrderbookAxisScale.LOG].map((type, typeIndex) => (
+                                            <div
+                                                key={`${type}-${typeIndex}`}
+                                                className={cn('flex items-center gap-2 w-full px-4 py-1.5 rounded-lg transition', {
+                                                    'text-white bg-gray-600/20': yAxisType === type,
+                                                    'text-milk-400 hover:bg-gray-600/20': yAxisType !== type,
+                                                })}
+                                                onClick={() => setYAxisType(type)}
+                                            >
+                                                <p className="text-sm">{type === OrderbookAxisScale.VALUE ? 'Linear' : `Log ${yAxisLogBase}`}</p>
+                                            </div>
+                                        ))}
+                                    </div>
+
+                                    <div className="flex flex-col w-full items-start gap-0.5">
+                                        <p className="text-milk-400 text-sm font-bold">Color Bids and Asks areas</p>
+                                        {[OrderbookAreaColor.YES, OrderbookAreaColor.NO].map((option, optionIndex) => (
+                                            <div
+                                                key={`${option}-${optionIndex}`}
+                                                className={cn('flex items-center gap-2 w-full px-4 py-1.5 rounded-lg transition', {
+                                                    'text-white bg-gray-600/20': coloredAreas === option,
+                                                    'text-milk-400 hover:bg-gray-600/20': coloredAreas !== option,
+                                                })}
+                                                onClick={() =>
+                                                    setColoredAreas(
+                                                        coloredAreas === OrderbookAreaColor.YES ? OrderbookAreaColor.NO : OrderbookAreaColor.YES,
+                                                    )
+                                                }
+                                            >
+                                                <p className="text-sm">{option}</p>
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
                             </button>
                         </div>
@@ -379,18 +435,35 @@ export default function Dashboard() {
             {/* right */}
             <div className="col-span-1 md:col-span-4 flex flex-col gap-0.5">
                 {/* sell */}
-                <div className="bg-milk-600/5 flex flex-col gap-1 p-4 rounded-xl border-milk-150 w-full">
+                <div
+                    className={cn('flex flex-col gap-1 p-4 rounded-xl border-milk-150 w-full', {
+                        'bg-folly/20': account.isConnected && sellToken?.address && sellTokenAmountInput && sellTokenBalance < sellTokenAmountInput,
+                        'bg-milk-600/5': !(
+                            account.isConnected &&
+                            sellToken?.address &&
+                            sellTokenAmountInput &&
+                            sellTokenBalance < sellTokenAmountInput
+                        ),
+                    })}
+                >
                     <div className="flex justify-between">
                         <p className="text-milk-600 text-xs">Sell</p>
-                        <button
-                            onClick={() => {}}
-                            className={cn('flex transition-colors duration-300 opacity-80 px-2.5 py-1.5 rounded-lg', {
-                                'bg-milk-100/5': true,
-                                'hover:opacity-100 hover:bg-milk-100/5': false,
-                            })}
-                        >
-                            <p className="font-bold text-aquamarine text-xs">Best bid</p>
-                        </button>
+                        <div className="flex items-center">
+                            {account.isConnected && sellToken?.address && sellTokenBalance < Number(sellTokenAmountInput) ? (
+                                <button onClick={() => setSellTokenAmountInput(sellTokenBalance)} className="pr-1">
+                                    <p className="text-folly font-bold text-xs">Exceeds Balance</p>
+                                </button>
+                            ) : null}
+                            <button
+                                onClick={() => {}}
+                                className={cn('flex transition-colors duration-300 opacity-80 px-2.5 py-1.5 rounded-lg', {
+                                    'bg-milk-100/5': true,
+                                    'hover:opacity-100 hover:bg-milk-100/5': false,
+                                })}
+                            >
+                                <p className="font-bold text-aquamarine text-xs">Best bid</p>
+                            </button>
+                        </div>
                     </div>
                     <div className="flex justify-between gap-3">
                         <button
@@ -415,7 +488,7 @@ export default function Dashboard() {
                         <input
                             type="text"
                             className="text-xl font-bold text-right border-none outline-none ring-0 focus:ring-0 focus:outline-none focus:border-none bg-transparent w-40"
-                            value={numeral(metrics?.highestBid?.amount ?? 0).format('0,0.[00000]')}
+                            value={numeral(sellTokenBalance ?? 0).format('0,0.[00000]')}
                             onChange={(e) => {
                                 const parsedNumber = Number(numeral(e.target.value ?? 0).value())
                                 if (isNaN(parsedNumber)) return
@@ -427,7 +500,14 @@ export default function Dashboard() {
                         <div className="mt-2 flex justify-between items-center">
                             <div className="flex justify-between gap-1 items-center">
                                 <IconWrapper icon={IconIds.WALLET} className="size-4 text-milk-400" />
-                                <p className="text-milk-600 text-xs">{account.isConnected ? 'todo' : '-'}</p>
+                                <p className="text-milk-400 text-xs">
+                                    {account.isConnected && sellTokenBalance >= 0 ? formatAmount(sellTokenBalance) : 0}
+                                </p>
+                                {account.isConnected && sellToken?.address && (
+                                    <button onClick={() => setSellTokenAmountInput(sellTokenBalance)} className="pl-1">
+                                        <p className="text-folly font-bold text-xs">MAX</p>
+                                    </button>
+                                )}
                             </div>
                             <p className="text-milk-600 text-xs">
                                 ${' '}
@@ -438,9 +518,11 @@ export default function Dashboard() {
                         <div className="mt-2 flex justify-between items-center">
                             <div className="flex justify-between gap-1 items-center">
                                 <IconWrapper icon={IconIds.WALLET} className="size-4 text-milk-400" />
-                                <p className="text-milk-600 text-xs">{account.isConnected ? 'todo' : '-'}</p>
+                                <p className="text-milk-400 text-xs">
+                                    {account.isConnected && buyTokenBalance >= 0 ? formatAmount(buyTokenBalance) : 0}
+                                </p>
                             </div>
-                            <p className="text-milk-600 text-xs">$todo</p>
+                            <div className="skeleton-loading w-16 h-4 rounded-full" />
                         </div>
                     )}
                 </div>
@@ -502,7 +584,9 @@ export default function Dashboard() {
                         <div className="flex justify-between items-center">
                             <div className="flex justify-between gap-1 items-center">
                                 <IconWrapper icon={IconIds.WALLET} className="size-4 text-milk-400" />
-                                <p className="text-milk-600 text-xs">{account.isConnected ? 'todo' : '-'}</p>
+                                <p className="text-milk-400 text-xs">
+                                    {account.isConnected && sellTokenBalance >= 0 ? formatAmount(sellTokenBalance) : 0}
+                                </p>
                             </div>
                             <p className="text-milk-600 text-xs">
                                 ${' '}
@@ -515,9 +599,11 @@ export default function Dashboard() {
                         <div className="mt-2 flex justify-between items-center">
                             <div className="flex justify-between gap-1 items-center">
                                 <IconWrapper icon={IconIds.WALLET} className="size-4 text-milk-400" />
-                                <p className="text-milk-600 text-xs">{account.isConnected ? 'todo' : '-'}</p>
+                                <p className="text-milk-400 text-xs">
+                                    {account.isConnected && sellTokenBalance >= 0 ? formatAmount(sellTokenBalance) : 0}
+                                </p>
                             </div>
-                            <p className="text-milk-600 text-xs">$todo</p>
+                            <div className="skeleton-loading w-16 h-4 rounded-full" />
                         </div>
                     )}
                 </div>
@@ -526,33 +612,86 @@ export default function Dashboard() {
                 <div className="h-0 w-full" />
 
                 {/* fees */}
-                <div className="bg-milk-600/5 flex justify-between p-4 rounded-xl border-milk-150 text-xs">
-                    <p className="text-milk-600 truncate">
-                        {sellToken && buyToken && metrics.highestBid && metrics.orderbook
-                            ? `1 ${sellToken.symbol} = ${formatAmount((1 / metrics.highestBid.amount) * metrics.highestBid.output)} ${buyToken.symbol}
-                            ($ ${formatAmount(
-                                (1 / metrics.highestBid.amount) *
-                                    metrics.highestBid.output *
-                                    metrics.orderbook.eth_usd *
-                                    metrics.orderbook.quote_worth_eth,
-                            )}
-                            )`
-                            : sellToken && buyToken
-                              ? `1 ${sellToken.symbol} = [...] ${buyToken.symbol}`
-                              : `[...]`}
-                    </p>
-                    <div className="flex gap-1.5 items-center">
-                        <IconWrapper icon={IconIds.GAS} className="size-4 text-milk-600" />
-                        <ChainImage networkName="ethereum" className="size-4" />
-                        <p className="text-milk-600">
-                            ${' '}
-                            {metrics.highestBid?.gas_costs_usd
-                                ? numeral(metrics.highestBid.gas_costs_usd.reduce((cost, curr) => (cost += curr), 0)).format('0,0.[00]')
-                                : '-'}
-                        </p>
-                        {/* <p className="text-milk-600">$ {JSON.stringify(highestBid.gas_costs_usd)}</p> */}
-                        <IconWrapper icon={IconIds.TRIANGLE_DOWN} className="size-4" />
+                <div className="bg-milk-600/5 flex flex-col gap-6 px-2 py-4 rounded-xl border-milk-150 text-xs">
+                    {/* summary */}
+                    <div className="flex w-full justify-between items-center">
+                        {sellToken && buyToken && metrics.highestBid && metrics.orderbook ? (
+                            <p className="text-milk-600 truncate pl-2">
+                                1 {sellToken.symbol} = {formatAmount((1 / metrics.highestBid.amount) * metrics.highestBid.output)} {buyToken.symbol}{' '}
+                                (${' '}
+                                {formatAmount(
+                                    (1 / metrics.highestBid.amount) *
+                                        metrics.highestBid.output *
+                                        metrics.orderbook.eth_usd *
+                                        metrics.orderbook.quote_worth_eth,
+                                )}
+                                )
+                            </p>
+                        ) : sellToken && buyToken ? (
+                            <div className="flex items-center gap-1">
+                                <p className="text-milk-600 truncate pl-2">1 {sellToken.symbol} =</p>
+                                <div className="skeleton-loading flex w-12 h-4 items-center justify-center rounded-full" />
+                                <p className="text-milk-600 truncate">{buyToken.symbol}</p>
+                            </div>
+                        ) : (
+                            <div className="skeleton-loading flex w-20 h-4 items-center justify-center rounded-full" />
+                        )}
+
+                        <button
+                            onClick={() => showTradeDetails(!openTradeDetails)}
+                            className="flex gap-1.5 items-center hover:bg-milk-100/5 px-2 py-1 rounded-xl"
+                        >
+                            <IconWrapper icon={IconIds.GAS} className="size-4 text-milk-600" />
+                            <ChainImage networkName="ethereum" className="size-4" />
+                            <p className="text-milk-600">
+                                ${' '}
+                                {metrics.highestBid?.gas_costs_usd
+                                    ? numeral(metrics.highestBid.gas_costs_usd.reduce((cost, curr) => (cost += curr), 0)).format('0,0.[00]')
+                                    : '-'}
+                            </p>
+                            <IconWrapper
+                                icon={openTradeDetails ? IconIds.TRIANGLE_UP : IconIds.TRIANGLE_DOWN}
+                                className="size-4 transition-transform duration-300"
+                            />
+                        </button>
                     </div>
+
+                    {/* details */}
+                    {openTradeDetails && (
+                        <div className="flex flex-col gap-2 text-xs px-2">
+                            <div className="flex justify-between w-full text-milk-400">
+                                <p>Expected output</p>
+                                <div className="skeleton-loading w-16 h-4 rounded-full" />
+                            </div>
+                            <div className="flex justify-between w-full text-milk-400">
+                                <p>Minimum received after slippage (0.2%)</p>
+                                <div className="skeleton-loading w-16 h-4 rounded-full" />
+                            </div>
+                            <div className="flex justify-between w-full text-milk-400">
+                                <p>Price Impact</p>
+                                <div className="skeleton-loading w-16 h-4 rounded-full" />
+                            </div>
+                            <div className="flex justify-between w-full text-milk-400">
+                                <p>Gas token</p>
+                                <div className="flex gap-1 items-center">
+                                    {sellToken ? (
+                                        <TokenImage size={16} token={sellToken} />
+                                    ) : (
+                                        <span className="animate-pulse rounded-full bg-milk-150" style={{ width: 16, height: 16 }} />
+                                    )}
+                                    {sellToken ? (
+                                        <p className="font-semibold tracking-wide">{sellToken.symbol}</p>
+                                    ) : (
+                                        <div className="skeleton-loading flex w-16 h-6 items-center justify-center rounded-full" />
+                                    )}
+                                </div>
+                            </div>
+                            <div className="flex justify-between w-full text-milk-400">
+                                <p>Network Fee</p>
+                                <div className="skeleton-loading w-16 h-4 rounded-full" />
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 {/* separator */}

@@ -11,7 +11,9 @@ export interface InterfaceAppLink {
     sublinks: InterfaceAppLink[]
 }
 
-export interface APIResponse<Data> {
+export interface StructuredOutput<Data> {
+    success: boolean
     data?: Data
     error: string
+    ts: number
 }

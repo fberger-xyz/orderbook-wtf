@@ -76,7 +76,7 @@ export default async function RootLayout({
                             <ErrorBoundary FallbackComponent={ErrorBoundaryFallback}>{children}</ErrorBoundary>
                         </Suspense>
                         <Footer />
-                        <Toaster position="bottom-center" reverseOrder={true} />
+                        <Toaster position="bottom-right" reverseOrder={true} />
                     </main>
                 </WagmiAndReactQueryProviders>
             </body>

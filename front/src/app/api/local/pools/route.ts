@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server'
-import { APIResponse, RustApiLiquidityPool } from '@/interfaces'
+import { RustApiLiquidityPool, StructuredOutput } from '@/interfaces'
 import { PUBLIC_STREAM_API_URL } from '@/config/app.config'
+import { initOutput } from '@/utils'
 
 export async function GET() {
-    const res: APIResponse<RustApiLiquidityPool[]> = { data: undefined, error: '' }
+    const res = initOutput<RustApiLiquidityPool[]>()
     const url = `${PUBLIC_STREAM_API_URL}/components`
     try {
         // prepare request
@@ -28,8 +29,10 @@ export async function GET() {
         }
 
         // read and cast
-        const fetchResponseJson = (await fetchResponse.json()) as { components: RustApiLiquidityPool[] }
-        res.data = fetchResponseJson.components
+        const fetchResponseJson = (await fetchResponse.json()) as StructuredOutput<RustApiLiquidityPool[]>
+        res.ts = fetchResponseJson.ts
+        res.error = fetchResponseJson.error
+        res.data = fetchResponseJson.data
 
         // res
         return NextResponse.json(res)

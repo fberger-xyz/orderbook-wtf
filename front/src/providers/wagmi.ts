@@ -1,3 +1,5 @@
+'use client'
+
 import { APP_METADATA, APP_ROUTE } from '@/config/app.config'
 import { getDefaultConfig } from 'connectkit'
 import { createConfig, http } from 'wagmi'
@@ -12,7 +14,11 @@ const configParams = getDefaultConfig({
     appUrl: APP_ROUTE,
     chains: [mainnet, arbitrum, gnosis],
     connectors: [safe({ allowedDomains: [/app.safe.global$/], debug: true })],
-    transports: [mainnet, arbitrum, gnosis].reduce((obj, chain) => ({ ...obj, [chain.id]: http() }), {}),
+    transports: {
+        [mainnet.id]: http(`https://eth.llamarpc.com`),
+        [arbitrum.id]: http(), // default is fine for these
+        [gnosis.id]: http(),
+    },
     appName: APP_METADATA.SITE_NAME,
     ssr: true,
 })

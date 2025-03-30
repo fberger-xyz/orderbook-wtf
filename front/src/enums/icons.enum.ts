@@ -75,4 +75,5 @@ export enum IconIds {
     CHARTS = 'material-symbols:insert-chart-outline-rounded',
     GAS = 'ri:gas-station-line',
     TRIANGLE_DOWN = 'ic:round-arrow-drop-down',
+    TRIANGLE_UP = 'ic:round-arrow-drop-up',
 }

@@ -11,5 +11,5 @@ export const toastStyle = {
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
-    maxWidth: '350px',
+    maxWidth: '800px',
 }

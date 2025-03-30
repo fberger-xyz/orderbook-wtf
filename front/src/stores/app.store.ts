@@ -4,18 +4,26 @@ import { APP_METADATA, IS_DEV } from '@/config/app.config'
 import { OrderbookDataPoint } from '@/types'
 import { AmmAsOrderbook, AmmPool, Token } from '@/interfaces'
 import { hardcodedTokensList } from '@/data/back-tokens'
-import { OrderbookAxisScale } from '@/enums'
+import { OrderbookAreaColor, OrderbookAxisScale } from '@/enums'
 
 export const useAppStore = create<{
+    // -
     showMobileMenu: boolean
     hasHydrated: boolean
     storeRefreshedAt: number
     refetchInterval: number
     selectedTrade?: { datapoint: OrderbookDataPoint; bidsPools: AmmPool[]; asksPools: AmmPool[] }
+
+    // chart options
     yAxisType: OrderbookAxisScale
     yAxisLogBase: number
+    setYAxisType: (yAxisType: OrderbookAxisScale) => void
+    setYAxisLogBase: (yAxisLogBase: number) => void
+    coloredAreas: OrderbookAreaColor
+    setColoredAreas: (coloredAreas: OrderbookAreaColor) => void
+
+    // -
     availablePairs: string[]
-    selectedPair?: string
     sellToken?: Token
     sellTokenAmountInput?: number
     buyToken?: Token
@@ -29,10 +37,7 @@ export const useAppStore = create<{
     setHasHydrated: (hasHydrated: boolean) => void
     setStoreRefreshedAt: (storeRefreshedAt: number) => void
     selectOrderbookDataPoint: (selectedTrade?: { datapoint: OrderbookDataPoint; bidsPools: AmmPool[]; asksPools: AmmPool[] }) => void
-    setYAxisType: (yAxisType: OrderbookAxisScale) => void
-    setYAxisLogBase: (yAxisLogBase: number) => void
     setAvailablePairs: (availablePairs: string[]) => void
-    selectPair: (selectedPair?: string) => void
     selectSellToken: (sellToken?: Token) => void
     setSellTokenAmountInput: (sellTokenAmountInput: number) => void
     selectBuyToken: (buyToken?: Token) => void
@@ -46,20 +51,31 @@ export const useAppStore = create<{
 }>()(
     persist(
         (set) => ({
+            // -
             showMobileMenu: false,
             hasHydrated: false,
             storeRefreshedAt: -1,
             refetchInterval: (IS_DEV ? 60 : 15) * 1000,
             selectedTrade: undefined,
+
+            // chart options
             yAxisType: OrderbookAxisScale.VALUE,
             yAxisLogBase: 10,
+            setYAxisLogBase: (yAxisLogBase) => set(() => ({ yAxisLogBase })),
+            setAvailablePairs: (availablePairs) => set(() => ({ availablePairs })),
+            coloredAreas: OrderbookAreaColor.NO,
+            setColoredAreas: (coloredAreas) => set(() => ({ coloredAreas })),
+
+            // -
             availablePairs: [],
-            selectedPair: undefined,
+            availableTokens: [],
+
+            // swap
             sellToken: hardcodedTokensList[1],
             sellTokenAmountInput: 2000,
             buyToken: hardcodedTokensList[0],
             buyTokenAmountInput: 1,
-            availableTokens: [],
+
             loadedOrderbooks: {},
             showSelectTokenModal: false,
             selectTokenModalFor: 'buy',
@@ -69,9 +85,6 @@ export const useAppStore = create<{
             setStoreRefreshedAt: (storeRefreshedAt) => set(() => ({ storeRefreshedAt })),
             selectOrderbookDataPoint: (selectedTrade) => set(() => ({ selectedTrade })),
             setYAxisType: (yAxisType) => set(() => ({ yAxisType })),
-            setYAxisLogBase: (yAxisLogBase) => set(() => ({ yAxisLogBase })),
-            setAvailablePairs: (availablePairs) => set(() => ({ availablePairs })),
-            selectPair: (selectedPair) => set(() => ({ selectedPair })),
             selectSellToken: (sellToken) =>
                 set((state) => {
                     console.log(`selectsellToken: ${sellToken?.symbol} (prev=${state.sellToken?.symbol})`)

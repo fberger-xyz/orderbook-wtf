@@ -3,7 +3,7 @@
 import * as echarts from 'echarts'
 import { ErrorBoundary } from 'react-error-boundary'
 import { Suspense, useEffect, useState } from 'react'
-import { OrderbookSide } from '@/enums'
+import { OrderbookAreaColor, OrderbookSide } from '@/enums'
 import EchartWrapper from './EchartWrapper'
 import { ChartBackground, CustomFallback, LoadingArea } from './ChartsCommons'
 import { useAppStore } from '@/stores/app.store'
@@ -53,10 +53,11 @@ const getOptions = (
     asks: LineDataPoint[],
     yAxisType: 'value' | 'log',
     yAxisLogBase: number,
+    coloredAreas: OrderbookAreaColor,
 ): echarts.EChartsOption => {
     const startValue = bids.sort((curr, next) => curr.value[0] - next.value[0])[Math.max(0, bids.length - 6)].value[0]
     const endValue = asks.sort((curr, next) => curr.value[0] - next.value[0])[Math.min(6, asks.length - 1)].value[0]
-    console.log({ startValue, endValue })
+    // console.log({ startValue, endValue })
     return {
         tooltip: {
             trigger: 'axis',
@@ -209,7 +210,7 @@ const getOptions = (
                     fontSize: 11,
                     show: true,
                     color: AppColors.milk[200],
-                    formatter: (value) => formatAmount(value),
+                    formatter: (value) => String(formatAmount(value)),
                 },
                 axisLine: {
                     show: false,
@@ -217,7 +218,8 @@ const getOptions = (
                 axisPointer: {
                     snap: true,
                 },
-                min: 0,
+                // min: 0,
+                min: 'dataMin',
                 max: 'dataMax',
             },
             {
@@ -241,7 +243,7 @@ const getOptions = (
                     fontSize: 11,
                     show: true,
                     color: AppColors.milk[200],
-                    formatter: (value) => formatAmount(value),
+                    formatter: (value) => String(formatAmount(value)),
                 },
                 axisLine: {
                     show: false,
@@ -249,7 +251,8 @@ const getOptions = (
                 axisPointer: {
                     snap: true,
                 },
-                min: 0,
+                // min: 0,
+                min: 'dataMin',
                 max: 'dataMax',
             },
         ],
@@ -283,6 +286,23 @@ const getOptions = (
                 emphasis: {
                     itemStyle: { color: AppColors.aquamarine, borderWidth: 4 },
                 },
+                areaStyle:
+                    coloredAreas === OrderbookAreaColor.NO
+                        ? undefined
+                        : {
+                              opacity: 0.3,
+                              color: {
+                                  type: 'linear',
+                                  x: 0,
+                                  y: 0,
+                                  x2: 0,
+                                  y2: 1,
+                                  colorStops: [
+                                      { offset: 0, color: AppColors.aquamarine }, // top
+                                      { offset: 1, color: 'transparent' }, // bottom
+                                  ],
+                              },
+                          },
             },
             {
                 yAxisIndex: 1,
@@ -302,13 +322,30 @@ const getOptions = (
                 emphasis: {
                     itemStyle: { color: AppColors.folly, borderWidth: 4 },
                 },
+                areaStyle:
+                    coloredAreas === OrderbookAreaColor.NO
+                        ? undefined
+                        : {
+                              opacity: 0.3,
+                              color: {
+                                  type: 'linear',
+                                  x: 0,
+                                  y: 0,
+                                  x2: 0,
+                                  y2: 1,
+                                  colorStops: [
+                                      { offset: 0, color: AppColors.folly }, // top
+                                      { offset: 1, color: 'transparent' }, // bottom
+                                  ],
+                              },
+                          },
             },
         ],
     }
 }
 
 export default function DepthChart() {
-    const { buyToken, sellToken, storeRefreshedAt, yAxisType, yAxisLogBase, selectOrderbookDataPoint } = useAppStore()
+    const { buyToken, sellToken, storeRefreshedAt, yAxisType, yAxisLogBase, coloredAreas, selectOrderbookDataPoint } = useAppStore()
     const { apiStoreRefreshedAt, getOrderbook } = useApiStore()
     const [options, setOptions] = useState<null | echarts.EChartsOption>(null)
 
@@ -387,18 +424,20 @@ export default function DepthChart() {
                 })
 
             // debug
-            console.log('bids.length', bids.length, 'highestBid', highestBid.average_sell_price)
-            console.log('asks.length', asks.length, 'lowestAsk', 1 / lowestAsk.average_sell_price)
+            // console.log('bids.length', bids.length, 'highestBid', highestBid.average_sell_price)
+            // console.log('asks.length', asks.length, 'lowestAsk', 1 / lowestAsk.average_sell_price)
 
             // options
-            const newOptions = getOptions(orderbook, bids, asks, yAxisType, yAxisLogBase)
+            const newOptions = getOptions(orderbook, bids, asks, yAxisType, yAxisLogBase, coloredAreas)
 
             // update
             setOptions(newOptions)
+        } else {
+            setOptions(null)
         }
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [sellToken?.address, buyToken?.address, apiStoreRefreshedAt, yAxisType, yAxisLogBase])
+    }, [sellToken?.address, buyToken?.address, apiStoreRefreshedAt, yAxisType, yAxisLogBase, coloredAreas])
 
     // methods
     const handlePointClick = (params: { value: undefined | OrderbookDataPoint }) => {

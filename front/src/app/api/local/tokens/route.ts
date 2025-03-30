@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server'
-import { APIResponse, Token } from '@/interfaces'
+import { StructuredOutput, Token } from '@/interfaces'
 import { PUBLIC_STREAM_API_URL } from '@/config/app.config'
+import { initOutput } from '@/utils'
 
 export async function GET() {
-    const res: APIResponse<Token[]> = { data: undefined, error: '' }
+    const res = initOutput<Token[]>()
     const url = `${PUBLIC_STREAM_API_URL}/tokens`
     try {
         // prepare request
@@ -28,8 +29,10 @@ export async function GET() {
         }
 
         // read and cast
-        const fetchResponseJson = (await fetchResponse.json()) as { tokens: Token[] }
-        res.data = fetchResponseJson.tokens
+        const fetchResponseJson = (await fetchResponse.json()) as StructuredOutput<Token[]>
+        res.ts = fetchResponseJson.ts
+        res.error = fetchResponseJson.error
+        res.data = fetchResponseJson.data
 
         // res
         return NextResponse.json(res)

@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { AmmAsOrderbook, APIResponse } from '@/interfaces'
+import { AmmAsOrderbook, StructuredOutput } from '@/interfaces'
 import { isAddress } from 'viem'
 import { PUBLIC_STREAM_API_URL } from '@/config/app.config'
+import { initOutput } from '@/utils'
 
 export async function GET(req: NextRequest) {
-    const res: APIResponse<AmmAsOrderbook> = { data: undefined, error: '' }
-    const url = `${PUBLIC_STREAM_API_URL}/orderbook`
+    const res = initOutput<AmmAsOrderbook>()
+    const url = `${PUBLIC_STREAM_API_URL}/orderbook` // todo select vm http endpoint in production
 
     // safe exec
     try {
@@ -25,7 +26,6 @@ export async function GET(req: NextRequest) {
         // prepare request
         const controller = new AbortController()
         const timeoutId = setTimeout(() => controller.abort(), 60000) // 60 seconds timeout
-        const postEndpoint = `${url}`
         const body = {
             tag: `${token0}-${token1}`,
             single: false,
@@ -35,10 +35,10 @@ export async function GET(req: NextRequest) {
 
         // debug
         console.log('-------')
-        console.log({ postEndpoint, body })
+        // console.log({ url, body })
 
         // run req
-        const fetchResponse = await fetch(postEndpoint, {
+        const fetchResponse = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             signal: controller.signal,
@@ -56,8 +56,10 @@ export async function GET(req: NextRequest) {
         }
 
         // read and cast
-        const fetchResponseJson = (await fetchResponse.json()) as { orderbook: AmmAsOrderbook }
-        res.data = fetchResponseJson.orderbook
+        const fetchResponseJson = (await fetchResponse.json()) as StructuredOutput<AmmAsOrderbook>
+        res.ts = fetchResponseJson.ts
+        res.error = fetchResponseJson.error
+        res.data = fetchResponseJson.data
 
         // double check errors
         if (String(res.data).includes('backend error')) {
