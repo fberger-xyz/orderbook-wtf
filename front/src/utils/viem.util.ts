@@ -53,6 +53,6 @@ export async function fetchBalance(
     } catch (err) {
         console.error('Failed to fetch balance', err)
         toast.error('Could not fetch balance', { style: toastStyle })
-        return -1
+        return 0
     }
 }
