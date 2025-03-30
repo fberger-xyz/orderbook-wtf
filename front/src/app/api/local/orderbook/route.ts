@@ -25,21 +25,25 @@ export async function GET(req: NextRequest) {
         // prepare request
         const controller = new AbortController()
         const timeoutId = setTimeout(() => controller.abort(), 60000) // 60 seconds timeout
-        const endpoint = `${url}`
-        console.log(endpoint)
+        const postEndpoint = `${url}`
+        const body = {
+            tag: `${token0}-${token1}`,
+            single: false,
+            sp_input: 'todo',
+            sp_amount: 0,
+        }
+
+        // debug
+        console.log('-------')
+        console.log({ postEndpoint, body })
 
         // run req
-        const fetchResponse = await fetch(endpoint, {
+        const fetchResponse = await fetch(postEndpoint, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             signal: controller.signal,
             cache: 'no-store',
-            body: JSON.stringify({
-                tag: `${token0}-${token1}`,
-                single: false,
-                sp_input: 'todo',
-                sp_amount: 0,
-            }),
+            body: JSON.stringify(body),
         })
 
         // timeout
@@ -54,6 +58,11 @@ export async function GET(req: NextRequest) {
         // read and cast
         const fetchResponseJson = (await fetchResponse.json()) as { orderbook: AmmAsOrderbook }
         res.data = fetchResponseJson.orderbook
+
+        // double check errors
+        if (String(res.data).includes('backend error')) {
+            return NextResponse.json({ ...res, error: `Upstream rust API returned an error` }, { status: 502 })
+        }
 
         // res
         return NextResponse.json(res)

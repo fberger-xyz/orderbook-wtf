@@ -316,7 +316,7 @@ export default function DepthChart() {
     useEffect(() => {
         const key = `${sellToken?.address}-${buyToken?.address}`
         const orderbook = getOrderbook(key)
-        if (orderbook) {
+        if (orderbook?.bids && orderbook?.asks) {
             const highestBid = orderbook.bids.reduce((max, t) => (t.average_sell_price > max.average_sell_price ? t : max), orderbook.bids[0])
             const lowestAsk = orderbook.asks.reduce((min, t) => (1 / t.average_sell_price < 1 / min.average_sell_price ? t : min), orderbook.asks[0])
             const bids: LineDataPoint[] = orderbook?.bids
@@ -398,7 +398,7 @@ export default function DepthChart() {
         }
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [sellToken, buyToken, apiStoreRefreshedAt, yAxisType, yAxisLogBase])
+    }, [sellToken?.address, buyToken?.address, apiStoreRefreshedAt, yAxisType, yAxisLogBase])
 
     // methods
     const handlePointClick = (params: { value: undefined | OrderbookDataPoint }) => {

@@ -3,7 +3,7 @@
 import { IconIds, OrderbookAxisScale } from '@/enums'
 import numeral from 'numeral'
 import { useAppStore } from '@/stores/app.store'
-import { ReactNode, useRef, useState } from 'react'
+import { ReactNode, useEffect, useRef, useState } from 'react'
 import IconWrapper from '../common/IconWrapper'
 import TokenImage from './TokenImage'
 import ChainImage from './ChainImage'
@@ -53,13 +53,15 @@ export default function Dashboard() {
     useClickOutside(chartOptionsDropdown, () => showChartOptions(false))
 
     // load data from rust api
-    useQueries({
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const [_, ApiOrderbookQuery] = useQueries({
         queries: [
             {
                 queryKey: ['ApiTokensQuery'],
                 enabled: true,
                 queryFn: async () => {
                     // fetch
+                    toast(`Refreshing tokens list...`, { style: toastStyle })
                     const [tokensResponse] = await Promise.all([
                         fetch(`${APP_ROUTE}/api/local/tokens`, { method: 'GET', headers: { 'Content-Type': 'application/json' } }),
                     ])
@@ -84,16 +86,32 @@ export default function Dashboard() {
                 enabled: true,
                 queryFn: async () => {
                     if (!sellToken?.address || !buyToken?.address) return null
+
+                    toast(`Refreshing ${sellToken.symbol}-${buyToken.symbol} orderbook data...`, { style: toastStyle })
                     const url = `${APP_ROUTE}/api/local/orderbook?token0=${sellToken.address}&token1=${buyToken.address}`
                     const [response] = await Promise.all([fetch(url, { method: 'GET', headers: { 'Content-Type': 'application/json' } })])
                     const [responseJson] = (await Promise.all([response.json()])) as [APIResponse<AmmAsOrderbook>]
                     const pair = `${sellToken.address}-${buyToken.address}`
-                    if (responseJson.data) {
+
+                    // handle errors
+                    if (responseJson.error) {
+                        toast.error(`${responseJson.error}`, { style: toastStyle })
+                    }
+
+                    // handle errors
+                    else if (!responseJson.data?.bids || !responseJson.data?.asks) {
+                        toast.error(`Bad orderbook format`, { style: toastStyle })
+                    }
+
+                    // handle success
+                    else if (responseJson.data) {
                         setApiOrderbook(pair, responseJson.data)
-                        toast.success(`Orderbook loaded for ${sellToken.symbol}-${buyToken.symbol}`, { style: toastStyle })
+                        toast.success(`Latest ${sellToken.symbol}-${buyToken.symbol} orderbook data loaded`, { style: toastStyle })
                         setApiStoreRefreshedAt(Date.now())
                         // todo set current trade as best bid
                     }
+
+                    // -
                     return { responseJson }
                 },
                 refetchOnWindowFocus: false,
@@ -101,6 +119,10 @@ export default function Dashboard() {
             },
         ],
     })
+
+    useEffect(() => {
+        if (!ApiOrderbookQuery.isFetching || !ApiOrderbookQuery.isLoading) ApiOrderbookQuery.refetch()
+    }, [sellToken, buyToken])
 
     // prepare
     const metrics:
@@ -525,7 +547,7 @@ export default function Dashboard() {
                         <p className="text-milk-600">
                             ${' '}
                             {metrics.highestBid?.gas_costs_usd
-                                ? formatAmount(metrics.highestBid.gas_costs_usd.reduce((cost, curr) => (cost += curr), 0))
+                                ? numeral(metrics.highestBid.gas_costs_usd.reduce((cost, curr) => (cost += curr), 0)).format('0,0.[00]')
                                 : '-'}
                         </p>
                         {/* <p className="text-milk-600">$ {JSON.stringify(highestBid.gas_costs_usd)}</p> */}

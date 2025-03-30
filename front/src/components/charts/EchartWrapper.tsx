@@ -45,7 +45,7 @@ export default function EchartWrapper(props: InterfaceEchartWrapperProps) {
 
             // @ts-expect-error: poorly typed
             const grid3DOptions = currentOptions?.grid3D ? { grid3D: currentOptions.grid3D } : {}
-            const dataZoomOptions = currentOptions?.dataZoom ? { grid3D: currentOptions.dataZoom } : {}
+            const dataZoomOptions = currentOptions?.dataZoom ? { dataZoom: currentOptions.dataZoom } : {}
 
             // set option
             // @ts-expect-error: poorly typed
@@ -57,12 +57,12 @@ export default function EchartWrapper(props: InterfaceEchartWrapperProps) {
                 if (props.onPointClick) props.onPointClick(params)
             })
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            myChart.current.on('dataZoom', (params: unknown) => {
-                const options = myChart.current?.getOption()
-                if (options) {
-                    console.log('dataZoom', 'options?.dataZoom', options?.dataZoom)
-                } else console.log('dataZoom', { params })
-            })
+            // myChart.current.on('dataZoom', (params: unknown) => {
+            //     const options = myChart.current?.getOption()
+            //     if (options) {
+            //         console.log('dataZoom', 'options?.dataZoom', options?.dataZoom)
+            //     } else console.log('dataZoom', { params })
+            // })
         }
 
         return () => {

@@ -22,7 +22,7 @@ export const formatNumberWithDecimals = (numberAsString: string | number, decima
 }
 
 const unknownFormatMap = [
-    { limit: 2, format: '0,0.[000000000]' },
+    { limit: 2, format: '0,0.[0000000]' },
     { limit: 10, format: '0,0.[0000]' },
     { limit: 100, format: '0,0.[000]' },
     { limit: 1000, format: '0,0.[00]' },

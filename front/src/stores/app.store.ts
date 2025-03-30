@@ -72,9 +72,17 @@ export const useAppStore = create<{
             setYAxisLogBase: (yAxisLogBase) => set(() => ({ yAxisLogBase })),
             setAvailablePairs: (availablePairs) => set(() => ({ availablePairs })),
             selectPair: (selectedPair) => set(() => ({ selectedPair })),
-            selectSellToken: (sellToken) => set(() => ({ sellToken })),
+            selectSellToken: (sellToken) =>
+                set((state) => {
+                    console.log(`selectsellToken: ${sellToken?.symbol} (prev=${state.sellToken?.symbol})`)
+                    return { sellToken }
+                }),
             setSellTokenAmountInput: (sellTokenAmountInput) => set(() => ({ sellTokenAmountInput })),
-            selectBuyToken: (buyToken) => set(() => ({ buyToken })),
+            selectBuyToken: (buyToken) =>
+                set((state) => {
+                    console.log(`selectBuyToken: ${buyToken?.symbol} (prev=${state.buyToken?.symbol})`)
+                    return { buyToken }
+                }),
             setBuyTokenAmountInput: (buyTokenAmountInput) => set(() => ({ buyTokenAmountInput })),
             setAvailableTokens: (availableTokens) => set(() => ({ availableTokens })),
             saveLoadedOrderbook: (pair, orderbook) => set((state) => ({ loadedOrderbooks: { ...state.loadedOrderbooks, [pair]: orderbook } })),
@@ -98,20 +106,20 @@ export const useAppStore = create<{
                     state.selectOrderbookDataPoint(undefined) // reset
 
                     // pre select default tokens if need be
-                    if (!state.buyToken)
-                        state.selectBuyToken({
-                            address: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
-                            decimals: 18,
-                            symbol: 'WETH',
-                            gas: '29962',
-                        })
-                    if (!state.sellToken)
-                        state.selectSellToken({
-                            address: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
-                            decimals: 18,
-                            symbol: 'WETH',
-                            gas: '29962',
-                        })
+                    // if (!state.buyToken)
+                    //     state.selectBuyToken({
+                    //         address: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
+                    //         decimals: 6,
+                    //         symbol: 'USDC',
+                    //         gas: '40652',
+                    //     })
+                    // if (!state.sellToken)
+                    //     state.selectSellToken({
+                    //         address: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
+                    //         decimals: 18,
+                    //         symbol: 'WETH',
+                    //         gas: '29962',
+                    //     })
                 }
             },
         },
