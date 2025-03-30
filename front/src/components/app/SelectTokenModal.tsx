@@ -111,14 +111,20 @@ export default function SelectTokenModal() {
                         <>
                             <p className="p-4 text-base text-milk-400">Your tokens</p>
                             {tokensList
+                                .filter((token) => token.address !== (selectTokenModalFor === 'buy' ? sellToken?.address : buyToken?.address))
                                 .slice(0, 3)
                                 .filter((token) => token.symbol.toLowerCase().includes(selectTokenModalSearch.toLowerCase()))
                                 .map((token, tokenIndex) => (
                                     <button
                                         key={`${token}-${tokenIndex}`}
                                         onClick={async () => {
-                                            if (selectTokenModalFor === 'buy') selectBuyToken(token)
-                                            else selectSellToken(token)
+                                            if (selectTokenModalFor === 'buy') {
+                                                if (buyToken?.address === token.address) return
+                                                selectBuyToken(token)
+                                            } else {
+                                                if (sellToken?.address === token.address) return
+                                                selectSellToken(token)
+                                            }
                                             await sleep(200)
                                             setShowSelectTokenModal(false)
                                         }}
@@ -149,14 +155,20 @@ export default function SelectTokenModal() {
 
                     <p className="p-4 text-base text-milk-400">Popular tokens</p>
                     {tokensList
+                        .filter((token) => token.address !== (selectTokenModalFor === 'buy' ? sellToken?.address : buyToken?.address))
                         .slice(account.isConnected ? 3 : 0, 200)
                         .filter((token) => token.symbol.toLowerCase().includes(selectTokenModalSearch.toLowerCase()))
                         .map((token, tokenIndex) => (
                             <button
                                 key={`${token}-${tokenIndex}`}
                                 onClick={async () => {
-                                    if (selectTokenModalFor === 'buy') selectBuyToken(token)
-                                    else selectSellToken(token)
+                                    if (selectTokenModalFor === 'buy') {
+                                        if (buyToken?.address === token.address) return
+                                        selectBuyToken(token)
+                                    } else {
+                                        if (sellToken?.address === token.address) return
+                                        selectSellToken(token)
+                                    }
                                     await sleep(200)
                                     setShowSelectTokenModal(false)
                                 }}

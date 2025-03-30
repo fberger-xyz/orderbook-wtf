@@ -55,10 +55,10 @@ const getOptions = (
     yAxisLogBase: number,
     coloredAreas: OrderbookAreaColor,
 ): echarts.EChartsOption => {
-    const sortedBids = bids.sort((curr, next) => curr.value[0] - next.value[0])
-    const sortedAsks = asks.sort((curr, next) => curr.value[0] - next.value[0])
-    const startValue = Math.min(sortedBids[Math.max(0, bids.length - 6)].value[0], sortedAsks[0].value[0])
-    const endValue = Math.max(sortedAsks[Math.min(6, asks.length - 1)].value[0], sortedBids[0].value[0])
+    // const sortedBids = bids.sort((curr, next) => curr.value[0] - next.value[0])
+    // const sortedAsks = asks.sort((curr, next) => curr.value[0] - next.value[0])
+    // const startValue = Math.min(sortedBids[Math.max(0, bids.length - 6)].value[0], sortedAsks[0].value[0])
+    // const endValue = Math.max(sortedAsks[Math.min(6, asks.length - 1)].value[0], sortedBids[0].value[0])
     // console.log({ startValue, endValue })
     return {
         tooltip: {
@@ -182,8 +182,8 @@ const getOptions = (
                     moveHandleStyle: { color: AppColors.milk[400] }, // top bar
                 },
                 rangeMode: ['value', 'value'],
-                startValue,
-                endValue,
+                // startValue,
+                // endValue,
             },
             {
                 xAxisIndex: 0, // make this x axis zoomable
@@ -212,7 +212,8 @@ const getOptions = (
                     fontSize: 11,
                     show: true,
                     color: AppColors.milk[200],
-                    formatter: (value) => String(formatAmount(value)),
+                    // formatter: (value) => `${formatAmount(value)}`,
+                    formatter: (value) => `${formatAmount(value)} ${orderbook.base.symbol}`,
                 },
                 axisLine: {
                     show: false,
@@ -245,7 +246,8 @@ const getOptions = (
                     fontSize: 11,
                     show: true,
                     color: AppColors.milk[200],
-                    formatter: (value) => String(formatAmount(value)),
+                    // formatter: (value) => String(formatAmount(value)),
+                    formatter: (value) => `${formatAmount(value)} ${orderbook.quote.symbol}`,
                 },
                 axisLine: {
                     show: false,

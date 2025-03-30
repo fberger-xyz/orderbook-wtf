@@ -19,6 +19,7 @@ import { useApiStore } from '@/stores/api.store'
 import { APP_ROUTE } from '@/config/app.config'
 import toast from 'react-hot-toast'
 import { toastStyle } from '@/config/toasts.config'
+import LinkWrapper from '../common/LinkWrapper'
 
 const OrderbookKeyMetric = (props: { title: string; content: ReactNode }) => (
     <OrderbookComponentLayout title={<p className="text-milk-600 text-xs">{props.title}</p>} content={props.content} />
@@ -46,7 +47,7 @@ export default function Dashboard() {
         setShowSelectTokenModal,
         setSelectTokenModalFor,
         setSellTokenAmountInput,
-        setBuyTokenAmountInput,
+        // setBuyTokenAmountInput,
         setYAxisType,
     } = useAppStore()
     const { orderBookRefreshIntervalMs, setApiTokens, setApiOrderbook, setApiStoreRefreshedAt, getOrderbook } = useApiStore()
@@ -78,7 +79,7 @@ export default function Dashboard() {
                 enabled: true,
                 queryFn: async () => {
                     // fetch
-                    toast(`Refreshing tokens list...`, { style: toastStyle })
+                    // toast(`Refreshing tokens list...`, { style: toastStyle })
                     const [tokensResponse] = await Promise.all([
                         fetch(`${APP_ROUTE}/api/local/tokens`, { method: 'GET', headers: { 'Content-Type': 'application/json' } }),
                     ])
@@ -89,7 +90,7 @@ export default function Dashboard() {
                     // store
                     if (tokensResponseJson?.data) {
                         setApiTokens(tokensResponseJson.data)
-                        toast.success(`Tokens list loaded`, { style: toastStyle })
+                        // toast.success(`Tokens list loaded`, { style: toastStyle })
                     }
 
                     // finally
@@ -104,7 +105,7 @@ export default function Dashboard() {
                 queryFn: async () => {
                     if (!sellToken?.address || !buyToken?.address) return null
 
-                    toast(`Refreshing ${sellToken.symbol}-${buyToken.symbol} orderbook data...`, { style: toastStyle })
+                    // toast(`Refreshing ${sellToken.symbol}-${buyToken.symbol} orderbook data...`, { style: toastStyle })
                     const url = `${APP_ROUTE}/api/local/orderbook?token0=${sellToken.address}&token1=${buyToken.address}`
                     const [response] = await Promise.all([fetch(url, { method: 'GET', headers: { 'Content-Type': 'application/json' } })])
                     const [responseJson] = (await Promise.all([response.json()])) as [StructuredOutput<AmmAsOrderbook>]
@@ -112,7 +113,9 @@ export default function Dashboard() {
 
                     // handle errors
                     if (responseJson.error) {
-                        toast.error(`${responseJson.error}`, { style: toastStyle })
+                        if (responseJson.error.includes('pair has 0 associated components'))
+                            toast.error(`No pool for pair ${sellToken.symbol}-${buyToken.symbol} > select another pair`, { style: toastStyle })
+                        else toast.error(`${responseJson.error}`, { style: toastStyle })
                     }
 
                     // handle errors
@@ -216,8 +219,13 @@ export default function Dashboard() {
                 <div className="w-full grid grid-cols-2 md:grid-cols-3 gap-2">
                     {/* bid */}
                     {!metrics.showOrderbookPlaceholders && sellToken?.symbol && buyToken?.symbol && metrics.highestBid ? (
-                        <OrderbookKeyMetric
-                            title={`Best bid 1 ${sellToken.symbol}`}
+                        <OrderbookComponentLayout
+                            title={
+                                <div className="w-full flex items-start gap-1 group">
+                                    <p className="text-milk-600 text-xs">Best bid 1 ${sellToken.symbol}</p>
+                                    <IconWrapper icon={IconIds.INFORMATION} className="size-3.5 text-milk-200 group-hover:text-milk cursor-pointer" />
+                                </div>
+                            }
                             content={
                                 <div className="flex gap-1.5 items-center flex-wrap">
                                     <TokenImage size={20} token={buyToken} />
@@ -226,10 +234,15 @@ export default function Dashboard() {
                             }
                         />
                     ) : (
-                        <OrderbookKeyMetric
-                            title="Best bid"
+                        <OrderbookComponentLayout
+                            title={
+                                <div className="w-full flex items-start gap-1 group">
+                                    <p className="text-milk-600 text-xs">Best bid</p>
+                                    <IconWrapper icon={IconIds.INFORMATION} className="size-3.5 text-milk-200 group-hover:text-milk cursor-pointer" />
+                                </div>
+                            }
                             content={
-                                <div className="flex gap-1.5 items-center flex-wrap skeleton-loading p-2">
+                                <div className="flex gap-1.5 items-center flex-wrap skeleton-loading p-1">
                                     <span className="animate-pulse rounded-full bg-milk-150" style={{ width: 20, height: 20 }} />
                                 </div>
                             }
@@ -251,7 +264,7 @@ export default function Dashboard() {
                         <OrderbookKeyMetric
                             title="Mid-price"
                             content={
-                                <div className="flex gap-1.5 items-center flex-wrap skeleton-loading p-2">
+                                <div className="flex gap-1.5 items-center flex-wrap skeleton-loading p-1">
                                     <span className="animate-pulse rounded-full bg-milk-150" style={{ width: 20, height: 20 }} />
                                 </div>
                             }
@@ -274,7 +287,7 @@ export default function Dashboard() {
                         <OrderbookKeyMetric
                             title="Best ask"
                             content={
-                                <div className="flex gap-1.5 items-center flex-wrap skeleton-loading p-2">
+                                <div className="flex gap-1.5 items-center flex-wrap skeleton-loading p-1">
                                     <span className="animate-pulse rounded-full bg-milk-150" style={{ width: 20, height: 20 }} />
                                 </div>
                             }
@@ -295,7 +308,7 @@ export default function Dashboard() {
                                     {numeral(
                                         (1 / metrics.lowestAsk.average_sell_price - metrics.highestBid.average_sell_price) / metrics.midPrice,
                                     ).format('0,0.[0000]%')}{' '}
-                                    <span className="pl-2 text-milk-150">
+                                    <span className="pl-1 text-milk-150 text-xs">
                                         {numeral(
                                             (1 / metrics.lowestAsk.average_sell_price - metrics.highestBid.average_sell_price) / metrics.midPrice,
                                         )
@@ -311,7 +324,7 @@ export default function Dashboard() {
                             title="Spread"
                             content={
                                 <div className="flex gap-1.5 items-center flex-wrap skeleton-loading p-1">
-                                    <p className="text-milk-100 font-bold text-base">0.00%</p>
+                                    <p className="text-milk-100 font-bold text-sm">0.00%</p>
                                 </div>
                             }
                         />
@@ -326,14 +339,19 @@ export default function Dashboard() {
                                     <p className="text-milk-600 text-xs">3s</p>
                                 </div>
                             }
-                            content={<p className="text-milk font-bold text-base">{metrics.orderbook.block}</p>}
+                            content={
+                                <LinkWrapper href={`https://etherscan.io/block/${metrics.orderbook.block}`} className="flex gap-1 items-center group">
+                                    <p className="text-milk font-bold text-base">{numeral(metrics.orderbook.block).format('0,0')}</p>
+                                    <IconWrapper icon={IconIds.OPEN_LINK_IN_NEW_TAB} className="size-4 text-milk-200 group-hover:text-milk" />
+                                </LinkWrapper>
+                            }
                         />
                     ) : (
                         <OrderbookKeyMetric
                             title="Last block"
                             content={
                                 <div className="flex gap-1.5 items-center flex-wrap skeleton-loading p-1">
-                                    <p className="text-milk-100 font-bold text-base">123456789</p>
+                                    <p className="text-milk-100 font-bold text-sm">123456789</p>
                                 </div>
                             }
                         />
@@ -355,8 +373,8 @@ export default function Dashboard() {
                         <OrderbookKeyMetric
                             title="Total TVL"
                             content={
-                                <div className="flex gap-1.5 items-center flex-wrap skeleton-loading p-1 w-40">
-                                    <p className="text-milk-100 font-bold text-base">$ 100m</p>
+                                <div className="flex gap-1.5 items-center flex-wrap skeleton-loading p-1 w-full">
+                                    <p className="text-milk-100 font-bold text-sm">$ 100m</p>
                                 </div>
                             }
                         />
@@ -403,7 +421,7 @@ export default function Dashboard() {
                                     </div>
 
                                     <div className="flex flex-col w-full items-start gap-0.5">
-                                        <p className="text-milk-400 text-sm font-bold">Color Bids and Asks areas</p>
+                                        <p className="text-milk-400 text-sm font-bold">Colored areas</p>
                                         {[OrderbookAreaColor.YES, OrderbookAreaColor.NO].map((option, optionIndex) => (
                                             <div
                                                 key={`${option}-${optionIndex}`}
@@ -488,9 +506,9 @@ export default function Dashboard() {
                         <input
                             type="text"
                             className="text-xl font-bold text-right border-none outline-none ring-0 focus:ring-0 focus:outline-none focus:border-none bg-transparent w-40"
-                            value={numeral(sellTokenBalance ?? 0).format('0,0.[00000]')}
+                            value={numeral(sellTokenAmountInput).format('0,0.[00000]')}
                             onChange={(e) => {
-                                const parsedNumber = Number(numeral(e.target.value ?? 0).value())
+                                const parsedNumber = Number(numeral(e.target.value).value())
                                 if (isNaN(parsedNumber)) return
                                 setSellTokenAmountInput(parsedNumber)
                             }}
@@ -568,16 +586,19 @@ export default function Dashboard() {
                             )}
                             <IconWrapper icon={IconIds.TRIANGLE_DOWN} className="size-4" />
                         </button>
-                        <input
+                        <p className="text-xl font-bold text-right border-none outline-none ring-0 focus:ring-0 focus:outline-none focus:border-none bg-transparent w-40 cursor-not-allowed">
+                            {numeral(metrics?.highestBid?.output ?? 0).format('0,0.[00000]')}
+                        </p>
+                        {/* <input
                             type="text"
-                            className="text-xl font-bold text-right border-none outline-none ring-0 focus:ring-0 focus:outline-none focus:border-none bg-transparent w-40"
-                            value={numeral(metrics?.highestBid?.output ?? 0).format('0,0.[00000]')}
-                            onChange={(e) => {
-                                const parsedNumber = Number(numeral(e.target.value ?? 0).value())
-                                if (isNaN(parsedNumber)) return
-                                setBuyTokenAmountInput(parsedNumber)
-                            }}
-                        />
+                            className="text-xl font-bold text-right border-none outline-none ring-0 focus:ring-0 focus:outline-none focus:border-none bg-transparent w-40 cursor-not-allowed"
+                            value={numeral(metrics?.highestBid?.output ?? 0).format('0,0.[00000]')} // todo load trade here
+                            // onChange={(e) => {
+                            //     const parsedNumber = Number(numeral(e.target.value ?? 0).value())
+                            //     if (isNaN(parsedNumber)) return
+                            //     setBuyTokenAmountInput(parsedNumber)
+                            // }}
+                        /> */}
                     </div>
 
                     {metrics.highestBid && metrics.orderbook ? (

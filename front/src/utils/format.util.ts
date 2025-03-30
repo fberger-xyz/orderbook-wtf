@@ -53,6 +53,11 @@ export const formatAmount = (amount: number | string) => {
     }
 }
 
+export const roundToDecimals = (value: number, decimals: number): number => {
+    const factor = 10 ** decimals
+    return Math.round(value * factor) / factor
+}
+
 const usdFormatMap = [
     { limit: 2, format: '0,0.[0000]$' },
     { limit: 10, format: '0,0.[000]$' },
