@@ -34,7 +34,7 @@ export async function GET(req: NextRequest) {
         }
 
         // debug
-        console.log('-------')
+        // console.log('-------')
         // console.log({ url, body })
 
         // run req

@@ -1,5 +1,3 @@
-'use client'
-
 import { APP_METADATA, APP_ROUTE } from '@/config/app.config'
 import { getDefaultConfig } from 'connectkit'
 import { createConfig, http } from 'wagmi'
