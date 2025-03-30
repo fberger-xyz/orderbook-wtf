@@ -55,8 +55,10 @@ const getOptions = (
     yAxisLogBase: number,
     coloredAreas: OrderbookAreaColor,
 ): echarts.EChartsOption => {
-    const startValue = bids.sort((curr, next) => curr.value[0] - next.value[0])[Math.max(0, bids.length - 6)].value[0]
-    const endValue = asks.sort((curr, next) => curr.value[0] - next.value[0])[Math.min(6, asks.length - 1)].value[0]
+    const sortedBids = bids.sort((curr, next) => curr.value[0] - next.value[0])
+    const sortedAsks = asks.sort((curr, next) => curr.value[0] - next.value[0])
+    const startValue = Math.min(sortedBids[Math.max(0, bids.length - 6)].value[0], sortedAsks[0].value[0])
+    const endValue = Math.max(sortedAsks[Math.min(6, asks.length - 1)].value[0], sortedBids[0].value[0])
     // console.log({ startValue, endValue })
     return {
         tooltip: {
@@ -218,8 +220,8 @@ const getOptions = (
                 axisPointer: {
                     snap: true,
                 },
-                // min: 0,
-                min: 'dataMin',
+                min: 0,
+                // min: 'dataMin',
                 max: 'dataMax',
             },
             {
@@ -251,8 +253,8 @@ const getOptions = (
                 axisPointer: {
                     snap: true,
                 },
-                // min: 0,
-                min: 'dataMin',
+                min: 0,
+                // min: 'dataMin',
                 max: 'dataMax',
             },
         ],
