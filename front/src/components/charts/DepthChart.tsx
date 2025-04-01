@@ -97,7 +97,11 @@ const getOptions = (
                     const protocolName = orderbook.pools[percentIndex]?.protocol_system ?? 'Unknown'
                     const attributes = orderbook.pools[percentIndex]?.static_attributes ?? []
                     const hexaPercent = attributes.find((entry) => entry[0].toLowerCase() === 'fee')?.[1] ?? '0'
-                    return `- ${numeral(percent / 100).format('#4#0,0%')} in ${protocolName} ${numeral(parseInt(hexaPercent, 16)).divide(100).format('0,0.[0]')}bps`
+                    const usagePercent = numeral(percent / 100).format('0,0%')
+                    const isPoolUsed = usagePercent !== '0%'
+                    const poolBps = numeral(parseInt(hexaPercent, 16)).divide(100).format('0,0.[0]')
+                    return `<span style="color:${isPoolUsed ? AppColors.milk[600] : AppColors.milk[200]}">- ${usagePercent} in ${protocolName} ${poolBps}bps</span>`
+                    // return `<span>- ${numeral(percent / 100).format('0,0%')} in ${protocolName} ${numeral(parseInt(hexaPercent, 16)).divide(100).format('0,0.[0]')}bps</span>`
                 })
 
                 return [
