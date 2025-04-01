@@ -426,7 +426,7 @@ export default function Dashboard() {
                                     {/* option */}
                                     <div className="flex flex-col w-full items-start gap-0.5">
                                         <p className="text-milk-400 text-sm font-bold">Y Axis scale</p>
-                                        <div className="grid grid-cols-2 w-full">
+                                        <div className="grid grid-cols-2 w-full gap-1">
                                             {[OrderbookAxisScale.VALUE, OrderbookAxisScale.LOG].map((type, typeIndex) => (
                                                 <div
                                                     key={`${type}-${typeIndex}`}
@@ -447,7 +447,7 @@ export default function Dashboard() {
                                     {/* option */}
                                     <div className="flex flex-col w-full items-start gap-0.5">
                                         <p className="text-milk-400 text-sm font-bold">Colored areas</p>
-                                        <div className="grid grid-cols-2 w-full">
+                                        <div className="grid grid-cols-2 w-full gap-1">
                                             {[OrderbookOption.YES, OrderbookOption.NO].map((option, optionIndex) => (
                                                 <div
                                                     key={`${option}-${optionIndex}`}
@@ -470,7 +470,7 @@ export default function Dashboard() {
                                     {/* titles */}
                                     <div className="flex flex-col w-full items-start gap-0.5">
                                         <p className="text-milk-400 text-sm font-bold">Symbols in Y axis labels</p>
-                                        <div className="grid grid-cols-2 w-full">
+                                        <div className="grid grid-cols-2 w-full gap-1">
                                             {[OrderbookOption.YES, OrderbookOption.NO].map((option, optionIndex) => (
                                                 <div
                                                     key={`${option}-${optionIndex}`}
