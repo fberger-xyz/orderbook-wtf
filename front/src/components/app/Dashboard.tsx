@@ -1,6 +1,6 @@
 'use client'
 
-import { IconIds, OrderbookOption, OrderbookAxisScale, SvgIds } from '@/enums'
+import { IconIds, OrderbookOption, OrderbookAxisScale, OrderbookSide, SvgIds } from '@/enums'
 import numeral from 'numeral'
 import { useAppStore } from '@/stores/app.store'
 import { ReactNode, useEffect, useRef, useState } from 'react'
@@ -32,30 +32,96 @@ const OrderbookComponentLayout = (props: { title: ReactNode; content: ReactNode 
     </div>
 )
 
+const mapProtocolNameToSvgId = (protocolName: string): SvgIds => {
+    let svgId = SvgIds.BALANCERV2
+    if (protocolName.includes('balancer')) svgId = SvgIds.BALANCERV2
+    if (protocolName.includes('sushi')) svgId = SvgIds.SUSHISWAPV2
+    if (protocolName.includes('pancake')) svgId = SvgIds.PANCAKESWAPV2
+    if (protocolName.includes('uniswap')) svgId = SvgIds.UNISWAPV2
+    return svgId
+}
+
+const mapProtocolIdToProtocolConfig = (protocolId: string): { id: string; name: string; svgId: SvgIds } => {
+    const config: { id: string; name: string; svgId: SvgIds } = { id: protocolId, name: '', svgId: mapProtocolNameToSvgId(protocolId) }
+    if (protocolId.includes('balancer')) config.name = 'Balance V2'
+    if (protocolId.includes('sushi')) config.name = 'Sushiswap V2'
+    if (protocolId.includes('pancake')) config.name = 'PancakeSwap V2'
+    if (protocolId.includes('uniswap')) {
+        if (protocolId.includes('2')) config.name = 'Uniswap V2'
+        if (protocolId.includes('3')) config.name = 'Uniswap V3'
+        if (protocolId.includes('4')) config.name = 'Uniswap V4'
+    }
+    return config
+}
+
 export default function Dashboard() {
     const account = useAccount()
     const { setOpen } = useModal()
     const {
-        sellToken,
-        sellTokenAmountInput,
-        buyToken,
-        // buyTokenAmountInput,
+        /**
+         * store
+         */
 
-        // options
+        // hasHydrated,
+        // setHasHydrated,
+
+        /**
+         * ui
+         */
+
+        // showMobileMenu,
+        // setShowMobileMenu,
+        // storeRefreshedAt,
+        // setStoreRefreshedAt,
+        // refetchInterval,
+
+        /**
+         * orderbook
+         */
+
+        // data
+        // loadedOrderbooks,
+        // saveLoadedOrderbook,
+
+        // chart
         yAxisType,
         yAxisLogBase,
         setYAxisType,
+        // setYAxisLogBase,
         coloredAreas,
         setColoredAreas,
         symbolsInYAxis,
         setSymbolsInYAxis,
 
-        // -
-        switchSelectedTokens,
-        setShowSelectTokenModal,
-        setSelectTokenModalFor,
+        /**
+         * swap
+         */
+
+        // inputs
+        sellToken,
+        // selectSellToken,
+        sellTokenAmountInput,
         setSellTokenAmountInput,
+        buyToken,
+        // selectBuyToken,
+        // buyTokenAmountInput,
         // setBuyTokenAmountInput,
+        switchSelectedTokens,
+
+        // trade
+        selectedTrade,
+        // selectOrderbookDataPoint,
+
+        /**
+         * modal
+         */
+
+        // showSelectTokenModal,
+        setShowSelectTokenModal,
+        // selectTokenModalFor,
+        setSelectTokenModalFor,
+        // selectTokenModalSearch,
+        // setSelectTokenModalSearch,
     } = useAppStore()
     const { orderBookRefreshIntervalMs, setApiTokens, setApiOrderbook, setApiStoreRefreshedAt, getOrderbook } = useApiStore()
     const [openChartOptions, showChartOptions] = useState(false)
@@ -141,7 +207,12 @@ export default function Dashboard() {
                                 (max, t) => (t.average_sell_price > max.average_sell_price ? t : max),
                                 responseJson.data.bids[0],
                             )
-                            if (highestBid) setSellTokenAmountInput(highestBid.amount)
+
+                            // if (selectedTrade?.data) {
+                            //     setSellTokenAmountInput(selectedTrade.data.value[1])
+                            if (highestBid) {
+                                setSellTokenAmountInput(highestBid.amount)
+                            }
                         }
                     }
 
@@ -165,8 +236,9 @@ export default function Dashboard() {
               showOrderbookPlaceholders: boolean
               orderbook?: AmmAsOrderbook
               highestBid?: AmmTrade
-              lowestAsk?: AmmTrade
               midPrice: number
+              lowestAsk?: AmmTrade
+              spreadPercent: number
               totalBaseAmountInPools: number
               totalQuoteAmountInPools: number
               totalBaseTvlUsd: number
@@ -176,8 +248,9 @@ export default function Dashboard() {
               showOrderbookPlaceholders: boolean
               orderbook: AmmAsOrderbook
               highestBid: AmmTrade
-              lowestAsk: AmmTrade
               midPrice: number
+              lowestAsk: AmmTrade
+              spreadPercent: number
               totalBaseAmountInPools: number
               totalQuoteAmountInPools: number
               totalBaseTvlUsd: number
@@ -185,8 +258,9 @@ export default function Dashboard() {
           } = {
         showOrderbookPlaceholders: true,
         highestBid: undefined,
-        lowestAsk: undefined,
         midPrice: -1,
+        lowestAsk: undefined,
+        spreadPercent: -1,
         totalBaseAmountInPools: -1,
         totalQuoteAmountInPools: -1,
         totalBaseTvlUsd: -1,
@@ -208,7 +282,8 @@ export default function Dashboard() {
                 (min, t) => (t.average_sell_price > min.average_sell_price ? t : min),
                 metrics.orderbook.asks[0],
             )
-            metrics.midPrice = (metrics.highestBid.average_sell_price + 1 / metrics.lowestAsk.average_sell_price) / 2
+            metrics.midPrice = (metrics.highestBid.average_sell_price + 1 / metrics?.lowestAsk.average_sell_price) / 2
+            metrics.spreadPercent = (1 / metrics.lowestAsk.average_sell_price - metrics.highestBid.average_sell_price) / metrics.midPrice
             metrics.totalBaseAmountInPools = metrics.orderbook.base_lqdty.reduce((total, baseAmountInPool) => (total += baseAmountInPool), 0)
             metrics.totalQuoteAmountInPools = metrics.orderbook.quote_lqdty.reduce((total, quoteAmountInPool) => (total += quoteAmountInPool), 0)
             metrics.totalBaseTvlUsd = metrics.totalBaseAmountInPools * metrics.orderbook.base_worth_eth * metrics.orderbook.eth_usd
@@ -226,100 +301,60 @@ export default function Dashboard() {
                 {/* metrics */}
                 <div className="w-full grid grid-cols-2 md:grid-cols-3 gap-2">
                     {/* bid */}
-                    {!metrics.showOrderbookPlaceholders && sellToken?.symbol && buyToken?.symbol && metrics.highestBid ? (
-                        <OrderbookComponentLayout
-                            title={
-                                <div className="w-full flex items-start gap-1 group">
-                                    <p className="text-milk-600 text-xs">Best bid</p>
-                                    <IconWrapper icon={IconIds.INFORMATION} className="size-3.5 text-milk-200 group-hover:text-milk cursor-pointer" />
-                                </div>
-                            }
-                            content={
-                                <div className="flex gap-1.5 items-center flex-wrap">
-                                    <TokenImage size={20} token={buyToken} />
+                    <OrderbookComponentLayout
+                        title={
+                            <div className="w-full flex items-start gap-1 group">
+                                <p className="text-milk-600 text-xs">Best bid</p>
+                                <IconWrapper icon={IconIds.INFORMATION} className="size-3.5 text-milk-200 group-hover:text-milk cursor-pointer" />
+                            </div>
+                        }
+                        content={
+                            <div
+                                className={cn('flex gap-1.5 items-center flex-wrap', {
+                                    'skeleton-loading p-1': metrics.showOrderbookPlaceholders,
+                                })}
+                            >
+                                <TokenImage size={20} token={buyToken} />
+                                {metrics.highestBid?.average_sell_price && (
                                     <p className="text-milk font-bold text-base">{formatAmount(metrics.highestBid.average_sell_price)}</p>
-                                </div>
-                            }
-                        />
-                    ) : (
-                        <OrderbookComponentLayout
-                            title={
-                                <div className="w-full flex items-start gap-1 group">
-                                    <p className="text-milk-600 text-xs">Best bid</p>
-                                    <IconWrapper icon={IconIds.INFORMATION} className="size-3.5 text-milk-200 group-hover:text-milk cursor-pointer" />
-                                </div>
-                            }
-                            content={
-                                <div className="flex gap-1.5 items-center flex-wrap skeleton-loading p-1">
-                                    <span className="animate-pulse rounded-full bg-milk-150" style={{ width: 20, height: 20 }} />
-                                </div>
-                            }
-                        />
-                    )}
+                                )}
+                            </div>
+                        }
+                    />
 
                     {/* mid price */}
-                    {!metrics.showOrderbookPlaceholders && sellToken?.symbol && buyToken?.symbol && metrics.midPrice ? (
-                        <OrderbookComponentLayout
-                            title={
-                                <div className="w-full flex items-start gap-1 group">
-                                    <p className="text-milk-600 text-xs">Mid-price</p>
-                                    <IconWrapper icon={IconIds.INFORMATION} className="size-3.5 text-milk-200 group-hover:text-milk cursor-pointer" />
-                                </div>
-                            }
-                            content={
-                                <div className="flex gap-1.5 items-center flex-wrap">
-                                    <TokenImage size={20} token={buyToken} />
-                                    <p className="text-milk font-bold text-base">{formatAmount(metrics.midPrice)}</p>
-                                </div>
-                            }
-                        />
-                    ) : (
-                        <OrderbookComponentLayout
-                            title={
-                                <div className="w-full flex items-start gap-1 group">
-                                    <p className="text-milk-600 text-xs">Mid-price</p>
-                                    <IconWrapper icon={IconIds.INFORMATION} className="size-3.5 text-milk-200 group-hover:text-milk cursor-pointer" />
-                                </div>
-                            }
-                            content={
-                                <div className="flex gap-1.5 items-center flex-wrap skeleton-loading p-1">
-                                    <span className="animate-pulse rounded-full bg-milk-150" style={{ width: 20, height: 20 }} />
-                                </div>
-                            }
-                        />
-                    )}
+                    <OrderbookComponentLayout
+                        title={
+                            <div className="w-full flex items-start gap-1 group">
+                                <p className="text-milk-600 text-xs">Mid-price</p>
+                                <IconWrapper icon={IconIds.INFORMATION} className="size-3.5 text-milk-200 group-hover:text-milk cursor-pointer" />
+                            </div>
+                        }
+                        content={
+                            <div className={cn('flex gap-1.5 items-center flex-wrap', { 'skeleton-loading p-1': metrics.showOrderbookPlaceholders })}>
+                                <TokenImage size={20} token={buyToken} />
+                                {metrics.midPrice > 0 && <p className="text-milk font-bold text-base">{formatAmount(metrics.midPrice)}</p>}
+                            </div>
+                        }
+                    />
 
                     {/* ask */}
-                    {!metrics.showOrderbookPlaceholders && sellToken?.symbol && buyToken?.symbol && metrics.lowestAsk ? (
-                        <OrderbookComponentLayout
-                            title={
-                                <div className="w-full flex items-start gap-1 group">
-                                    <p className="text-milk-600 text-xs">Best ask</p>
-                                    <IconWrapper icon={IconIds.INFORMATION} className="size-3.5 text-milk-200 group-hover:text-milk cursor-pointer" />
-                                </div>
-                            }
-                            content={
-                                <div className="flex gap-1.5 items-center flex-wrap">
-                                    <TokenImage size={20} token={buyToken} />
+                    <OrderbookComponentLayout
+                        title={
+                            <div className="w-full flex items-start gap-1 group">
+                                <p className="text-milk-600 text-xs">Best ask</p>
+                                <IconWrapper icon={IconIds.INFORMATION} className="size-3.5 text-milk-200 group-hover:text-milk cursor-pointer" />
+                            </div>
+                        }
+                        content={
+                            <div className={cn('flex gap-1.5 items-center flex-wrap', { 'skeleton-loading p-1': metrics.showOrderbookPlaceholders })}>
+                                <TokenImage size={20} token={buyToken} />
+                                {metrics?.lowestAsk?.average_sell_price && (
                                     <p className="text-milk font-bold text-base">{formatAmount(1 / metrics.lowestAsk.average_sell_price)}</p>
-                                </div>
-                            }
-                        />
-                    ) : (
-                        <OrderbookComponentLayout
-                            title={
-                                <div className="w-full flex items-start gap-1 group">
-                                    <p className="text-milk-600 text-xs">Best ask</p>
-                                    <IconWrapper icon={IconIds.INFORMATION} className="size-3.5 text-milk-200 group-hover:text-milk cursor-pointer" />
-                                </div>
-                            }
-                            content={
-                                <div className="flex gap-1.5 items-center flex-wrap skeleton-loading p-1">
-                                    <span className="animate-pulse rounded-full bg-milk-150" style={{ width: 20, height: 20 }} />
-                                </div>
-                            }
-                        />
-                    )}
+                                )}
+                            </div>
+                        }
+                    />
 
                     {/* spread */}
                     {!metrics.showOrderbookPlaceholders &&
@@ -332,16 +367,9 @@ export default function Dashboard() {
                             title="Spread"
                             content={
                                 <p className="text-milk font-bold text-base">
-                                    {numeral(
-                                        (1 / metrics.lowestAsk.average_sell_price - metrics.highestBid.average_sell_price) / metrics.midPrice,
-                                    ).format('0,0.[0000]%')}{' '}
+                                    {numeral(metrics.spreadPercent).format('0,0.[0000]%')}{' '}
                                     <span className="pl-1 text-milk-400 text-xs">
-                                        {numeral(
-                                            (1 / metrics.lowestAsk.average_sell_price - metrics.highestBid.average_sell_price) / metrics.midPrice,
-                                        )
-                                            .multiply(10000)
-                                            .format('0,0.[00]')}{' '}
-                                        bps
+                                        {numeral(metrics.spreadPercent).multiply(10000).format('0,0.[00]')} bps
                                     </span>
                                 </p>
                             }
@@ -351,7 +379,7 @@ export default function Dashboard() {
                             title="Spread"
                             content={
                                 <div className="flex gap-1.5 items-center flex-wrap skeleton-loading p-1">
-                                    <p className="text-milk-100 font-bold text-sm">0.00%</p>
+                                    <p className="text-milk-100 font-bold text-sm">-.--%</p>
                                 </div>
                             }
                         />
@@ -405,7 +433,7 @@ export default function Dashboard() {
                             title="Total TVL"
                             content={
                                 <div className="flex gap-1.5 items-center flex-wrap skeleton-loading p-1 w-full">
-                                    <p className="text-milk-100 font-bold text-sm">$ 100m</p>
+                                    <p className="text-milk-100 font-bold text-sm">$ --- m</p>
                                 </div>
                             }
                         />
@@ -427,7 +455,7 @@ export default function Dashboard() {
                                 <div
                                     ref={chartOptionsDropdown}
                                     className={cn(
-                                        `z-20 absolute mt-2 w-52 rounded-2xl backdrop-blur-lg border border-milk-150 shadow-lg p-2.5 transition-all origin-top-left flex flex-col gap-5`,
+                                        `z-20 absolute mt-2 w-52 rounded-2xl backdrop-blur-lg border border-milk-150 shadow-lg p-3 transition-all origin-top-left flex flex-col gap-5`,
                                         {
                                             'scale-100 opacity-100': openChartOptions,
                                             'scale-95 opacity-0 pointer-events-none': !openChartOptions,
@@ -436,7 +464,7 @@ export default function Dashboard() {
                                 >
                                     {/* option */}
                                     <div className="flex flex-col w-full items-start gap-0.5">
-                                        <p className="text-milk-400 text-sm font-bold">Y Axis scale</p>
+                                        <p className="text-milk-600 text-sm font-bold">Y Axis scale</p>
                                         <div className="grid grid-cols-2 w-full gap-1">
                                             {[OrderbookAxisScale.VALUE, OrderbookAxisScale.LOG].map((type, typeIndex) => (
                                                 <div
@@ -457,7 +485,7 @@ export default function Dashboard() {
 
                                     {/* option */}
                                     <div className="flex flex-col w-full items-start gap-0.5">
-                                        <p className="text-milk-400 text-sm font-bold">Colored areas</p>
+                                        <p className="text-milk-600 text-sm font-bold">Colored areas</p>
                                         <div className="grid grid-cols-2 w-full gap-1">
                                             {[OrderbookOption.YES, OrderbookOption.NO].map((option, optionIndex) => (
                                                 <div
@@ -480,7 +508,7 @@ export default function Dashboard() {
 
                                     {/* titles */}
                                     <div className="flex flex-col w-full items-start gap-0.5">
-                                        <p className="text-milk-400 text-sm font-bold">Symbols in Y axis labels</p>
+                                        <p className="text-milk-600 text-sm font-bold">Symbols in Y axis labels</p>
                                         <div className="grid grid-cols-2 w-full gap-1">
                                             {[OrderbookOption.YES, OrderbookOption.NO].map((option, optionIndex) => (
                                                 <div
@@ -509,15 +537,149 @@ export default function Dashboard() {
 
                 {/* routes */}
                 <OrderbookComponentLayout
-                    title={<p className="text-milk text-base font-bold">Routing</p>}
+                    title={<p className="text-milk text-base font-bold mb-2">Routing</p>}
                     content={
-                        <div className="flex gap-2">
-                            {Object.values(SvgIds).map((id) => (
-                                <div key={id} className="flex justify-center rounded-full p-1 border border-milk-200">
-                                    <SvgMapper icon={id} className="size-5" />
+                        selectedTrade?.data ? (
+                            <div className="flex gap-4 w-full p-1">
+                                {/* from */}
+                                <div className="max-w-24 flex items-center border-r border-dashed border-milk-150 pr-4 my-1">
+                                    <TokenImage size={40} token={selectedTrade.data.customData.side === OrderbookSide.BID ? sellToken : buyToken} />
                                 </div>
-                            ))}
-                        </div>
+
+                                {/* token % */}
+                                {metrics.orderbook ? (
+                                    <>
+                                        <div className="flex items-center">
+                                            <p className="font-bold text-milk-400 text-sm">100%</p>
+                                            <IconWrapper
+                                                icon={IconIds.CHEVRON_RIGHT}
+                                                className={cn('size-4 text-milk-400', {
+                                                    // 'text-aquamarine': selectedTrade.data.customData.side === OrderbookSide.BID,
+                                                    // 'text-folly': selectedTrade.data.customData.side === OrderbookSide.ASK,
+                                                })}
+                                            />
+                                        </div>
+
+                                        {/* details */}
+                                        <div className="flex-grow flex flex-col gap-2">
+                                            {/* tokn */}
+                                            <div className="flex gap-2 items-start">
+                                                <TokenImage
+                                                    size={22}
+                                                    token={selectedTrade.data.customData.side === OrderbookSide.BID ? buyToken : sellToken}
+                                                />
+                                                <p className="font-semibold text-milk tracking-wide">
+                                                    {(selectedTrade.data.customData.side === OrderbookSide.BID ? buyToken : sellToken)?.symbol}
+                                                </p>
+                                            </div>
+
+                                            {/* distribution */}
+                                            <div className="flex w-full justify-center items-center rounded-xl gap-1 border border-milk-150 flex-col px-3 py-2">
+                                                {/* headers */}
+                                                <div className="grid grid-cols-9 w-full rounded-xl py-1 px-4 gap-6 items-center text-xs text-milk-200 font-bold">
+                                                    {/* <p className="col-span-1 text-xs">#</p> */}
+                                                    <p className="col-span-1 font-bold w-14">%</p>
+                                                    <p className="col-span-4">Pool</p>
+                                                    <p className="col-span-2">Input</p>
+                                                    <p className="col-span-2">Output</p>
+                                                </div>
+                                                {selectedTrade.data.customData.distribution
+                                                    .sort((curr, next) => next - curr)
+                                                    .map((percent, percentIndex) => {
+                                                        const pool = metrics.orderbook?.pools[percentIndex]
+                                                        const protocolName = pool?.protocol_system ?? 'Unknown'
+                                                        const attributes = pool?.static_attributes ?? []
+                                                        const hexaPercent = attributes.find((entry) => entry[0].toLowerCase() === 'fee')?.[1] ?? '0'
+                                                        // const usagePercent = numeral(percent / 100).format('0,0%')
+                                                        // const isPoolUsed = usagePercent !== '0%'
+                                                        const poolBps = numeral(parseInt(hexaPercent, 16)).divide(100).format('0,0.[0]')
+                                                        const config = mapProtocolIdToProtocolConfig(protocolName)
+                                                        return (
+                                                            <div
+                                                                key={`${percent}-${percentIndex}`}
+                                                                className="grid grid-cols-9 w-full bg-gray-600/10 hover:bg-gray-600/20 rounded-xl py-1.5 px-4 gap-6 items-center text-sm"
+                                                            >
+                                                                <p className="col-span-1 text-milk-600 w-14">{numeral(percent).format('0,0.[0]')}%</p>
+                                                                <LinkWrapper
+                                                                    target="_blank"
+                                                                    href={`https://etherscan.io/contract/${pool?.address}`}
+                                                                    className="col-span-4 flex gap-2 items-center group"
+                                                                >
+                                                                    <div className="flex justify-center rounded-full p-1 border border-milk-200 bg-milk-200/10">
+                                                                        <SvgMapper icon={config.svgId} className="size-3.5" />
+                                                                    </div>
+                                                                    <p className="text-milk-600">
+                                                                        {config.name} - {poolBps} bps - {pool?.address.slice(0, 5)}
+                                                                    </p>
+                                                                    <IconWrapper
+                                                                        icon={IconIds.OPEN_LINK_IN_NEW_TAB}
+                                                                        className="size-4 text-milk-200 group-hover:text-milk"
+                                                                    />
+                                                                </LinkWrapper>
+                                                                <div className="col-span-2 flex gap-1 items-center">
+                                                                    {/* <TokenImage
+                                                                    size={14}
+                                                                    token={
+                                                                        selectedTrade.data.customData.side === OrderbookSide.BID
+                                                                            ? sellToken
+                                                                            : buyToken
+                                                                    }
+                                                                /> */}
+                                                                    <p className="text-milk-600 text-right text-xs">
+                                                                        {numeral(selectedTrade.data.value[1]).multiply(percent).format('0,0a')}{' '}
+                                                                    </p>
+                                                                    <p className="text-xs text-milk-400">
+                                                                        {
+                                                                            (selectedTrade.data.customData.side === OrderbookSide.BID
+                                                                                ? sellToken
+                                                                                : buyToken
+                                                                            )?.symbol
+                                                                        }
+                                                                    </p>
+                                                                </div>
+                                                                <div className="col-span-2 flex gap-1 items-center">
+                                                                    <p className="text-milk-600 text-right text-xs">
+                                                                        {numeral(selectedTrade.data.value[1])
+                                                                            .multiply(percent)
+                                                                            .multiply(selectedTrade.data.value[0])
+                                                                            .format('0,0a')}{' '}
+                                                                    </p>
+                                                                    {/* <TokenImage
+                                                                    size={14}
+                                                                    token={
+                                                                        selectedTrade.data.customData.side === OrderbookSide.BID
+                                                                            ? buyToken
+                                                                            : sellToken
+                                                                    }
+                                                                /> */}
+                                                                    <p className="text-xs text-milk-400">
+                                                                        {
+                                                                            (selectedTrade.data.customData.side === OrderbookSide.BID
+                                                                                ? buyToken
+                                                                                : sellToken
+                                                                            )?.symbol
+                                                                        }
+                                                                    </p>
+                                                                </div>
+                                                                {/* <p className="col-span-2 text-milk-600">{numeral(poolBps).format('0,0.0')}</p> */}
+                                                            </div>
+                                                        )
+                                                    })}
+                                            </div>
+                                        </div>
+                                    </>
+                                ) : (
+                                    <div className="skeleton-loading w-full h-16" />
+                                )}
+
+                                {/* to */}
+                                <div className="max-w-24 flex items-center border-l border-dashed border-milk-150 pl-4 my-1">
+                                    <TokenImage size={40} token={selectedTrade.data.customData.side === OrderbookSide.BID ? buyToken : sellToken} />
+                                </div>
+                            </div>
+                        ) : (
+                            <div className="skeleton-loading w-full h-16" />
+                        )
                     }
                 />
             </div>
@@ -620,12 +782,13 @@ export default function Dashboard() {
                     <div className="size-[44px] rounded-xl bg-background p-1">
                         <button
                             onClick={() => {
-                                if (!metrics.showOrderbookPlaceholders) switchSelectedTokens()
+                                // if (!metrics.showOrderbookPlaceholders) switchSelectedTokens()
+                                switchSelectedTokens()
                                 // do nothing
                             }}
-                            className={cn('size-full rounded-lg bg-milk-600/5 flex items-center justify-center', {
-                                'cursor-not-allowed': metrics.showOrderbookPlaceholders,
-                                group: !metrics.showOrderbookPlaceholders,
+                            className={cn('size-full rounded-lg bg-milk-600/5 flex items-center justify-center group', {
+                                // 'cursor-not-allowed': metrics.showOrderbookPlaceholders,
+                                // group: !metrics.showOrderbookPlaceholders,
                             })}
                         >
                             <IconWrapper icon={IconIds.ARROW_DOWN} className="size-5 transition-transform duration-300 group-hover:rotate-180" />
@@ -657,7 +820,15 @@ export default function Dashboard() {
                             <IconWrapper icon={IconIds.TRIANGLE_DOWN} className="size-4" />
                         </button>
                         <p className="text-xl font-bold text-right border-none outline-none ring-0 focus:ring-0 focus:outline-none focus:border-none bg-transparent w-40 cursor-not-allowed">
-                            {numeral(metrics?.highestBid?.output ?? 0).format('0,0.[00000]')}
+                            {selectedTrade?.data.value[0]
+                                ? numeral(selectedTrade?.data.value[1])
+                                      .multiply(
+                                          selectedTrade.data.customData.side === OrderbookSide.ASK
+                                              ? 1 / selectedTrade.data.value[0]
+                                              : selectedTrade.data.value[0],
+                                      )
+                                      .format('0,0.[00000]')
+                                : '-'}
                         </p>
                         {/* <input
                             type="text"

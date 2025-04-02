@@ -1,8 +1,7 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 import { APP_METADATA, IS_DEV } from '@/config/app.config'
-import { OrderbookDataPoint } from '@/types'
-import { AmmAsOrderbook, AmmPool, Token } from '@/interfaces'
+import { AmmAsOrderbook, AmmPool, EchartOnClickParamsData, Token } from '@/interfaces'
 import { hardcodedTokensList } from '@/data/back-tokens'
 import { OrderbookOption, OrderbookAxisScale } from '@/enums'
 
@@ -58,8 +57,8 @@ export const useAppStore = create<{
     switchSelectedTokens: () => void
 
     // trade
-    selectedTrade?: { datapoint: OrderbookDataPoint; bidsPools: AmmPool[]; asksPools: AmmPool[] }
-    selectOrderbookDataPoint: (selectedTrade?: { datapoint: OrderbookDataPoint; bidsPools: AmmPool[]; asksPools: AmmPool[] }) => void
+    selectedTrade?: { data: EchartOnClickParamsData; bidsPools: AmmPool[]; asksPools: AmmPool[] }
+    selectOrderbookDataPoint: (selectedTrade?: { data: EchartOnClickParamsData; bidsPools: AmmPool[]; asksPools: AmmPool[] }) => void
 
     /**
      * modal

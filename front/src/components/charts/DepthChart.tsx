@@ -10,9 +10,8 @@ import { useAppStore } from '@/stores/app.store'
 import { APP_FONT } from '@/config/app.config'
 import { ErrorBoundaryFallback } from '../common/ErrorBoundaryFallback'
 import { AppColors, formatAmount } from '@/utils'
-import { AmmAsOrderbook } from '@/interfaces'
+import { AmmAsOrderbook, AmmPool, EchartOnClickParamsData } from '@/interfaces'
 import numeral from 'numeral'
-import { OrderbookDataPoint } from '@/types'
 import toast from 'react-hot-toast'
 import { toastStyle } from '@/config/toasts.config'
 import { useApiStore } from '@/stores/api.store'
@@ -55,12 +54,18 @@ const getOptions = (
     yAxisLogBase: number,
     coloredAreas: OrderbookOption,
     symbolsInYAxis: OrderbookOption,
+    selectedTrade?: {
+        data: EchartOnClickParamsData
+        bidsPools: AmmPool[]
+        asksPools: AmmPool[]
+    },
 ): echarts.EChartsOption => {
     // const sortedBids = bids.sort((curr, next) => curr.value[0] - next.value[0])
     // const sortedAsks = asks.sort((curr, next) => curr.value[0] - next.value[0])
     // const startValue = Math.min(sortedBids[Math.max(0, bids.length - 6)].value[0], sortedAsks[0].value[0])
     // const endValue = Math.max(sortedAsks[Math.min(6, asks.length - 1)].value[0], sortedBids[0].value[0])
     // console.log({ startValue, endValue })
+    console.log({ selectedTrade })
     return {
         tooltip: {
             trigger: 'axis',
@@ -337,6 +342,31 @@ const getOptions = (
                                   ],
                               },
                           },
+                markLine: selectedTrade
+                    ? {
+                          symbol: ['circle', 'none'],
+                          animation: false,
+                          data: [
+                              {
+                                  symbolSize: 6,
+                                  lineStyle: {
+                                      color: AppColors.aquamarine,
+                                      opacity: 1,
+                                  },
+                                  name: 'bid todo',
+                                  xAxis: selectedTrade.data.value[0],
+                                  label: {
+                                      color: AppColors.aquamarine,
+                                      show: true,
+                                      position: 'insideMiddleTop',
+                                      rotate: 90,
+                                      fontSize: 11,
+                                      opacity: 0.8,
+                                  },
+                              },
+                          ],
+                      }
+                    : undefined,
             },
             {
                 yAxisIndex: 1,
@@ -372,13 +402,41 @@ const getOptions = (
                                   ],
                               },
                           },
+                markLine: selectedTrade
+                    ? {
+                          symbol: ['circle', 'none'],
+                          symbolSize: 6,
+                          lineStyle: {
+                              color: AppColors.folly,
+                              opacity: 1,
+                          },
+                          data: [
+                              {
+                                  name: 'ask todo',
+                                  xAxis: 1 / selectedTrade.data.value[0],
+                              },
+                          ],
+                      }
+                    : undefined,
             },
         ],
     }
 }
 
 export default function DepthChart() {
-    const { buyToken, sellToken, storeRefreshedAt, yAxisType, yAxisLogBase, coloredAreas, symbolsInYAxis, selectOrderbookDataPoint } = useAppStore()
+    const {
+        buyToken,
+        sellToken,
+        storeRefreshedAt,
+        yAxisType,
+        yAxisLogBase,
+        coloredAreas,
+        symbolsInYAxis,
+        selectedTrade,
+        selectOrderbookDataPoint,
+        setSellTokenAmountInput,
+        // setBuyTokenAmountInput,
+    } = useAppStore()
     const { apiStoreRefreshedAt, getOrderbook } = useApiStore()
     const [options, setOptions] = useState<null | echarts.EChartsOption>(null)
 
@@ -461,7 +519,7 @@ export default function DepthChart() {
             // console.log('asks.length', asks.length, 'lowestAsk', 1 / lowestAsk.average_sell_price)
 
             // options
-            const newOptions = getOptions(orderbook, bids, asks, yAxisType, yAxisLogBase, coloredAreas, symbolsInYAxis)
+            const newOptions = getOptions(orderbook, bids, asks, yAxisType, yAxisLogBase, coloredAreas, symbolsInYAxis, selectedTrade)
 
             // update
             setOptions(newOptions)
@@ -470,13 +528,23 @@ export default function DepthChart() {
         }
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [sellToken?.address, buyToken?.address, apiStoreRefreshedAt, yAxisType, yAxisLogBase, coloredAreas, symbolsInYAxis])
+    }, [sellToken?.address, buyToken?.address, apiStoreRefreshedAt, yAxisType, yAxisLogBase, coloredAreas, symbolsInYAxis, selectedTrade])
 
     // methods
-    const handlePointClick = (params: { value: undefined | OrderbookDataPoint }) => {
-        if (params.value && Array.isArray(params.value))
-            // selectOrderbookDataPoint({ datapoint: params.value, bidsPools: getOrderbook().pools, asksPools: getOrderbook().pools })
-            selectOrderbookDataPoint({ datapoint: params.value, bidsPools: [], asksPools: [] })
+    const handlePointClick = (params: undefined | { data: EchartOnClickParamsData }) => {
+        if (params?.data) {
+            const key = `${sellToken?.address}-${buyToken?.address}`
+            const orderbook = getOrderbook(key)
+
+            if (orderbook) {
+                // update datapoint
+                selectOrderbookDataPoint({ data: params.data, bidsPools: orderbook.pools, asksPools: orderbook.pools })
+
+                // update selected trade
+                setSellTokenAmountInput(params.data.value[1])
+                // setBuyTokenAmountInput(params.data.value[1] * params.data.value[0])
+            }
+        }
     }
 
     return (
@@ -490,7 +558,7 @@ export default function DepthChart() {
                             options={options}
                             onPointClick={(params) => {
                                 toast.success(`Trade selected`, { style: toastStyle })
-                                handlePointClick(params as { value: undefined | OrderbookDataPoint })
+                                handlePointClick(params as undefined | { data: EchartOnClickParamsData })
                             }}
                         />
                     ) : (

@@ -68,7 +68,7 @@ export default async function RootLayout({
                 <WagmiAndReactQueryProviders>
                     <main className="relative flex min-h-screen w-screen flex-col">
                         <div
-                            className="absolute w-full -top-[600px] h-[800px] rounded-full bg-gradient-stroke blur-3xl opacity-[0.07]"
+                            className="absolute w-full -top-[600px] h-[800px] rounded-full bg-gradient-stroke blur-3xl opacity-[0.06]"
                             style={{ zIndex: -1 }}
                         />
                         <Header />

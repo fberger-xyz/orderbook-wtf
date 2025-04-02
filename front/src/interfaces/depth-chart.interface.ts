@@ -1,25 +1,11 @@
+import { OrderbookSide } from '@/enums'
+
 export interface Token {
     address: string
     decimals: number
     symbol: string
     gas: string
 }
-
-// old
-// export interface AmmAsOrderbook {
-//     token0: Token
-//     token1: Token
-//     prices0to1: number[]
-//     prices1to0: number[]
-//     trades0to1: AmmTrade[]
-//     trades1to0: AmmTrade[]
-//     aggt0lqdty: number[]
-//     aggt1lqdty: number[]
-//     mpd0to1: OrderbookKeyMetrics
-//     mpd1to0: OrderbookKeyMetrics
-//     pools: AmmPool[]
-//     eth_usd: number
-// }
 
 export interface AmmAsOrderbook {
     block: number
@@ -79,4 +65,31 @@ export interface OrderbookKeyMetrics {
     mid: number
     spread: number
     spread_pct: number
+}
+
+// ---------
+// {
+//     "value": [
+//         1897.798730270239,
+//         2377407.8666922892
+//     ],
+//     "customData": {
+//         "side": "ask",
+//         "distribution": [
+//             0.14,
+//             2.91,
+//             2.72,
+//             0.73,
+//             93.51
+//         ],
+//         "output": 1252.7186517580585
+//     }
+// }
+export interface EchartOnClickParamsData {
+    value: [number, number]
+    customData: {
+        side: OrderbookSide
+        distribution: number[]
+        output: number
+    }
 }
