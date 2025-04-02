@@ -7,14 +7,32 @@ import { hardcodedTokensList } from '@/data/back-tokens'
 import { OrderbookOption, OrderbookAxisScale } from '@/enums'
 
 export const useAppStore = create<{
-    // -
-    showMobileMenu: boolean
-    hasHydrated: boolean
-    storeRefreshedAt: number
-    refetchInterval: number
-    selectedTrade?: { datapoint: OrderbookDataPoint; bidsPools: AmmPool[]; asksPools: AmmPool[] }
+    /**
+     * store
+     */
 
-    // chart options
+    hasHydrated: boolean
+    setHasHydrated: (hasHydrated: boolean) => void
+
+    /**
+     * ui
+     */
+
+    showMobileMenu: boolean
+    setShowMobileMenu: (showMobileMenu: boolean) => void
+    storeRefreshedAt: number
+    setStoreRefreshedAt: (storeRefreshedAt: number) => void
+    refetchInterval: number
+
+    /**
+     * orderbook
+     */
+
+    // data
+    loadedOrderbooks: Record<string, undefined | AmmAsOrderbook>
+    saveLoadedOrderbook: (pair: string, orderbook?: AmmAsOrderbook) => void
+
+    // chart
     yAxisType: OrderbookAxisScale
     yAxisLogBase: number
     setYAxisType: (yAxisType: OrderbookAxisScale) => void
@@ -24,60 +42,85 @@ export const useAppStore = create<{
     symbolsInYAxis: OrderbookOption
     setSymbolsInYAxis: (symbolsInYAxis: OrderbookOption) => void
 
-    // -
-    availablePairs: string[]
+    /**
+     * swap
+     */
+
+    // inputs
     sellToken?: Token
-    sellTokenAmountInput?: number
-    buyToken?: Token
-    buyTokenAmountInput?: number
-    availableTokens: Token[]
-    loadedOrderbooks: Record<string, undefined | AmmAsOrderbook>
-    showSelectTokenModal: boolean
-    selectTokenModalFor: 'buy' | 'sell'
-    selectTokenModalSearch: string
-    setShowMobileMenu: (showMobileMenu: boolean) => void
-    setHasHydrated: (hasHydrated: boolean) => void
-    setStoreRefreshedAt: (storeRefreshedAt: number) => void
-    selectOrderbookDataPoint: (selectedTrade?: { datapoint: OrderbookDataPoint; bidsPools: AmmPool[]; asksPools: AmmPool[] }) => void
-    setAvailablePairs: (availablePairs: string[]) => void
     selectSellToken: (sellToken?: Token) => void
+    sellTokenAmountInput?: number
     setSellTokenAmountInput: (sellTokenAmountInput: number) => void
+    buyToken?: Token
     selectBuyToken: (buyToken?: Token) => void
+    buyTokenAmountInput?: number
     setBuyTokenAmountInput: (buyTokenAmountInput: number) => void
-    setAvailableTokens: (availableTokens: Token[]) => void
-    saveLoadedOrderbook: (pair: string, orderbook?: AmmAsOrderbook) => void
     switchSelectedTokens: () => void
+
+    // trade
+    selectedTrade?: { datapoint: OrderbookDataPoint; bidsPools: AmmPool[]; asksPools: AmmPool[] }
+    selectOrderbookDataPoint: (selectedTrade?: { datapoint: OrderbookDataPoint; bidsPools: AmmPool[]; asksPools: AmmPool[] }) => void
+
+    /**
+     * modal
+     */
+
+    showSelectTokenModal: boolean
     setShowSelectTokenModal: (showSelectTokenModal: boolean) => void
+    selectTokenModalFor: 'buy' | 'sell'
     setSelectTokenModalFor: (selectTokenModalFor: 'buy' | 'sell') => void
+    selectTokenModalSearch: string
     setSelectTokenModalSearch: (selectTokenModalSearch: string) => void
 }>()(
     persist(
         (set) => ({
-            // -
-            showMobileMenu: false,
+            /**
+             * store
+             */
+
             hasHydrated: false,
+            setHasHydrated: (hasHydrated) => set(() => ({ hasHydrated })),
+
+            /**
+             * ui
+             */
+
+            showMobileMenu: false,
             storeRefreshedAt: -1,
             refetchInterval: (IS_DEV ? 60 : 15) * 1000,
-            selectedTrade: undefined,
 
-            // chart options
+            /**
+             * orderbook
+             */
+
+            // data
+            // chart
             yAxisType: OrderbookAxisScale.VALUE,
             yAxisLogBase: 10,
             setYAxisLogBase: (yAxisLogBase) => set(() => ({ yAxisLogBase })),
-            setAvailablePairs: (availablePairs) => set(() => ({ availablePairs })),
             coloredAreas: OrderbookOption.NO,
             setColoredAreas: (coloredAreas) => set(() => ({ coloredAreas })),
             symbolsInYAxis: OrderbookOption.NO,
             setSymbolsInYAxis: (symbolsInYAxis) => set(() => ({ symbolsInYAxis })),
 
+            /**
+             * swap
+             */
+
+            // inputs
+            // trade
+            selectedTrade: undefined,
+
+            /**
+             * modal
+             */
+
             // -
-            availablePairs: [],
-            availableTokens: [],
 
             // swap
-            sellToken: hardcodedTokensList[1],
+            sellToken: hardcodedTokensList[1], // todo put this as null
             sellTokenAmountInput: 2000,
-            buyToken: hardcodedTokensList[0],
+            buyToken: hardcodedTokensList[0], // todo put this as null
             buyTokenAmountInput: 1,
 
             loadedOrderbooks: {},
@@ -85,7 +128,6 @@ export const useAppStore = create<{
             selectTokenModalFor: 'buy',
             selectTokenModalSearch: '',
             setShowMobileMenu: (showMobileMenu) => set(() => ({ showMobileMenu })),
-            setHasHydrated: (hasHydrated) => set(() => ({ hasHydrated })),
             setStoreRefreshedAt: (storeRefreshedAt) => set(() => ({ storeRefreshedAt })),
             selectOrderbookDataPoint: (selectedTrade) => set(() => ({ selectedTrade })),
             setYAxisType: (yAxisType) => set(() => ({ yAxisType })),
@@ -101,7 +143,6 @@ export const useAppStore = create<{
                     return { buyToken }
                 }),
             setBuyTokenAmountInput: (buyTokenAmountInput) => set(() => ({ buyTokenAmountInput })),
-            setAvailableTokens: (availableTokens) => set(() => ({ availableTokens })),
             saveLoadedOrderbook: (pair, orderbook) => set((state) => ({ loadedOrderbooks: { ...state.loadedOrderbooks, [pair]: orderbook } })),
             switchSelectedTokens: () => set((state) => ({ sellToken: state.buyToken, buyToken: state.sellToken })),
             setShowSelectTokenModal: (showSelectTokenModal) => set(() => ({ showSelectTokenModal })),
@@ -119,7 +160,6 @@ export const useAppStore = create<{
             onRehydrateStorage: () => (state) => {
                 if (state && !state.hasHydrated) {
                     state.setHasHydrated(true)
-                    state.setAvailablePairs([]) // reset
                     state.selectOrderbookDataPoint(undefined) // reset
 
                     // pre select default tokens if need be

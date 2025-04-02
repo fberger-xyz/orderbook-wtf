@@ -101,14 +101,13 @@ const getOptions = (
                     const isPoolUsed = usagePercent !== '0%'
                     const poolBps = numeral(parseInt(hexaPercent, 16)).divide(100).format('0,0.[0]')
                     return `<span style="color:${isPoolUsed ? AppColors.milk[600] : AppColors.milk[200]}">- ${usagePercent} in ${protocolName} ${poolBps}bps</span>`
-                    // return `<span>- ${numeral(percent / 100).format('0,0%')} in ${protocolName} ${numeral(parseInt(hexaPercent, 16)).divide(100).format('0,0.[0]')}bps</span>`
                 })
 
                 return [
-                    `<strong>You sell</strong> (${side === OrderbookSide.BID ? 'left' : 'right'} Y axis)`,
+                    `<strong>You sell</strong> <span style="color:${AppColors.milk[200]}">see Y axis</span>`,
                     `${numeral(input).format('0,0.[00000]')} ${side === OrderbookSide.BID ? orderbook.base.symbol : orderbook.quote.symbol}`,
                     // -
-                    `<br/><strong>At price</strong> (X axis)`,
+                    `<br/><strong>At price</strong> <span style="color:${AppColors.milk[200]}">see X axis</span>`,
                     `1 ${orderbook.base.symbol} = ${numeral(price).format('0,0.[00000]')} ${orderbook.quote.symbol}`,
                     `1 ${orderbook.quote.symbol} = ${numeral(1 / price).format('0,0.[00000]')} ${orderbook.base.symbol}`,
                     // -

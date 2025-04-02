@@ -22,12 +22,12 @@ yarn-debug.log*
 pnpm-debug.log*
 
 # environment files
-.env*
-*.local
-*.development
-*.test
-*.preview
-*.production
+# .env*
+# *.local
+# *.development
+# *.test
+# *.preview
+# *.production
 
 # vercel & xata
 .vercel

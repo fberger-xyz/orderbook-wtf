@@ -221,7 +221,7 @@ export default function Dashboard() {
     return (
         <div className="w-full grid grid-cols-1 md:grid-cols-11 gap-4">
             {/* left */}
-            <div className="col-span-1 md:col-span-7 flex flex-col gap-4">
+            <div className="col-span-1 md:col-span-7 flex flex-col gap-4 xl:col-span-8">
                 {/* metrics */}
                 <div className="w-full grid grid-cols-2 md:grid-cols-3 gap-2">
                     {/* bid */}
@@ -273,8 +273,13 @@ export default function Dashboard() {
                             }
                         />
                     ) : (
-                        <OrderbookKeyMetric
-                            title="Mid-price"
+                        <OrderbookComponentLayout
+                            title={
+                                <div className="w-full flex items-start gap-1 group">
+                                    <p className="text-milk-600 text-xs">Mid-price</p>
+                                    <IconWrapper icon={IconIds.INFORMATION} className="size-3.5 text-milk-200 group-hover:text-milk cursor-pointer" />
+                                </div>
+                            }
                             content={
                                 <div className="flex gap-1.5 items-center flex-wrap skeleton-loading p-1">
                                     <span className="animate-pulse rounded-full bg-milk-150" style={{ width: 20, height: 20 }} />
@@ -300,8 +305,13 @@ export default function Dashboard() {
                             }
                         />
                     ) : (
-                        <OrderbookKeyMetric
-                            title="Best ask"
+                        <OrderbookComponentLayout
+                            title={
+                                <div className="w-full flex items-start gap-1 group">
+                                    <p className="text-milk-600 text-xs">Best ask</p>
+                                    <IconWrapper icon={IconIds.INFORMATION} className="size-3.5 text-milk-200 group-hover:text-milk cursor-pointer" />
+                                </div>
+                            }
                             content={
                                 <div className="flex gap-1.5 items-center flex-wrap skeleton-loading p-1">
                                     <span className="animate-pulse rounded-full bg-milk-150" style={{ width: 20, height: 20 }} />
@@ -501,7 +511,7 @@ export default function Dashboard() {
             </div>
 
             {/* right */}
-            <div className="col-span-1 md:col-span-4 flex flex-col gap-0.5">
+            <div className="col-span-1 md:col-span-4 flex flex-col gap-0.5 xl:col-span-3">
                 {/* sell */}
                 <div
                     className={cn('flex flex-col gap-1 p-4 rounded-xl border-milk-150 w-full', {
@@ -518,9 +528,7 @@ export default function Dashboard() {
                         <p className="text-milk-600 text-xs">Sell</p>
                         <div className="flex items-center">
                             {account.isConnected && sellToken?.address && sellTokenBalance < Number(sellTokenAmountInput) ? (
-                                <button onClick={() => setSellTokenAmountInput(sellTokenBalance)} className="pr-1">
-                                    <p className="text-folly font-bold text-xs">Exceeds Balance</p>
-                                </button>
+                                <p className="text-folly font-bold text-xs pr-2">Exceeds Balance</p>
                             ) : null}
                             <button
                                 onClick={() => {}}
