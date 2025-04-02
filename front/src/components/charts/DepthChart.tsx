@@ -167,6 +167,7 @@ const getOptions = (
                 show: true,
                 label: {
                     show: true,
+                    margin: 10,
                     padding: [6, 10],
                     fontSize: 11,
                     borderRadius: 4,
@@ -180,6 +181,7 @@ const getOptions = (
                     backgroundColor: AppColors.jagger[800],
                     color: AppColors.milk.DEFAULT,
                     borderColor: 'transparent',
+                    // extraCssText: 'backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);',
                 },
             },
         },
@@ -212,6 +214,8 @@ const getOptions = (
                 rangeMode: ['value', 'value'],
                 // startValue,
                 // endValue,
+                left: '20%',
+                right: '20%',
             },
             {
                 xAxisIndex: 0, // make this x axis zoomable
@@ -293,30 +297,28 @@ const getOptions = (
             fontFamily: APP_FONT.style.fontFamily,
         },
         grid: {
-            left: '10%',
-            right: '10%',
+            left: '5%',
+            right: '5%',
             top: '20',
             bottom: '100',
         },
-
         series: [
             {
                 yAxisIndex: 0,
                 name: 'Bids',
                 type: 'line',
                 data: bids,
-                // step: 'start',
                 smooth: true,
                 lineStyle: { width: 0.5, color: AppColors.aquamarine, opacity: 0.5 },
                 symbol: 'circle',
-                symbolSize: 4,
+                symbolSize: 7,
                 itemStyle: {
-                    color: AppColors.aquamarine,
+                    color: AppColors.background,
                     borderColor: AppColors.aquamarine,
-                    borderWidth: 1,
+                    borderWidth: 2,
                 },
                 emphasis: {
-                    itemStyle: { color: AppColors.aquamarine, borderWidth: 4 },
+                    itemStyle: { color: AppColors.aquamarine, borderColor: AppColors.aquamarine, borderWidth: 4 },
                 },
                 areaStyle:
                     coloredAreas === OrderbookOption.NO
@@ -341,18 +343,17 @@ const getOptions = (
                 name: 'Asks',
                 type: 'line',
                 data: asks,
-                // step: 'end',
                 smooth: true,
                 lineStyle: { width: 0.5, color: AppColors.folly, opacity: 0.5 },
                 symbol: 'circle',
-                symbolSize: 4,
+                symbolSize: 7,
                 itemStyle: {
-                    color: AppColors.folly,
+                    color: AppColors.background,
                     borderColor: AppColors.folly,
-                    borderWidth: 1,
+                    borderWidth: 2,
                 },
                 emphasis: {
-                    itemStyle: { color: AppColors.folly, borderWidth: 4 },
+                    itemStyle: { color: AppColors.folly, borderColor: AppColors.folly, borderWidth: 4 },
                 },
                 areaStyle:
                     coloredAreas === OrderbookOption.NO
@@ -410,7 +411,7 @@ export default function DepthChart() {
                     }
                     if (trade === highestBid) {
                         point.symbol = customSymbolPath
-                        point.symbolSize = 14
+                        point.symbolSize = 18
                         point.itemStyle = {
                             borderWidth: 1,
                             borderColor: AppColors.jagger[500],
@@ -435,7 +436,7 @@ export default function DepthChart() {
                     }
                     if (trade === lowestAsk) {
                         point.symbol = customSymbolPath
-                        point.symbolSize = 14
+                        point.symbolSize = 18
                         point.itemStyle = {
                             borderWidth: 1,
                             borderColor: AppColors.jagger[500],

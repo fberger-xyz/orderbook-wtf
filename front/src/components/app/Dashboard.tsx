@@ -1,6 +1,6 @@
 'use client'
 
-import { IconIds, OrderbookOption, OrderbookAxisScale } from '@/enums'
+import { IconIds, OrderbookOption, OrderbookAxisScale, SvgIds } from '@/enums'
 import numeral from 'numeral'
 import { useAppStore } from '@/stores/app.store'
 import { ReactNode, useEffect, useRef, useState } from 'react'
@@ -20,12 +20,13 @@ import { APP_ROUTE } from '@/config/app.config'
 import toast from 'react-hot-toast'
 import { toastStyle } from '@/config/toasts.config'
 import LinkWrapper from '../common/LinkWrapper'
+import SvgMapper from '../icons/SvgMapper'
 
 const OrderbookKeyMetric = (props: { title: string; content: ReactNode }) => (
     <OrderbookComponentLayout title={<p className="text-milk-600 text-xs">{props.title}</p>} content={props.content} />
 )
 const OrderbookComponentLayout = (props: { title: ReactNode; content: ReactNode }) => (
-    <div className="flex flex-col w-full border rounded-xl px-4 py-3 border-milk-100 gap-1 bg-gray-600/5">
+    <div className="flex flex-col w-full border rounded-xl px-4 py-3 border-milk-100 gap-1 bg-gray-500/5">
         {props.title}
         {props.content}
     </div>
@@ -219,9 +220,9 @@ export default function Dashboard() {
     }
 
     return (
-        <div className="w-full grid grid-cols-1 md:grid-cols-11 gap-4">
+        <div className="w-full grid grid-cols-1 md:grid-cols-10 gap-4">
             {/* left */}
-            <div className="col-span-1 md:col-span-7 flex flex-col gap-4 xl:col-span-8">
+            <div className="col-span-1 md:col-span-6 flex flex-col gap-4 xl:col-span-7">
                 {/* metrics */}
                 <div className="w-full grid grid-cols-2 md:grid-cols-3 gap-2">
                     {/* bid */}
@@ -507,7 +508,18 @@ export default function Dashboard() {
                 />
 
                 {/* routes */}
-                <OrderbookComponentLayout title={<p className="text-milk text-base font-bold">Routing</p>} content={undefined} />
+                <OrderbookComponentLayout
+                    title={<p className="text-milk text-base font-bold">Routing</p>}
+                    content={
+                        <div className="flex gap-2">
+                            {Object.values(SvgIds).map((id) => (
+                                <div key={id} className="flex justify-center rounded-full p-1 border border-milk-200">
+                                    <SvgMapper icon={id} className="size-5" />
+                                </div>
+                            ))}
+                        </div>
+                    }
+                />
             </div>
 
             {/* right */}

@@ -2,7 +2,7 @@ import React, { SVGProps } from 'react'
 
 export default function MainnetSVG(props: SVGProps<SVGSVGElement>) {
     return (
-        <svg className={props.className} xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none">
+        <svg className={props.className} xmlns="http://www.w3.org/2000/svg" fill="none">
             <circle cx="30" cy="30" r="30" fill="#627EEA" />
             <path fill="#C0CBF6" d="m29.996 14-.218.73v21.16l.218.215 9.998-5.807L29.996 14Z" />
             <path fill="#fff" d="M29.998 14 20 30.298l9.998 5.807V14Z" />

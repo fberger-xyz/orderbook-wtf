@@ -86,7 +86,9 @@ export const useAppStore = create<{
              */
 
             showMobileMenu: false,
+            setShowMobileMenu: (showMobileMenu) => set(() => ({ showMobileMenu })),
             storeRefreshedAt: -1,
+            setStoreRefreshedAt: (storeRefreshedAt) => set(() => ({ storeRefreshedAt })),
             refetchInterval: (IS_DEV ? 60 : 15) * 1000,
 
             /**
@@ -94,9 +96,13 @@ export const useAppStore = create<{
              */
 
             // data
+            loadedOrderbooks: {},
+            saveLoadedOrderbook: (pair, orderbook) => set((state) => ({ loadedOrderbooks: { ...state.loadedOrderbooks, [pair]: orderbook } })),
+
             // chart
             yAxisType: OrderbookAxisScale.VALUE,
             yAxisLogBase: 10,
+            setYAxisType: (yAxisType) => set(() => ({ yAxisType })),
             setYAxisLogBase: (yAxisLogBase) => set(() => ({ yAxisLogBase })),
             coloredAreas: OrderbookOption.NO,
             setColoredAreas: (coloredAreas) => set(() => ({ coloredAreas })),
@@ -108,53 +114,45 @@ export const useAppStore = create<{
              */
 
             // inputs
+
+            sellToken: hardcodedTokensList[1], // todo put this as null
+            selectSellToken: (sellToken) =>
+                set((state) => {
+                    console.log(`selectsellToken: ${sellToken?.symbol} (prev=${state.sellToken?.symbol})`)
+                    return { sellToken }
+                }),
+            sellTokenAmountInput: 2000,
+            buyToken: hardcodedTokensList[0], // todo put this as null
+            selectBuyToken: (buyToken) =>
+                set((state) => {
+                    console.log(`selectBuyToken: ${buyToken?.symbol} (prev=${state.buyToken?.symbol})`)
+                    return { buyToken }
+                }),
+            buyTokenAmountInput: 1,
+            setSellTokenAmountInput: (sellTokenAmountInput) => set(() => ({ sellTokenAmountInput })),
+            setBuyTokenAmountInput: (buyTokenAmountInput) => set(() => ({ buyTokenAmountInput })),
+            switchSelectedTokens: () => set((state) => ({ sellToken: state.buyToken, buyToken: state.sellToken })),
+
             // trade
             selectedTrade: undefined,
+            selectOrderbookDataPoint: (selectedTrade) => set(() => ({ selectedTrade })),
 
             /**
              * modal
              */
 
             // -
-
-            // swap
-            sellToken: hardcodedTokensList[1], // todo put this as null
-            sellTokenAmountInput: 2000,
-            buyToken: hardcodedTokensList[0], // todo put this as null
-            buyTokenAmountInput: 1,
-
-            loadedOrderbooks: {},
             showSelectTokenModal: false,
             selectTokenModalFor: 'buy',
             selectTokenModalSearch: '',
-            setShowMobileMenu: (showMobileMenu) => set(() => ({ showMobileMenu })),
-            setStoreRefreshedAt: (storeRefreshedAt) => set(() => ({ storeRefreshedAt })),
-            selectOrderbookDataPoint: (selectedTrade) => set(() => ({ selectedTrade })),
-            setYAxisType: (yAxisType) => set(() => ({ yAxisType })),
-            selectSellToken: (sellToken) =>
-                set((state) => {
-                    console.log(`selectsellToken: ${sellToken?.symbol} (prev=${state.sellToken?.symbol})`)
-                    return { sellToken }
-                }),
-            setSellTokenAmountInput: (sellTokenAmountInput) => set(() => ({ sellTokenAmountInput })),
-            selectBuyToken: (buyToken) =>
-                set((state) => {
-                    console.log(`selectBuyToken: ${buyToken?.symbol} (prev=${state.buyToken?.symbol})`)
-                    return { buyToken }
-                }),
-            setBuyTokenAmountInput: (buyTokenAmountInput) => set(() => ({ buyTokenAmountInput })),
-            saveLoadedOrderbook: (pair, orderbook) => set((state) => ({ loadedOrderbooks: { ...state.loadedOrderbooks, [pair]: orderbook } })),
-            switchSelectedTokens: () => set((state) => ({ sellToken: state.buyToken, buyToken: state.sellToken })),
             setShowSelectTokenModal: (showSelectTokenModal) => set(() => ({ showSelectTokenModal })),
             setSelectTokenModalFor: (selectTokenModalFor) => set(() => ({ selectTokenModalFor })),
             setSelectTokenModalSearch: (selectTokenModalSearch) => set(() => ({ selectTokenModalSearch })),
         }),
         {
             name: IS_DEV
-                ? // always keep state in dev
-                  `${APP_METADATA.SITE_DOMAIN}-app-store-dev`
-                : // refresh at each new deployment
-                  `${APP_METADATA.SITE_DOMAIN}-app-store-prod-${process.env.NEXT_PUBLIC_COMMIT_TIMESTAMP}`,
+                ? `${APP_METADATA.SITE_DOMAIN}-app-store-dev` // always keep state in dev
+                : `${APP_METADATA.SITE_DOMAIN}-app-store-prod-${process.env.NEXT_PUBLIC_COMMIT_TIMESTAMP}`, // refresh at each new deployment
             storage: createJSONStorage(() => sessionStorage),
             skipHydration: false,
             onRehydrateStorage: () => (state) => {
