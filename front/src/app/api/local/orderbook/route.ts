@@ -71,6 +71,6 @@ export async function GET(req: NextRequest) {
     } catch (error) {
         const parsedError = extractErrorMessage(error)
         console.log(parsedError)
-        return NextResponse.json({ ...res, error: parsedError ? parsedError : `Unexpected error while fetching ${url}` }, { status: 500 })
+        return NextResponse.json({ ...res, error: `Unexpected error '${parsedError}' while fetching ${url}` }, { status: 500 })
     }
 }

@@ -20,7 +20,7 @@ export default function Header(props: { className?: string }) {
                 <TychoSVG className="h-5" />
                 <p className="text-milk-600 font-light opacity-50">Orderbook</p>
             </div>
-            <div className="flex justify-end items-center gap-2 z-20">
+            <div className="flex flex-wrap justify-end items-center gap-2 z-20">
                 {/* docs */}
                 <LinkWrapper
                     // https://tycho-orderbook.gitbook.io/docs
@@ -43,7 +43,8 @@ export default function Header(props: { className?: string }) {
                     <div
                         ref={networkDropown}
                         className={cn(
-                            `absolute mt-2 w-52 rounded-2xl backdrop-blur-lg border-milk-150 border-2 shadow-lg p-2.5 transition-all origin-top-right`,
+                            // `absolute mt-2 w-52 rounded-2xl backdrop-blur-lg border-milk-150 border-2 shadow-lg p-2.5 transition-all origin-top-right`,
+                            `absolute right-0 mt-2 w-52 rounded-2xl backdrop-blur-lg border-milk-150 border-2 shadow-lg p-2.5 transition-all origin-top-right`,
                             {
                                 'scale-100 opacity-100': openNetworkDropown,
                                 'scale-95 opacity-0 pointer-events-none': !openNetworkDropown,
