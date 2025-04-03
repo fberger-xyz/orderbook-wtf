@@ -139,7 +139,11 @@ export const useAppStore = create<{
             // trade
             selectedTrade: undefined,
             selectOrderbookTrade: (selectedTrade) =>
-                set(() => ({ selectedTrade, sellTokenAmountInput: selectedTrade?.amountIn ?? 0, buyTokenAmountInput: selectedTrade?.output ?? 0 })),
+                set(() => ({
+                    selectedTrade,
+                    sellTokenAmountInput: selectedTrade?.amountIn ?? 0,
+                    buyTokenAmountInput: selectedTrade?.trade?.output ?? 0,
+                })),
 
             /**
              * modal

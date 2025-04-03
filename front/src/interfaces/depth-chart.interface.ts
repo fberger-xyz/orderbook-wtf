@@ -105,9 +105,6 @@ export interface SelectedTrade {
 
     // must be calculated
     trade?: AmmTrade
-    price?: number
-    distribution: number[]
-    output?: number
     pools: AmmPool[]
 
     // meta

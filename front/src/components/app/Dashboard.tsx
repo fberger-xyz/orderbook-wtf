@@ -1,6 +1,6 @@
 'use client'
 
-import { IconIds, OrderbookOption, OrderbookAxisScale, OrderbookSide, SvgIds } from '@/enums'
+import { IconIds, OrderbookOption, OrderbookAxisScale, OrderbookSide } from '@/enums'
 import numeral from 'numeral'
 import { useAppStore } from '@/stores/app.store'
 import { ReactNode, useEffect, useRef, useState } from 'react'
@@ -13,7 +13,17 @@ import SelectTokenModal from './SelectTokenModal'
 import { useModal } from 'connectkit'
 import { useAccount } from 'wagmi'
 import { useClickOutside } from '@/hooks/useClickOutside'
-import { cn, fetchBalance, formatAmount, getBaseValueInUsd, getHighestBid, getLowestAsk, getQuoteValueInUsd, safeNumeral } from '@/utils'
+import {
+    cn,
+    fetchBalance,
+    formatAmount,
+    getBaseValueInUsd,
+    getHighestBid,
+    getLowestAsk,
+    getQuoteValueInUsd,
+    mapProtocolIdToProtocolConfig,
+    safeNumeral,
+} from '@/utils'
 import { useQueries } from '@tanstack/react-query'
 import { useApiStore } from '@/stores/api.store'
 import { APP_ROUTE } from '@/config/app.config'
@@ -31,55 +41,6 @@ const OrderbookComponentLayout = (props: { title: ReactNode; content: ReactNode 
         {props.content}
     </div>
 )
-
-const mapProtocolNameToSvgId = (protocolName: string): SvgIds => {
-    let svgId = SvgIds.BALANCERV2
-    if (protocolName.includes('balancer')) svgId = SvgIds.BALANCERV2
-    if (protocolName.includes('sushi')) svgId = SvgIds.SUSHISWAPV2
-    if (protocolName.includes('pancake')) svgId = SvgIds.PANCAKESWAPV2
-    if (protocolName.includes('uniswap')) svgId = SvgIds.UNISWAPV2
-    return svgId
-}
-
-const mapProtocolIdToProtocolConfig = (protocolId: string) => {
-    const config: { id: string; version: string; name: string; svgId: SvgIds } = {
-        id: protocolId,
-        name: '',
-        version: '',
-        svgId: mapProtocolNameToSvgId(protocolId),
-    }
-    if (protocolId.includes('balancer')) {
-        config.name = 'Balance V2'
-        config.version = 'V2'
-    }
-    if (protocolId.includes('sushi')) {
-        config.name = 'Sushiswap V2'
-        config.version = 'V2'
-    }
-    if (protocolId.includes('pancake')) {
-        config.name = 'PancakeSwap V2'
-        config.version = 'V2'
-    }
-    if (protocolId.includes('curve')) {
-        config.name = 'Curve'
-        config.version = ''
-    }
-    if (protocolId.includes('uniswap')) {
-        if (protocolId.includes('2')) {
-            config.name = 'Uniswap V2'
-            config.version = 'V2'
-        }
-        if (protocolId.includes('3')) {
-            config.name = 'Uniswap V3'
-            config.version = 'V2'
-        }
-        if (protocolId.includes('4')) {
-            config.name = 'Uniswap V4'
-            config.version = 'V2'
-        }
-    }
-    return config
-}
 
 export default function Dashboard() {
     /**
@@ -187,7 +148,7 @@ export default function Dashboard() {
     // todo
     // useEffect(() => {
     //     if (!selectedTrade?.toDisplay) {
-    //         // trigger fetching some data
+    //         toast(`Selected trade can't be displayed...`, { style: toastStyle })
     //     }
     // }, [selectedTrade])
 
@@ -272,6 +233,7 @@ export default function Dashboard() {
                         //         pools: responseJson.data.pools,
                         //     })
                         // }
+                        selectOrderbookTrade(selectedTrade ? { ...selectedTrade, trade: undefined, toDisplay: false } : undefined)
                     }
 
                     // -
@@ -638,13 +600,11 @@ export default function Dashboard() {
                                                     <p className="col-span-1 font-bold w-14">Quote %</p>
                                                     <p className="col-span-2">Quote</p>
                                                 </div>
-                                                {selectedTrade?.distribution
+                                                {selectedTrade?.trade?.distribution
                                                     // .sort((curr, next) => next - curr)
                                                     .map((percent, percentIndex) => {
                                                         const pool = metrics.orderbook?.pools[percentIndex]
                                                         const protocolName = pool?.protocol_system ?? 'Unknown'
-                                                        // const usagePercent = numeral(percent / 100).format('0,0%')
-                                                        // const isPoolUsed = usagePercent !== '0%'
                                                         const config = mapProtocolIdToProtocolConfig(protocolName)
                                                         return (
                                                             <div
@@ -710,7 +670,7 @@ export default function Dashboard() {
                                                                     <p className="text-milk-600 text-right text-xs">
                                                                         {selectedTrade.trade?.distributed[percentIndex]
                                                                             ? numeral(selectedTrade.trade?.distributed[percentIndex])
-                                                                                  .multiply(selectedTrade.output)
+                                                                                  .multiply(selectedTrade.trade?.output)
                                                                                   .format('0,0.[000]')
                                                                             : '-'}
                                                                     </p>
@@ -801,26 +761,67 @@ export default function Dashboard() {
                             type="text"
                             className="text-xl font-bold text-right border-none outline-none ring-0 focus:ring-0 focus:outline-none focus:border-none bg-transparent w-40"
                             value={numeral(sellTokenAmountInput).format('0,0.[00000]')}
-                            onChange={(e) => {
-                                const parsedNumber = Number(numeral(e.target.value).value())
-                                if (isNaN(parsedNumber)) return
-                                const newSelectedTrade: SelectedTrade = {
-                                    side: OrderbookSide.BID,
-                                    amountIn: parsedNumber,
-                                    selectedAt: Date.now(),
+                            onChange={async (e) => {
+                                try {
+                                    // lock
+                                    const parsedNumber = Number(numeral(e.target.value).value())
+                                    if (isNaN(parsedNumber)) return
+                                    const newSelectedTrade: SelectedTrade = {
+                                        side: OrderbookSide.BID,
+                                        amountIn: parsedNumber,
+                                        selectedAt: Date.now(),
 
-                                    // must be calculated
-                                    price: undefined,
-                                    distribution: [],
-                                    trade: undefined,
-                                    output: undefined,
-                                    pools: [],
+                                        // must be calculated
+                                        trade: undefined,
+                                        pools: [],
 
-                                    // meta
-                                    toDisplay: false,
+                                        // meta
+                                        toDisplay: false,
+                                    }
+
+                                    selectOrderbookTrade(newSelectedTrade)
+                                    setSellTokenAmountInput(parsedNumber)
+
+                                    // fetch
+                                    if (sellToken?.address && buyToken?.address) {
+                                        const url = `${APP_ROUTE}/api/local/orderbook?token0=${sellToken?.address}&token1=${buyToken?.address}&pointAmount=${parsedNumber}&pointToken=${sellToken?.address}`
+                                        console.log('----')
+                                        console.log(parsedNumber, url)
+                                        console.log('----')
+                                        const tradeResponse = await fetch(url, { method: 'GET', headers: { 'Content-Type': 'application/json' } })
+                                        const tradeResponseJson = (await tradeResponse.json()) as StructuredOutput<AmmAsOrderbook>
+                                        console.log({ tradeResponseJson })
+                                        const pair = `${sellToken.address}-${buyToken.address}`
+                                        const orderbook = getOrderbook(pair)
+                                        if (orderbook && tradeResponseJson.data) {
+                                            const newOrderbook = {
+                                                ...orderbook,
+                                                bids: [...orderbook.bids, ...tradeResponseJson.data.bids],
+                                                asks: [...orderbook.asks, ...tradeResponseJson.data.asks],
+                                                base_worth_eth: tradeResponseJson.data.base_worth_eth,
+                                                quote_worth_eth: tradeResponseJson.data.quote_worth_eth,
+                                                block: tradeResponseJson.data.block,
+                                            }
+                                            console.log({ newOrderbook })
+                                            setApiOrderbook(pair, newOrderbook)
+                                            selectOrderbookTrade({
+                                                side: OrderbookSide.BID,
+                                                amountIn: parsedNumber,
+                                                selectedAt: Date.now(),
+
+                                                // must be calculated
+                                                trade: newOrderbook.bids.find((bid) => bid.amount === parsedNumber),
+                                                pools: newOrderbook.pools,
+
+                                                // meta
+                                                toDisplay: true,
+                                            })
+                                        }
+                                    }
+                                } catch (error) {
+                                } finally {
+                                    // unlock
                                 }
-                                if (selectedTrade) selectOrderbookTrade(newSelectedTrade)
-                                setSellTokenAmountInput(parsedNumber)
                             }}
                         />
                     </div>
@@ -904,7 +905,11 @@ export default function Dashboard() {
                         </p> */}
                         <input
                             type="text"
-                            className="text-xl font-bold text-right border-none outline-none ring-0 focus:ring-0 focus:outline-none focus:border-none bg-transparent w-40 cursor-not-allowed"
+                            className={cn('text-xl font-bold text-right border-none outline-none', {
+                                'cursor-not-allowed bg-transparent ring-0 focus:ring-0 focus:outline-none focus:border-none w-40':
+                                    selectedTrade?.toDisplay,
+                                'skeleton-loading ml-auto w-28 h-8 rounded-full text-transparent': !selectedTrade?.toDisplay,
+                            })}
                             value={numeral(buyTokenAmountInput).format('0,0.[00000]')}
                             disabled={true}
                         />

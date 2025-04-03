@@ -350,13 +350,13 @@ const getOptions = (
                                           color: AppColors.aquamarine,
                                           opacity: 1,
                                       },
-                                      xAxis: selectedTrade.price,
+                                      xAxis: selectedTrade.trade?.average_sell_price,
                                       label: {
                                           formatter: (bidMarlineParams) => {
                                               return [
                                                   `${numeral(selectedTrade.amountIn).format('0.0,[000]')} ${orderbook.base.symbol}`,
                                                   `at ${bidMarlineParams.value} ${orderbook.base.symbol}/${orderbook.quote.symbol}`,
-                                                  `= ${selectedTrade.output ? `${numeral(selectedTrade.output).format('0,0.[000]')} ${orderbook.quote.symbol}` : '...computing'}`,
+                                                  `= ${selectedTrade.trade?.output ? `${numeral(selectedTrade.trade.output).format('0,0.[000]')} ${orderbook.quote.symbol}` : '...computing'}`,
                                               ].join('\n')
                                           },
                                           color: AppColors.aquamarine,
@@ -419,13 +419,13 @@ const getOptions = (
                                           opacity: 1,
                                       },
                                       //   name: 'bid todo',
-                                      xAxis: 1 / (selectedTrade.price ?? 1),
+                                      xAxis: 1 / (selectedTrade.trade?.average_sell_price ?? 1),
                                       label: {
                                           formatter: (askMarlineParams) => {
                                               return [
                                                   `${numeral(selectedTrade.amountIn).format('0.0,[000]')} ${orderbook.quote.symbol}`,
                                                   `at ${askMarlineParams.value} ${orderbook.base.symbol}/${orderbook.quote.symbol}`,
-                                                  `= ${selectedTrade.output ? `${numeral(selectedTrade.output).format('0,0.[000]')} ${orderbook.base.symbol}` : '...computing'}`,
+                                                  `= ${selectedTrade.trade?.output ? `${numeral(selectedTrade.trade?.output).format('0,0.[000]')} ${orderbook.base.symbol}` : '...computing'}`,
                                               ].join('\n')
                                           },
                                           color: AppColors.folly,
@@ -562,10 +562,10 @@ export default function DepthChart() {
                 const selectedTrade: SelectedTrade = {
                     selectedAt: Date.now(),
                     side: params.data?.customData.side,
-                    price: params.data.customData?.side === OrderbookSide.BID ? params.data.value[0] : 1 / params.data.value[0],
+                    // price: params.data.customData?.side === OrderbookSide.BID ? params.data.value[0] : 1 / params.data.value[0],
                     amountIn: params.data.value[1],
-                    distribution: params.data.customData.distribution,
-                    output: params.data.customData.output,
+                    // distribution: params.data.customData.distribution,
+                    // output: params.data.customData.output,
                     pools: orderbook.pools,
                     trade:
                         params.data.customData?.side === OrderbookSide.BID

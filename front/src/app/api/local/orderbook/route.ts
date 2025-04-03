@@ -14,6 +14,8 @@ export async function GET(req: NextRequest) {
         const { searchParams } = new URL(req.url)
         const token0 = searchParams.get('token0')
         const token1 = searchParams.get('token1')
+        const pointToken = searchParams.get('pointToken')
+        const pointAmount = Number(searchParams.get('pointAmount'))
         if (!token0 || !isAddress(token0)) {
             res.error = `token0 must be a valid address ${url}`
             return NextResponse.json(res, { status: 500 })
@@ -26,12 +28,8 @@ export async function GET(req: NextRequest) {
         // prepare request
         const controller = new AbortController()
         const timeoutId = setTimeout(() => controller.abort(), 60000) // 60 seconds timeout
-        const body = {
-            tag: `${token0}-${token1}`,
-            single: false,
-            sp_input: 'todo',
-            sp_amount: 0,
-        }
+        const body: { tag: string; point?: { input: string; amount: number } } = { tag: `${token0}-${token1}` }
+        if (pointToken && !isNaN(Number(pointAmount))) body.point = { input: pointToken, amount: Number(pointAmount) }
 
         // debug
         // console.log('-------')
