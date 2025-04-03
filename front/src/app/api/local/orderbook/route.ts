@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { AmmAsOrderbook, StructuredOutput } from '@/interfaces'
 import { isAddress } from 'viem'
 import { PUBLIC_STREAM_API_URL } from '@/config/app.config'
-import { initOutput } from '@/utils'
+import { extractErrorMessage, initOutput } from '@/utils'
 
 export async function GET(req: NextRequest) {
     const res = initOutput<AmmAsOrderbook>()
@@ -69,6 +69,8 @@ export async function GET(req: NextRequest) {
         // res
         return NextResponse.json(res)
     } catch (error) {
-        return NextResponse.json({ ...res, error: `Unexpected error while fetching ${url}` }, { status: 500 })
+        const parsedError = extractErrorMessage(error)
+        console.log(parsedError)
+        return NextResponse.json({ ...res, error: parsedError ? parsedError : `Unexpected error while fetching ${url}` }, { status: 500 })
     }
 }

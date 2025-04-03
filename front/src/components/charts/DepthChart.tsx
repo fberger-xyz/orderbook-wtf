@@ -353,7 +353,6 @@ const getOptions = (
                                       xAxis: selectedTrade.price,
                                       label: {
                                           formatter: (bidMarlineParams) => {
-                                              console.log(bidMarlineParams)
                                               return [
                                                   `${numeral(selectedTrade.amountIn).format('0.0,[000]')} ${orderbook.base.symbol}`,
                                                   `at ${bidMarlineParams.value} ${orderbook.base.symbol}/${orderbook.quote.symbol}`,
@@ -423,7 +422,6 @@ const getOptions = (
                                       xAxis: 1 / (selectedTrade.price ?? 1),
                                       label: {
                                           formatter: (askMarlineParams) => {
-                                              console.log(askMarlineParams)
                                               return [
                                                   `${numeral(selectedTrade.amountIn).format('0.0,[000]')} ${orderbook.quote.symbol}`,
                                                   `at ${askMarlineParams.value} ${orderbook.base.symbol}/${orderbook.quote.symbol}`,
@@ -555,7 +553,7 @@ export default function DepthChart() {
     }, [sellToken?.address, buyToken?.address, apiStoreRefreshedAt, yAxisType, yAxisLogBase, coloredAreas, symbolsInYAxis, selectedTrade])
 
     // methods
-    const handlePointClick = (params: undefined | { data: EchartOnClickParamsData }) => {
+    const handlePointClick = (params: undefined | { data: EchartOnClickParamsData; dataIndex: number }) => {
         if (params?.data) {
             const key = `${sellToken?.address}-${buyToken?.address}`
             const orderbook = getOrderbook(key)
@@ -569,11 +567,15 @@ export default function DepthChart() {
                     distribution: params.data.customData.distribution,
                     output: params.data.customData.output,
                     pools: orderbook.pools,
+                    trade:
+                        params.data.customData?.side === OrderbookSide.BID
+                            ? orderbook.bids.find((bid) => bid.output === params.data.customData.output)
+                            : orderbook.asks.find((ask) => ask.output === params.data.customData.output),
                     toDisplay: true,
                 }
 
                 // debug
-                console.log({ selectedTrade })
+                console.log({ params, selectedTrade })
 
                 // update
                 selectOrderbookTrade(selectedTrade)
@@ -592,7 +594,7 @@ export default function DepthChart() {
                             options={options}
                             onPointClick={(params) => {
                                 toast.success(`Trade selected`, { style: toastStyle })
-                                handlePointClick(params as undefined | { data: EchartOnClickParamsData })
+                                handlePointClick(params as undefined | { data: EchartOnClickParamsData; dataIndex: number })
                             }}
                         />
                     ) : (

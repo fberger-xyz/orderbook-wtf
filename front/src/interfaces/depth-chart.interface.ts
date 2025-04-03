@@ -53,10 +53,12 @@ export interface AmmPool {
 export interface AmmTrade {
     amount: number
     output: number
+    distributed: number[] // in output token
     distribution: number[]
     gas_costs: number[]
     gas_costs_usd: number[]
     average_sell_price: number
+    price_impact: number // donné en %
 }
 
 export interface OrderbookKeyMetrics {
@@ -102,6 +104,7 @@ export interface SelectedTrade {
     selectedAt: number
 
     // must be calculated
+    trade?: AmmTrade
     price?: number
     distribution: number[]
     output?: number

@@ -41,15 +41,42 @@ const mapProtocolNameToSvgId = (protocolName: string): SvgIds => {
     return svgId
 }
 
-const mapProtocolIdToProtocolConfig = (protocolId: string): { id: string; name: string; svgId: SvgIds } => {
-    const config: { id: string; name: string; svgId: SvgIds } = { id: protocolId, name: '', svgId: mapProtocolNameToSvgId(protocolId) }
-    if (protocolId.includes('balancer')) config.name = 'Balance V2'
-    if (protocolId.includes('sushi')) config.name = 'Sushiswap V2'
-    if (protocolId.includes('pancake')) config.name = 'PancakeSwap V2'
+const mapProtocolIdToProtocolConfig = (protocolId: string) => {
+    const config: { id: string; version: string; name: string; svgId: SvgIds } = {
+        id: protocolId,
+        name: '',
+        version: '',
+        svgId: mapProtocolNameToSvgId(protocolId),
+    }
+    if (protocolId.includes('balancer')) {
+        config.name = 'Balance V2'
+        config.version = 'V2'
+    }
+    if (protocolId.includes('sushi')) {
+        config.name = 'Sushiswap V2'
+        config.version = 'V2'
+    }
+    if (protocolId.includes('pancake')) {
+        config.name = 'PancakeSwap V2'
+        config.version = 'V2'
+    }
+    if (protocolId.includes('curve')) {
+        config.name = 'Curve'
+        config.version = ''
+    }
     if (protocolId.includes('uniswap')) {
-        if (protocolId.includes('2')) config.name = 'Uniswap V2'
-        if (protocolId.includes('3')) config.name = 'Uniswap V3'
-        if (protocolId.includes('4')) config.name = 'Uniswap V4'
+        if (protocolId.includes('2')) {
+            config.name = 'Uniswap V2'
+            config.version = 'V2'
+        }
+        if (protocolId.includes('3')) {
+            config.name = 'Uniswap V3'
+            config.version = 'V2'
+        }
+        if (protocolId.includes('4')) {
+            config.name = 'Uniswap V4'
+            config.version = 'V2'
+        }
     }
     return config
 }
@@ -602,30 +629,28 @@ export default function Dashboard() {
                                             {/* distribution */}
                                             <div className="flex w-full justify-center items-center rounded-xl gap-1 border border-milk-150 flex-col px-3 py-2">
                                                 {/* headers */}
-                                                <div className="grid grid-cols-9 w-full rounded-xl py-1 px-4 gap-6 items-center text-xs text-milk-200 font-bold">
+                                                <div className="grid grid-cols-10 w-full rounded-xl py-1 px-4 gap-6 items-center text-xs text-milk-200 font-bold">
                                                     {/* <p className="col-span-1 text-xs">#</p> */}
-                                                    <p className="col-span-1 font-bold w-14">%</p>
                                                     <p className="col-span-4">Pool</p>
-                                                    <p className="col-span-2">Input</p>
-                                                    <p className="col-span-2">Output</p>
+                                                    <p className="col-span-1 font-bold w-14">Base %</p>
+                                                    <p className="col-span-2">Base</p>
+                                                    <p className="col-span-1 font-bold w-14">Quote %</p>
+                                                    <p className="col-span-2">Quote</p>
                                                 </div>
                                                 {selectedTrade?.distribution
-                                                    .sort((curr, next) => next - curr)
+                                                    // .sort((curr, next) => next - curr)
                                                     .map((percent, percentIndex) => {
                                                         const pool = metrics.orderbook?.pools[percentIndex]
                                                         const protocolName = pool?.protocol_system ?? 'Unknown'
-                                                        const attributes = pool?.static_attributes ?? []
-                                                        const hexaPercent = attributes.find((entry) => entry[0].toLowerCase() === 'fee')?.[1] ?? '0'
                                                         // const usagePercent = numeral(percent / 100).format('0,0%')
                                                         // const isPoolUsed = usagePercent !== '0%'
-                                                        const poolBps = numeral(parseInt(hexaPercent, 16)).divide(100).format('0,0.[0]')
                                                         const config = mapProtocolIdToProtocolConfig(protocolName)
                                                         return (
                                                             <div
                                                                 key={`${percent}-${percentIndex}`}
-                                                                className="grid grid-cols-9 w-full bg-gray-600/10 hover:bg-gray-600/20 rounded-xl py-1.5 px-4 gap-6 items-center text-sm"
+                                                                className="grid grid-cols-10 w-full bg-gray-600/10 hover:bg-gray-600/20 rounded-xl py-1.5 px-4 gap-6 items-center text-xs"
                                                             >
-                                                                <p className="col-span-1 text-milk-600 w-14">{numeral(percent).format('0,0.[0]')}%</p>
+                                                                {/* pool */}
                                                                 <LinkWrapper
                                                                     target="_blank"
                                                                     href={`https://etherscan.io/contract/${pool?.address}`}
@@ -635,49 +660,69 @@ export default function Dashboard() {
                                                                         <SvgMapper icon={config.svgId} className="size-3.5" />
                                                                     </div>
                                                                     <p className="text-milk-600">
-                                                                        {config.name} - {poolBps} bps - {pool?.address.slice(0, 5)}
+                                                                        {config.version.toLowerCase()} - {pool?.fee} bps - {pool?.address.slice(0, 5)}
                                                                     </p>
                                                                     <IconWrapper
                                                                         icon={IconIds.OPEN_LINK_IN_NEW_TAB}
                                                                         className="size-4 text-milk-200 group-hover:text-milk"
                                                                     />
                                                                 </LinkWrapper>
-                                                                <div className="col-span-2 flex gap-1 items-center">
-                                                                    {/* <TokenImage
-                                                                    size={14}
-                                                                    token={
-                                                                        selectedTrade.side === OrderbookSide.BID
-                                                                            ? sellToken
-                                                                            : buyToken
-                                                                    }
-                                                                /> */}
-                                                                    <p className="text-milk-600 text-right text-xs">
-                                                                        {numeral(selectedTrade.amountIn).multiply(percent).format('0,0a')}{' '}
-                                                                    </p>
-                                                                    <p className="text-xs text-milk-400">
-                                                                        {(selectedTrade.side === OrderbookSide.BID ? sellToken : buyToken)?.symbol}
-                                                                    </p>
-                                                                </div>
+
+                                                                {/* input */}
+                                                                <p className="col-span-1 text-milk-600 w-14">
+                                                                    {selectedTrade.trade?.distribution &&
+                                                                    selectedTrade.trade.distribution[percentIndex] > 0
+                                                                        ? numeral(selectedTrade.trade.distribution[percentIndex])
+                                                                              .divide(100)
+                                                                              .format('0,0%')
+                                                                        : '-'}
+                                                                </p>
                                                                 <div className="col-span-2 flex gap-1 items-center">
                                                                     <p className="text-milk-600 text-right text-xs">
-                                                                        {numeral(selectedTrade.amountIn)
-                                                                            .multiply(percent)
-                                                                            .multiply(selectedTrade.price)
-                                                                            .format('0,0a')}{' '}
+                                                                        {selectedTrade.trade?.distribution[percentIndex]
+                                                                            ? numeral(selectedTrade.trade?.distribution[percentIndex])
+                                                                                  .multiply(selectedTrade.amountIn)
+                                                                                  .format('0,0.[000]')
+                                                                            : '-'}
                                                                     </p>
-                                                                    {/* <TokenImage
-                                                                    size={14}
-                                                                    token={
-                                                                        selectedTrade.side === OrderbookSide.BID
-                                                                            ? buyToken
-                                                                            : sellToken
-                                                                    }
-                                                                /> */}
-                                                                    <p className="text-xs text-milk-400">
-                                                                        {(selectedTrade.side === OrderbookSide.BID ? buyToken : sellToken)?.symbol}
-                                                                    </p>
+                                                                    {selectedTrade.trade?.distribution &&
+                                                                        selectedTrade.trade.distribution[percentIndex] > 0 && (
+                                                                            <p className="text-xs text-milk-400">
+                                                                                {
+                                                                                    (selectedTrade.side === OrderbookSide.BID ? sellToken : buyToken)
+                                                                                        ?.symbol
+                                                                                }
+                                                                            </p>
+                                                                        )}
                                                                 </div>
-                                                                {/* <p className="col-span-2 text-milk-600">{numeral(poolBps).format('0,0.0')}</p> */}
+
+                                                                {/* output */}
+                                                                <p className="col-span-1 text-milk-600 w-14">
+                                                                    {selectedTrade.trade?.distributed &&
+                                                                    selectedTrade.trade.distributed[percentIndex] > 0
+                                                                        ? numeral(selectedTrade.trade.distributed[percentIndex])
+                                                                              .divide(100)
+                                                                              .format('0,0%')
+                                                                        : '-'}
+                                                                </p>
+                                                                <div className="col-span-2 flex gap-1 items-center">
+                                                                    <p className="text-milk-600 text-right text-xs">
+                                                                        {selectedTrade.trade?.distributed[percentIndex]
+                                                                            ? numeral(selectedTrade.trade?.distributed[percentIndex])
+                                                                                  .multiply(selectedTrade.output)
+                                                                                  .format('0,0.[000]')
+                                                                            : '-'}
+                                                                    </p>
+                                                                    {selectedTrade.trade?.distributed &&
+                                                                        selectedTrade.trade.distributed[percentIndex] > 0 && (
+                                                                            <p className="text-xs text-milk-400">
+                                                                                {
+                                                                                    (selectedTrade.side === OrderbookSide.BID ? buyToken : sellToken)
+                                                                                        ?.symbol
+                                                                                }
+                                                                            </p>
+                                                                        )}
+                                                                </div>
                                                             </div>
                                                         )
                                                     })}
@@ -759,13 +804,18 @@ export default function Dashboard() {
                                 const parsedNumber = Number(numeral(e.target.value).value())
                                 if (isNaN(parsedNumber)) return
                                 const newSelectedTrade: SelectedTrade = {
-                                    selectedAt: Date.now(),
                                     side: OrderbookSide.BID,
-                                    price: undefined,
                                     amountIn: parsedNumber,
+                                    selectedAt: Date.now(),
+
+                                    // must be calculated
+                                    price: undefined,
                                     distribution: [],
+                                    trade: undefined,
                                     output: undefined,
                                     pools: [],
+
+                                    // meta
                                     toDisplay: false,
                                 }
                                 if (selectedTrade) selectOrderbookTrade(newSelectedTrade)
@@ -944,6 +994,7 @@ export default function Dashboard() {
                             <div className="flex justify-between w-full text-milk-400">
                                 <p>Price Impact</p>
                                 <div className="skeleton-loading w-16 h-4 rounded-full" />
+                                {/* todo */}
                             </div>
                             <div className="flex justify-between w-full text-milk-400">
                                 <p>Gas token</p>
