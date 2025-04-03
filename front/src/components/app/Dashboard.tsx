@@ -15,6 +15,7 @@ import { useAccount } from 'wagmi'
 import { useClickOutside } from '@/hooks/useClickOutside'
 import {
     cn,
+    extractErrorMessage,
     fetchBalance,
     formatAmount,
     getBaseValueInUsd,
@@ -766,8 +767,9 @@ export default function Dashboard() {
                                     // lock
                                     const parsedNumber = Number(numeral(e.target.value).value())
                                     if (isNaN(parsedNumber)) return
+                                    const newTradeSide = parsedNumber < metrics.midPrice ? OrderbookSide.BID : OrderbookSide.ASK
                                     const newSelectedTrade: SelectedTrade = {
-                                        side: OrderbookSide.BID,
+                                        side: newTradeSide,
                                         amountIn: parsedNumber,
                                         selectedAt: Date.now(),
 
@@ -785,12 +787,12 @@ export default function Dashboard() {
                                     // fetch
                                     if (sellToken?.address && buyToken?.address) {
                                         const url = `${APP_ROUTE}/api/local/orderbook?token0=${sellToken?.address}&token1=${buyToken?.address}&pointAmount=${parsedNumber}&pointToken=${sellToken?.address}`
-                                        console.log('----')
+                                        // console.log('----')
                                         console.log(parsedNumber, url)
-                                        console.log('----')
+                                        // console.log('----')
                                         const tradeResponse = await fetch(url, { method: 'GET', headers: { 'Content-Type': 'application/json' } })
                                         const tradeResponseJson = (await tradeResponse.json()) as StructuredOutput<AmmAsOrderbook>
-                                        console.log({ tradeResponseJson })
+                                        // console.log({ tradeResponseJson })
                                         const pair = `${sellToken.address}-${buyToken.address}`
                                         const orderbook = getOrderbook(pair)
                                         if (orderbook && tradeResponseJson.data) {
@@ -802,10 +804,10 @@ export default function Dashboard() {
                                                 quote_worth_eth: tradeResponseJson.data.quote_worth_eth,
                                                 block: tradeResponseJson.data.block,
                                             }
-                                            console.log({ newOrderbook })
+                                            // console.log({ newOrderbook })
                                             setApiOrderbook(pair, newOrderbook)
                                             selectOrderbookTrade({
-                                                side: OrderbookSide.BID,
+                                                side: newTradeSide,
                                                 amountIn: parsedNumber,
                                                 selectedAt: Date.now(),
 
@@ -819,8 +821,11 @@ export default function Dashboard() {
                                         }
                                     }
                                 } catch (error) {
+                                    toast.error(`Unexepected error while fetching price: ${extractErrorMessage(error)}`, {
+                                        style: toastStyle,
+                                    })
                                 } finally {
-                                    // unlock
+                                    // tba
                                 }
                             }}
                         />
@@ -841,7 +846,12 @@ export default function Dashboard() {
                             </div>
 
                             {/* right: input value in $ */}
-                            <p className="text-milk-600 text-xs">$ {safeNumeral(selectedTrade.amountIn * metrics.midPrice, '0,0.[00]')}</p>
+                            <p className="text-milk-600 text-xs">
+                                ${' '}
+                                {getBaseValueInUsd(metrics.orderbook)
+                                    ? safeNumeral(selectedTrade.amountIn * (getBaseValueInUsd(metrics.orderbook) as number), '0,0.[00]')
+                                    : '-'}
+                            </p>
                         </div>
                     ) : (
                         <div className="mt-2 flex justify-between items-center">
