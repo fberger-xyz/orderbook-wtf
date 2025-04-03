@@ -9,8 +9,8 @@ import { ChartBackground, CustomFallback, LoadingArea } from './ChartsCommons'
 import { useAppStore } from '@/stores/app.store'
 import { APP_FONT } from '@/config/app.config'
 import { ErrorBoundaryFallback } from '../common/ErrorBoundaryFallback'
-import { AppColors, formatAmount } from '@/utils'
-import { AmmAsOrderbook, AmmPool, EchartOnClickParamsData } from '@/interfaces'
+import { AppColors, formatAmount, getHighestBid, getLowestAsk } from '@/utils'
+import { AmmAsOrderbook, EchartOnClickParamsData, SelectedTrade } from '@/interfaces'
 import numeral from 'numeral'
 import toast from 'react-hot-toast'
 import { toastStyle } from '@/config/toasts.config'
@@ -54,18 +54,14 @@ const getOptions = (
     yAxisLogBase: number,
     coloredAreas: OrderbookOption,
     symbolsInYAxis: OrderbookOption,
-    selectedTrade?: {
-        data: EchartOnClickParamsData
-        bidsPools: AmmPool[]
-        asksPools: AmmPool[]
-    },
+    selectedTrade?: SelectedTrade,
 ): echarts.EChartsOption => {
     // const sortedBids = bids.sort((curr, next) => curr.value[0] - next.value[0])
     // const sortedAsks = asks.sort((curr, next) => curr.value[0] - next.value[0])
     // const startValue = Math.min(sortedBids[Math.max(0, bids.length - 6)].value[0], sortedAsks[0].value[0])
     // const endValue = Math.max(sortedAsks[Math.min(6, asks.length - 1)].value[0], sortedBids[0].value[0])
     // console.log({ startValue, endValue })
-    console.log({ selectedTrade })
+    // console.log({ selectedTrade })
     return {
         tooltip: {
             trigger: 'axis',
@@ -304,7 +300,7 @@ const getOptions = (
         grid: {
             left: '5%',
             right: '5%',
-            top: '20',
+            top: selectedTrade ? '40' : '20',
             bottom: '100',
         },
         series: [
@@ -342,31 +338,40 @@ const getOptions = (
                                   ],
                               },
                           },
-                markLine: selectedTrade
-                    ? {
-                          symbol: ['circle', 'none'],
-                          animation: false,
-                          data: [
-                              {
-                                  symbolSize: 6,
-                                  lineStyle: {
-                                      color: AppColors.aquamarine,
-                                      opacity: 1,
+                markLine:
+                    selectedTrade?.toDisplay && selectedTrade.side === OrderbookSide.BID
+                        ? {
+                              symbol: ['circle', 'none'],
+                              animation: false,
+                              data: [
+                                  {
+                                      symbolSize: 6,
+                                      lineStyle: {
+                                          color: AppColors.aquamarine,
+                                          opacity: 1,
+                                      },
+                                      xAxis: selectedTrade.price,
+                                      label: {
+                                          formatter: (bidMarlineParams) => {
+                                              console.log(bidMarlineParams)
+                                              return [
+                                                  `${numeral(selectedTrade.amountIn).format('0.0,[000]')} ${orderbook.base.symbol}`,
+                                                  `at ${bidMarlineParams.value} ${orderbook.base.symbol}/${orderbook.quote.symbol}`,
+                                                  `= ${selectedTrade.output ? `${numeral(selectedTrade.output).format('0,0.[000]')} ${orderbook.quote.symbol}` : '...computing'}`,
+                                              ].join('\n')
+                                          },
+                                          color: AppColors.aquamarine,
+                                          show: true,
+                                          //   position: 'insideMiddleTop',
+                                          position: 'end',
+                                          //   rotate: 90,
+                                          fontSize: 11,
+                                          opacity: 0.8,
+                                      },
                                   },
-                                  name: 'bid todo',
-                                  xAxis: selectedTrade.data.value[0],
-                                  label: {
-                                      color: AppColors.aquamarine,
-                                      show: true,
-                                      position: 'insideMiddleTop',
-                                      rotate: 90,
-                                      fontSize: 11,
-                                      opacity: 0.8,
-                                  },
-                              },
-                          ],
-                      }
-                    : undefined,
+                              ],
+                          }
+                        : undefined,
             },
             {
                 yAxisIndex: 1,
@@ -402,22 +407,41 @@ const getOptions = (
                                   ],
                               },
                           },
-                markLine: selectedTrade
-                    ? {
-                          symbol: ['circle', 'none'],
-                          symbolSize: 6,
-                          lineStyle: {
-                              color: AppColors.folly,
-                              opacity: 1,
-                          },
-                          data: [
-                              {
-                                  name: 'ask todo',
-                                  xAxis: 1 / selectedTrade.data.value[0],
-                              },
-                          ],
-                      }
-                    : undefined,
+                markLine:
+                    selectedTrade?.toDisplay && selectedTrade.side === OrderbookSide.ASK
+                        ? {
+                              symbol: ['circle', 'none'],
+                              animation: false,
+                              data: [
+                                  {
+                                      symbolSize: 6,
+                                      lineStyle: {
+                                          color: AppColors.folly,
+                                          opacity: 1,
+                                      },
+                                      //   name: 'bid todo',
+                                      xAxis: 1 / (selectedTrade.price ?? 1),
+                                      label: {
+                                          formatter: (askMarlineParams) => {
+                                              console.log(askMarlineParams)
+                                              return [
+                                                  `${numeral(selectedTrade.amountIn).format('0.0,[000]')} ${orderbook.quote.symbol}`,
+                                                  `at ${askMarlineParams.value} ${orderbook.base.symbol}/${orderbook.quote.symbol}`,
+                                                  `= ${selectedTrade.output ? `${numeral(selectedTrade.output).format('0,0.[000]')} ${orderbook.base.symbol}` : '...computing'}`,
+                                              ].join('\n')
+                                          },
+                                          color: AppColors.folly,
+                                          show: true,
+                                          //   position: 'insideMiddleTop',
+                                          position: 'end',
+                                          //   rotate: 90,
+                                          fontSize: 11,
+                                          opacity: 0.8,
+                                      },
+                                  },
+                              ],
+                          }
+                        : undefined,
             },
         ],
     }
@@ -433,8 +457,8 @@ export default function DepthChart() {
         coloredAreas,
         symbolsInYAxis,
         selectedTrade,
-        selectOrderbookDataPoint,
-        setSellTokenAmountInput,
+        selectOrderbookTrade,
+        // setSellTokenAmountInput,
         // setBuyTokenAmountInput,
     } = useAppStore()
     const { apiStoreRefreshedAt, getOrderbook } = useApiStore()
@@ -445,8 +469,8 @@ export default function DepthChart() {
         const key = `${sellToken?.address}-${buyToken?.address}`
         const orderbook = getOrderbook(key)
         if (orderbook?.bids && orderbook?.asks) {
-            const highestBid = orderbook.bids.reduce((max, t) => (t.average_sell_price > max.average_sell_price ? t : max), orderbook.bids[0])
-            const lowestAsk = orderbook.asks.reduce((min, t) => (1 / t.average_sell_price < 1 / min.average_sell_price ? t : min), orderbook.asks[0])
+            const highestBid = getHighestBid(orderbook)
+            const lowestAsk = getLowestAsk(orderbook)
             const bids: LineDataPoint[] = orderbook?.bids
                 .filter((trade, tradeIndex, trades) => trades.findIndex((_trade) => _trade.amount === trade.amount) === tradeIndex)
                 .sort((curr, next) => curr.average_sell_price * curr.amount - next.average_sell_price * next.amount)
@@ -535,14 +559,24 @@ export default function DepthChart() {
         if (params?.data) {
             const key = `${sellToken?.address}-${buyToken?.address}`
             const orderbook = getOrderbook(key)
-
             if (orderbook) {
-                // update datapoint
-                selectOrderbookDataPoint({ data: params.data, bidsPools: orderbook.pools, asksPools: orderbook.pools })
+                // prepare
+                const selectedTrade: SelectedTrade = {
+                    selectedAt: Date.now(),
+                    side: params.data?.customData.side,
+                    price: params.data.customData?.side === OrderbookSide.BID ? params.data.value[0] : 1 / params.data.value[0],
+                    amountIn: params.data.value[1],
+                    distribution: params.data.customData.distribution,
+                    output: params.data.customData.output,
+                    pools: orderbook.pools,
+                    toDisplay: true,
+                }
 
-                // update selected trade
-                setSellTokenAmountInput(params.data.value[1])
-                // setBuyTokenAmountInput(params.data.value[1] * params.data.value[0])
+                // debug
+                console.log({ selectedTrade })
+
+                // update
+                selectOrderbookTrade(selectedTrade)
             }
         }
     }

@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 import { APP_METADATA, IS_DEV } from '@/config/app.config'
-import { AmmAsOrderbook, AmmPool, EchartOnClickParamsData, Token } from '@/interfaces'
+import { AmmAsOrderbook, SelectedTrade, Token } from '@/interfaces'
 import { hardcodedTokensList } from '@/data/back-tokens'
 import { OrderbookOption, OrderbookAxisScale } from '@/enums'
 
@@ -57,8 +57,8 @@ export const useAppStore = create<{
     switchSelectedTokens: () => void
 
     // trade
-    selectedTrade?: { data: EchartOnClickParamsData; bidsPools: AmmPool[]; asksPools: AmmPool[] }
-    selectOrderbookDataPoint: (selectedTrade?: { data: EchartOnClickParamsData; bidsPools: AmmPool[]; asksPools: AmmPool[] }) => void
+    selectedTrade?: SelectedTrade
+    selectOrderbookTrade: (selectedTrade?: SelectedTrade) => void
 
     /**
      * modal
@@ -70,6 +70,10 @@ export const useAppStore = create<{
     setSelectTokenModalFor: (selectTokenModalFor: 'buy' | 'sell') => void
     selectTokenModalSearch: string
     setSelectTokenModalSearch: (selectTokenModalSearch: string) => void
+
+    /**
+     * computeds
+     */
 }>()(
     persist(
         (set) => ({
@@ -120,21 +124,22 @@ export const useAppStore = create<{
                     console.log(`selectsellToken: ${sellToken?.symbol} (prev=${state.sellToken?.symbol})`)
                     return { sellToken }
                 }),
-            sellTokenAmountInput: 2000,
+            sellTokenAmountInput: 0,
             buyToken: hardcodedTokensList[0], // todo put this as null
             selectBuyToken: (buyToken) =>
                 set((state) => {
                     console.log(`selectBuyToken: ${buyToken?.symbol} (prev=${state.buyToken?.symbol})`)
                     return { buyToken }
                 }),
-            buyTokenAmountInput: 1,
+            buyTokenAmountInput: 0,
             setSellTokenAmountInput: (sellTokenAmountInput) => set(() => ({ sellTokenAmountInput })),
             setBuyTokenAmountInput: (buyTokenAmountInput) => set(() => ({ buyTokenAmountInput })),
             switchSelectedTokens: () => set((state) => ({ sellToken: state.buyToken, buyToken: state.sellToken })),
 
             // trade
             selectedTrade: undefined,
-            selectOrderbookDataPoint: (selectedTrade) => set(() => ({ selectedTrade })),
+            selectOrderbookTrade: (selectedTrade) =>
+                set(() => ({ selectedTrade, sellTokenAmountInput: selectedTrade?.amountIn ?? 0, buyTokenAmountInput: selectedTrade?.output ?? 0 })),
 
             /**
              * modal
@@ -157,7 +162,11 @@ export const useAppStore = create<{
             onRehydrateStorage: () => (state) => {
                 if (state && !state.hasHydrated) {
                     state.setHasHydrated(true)
-                    state.selectOrderbookDataPoint(undefined) // reset
+
+                    // reset
+                    state?.selectOrderbookTrade(undefined)
+                    state?.setSellTokenAmountInput(0)
+                    state?.setBuyTokenAmountInput(0)
 
                     // pre select default tokens if need be
                     // if (!state.buyToken)

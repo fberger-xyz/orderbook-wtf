@@ -85,6 +85,7 @@ export interface OrderbookKeyMetrics {
 //         "output": 1252.7186517580585
 //     }
 // }
+
 export interface EchartOnClickParamsData {
     value: [number, number]
     customData: {
@@ -92,4 +93,20 @@ export interface EchartOnClickParamsData {
         distribution: number[]
         output: number
     }
+}
+
+export interface SelectedTrade {
+    // known
+    side: OrderbookSide
+    amountIn: number
+    selectedAt: number
+
+    // must be calculated
+    price?: number
+    distribution: number[]
+    output?: number
+    pools: AmmPool[]
+
+    // meta
+    toDisplay: boolean
 }

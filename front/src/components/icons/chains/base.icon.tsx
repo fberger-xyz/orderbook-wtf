@@ -3,7 +3,7 @@ import React, { SVGProps } from 'react'
 export default function BaseSVG(props: SVGProps<SVGSVGElement>) {
     return (
         <svg className={props.className} xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="none">
-            <g clip-path="url(#a)">
+            <g clipPath="url(#a)">
                 <path fill="#0052FF" d="M0 32C0 14.327 14.327 0 32 0c17.673 0 32 14.327 32 32 0 17.673-14.327 32-32 32C14.327 64 0 49.673 0 32Z" />
                 <path
                     fill="#fff"

@@ -3,7 +3,7 @@ import React, { SVGProps } from 'react'
 export default function BalancerV2SVG(props: SVGProps<SVGSVGElement>) {
     return (
         <svg className={props.className} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 129 128">
-            <g clip-path="url(#a)">
+            <g clipPath="url(#a)">
                 <rect width="128" height="128" x=".452" fill="#fff" rx="64" />
                 <path
                     fill="#000"

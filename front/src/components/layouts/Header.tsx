@@ -23,6 +23,7 @@ export default function Header(props: { className?: string }) {
             <div className="flex justify-end items-center gap-2 z-20">
                 {/* docs */}
                 <LinkWrapper
+                    // https://tycho-orderbook.gitbook.io/docs
                     href="https://github.com/propeller-heads/tycho-x/blob/main/TAP-2.md"
                     target="_blank"
                     className="flex items-center gap-1 px-2.5"

@@ -11,6 +11,7 @@ export * from './requests.util'
 export * from './app.util'
 export * from './theme.util'
 export * from './viem.util'
+export * from './orderbook.util'
 
 // misc
 export const copyToClipboard = (value: string) => {

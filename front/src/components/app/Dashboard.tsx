@@ -8,12 +8,12 @@ import IconWrapper from '../common/IconWrapper'
 import TokenImage from './TokenImage'
 import ChainImage from './ChainImage'
 import DepthChart from '../charts/DepthChart'
-import { AmmAsOrderbook, AmmTrade, StructuredOutput, Token } from '@/interfaces'
+import { AmmAsOrderbook, AmmTrade, SelectedTrade, StructuredOutput, Token } from '@/interfaces'
 import SelectTokenModal from './SelectTokenModal'
 import { useModal } from 'connectkit'
 import { useAccount } from 'wagmi'
 import { useClickOutside } from '@/hooks/useClickOutside'
-import { cn, fetchBalance, formatAmount } from '@/utils'
+import { cn, fetchBalance, formatAmount, getBaseValueInUsd, getHighestBid, getLowestAsk, getQuoteValueInUsd, safeNumeral } from '@/utils'
 import { useQueries } from '@tanstack/react-query'
 import { useApiStore } from '@/stores/api.store'
 import { APP_ROUTE } from '@/config/app.config'
@@ -55,8 +55,10 @@ const mapProtocolIdToProtocolConfig = (protocolId: string): { id: string; name: 
 }
 
 export default function Dashboard() {
-    const account = useAccount()
-    const { setOpen } = useModal()
+    /**
+     * zustand
+     */
+
     const {
         /**
          * store
@@ -104,13 +106,13 @@ export default function Dashboard() {
         setSellTokenAmountInput,
         buyToken,
         // selectBuyToken,
-        // buyTokenAmountInput,
+        buyTokenAmountInput,
         // setBuyTokenAmountInput,
         switchSelectedTokens,
 
         // trade
         selectedTrade,
-        // selectOrderbookDataPoint,
+        selectOrderbookTrade,
 
         /**
          * modal
@@ -124,12 +126,24 @@ export default function Dashboard() {
         // setSelectTokenModalSearch,
     } = useAppStore()
     const { orderBookRefreshIntervalMs, setApiTokens, setApiOrderbook, setApiStoreRefreshedAt, getOrderbook } = useApiStore()
+
+    // chart
     const [openChartOptions, showChartOptions] = useState(false)
-    const [openTradeDetails, showTradeDetails] = useState(false)
     const chartOptionsDropdown = useRef<HTMLDivElement>(null)
     useClickOutside(chartOptionsDropdown, () => showChartOptions(false))
+
+    /**
+     * swap
+     */
+
+    // actions
+    const account = useAccount()
+    const [openTradeDetails, showTradeDetails] = useState(false)
     const [buyTokenBalance, setBuyTokenBalance] = useState(-1)
     const [sellTokenBalance, setSellTokenBalance] = useState(-1)
+    const { setOpen } = useModal()
+
+    // balances
     useEffect(() => {
         if (account.status === 'connected' && account.address && account.chainId) {
             if (buyToken?.address)
@@ -142,6 +156,17 @@ export default function Dashboard() {
                 )
         }
     }, [account.address, account.chainId, account.status, buyToken?.address, sellToken?.address])
+
+    // todo
+    // useEffect(() => {
+    //     if (!selectedTrade?.toDisplay) {
+    //         // trigger fetching some data
+    //     }
+    // }, [selectedTrade])
+
+    /**
+     * tokens + data
+     */
 
     // load data from rust api
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -178,8 +203,7 @@ export default function Dashboard() {
                 enabled: true,
                 queryFn: async () => {
                     if (!sellToken?.address || !buyToken?.address) return null
-
-                    // toast(`Refreshing ${sellToken.symbol}-${buyToken.symbol} orderbook data...`, { style: toastStyle })
+                    toast(`Refreshing ${sellToken.symbol}-${buyToken.symbol} orderbook data...`, { style: toastStyle })
                     const url = `${APP_ROUTE}/api/local/orderbook?token0=${sellToken.address}&token1=${buyToken.address}`
                     const [response] = await Promise.all([fetch(url, { method: 'GET', headers: { 'Content-Type': 'application/json' } })])
                     const [responseJson] = (await Promise.all([response.json()])) as [StructuredOutput<AmmAsOrderbook>]
@@ -199,21 +223,28 @@ export default function Dashboard() {
 
                     // handle success
                     else if (responseJson.data) {
+                        // store orderbook
                         setApiOrderbook(pair, responseJson.data)
-                        toast.success(`Latest ${sellToken.symbol}-${buyToken.symbol} orderbook data loaded`, { style: toastStyle })
-                        setApiStoreRefreshedAt(Date.now())
-                        if (responseJson.data.bids) {
-                            const highestBid = responseJson.data.bids.reduce(
-                                (max, t) => (t.average_sell_price > max.average_sell_price ? t : max),
-                                responseJson.data.bids[0],
-                            )
 
-                            // if (selectedTrade?.data) {
-                            //     setSellTokenAmountInput(selectedTrade.data.value[1])
-                            if (highestBid) {
-                                setSellTokenAmountInput(highestBid.amount)
-                            }
-                        }
+                        // notify ui
+                        toast.success(`Latest ${sellToken.symbol}-${buyToken.symbol} orderbook data loaded`, { style: toastStyle })
+
+                        // trigger refresh ui
+                        setApiStoreRefreshedAt(Date.now())
+
+                        // set selected trade
+                        // const highestBid = getHighestBid(responseJson.data)
+                        // if (highestBid && responseJson.data.pools) {
+                        //     selectOrderbookTrade({
+                        //         selectedAt: Date.now(),
+                        //         side: OrderbookSide.BID,
+                        //         price: highestBid.average_sell_price,
+                        //         amountIn: highestBid.amount,
+                        //         distribution: highestBid.distribution,
+                        //         output: highestBid.output,
+                        //         pools: responseJson.data.pools,
+                        //     })
+                        // }
                     }
 
                     // -
@@ -269,28 +300,25 @@ export default function Dashboard() {
 
     // ensure sell / buy are defined
     if (sellToken && buyToken) {
+        // prepare
         const key = `${sellToken.address}-${buyToken.address}`
-
-        // ensure orderbook is loaded
         metrics.orderbook = getOrderbook(key)
-        if (metrics.orderbook?.bids && metrics.orderbook?.asks && metrics.orderbook?.base_lqdty && metrics.orderbook?.quote_lqdty) {
-            metrics.highestBid = metrics.orderbook.bids.reduce(
-                (max, t) => (t.average_sell_price > max.average_sell_price ? t : max),
-                metrics.orderbook.bids[0],
-            )
-            metrics.lowestAsk = metrics.orderbook.asks.reduce(
-                (min, t) => (t.average_sell_price > min.average_sell_price ? t : min),
-                metrics.orderbook.asks[0],
-            )
+        metrics.highestBid = getHighestBid(metrics.orderbook)
+        metrics.lowestAsk = getLowestAsk(metrics.orderbook)
+
+        // check 1
+        if (metrics.highestBid && metrics.lowestAsk) {
             metrics.midPrice = (metrics.highestBid.average_sell_price + 1 / metrics?.lowestAsk.average_sell_price) / 2
             metrics.spreadPercent = (1 / metrics.lowestAsk.average_sell_price - metrics.highestBid.average_sell_price) / metrics.midPrice
-            metrics.totalBaseAmountInPools = metrics.orderbook.base_lqdty.reduce((total, baseAmountInPool) => (total += baseAmountInPool), 0)
-            metrics.totalQuoteAmountInPools = metrics.orderbook.quote_lqdty.reduce((total, quoteAmountInPool) => (total += quoteAmountInPool), 0)
-            metrics.totalBaseTvlUsd = metrics.totalBaseAmountInPools * metrics.orderbook.base_worth_eth * metrics.orderbook.eth_usd
-            metrics.totalQuoteTvlUsd = metrics.totalQuoteAmountInPools * metrics.orderbook.quote_worth_eth * metrics.orderbook.eth_usd
 
-            // -
-            metrics.showOrderbookPlaceholders = false
+            // check 2
+            if (metrics.orderbook?.base_lqdty && metrics.orderbook?.quote_lqdty) {
+                metrics.totalBaseAmountInPools = metrics.orderbook.base_lqdty.reduce((total, baseAmountInPool) => (total += baseAmountInPool), 0)
+                metrics.totalQuoteAmountInPools = metrics.orderbook.quote_lqdty.reduce((total, quoteAmountInPool) => (total += quoteAmountInPool), 0)
+                metrics.totalBaseTvlUsd = metrics.totalBaseAmountInPools * metrics.orderbook.base_worth_eth * metrics.orderbook.eth_usd
+                metrics.totalQuoteTvlUsd = metrics.totalQuoteAmountInPools * metrics.orderbook.quote_worth_eth * metrics.orderbook.eth_usd
+                metrics.showOrderbookPlaceholders = false
+            }
         }
     }
 
@@ -452,6 +480,7 @@ export default function Dashboard() {
                                 </div>
 
                                 {/* options dropdown */}
+                                {/* todo make it open left aligned */}
                                 <div
                                     ref={chartOptionsDropdown}
                                     className={cn(
@@ -539,11 +568,11 @@ export default function Dashboard() {
                 <OrderbookComponentLayout
                     title={<p className="text-milk text-base font-bold mb-2">Routing</p>}
                     content={
-                        selectedTrade?.data ? (
+                        selectedTrade?.toDisplay ? (
                             <div className="flex gap-4 w-full p-1">
                                 {/* from */}
                                 <div className="max-w-24 flex items-center border-r border-dashed border-milk-150 pr-4 my-1">
-                                    <TokenImage size={40} token={selectedTrade.data.customData.side === OrderbookSide.BID ? sellToken : buyToken} />
+                                    <TokenImage size={40} token={selectedTrade.side === OrderbookSide.BID ? sellToken : buyToken} />
                                 </div>
 
                                 {/* token % */}
@@ -554,8 +583,8 @@ export default function Dashboard() {
                                             <IconWrapper
                                                 icon={IconIds.CHEVRON_RIGHT}
                                                 className={cn('size-4 text-milk-400', {
-                                                    // 'text-aquamarine': selectedTrade.data.customData.side === OrderbookSide.BID,
-                                                    // 'text-folly': selectedTrade.data.customData.side === OrderbookSide.ASK,
+                                                    // 'text-aquamarine': selectedTrade.side === OrderbookSide.BID,
+                                                    // 'text-folly': selectedTrade.side === OrderbookSide.ASK,
                                                 })}
                                             />
                                         </div>
@@ -564,12 +593,9 @@ export default function Dashboard() {
                                         <div className="flex-grow flex flex-col gap-2">
                                             {/* tokn */}
                                             <div className="flex gap-2 items-start">
-                                                <TokenImage
-                                                    size={22}
-                                                    token={selectedTrade.data.customData.side === OrderbookSide.BID ? buyToken : sellToken}
-                                                />
+                                                <TokenImage size={22} token={selectedTrade.side === OrderbookSide.BID ? buyToken : sellToken} />
                                                 <p className="font-semibold text-milk tracking-wide">
-                                                    {(selectedTrade.data.customData.side === OrderbookSide.BID ? buyToken : sellToken)?.symbol}
+                                                    {(selectedTrade.side === OrderbookSide.BID ? buyToken : sellToken)?.symbol}
                                                 </p>
                                             </div>
 
@@ -583,7 +609,7 @@ export default function Dashboard() {
                                                     <p className="col-span-2">Input</p>
                                                     <p className="col-span-2">Output</p>
                                                 </div>
-                                                {selectedTrade.data.customData.distribution
+                                                {selectedTrade?.distribution
                                                     .sort((curr, next) => next - curr)
                                                     .map((percent, percentIndex) => {
                                                         const pool = metrics.orderbook?.pools[percentIndex]
@@ -620,45 +646,35 @@ export default function Dashboard() {
                                                                     {/* <TokenImage
                                                                     size={14}
                                                                     token={
-                                                                        selectedTrade.data.customData.side === OrderbookSide.BID
+                                                                        selectedTrade.side === OrderbookSide.BID
                                                                             ? sellToken
                                                                             : buyToken
                                                                     }
                                                                 /> */}
                                                                     <p className="text-milk-600 text-right text-xs">
-                                                                        {numeral(selectedTrade.data.value[1]).multiply(percent).format('0,0a')}{' '}
+                                                                        {numeral(selectedTrade.amountIn).multiply(percent).format('0,0a')}{' '}
                                                                     </p>
                                                                     <p className="text-xs text-milk-400">
-                                                                        {
-                                                                            (selectedTrade.data.customData.side === OrderbookSide.BID
-                                                                                ? sellToken
-                                                                                : buyToken
-                                                                            )?.symbol
-                                                                        }
+                                                                        {(selectedTrade.side === OrderbookSide.BID ? sellToken : buyToken)?.symbol}
                                                                     </p>
                                                                 </div>
                                                                 <div className="col-span-2 flex gap-1 items-center">
                                                                     <p className="text-milk-600 text-right text-xs">
-                                                                        {numeral(selectedTrade.data.value[1])
+                                                                        {numeral(selectedTrade.amountIn)
                                                                             .multiply(percent)
-                                                                            .multiply(selectedTrade.data.value[0])
+                                                                            .multiply(selectedTrade.price)
                                                                             .format('0,0a')}{' '}
                                                                     </p>
                                                                     {/* <TokenImage
                                                                     size={14}
                                                                     token={
-                                                                        selectedTrade.data.customData.side === OrderbookSide.BID
+                                                                        selectedTrade.side === OrderbookSide.BID
                                                                             ? buyToken
                                                                             : sellToken
                                                                     }
                                                                 /> */}
                                                                     <p className="text-xs text-milk-400">
-                                                                        {
-                                                                            (selectedTrade.data.customData.side === OrderbookSide.BID
-                                                                                ? buyToken
-                                                                                : sellToken
-                                                                            )?.symbol
-                                                                        }
+                                                                        {(selectedTrade.side === OrderbookSide.BID ? buyToken : sellToken)?.symbol}
                                                                     </p>
                                                                 </div>
                                                                 {/* <p className="col-span-2 text-milk-600">{numeral(poolBps).format('0,0.0')}</p> */}
@@ -674,7 +690,7 @@ export default function Dashboard() {
 
                                 {/* to */}
                                 <div className="max-w-24 flex items-center border-l border-dashed border-milk-150 pl-4 my-1">
-                                    <TokenImage size={40} token={selectedTrade.data.customData.side === OrderbookSide.BID ? buyToken : sellToken} />
+                                    <TokenImage size={40} token={selectedTrade.side === OrderbookSide.BID ? buyToken : sellToken} />
                                 </div>
                             </div>
                         ) : (
@@ -701,7 +717,11 @@ export default function Dashboard() {
                     <div className="flex justify-between">
                         <p className="text-milk-600 text-xs">Sell</p>
                         <div className="flex items-center">
-                            {account.isConnected && sellToken?.address && sellTokenBalance < Number(sellTokenAmountInput) ? (
+                            {account.isConnected &&
+                            sellToken?.address &&
+                            sellTokenBalance &&
+                            sellTokenAmountInput &&
+                            sellTokenBalance < sellTokenAmountInput ? (
                                 <p className="text-folly font-bold text-xs pr-2">Exceeds Balance</p>
                             ) : null}
                             <button
@@ -723,11 +743,7 @@ export default function Dashboard() {
                             }}
                             className="flex rounded-full bg-gray-600/30 transition-colors duration-300 hover:bg-gray-600/50 items-center gap-1.5 pl-1.5 pr-2 py-1.5 min-w-fit"
                         >
-                            {sellToken ? (
-                                <TokenImage size={24} token={sellToken} />
-                            ) : (
-                                <span className="animate-pulse rounded-full bg-milk-150" style={{ width: 24, height: 24 }} />
-                            )}
+                            <TokenImage size={24} token={sellToken} />
                             {sellToken ? (
                                 <p className="font-semibold tracking-wide">{sellToken.symbol}</p>
                             ) : (
@@ -742,12 +758,24 @@ export default function Dashboard() {
                             onChange={(e) => {
                                 const parsedNumber = Number(numeral(e.target.value).value())
                                 if (isNaN(parsedNumber)) return
+                                const newSelectedTrade: SelectedTrade = {
+                                    selectedAt: Date.now(),
+                                    side: OrderbookSide.BID,
+                                    price: undefined,
+                                    amountIn: parsedNumber,
+                                    distribution: [],
+                                    output: undefined,
+                                    pools: [],
+                                    toDisplay: false,
+                                }
+                                if (selectedTrade) selectOrderbookTrade(newSelectedTrade)
                                 setSellTokenAmountInput(parsedNumber)
                             }}
                         />
                     </div>
-                    {metrics.highestBid && metrics.orderbook ? (
+                    {selectedTrade && metrics.midPrice ? (
                         <div className="mt-2 flex justify-between items-center">
+                            {/* left: balance */}
                             <div className="flex justify-between gap-1 items-center">
                                 <IconWrapper icon={IconIds.WALLET} className="size-4 text-milk-400" />
                                 <p className="text-milk-400 text-xs">
@@ -759,10 +787,9 @@ export default function Dashboard() {
                                     </button>
                                 )}
                             </div>
-                            <p className="text-milk-600 text-xs">
-                                ${' '}
-                                {numeral(metrics.highestBid.amount * metrics.orderbook.eth_usd * metrics.orderbook.base_worth_eth).format('0,0.[00]')}
-                            </p>
+
+                            {/* right: input value in $ */}
+                            <p className="text-milk-600 text-xs">$ {safeNumeral(selectedTrade.amountIn * metrics.midPrice, '0,0.[00]')}</p>
                         </div>
                     ) : (
                         <div className="mt-2 flex justify-between items-center">
@@ -807,11 +834,7 @@ export default function Dashboard() {
                             }}
                             className="flex rounded-full bg-gray-600/30 transition-colors duration-300 hover:bg-gray-600/50 items-center gap-1.5 pl-1.5 pr-2 py-1.5 min-w-fit"
                         >
-                            {buyToken ? (
-                                <TokenImage size={24} token={buyToken} />
-                            ) : (
-                                <span className="animate-pulse rounded-full bg-milk-150" style={{ width: 24, height: 24 }} />
-                            )}
+                            <TokenImage size={24} token={buyToken} />
                             {buyToken ? (
                                 <p className="font-semibold tracking-wide">{buyToken.symbol}</p>
                             ) : (
@@ -819,30 +842,24 @@ export default function Dashboard() {
                             )}
                             <IconWrapper icon={IconIds.TRIANGLE_DOWN} className="size-4" />
                         </button>
-                        <p className="text-xl font-bold text-right border-none outline-none ring-0 focus:ring-0 focus:outline-none focus:border-none bg-transparent w-40 cursor-not-allowed">
-                            {selectedTrade?.data.value[0]
-                                ? numeral(selectedTrade?.data.value[1])
-                                      .multiply(
-                                          selectedTrade.data.customData.side === OrderbookSide.ASK
-                                              ? 1 / selectedTrade.data.value[0]
-                                              : selectedTrade.data.value[0],
-                                      )
-                                      .format('0,0.[00000]')
+                        {/* <p className="text-xl font-bold text-right border-none outline-none ring-0 focus:ring-0 focus:outline-none focus:border-none bg-transparent w-40 cursor-not-allowed">
+                            {selectedTrade
+                                ? safeNumeral(
+                                      selectedTrade.amountIn *
+                                          (selectedTrade.side === OrderbookSide.ASK ? 1 / selectedTrade.price : selectedTrade.price),
+                                      '0,0.[00000]',
+                                  )
                                 : '-'}
-                        </p>
-                        {/* <input
+                        </p> */}
+                        <input
                             type="text"
                             className="text-xl font-bold text-right border-none outline-none ring-0 focus:ring-0 focus:outline-none focus:border-none bg-transparent w-40 cursor-not-allowed"
-                            value={numeral(metrics?.highestBid?.output ?? 0).format('0,0.[00000]')} // todo load trade here
-                            // onChange={(e) => {
-                            //     const parsedNumber = Number(numeral(e.target.value ?? 0).value())
-                            //     if (isNaN(parsedNumber)) return
-                            //     setBuyTokenAmountInput(parsedNumber)
-                            // }}
-                        /> */}
+                            value={numeral(buyTokenAmountInput).format('0,0.[00000]')}
+                            disabled={true}
+                        />
                     </div>
 
-                    {metrics.highestBid && metrics.orderbook ? (
+                    {selectedTrade ? (
                         <div className="flex justify-between items-center">
                             <div className="flex justify-between gap-1 items-center">
                                 <IconWrapper icon={IconIds.WALLET} className="size-4 text-milk-400" />
@@ -850,11 +867,13 @@ export default function Dashboard() {
                                     {account.isConnected && sellTokenBalance >= 0 ? formatAmount(sellTokenBalance) : 0}
                                 </p>
                             </div>
+
+                            {/* right: input value in $ */}
                             <p className="text-milk-600 text-xs">
                                 ${' '}
-                                {numeral(metrics.highestBid.output * metrics.orderbook.eth_usd * metrics.orderbook.quote_worth_eth).format(
-                                    '0,0.[00]',
-                                )}
+                                {buyTokenAmountInput && getQuoteValueInUsd(metrics.orderbook)
+                                    ? numeral(buyTokenAmountInput).multiply(getQuoteValueInUsd(metrics.orderbook)).format('0,0.[00]')
+                                    : '-'}
                             </p>
                         </div>
                     ) : (
@@ -879,15 +898,8 @@ export default function Dashboard() {
                     <div className="flex w-full justify-between items-center">
                         {sellToken && buyToken && metrics.highestBid && metrics.orderbook ? (
                             <p className="text-milk-600 truncate pl-2">
-                                1 {sellToken.symbol} = {formatAmount((1 / metrics.highestBid.amount) * metrics.highestBid.output)} {buyToken.symbol}{' '}
-                                (${' '}
-                                {formatAmount(
-                                    (1 / metrics.highestBid.amount) *
-                                        metrics.highestBid.output *
-                                        metrics.orderbook.eth_usd *
-                                        metrics.orderbook.quote_worth_eth,
-                                )}
-                                )
+                                1 {sellToken.symbol} = {formatAmount(metrics.midPrice)} {buyToken.symbol} (${' '}
+                                {formatAmount(getBaseValueInUsd(metrics.orderbook))})
                             </p>
                         ) : sellToken && buyToken ? (
                             <div className="flex items-center gap-1">

@@ -30,7 +30,7 @@ const unknownFormatMap = [
     { limit: 1000000, format: '0,0.[0]a' },
     { limit: 1000000000, format: '0,0a' },
 ]
-export const formatAmount = (amount: number | string) => {
+export const formatAmount = (amount?: number | string) => {
     try {
         const num = Number(amount)
         if (isNaN(num) || num < 0) return amount
@@ -49,7 +49,8 @@ export const formatAmount = (amount: number | string) => {
         if (String(output).toLowerCase().includes('nan')) return 'n/a'
         return output
     } catch {
-        return `error ${amount}`
+        // return `error ${amount}`
+        return `Error`
     }
 }
 
@@ -146,5 +147,14 @@ export const formatPercent = (percent: number | string) => {
         return formatted
     } catch (error) {
         return `n/a`
+    }
+}
+
+export const safeNumeral = (value: number, format: string): string => {
+    try {
+        return numeral(value).format(format)
+    } catch (error) {
+        console.error({ error })
+        return 'Error'
     }
 }
