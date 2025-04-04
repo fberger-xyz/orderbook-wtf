@@ -15,6 +15,7 @@ import numeral from 'numeral'
 import toast from 'react-hot-toast'
 import { toastStyle } from '@/config/toasts.config'
 import { useApiStore } from '@/stores/api.store'
+
 type LineDataPoint = {
     value: [number, number]
     symbol?: string
@@ -56,12 +57,6 @@ const getOptions = (
     symbolsInYAxis: OrderbookOption,
     selectedTrade?: SelectedTrade,
 ): echarts.EChartsOption => {
-    // const sortedBids = bids.sort((curr, next) => curr.value[0] - next.value[0])
-    // const sortedAsks = asks.sort((curr, next) => curr.value[0] - next.value[0])
-    // const startValue = Math.min(sortedBids[Math.max(0, bids.length - 6)].value[0], sortedAsks[0].value[0])
-    // const endValue = Math.max(sortedAsks[Math.min(6, asks.length - 1)].value[0], sortedBids[0].value[0])
-    // console.log({ startValue, endValue })
-    // console.log({ selectedTrade })
     return {
         tooltip: {
             trigger: 'axis',
@@ -107,14 +102,11 @@ const getOptions = (
                 return [
                     `<strong>You sell</strong> <span style="color:${AppColors.milk[200]}">see Y axis</span>`,
                     `${numeral(input).format('0,0.[00000]')} ${side === OrderbookSide.BID ? orderbook.base.symbol : orderbook.quote.symbol}`,
-                    // -
                     `<br/><strong>At price</strong> <span style="color:${AppColors.milk[200]}">see X axis</span>`,
                     `1 ${orderbook.base.symbol} = ${numeral(price).format('0,0.[00000]')} ${orderbook.quote.symbol}`,
                     `1 ${orderbook.quote.symbol} = ${numeral(1 / price).format('0,0.[00000]')} ${orderbook.base.symbol}`,
-                    // -
                     `<br/><strong>To buy</strong>`,
                     `${numeral(output).format('0,0.[00000]')} ${side === OrderbookSide.BID ? orderbook.quote.symbol : orderbook.base.symbol}`,
-                    // -
                     `<br/><strong>Distribution</strong>`,
                     ...distributionLines,
                 ]
@@ -182,13 +174,9 @@ const getOptions = (
                     backgroundColor: AppColors.jagger[800],
                     color: AppColors.milk.DEFAULT,
                     borderColor: 'transparent',
-                    // extraCssText: 'backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);',
                 },
             },
         },
-
-        // interesting: https://stackoverflow.com/questions/67622021/getting-values-instead-of-percentages-of-datazoom-in-apache-echarts
-        // + this https://echarts.apache.org/en/option.html#dataZoom-slider
         dataZoom: [
             {
                 xAxisIndex: 0,
@@ -205,21 +193,19 @@ const getOptions = (
                 handleLabel: { show: true },
                 dataBackground: { lineStyle: { color: 'transparent' }, areaStyle: { color: 'transparent' } },
                 selectedDataBackground: { lineStyle: { color: AppColors.milk[200] }, areaStyle: { color: AppColors.milk[50] } },
-                brushStyle: { color: 'transparent' }, // unknown
-                handleStyle: { color: AppColors.milk[600], borderColor: AppColors.milk[600] }, // small candles on left and right
-                moveHandleStyle: { color: AppColors.milk[200] }, // top bar
+                brushStyle: { color: 'transparent' },
+                handleStyle: { color: AppColors.milk[600], borderColor: AppColors.milk[600] },
+                moveHandleStyle: { color: AppColors.milk[200] },
                 emphasis: {
                     handleLabel: { show: true },
-                    moveHandleStyle: { color: AppColors.milk[400] }, // top bar
+                    moveHandleStyle: { color: AppColors.milk[400] },
                 },
                 rangeMode: ['value', 'value'],
-                // startValue,
-                // endValue,
                 left: '20%',
                 right: '20%',
             },
             {
-                xAxisIndex: 0, // make this x axis zoomable
+                xAxisIndex: 0,
                 type: 'inside',
             },
         ],
@@ -255,7 +241,6 @@ const getOptions = (
                     snap: true,
                 },
                 min: 0,
-                // min: 'dataMin',
                 max: 'dataMax',
             },
             {
@@ -289,7 +274,6 @@ const getOptions = (
                     snap: true,
                 },
                 min: 0,
-                // min: 'dataMin',
                 max: 'dataMax',
             },
         ],
@@ -333,13 +317,13 @@ const getOptions = (
                                   x2: 0,
                                   y2: 1,
                                   colorStops: [
-                                      { offset: 0, color: AppColors.aquamarine }, // top
-                                      { offset: 1, color: 'transparent' }, // bottom
+                                      { offset: 0, color: AppColors.aquamarine },
+                                      { offset: 1, color: 'transparent' },
                                   ],
                               },
                           },
                 markLine:
-                    selectedTrade?.toDisplay && selectedTrade.side === OrderbookSide.BID
+                    selectedTrade?.trade && selectedTrade.side === OrderbookSide.BID
                         ? {
                               symbol: ['circle', 'none'],
                               animation: false,
@@ -361,9 +345,7 @@ const getOptions = (
                                           },
                                           color: AppColors.aquamarine,
                                           show: true,
-                                          //   position: 'insideMiddleTop',
                                           position: 'end',
-                                          //   rotate: 90,
                                           fontSize: 11,
                                           opacity: 0.8,
                                       },
@@ -401,13 +383,13 @@ const getOptions = (
                                   x2: 0,
                                   y2: 1,
                                   colorStops: [
-                                      { offset: 0, color: AppColors.folly }, // top
-                                      { offset: 1, color: 'transparent' }, // bottom
+                                      { offset: 0, color: AppColors.folly },
+                                      { offset: 1, color: 'transparent' },
                                   ],
                               },
                           },
                 markLine:
-                    selectedTrade?.toDisplay && selectedTrade.side === OrderbookSide.ASK
+                    selectedTrade?.trade && selectedTrade.side === OrderbookSide.ASK
                         ? {
                               symbol: ['circle', 'none'],
                               animation: false,
@@ -418,7 +400,6 @@ const getOptions = (
                                           color: AppColors.folly,
                                           opacity: 1,
                                       },
-                                      //   name: 'bid todo',
                                       xAxis: 1 / (selectedTrade.trade?.average_sell_price ?? 1),
                                       label: {
                                           formatter: (askMarlineParams) => {
@@ -430,9 +411,7 @@ const getOptions = (
                                           },
                                           color: AppColors.folly,
                                           show: true,
-                                          //   position: 'insideMiddleTop',
                                           position: 'end',
-                                          //   rotate: 90,
                                           fontSize: 11,
                                           opacity: 0.8,
                                       },
@@ -456,16 +435,13 @@ export default function DepthChart() {
         symbolsInYAxis,
         selectedTrade,
         selectOrderbookTrade,
-        // setSellTokenAmountInput,
-        // setBuyTokenAmountInput,
+        getAddressPair,
     } = useAppStore()
     const { apiStoreRefreshedAt, getOrderbook } = useApiStore()
     const [options, setOptions] = useState<null | echarts.EChartsOption>(null)
 
-    // load/refresh chart
     useEffect(() => {
-        const key = `${sellToken?.address}-${buyToken?.address}`
-        const orderbook = getOrderbook(key)
+        const orderbook = getOrderbook(getAddressPair())
         if (orderbook?.bids && orderbook?.asks) {
             const highestBid = getHighestBid(orderbook)
             const lowestAsk = getLowestAsk(orderbook)
@@ -496,7 +472,7 @@ export default function DepthChart() {
                             borderWidth: 1,
                             borderColor: AppColors.jagger[500],
                             color: AppColors.aquamarine,
-                            shadowBlur: 15, // the intensity of the glow
+                            shadowBlur: 15,
                             shadowColor: 'rgba(144, 238, 144, 1)',
                         }
                     }
@@ -521,14 +497,14 @@ export default function DepthChart() {
                             borderWidth: 1,
                             borderColor: AppColors.jagger[500],
                             color: AppColors.folly,
-                            shadowBlur: 15, // the intensity of the glow
+                            shadowBlur: 15,
                             shadowColor: 'rgba(255, 0, 128, 1)',
                         }
                         point.emphasis = {
                             symbolSize: 30,
                             itemStyle: {
                                 shadowBlur: 10,
-                                shadowColor: 'rgba(255, 0, 128, 1)', // hot pink
+                                shadowColor: 'rgba(255, 0, 128, 1)',
                                 borderWidth: 0.5,
                             },
                         }
@@ -536,48 +512,30 @@ export default function DepthChart() {
                     return point
                 })
 
-            // debug
-            // console.log('bids.length', bids.length, 'highestBid', highestBid.average_sell_price)
-            // console.log('asks.length', asks.length, 'lowestAsk', 1 / lowestAsk.average_sell_price)
-
-            // options
             const newOptions = getOptions(orderbook, bids, asks, yAxisType, yAxisLogBase, coloredAreas, symbolsInYAxis, selectedTrade)
 
-            // update
             setOptions(newOptions)
         } else {
             setOptions(null)
         }
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [sellToken?.address, buyToken?.address, apiStoreRefreshedAt, yAxisType, yAxisLogBase, coloredAreas, symbolsInYAxis, selectedTrade])
 
-    // methods
     const handlePointClick = (params: undefined | { data: EchartOnClickParamsData; dataIndex: number }) => {
         if (params?.data) {
             const key = `${sellToken?.address}-${buyToken?.address}`
             const orderbook = getOrderbook(key)
             if (orderbook) {
-                // prepare
                 const selectedTrade: SelectedTrade = {
                     selectedAt: Date.now(),
                     side: params.data?.customData.side,
-                    // price: params.data.customData?.side === OrderbookSide.BID ? params.data.value[0] : 1 / params.data.value[0],
                     amountIn: params.data.value[1],
-                    // distribution: params.data.customData.distribution,
-                    // output: params.data.customData.output,
                     pools: orderbook.pools,
                     trade:
                         params.data.customData?.side === OrderbookSide.BID
                             ? orderbook.bids.find((bid) => bid.output === params.data.customData.output)
                             : orderbook.asks.find((ask) => ask.output === params.data.customData.output),
-                    toDisplay: true,
                 }
 
-                // debug
-                console.log({ params, selectedTrade })
-
-                // update
                 selectOrderbookTrade(selectedTrade)
             }
         }

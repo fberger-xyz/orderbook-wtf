@@ -74,9 +74,12 @@ export const useAppStore = create<{
     /**
      * computeds
      */
+
+    getAddressPair: () => string
+    getSymbolPair: () => string
 }>()(
     persist(
-        (set) => ({
+        (set, get) => ({
             /**
              * store
              */
@@ -156,6 +159,14 @@ export const useAppStore = create<{
             setShowSelectTokenModal: (showSelectTokenModal) => set(() => ({ showSelectTokenModal })),
             setSelectTokenModalFor: (selectTokenModalFor) => set(() => ({ selectTokenModalFor })),
             setSelectTokenModalSearch: (selectTokenModalSearch) => set(() => ({ selectTokenModalSearch })),
+
+            /**
+             * computeds
+             */
+
+            // -
+            getAddressPair: () => `${get().sellToken?.address}-${get().buyToken?.address}`,
+            getSymbolPair: () => `${get().sellToken?.symbol}-${get().buyToken?.symbol}`,
         }),
         {
             name: IS_DEV

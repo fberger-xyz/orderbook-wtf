@@ -3,12 +3,12 @@
 import { IconIds, OrderbookOption, OrderbookAxisScale, OrderbookSide } from '@/enums'
 import numeral from 'numeral'
 import { useAppStore } from '@/stores/app.store'
-import { ReactNode, useEffect, useRef, useState } from 'react'
+import { ChangeEvent, ReactNode, useEffect, useRef, useState } from 'react'
 import IconWrapper from '../common/IconWrapper'
 import TokenImage from './TokenImage'
 import ChainImage from './ChainImage'
 import DepthChart from '../charts/DepthChart'
-import { AmmAsOrderbook, AmmTrade, SelectedTrade, StructuredOutput, Token } from '@/interfaces'
+import { AmmAsOrderbook, DashboardMetrics, SelectedTrade, StructuredOutput, Token } from '@/interfaces'
 import SelectTokenModal from './SelectTokenModal'
 import { useModal } from 'connectkit'
 import { useAccount } from 'wagmi'
@@ -42,6 +42,47 @@ const OrderbookComponentLayout = (props: { title: ReactNode; content: ReactNode 
         {props.content}
     </div>
 )
+
+function getDashboardMetrics(orderbook: undefined | AmmAsOrderbook, sellToken: Token | undefined, buyToken: Token | undefined) {
+    const metrics: DashboardMetrics = {
+        orderbook: undefined,
+        highestBid: undefined,
+        midPrice: undefined,
+        lowestAsk: undefined,
+        spreadPercent: undefined,
+        totalBaseAmountInPools: undefined,
+        totalQuoteAmountInPools: undefined,
+        totalBaseTvlUsd: undefined,
+        totalQuoteTvlUsd: undefined,
+    }
+
+    if (!orderbook) return metrics
+    metrics.orderbook = orderbook
+    if (sellToken && buyToken) {
+        metrics.highestBid = getHighestBid(orderbook)
+        metrics.lowestAsk = getLowestAsk(orderbook)
+
+        if (metrics.highestBid && metrics.lowestAsk) {
+            metrics.midPrice = (metrics.highestBid.average_sell_price + 1 / metrics.lowestAsk.average_sell_price) / 2
+            metrics.spreadPercent = (1 / metrics.lowestAsk.average_sell_price - metrics.highestBid.average_sell_price) / metrics.midPrice
+
+            if (orderbook?.base_lqdty && orderbook?.quote_lqdty) {
+                metrics.totalBaseAmountInPools = orderbook.base_lqdty.reduce(
+                    (total: number, baseAmountInPool: number) => (total += baseAmountInPool),
+                    0,
+                )
+                metrics.totalQuoteAmountInPools = orderbook.quote_lqdty.reduce(
+                    (total: number, quoteAmountInPool: number) => (total += quoteAmountInPool),
+                    0,
+                )
+                metrics.totalBaseTvlUsd = metrics.totalBaseAmountInPools * orderbook.base_worth_eth * orderbook.eth_usd
+                metrics.totalQuoteTvlUsd = metrics.totalQuoteAmountInPools * orderbook.quote_worth_eth * orderbook.eth_usd
+            }
+        }
+    }
+
+    return metrics
+}
 
 export default function Dashboard() {
     /**
@@ -113,6 +154,12 @@ export default function Dashboard() {
         setSelectTokenModalFor,
         // selectTokenModalSearch,
         // setSelectTokenModalSearch,
+
+        /**
+         * computeds
+         */
+
+        getAddressPair,
     } = useAppStore()
     const { orderBookRefreshIntervalMs, setApiTokens, setApiOrderbook, setApiStoreRefreshedAt, getOrderbook } = useApiStore()
 
@@ -130,6 +177,7 @@ export default function Dashboard() {
     const [openTradeDetails, showTradeDetails] = useState(false)
     const [buyTokenBalance, setBuyTokenBalance] = useState(-1)
     const [sellTokenBalance, setSellTokenBalance] = useState(-1)
+    const [metrics, setMetrics] = useState<DashboardMetrics>(getDashboardMetrics(undefined, undefined, undefined))
     const { setOpen } = useModal()
 
     // balances
@@ -146,43 +194,23 @@ export default function Dashboard() {
         }
     }, [account.address, account.chainId, account.status, buyToken?.address, sellToken?.address])
 
-    // todo
-    // useEffect(() => {
-    //     if (!selectedTrade?.toDisplay) {
-    //         toast(`Selected trade can't be displayed...`, { style: toastStyle })
-    //     }
-    // }, [selectedTrade])
-
     /**
      * tokens + data
      */
 
     // load data from rust api
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const [_, ApiOrderbookQuery] = useQueries({
+    useQueries({
         queries: [
             // todo status query to update when the api is ready
             {
                 queryKey: ['ApiTokensQuery'],
                 enabled: true,
                 queryFn: async () => {
-                    // fetch
-                    // toast(`Refreshing tokens list...`, { style: toastStyle })
-                    const [tokensResponse] = await Promise.all([
-                        fetch(`${APP_ROUTE}/api/local/tokens`, { method: 'GET', headers: { 'Content-Type': 'application/json' } }),
-                    ])
-
-                    // parse
-                    const [tokensResponseJson] = (await Promise.all([tokensResponse.json()])) as [StructuredOutput<Token[]>]
-
-                    // store
-                    if (tokensResponseJson?.data) {
-                        setApiTokens(tokensResponseJson.data)
-                        // toast.success(`Tokens list loaded`, { style: toastStyle })
-                    }
-
-                    // finally
-                    return { tokensResponseJson }
+                    const tokensEndpoint = `${APP_ROUTE}/api/local/tokens`
+                    const tokensResponse = await fetch(tokensEndpoint, { method: 'GET', headers: { 'Content-Type': 'application/json' } })
+                    const tokensResponseJson = (await tokensResponse.json()) as StructuredOutput<Token[]>
+                    setApiTokens(tokensResponseJson.data ?? [])
+                    return tokensResponseJson.data
                 },
                 refetchOnWindowFocus: false,
                 refetchInterval: 1000 * 60 * 5,
@@ -192,53 +220,36 @@ export default function Dashboard() {
                 enabled: true,
                 queryFn: async () => {
                     if (!sellToken?.address || !buyToken?.address) return null
-                    toast(`Refreshing ${sellToken.symbol}-${buyToken.symbol} orderbook data...`, { style: toastStyle })
                     const url = `${APP_ROUTE}/api/local/orderbook?token0=${sellToken.address}&token1=${buyToken.address}`
-                    const [response] = await Promise.all([fetch(url, { method: 'GET', headers: { 'Content-Type': 'application/json' } })])
-                    const [responseJson] = (await Promise.all([response.json()])) as [StructuredOutput<AmmAsOrderbook>]
-                    const pair = `${sellToken.address}-${buyToken.address}`
+                    const orderbookResponse = await fetch(url, { method: 'GET', headers: { 'Content-Type': 'application/json' } })
+                    const orderbookJson = (await orderbookResponse.json()) as StructuredOutput<AmmAsOrderbook>
 
-                    // handle errors
-                    if (responseJson.error) {
-                        if (responseJson.error.includes('pair has 0 associated components'))
+                    // handle rust api errors
+                    if (orderbookJson.error) {
+                        // custom error
+                        if (orderbookJson.error.includes('pair has 0 associated components'))
                             toast.error(`No pool for pair ${sellToken.symbol}-${buyToken.symbol} > select another pair`, { style: toastStyle })
-                        else toast.error(`${responseJson.error}`, { style: toastStyle })
+                        // generic erros
+                        else toast.error(`${orderbookJson.error}`, { style: toastStyle })
                     }
 
-                    // handle errors
-                    else if (!responseJson.data?.bids || !responseJson.data?.asks) {
+                    // valide some crucial keys-values
+                    else if (!orderbookJson.data?.bids || !orderbookJson.data?.asks) {
                         toast.error(`Bad orderbook format`, { style: toastStyle })
                     }
 
                     // handle success
-                    else if (responseJson.data) {
-                        // store orderbook
-                        setApiOrderbook(pair, responseJson.data)
-
-                        // notify ui
-                        toast.success(`Latest ${sellToken.symbol}-${buyToken.symbol} orderbook data loaded`, { style: toastStyle })
-
-                        // trigger refresh ui
+                    else if (orderbookJson.data) {
+                        setApiOrderbook(getAddressPair(), orderbookJson.data)
+                        toast.success(`${sellToken.symbol}-${buyToken.symbol} orderbook data updated just now`, { style: toastStyle })
+                        const orderbook = getOrderbook(getAddressPair())
+                        setMetrics(getDashboardMetrics(orderbook, sellToken, buyToken))
                         setApiStoreRefreshedAt(Date.now())
-
-                        // set selected trade
-                        // const highestBid = getHighestBid(responseJson.data)
-                        // if (highestBid && responseJson.data.pools) {
-                        //     selectOrderbookTrade({
-                        //         selectedAt: Date.now(),
-                        //         side: OrderbookSide.BID,
-                        //         price: highestBid.average_sell_price,
-                        //         amountIn: highestBid.amount,
-                        //         distribution: highestBid.distribution,
-                        //         output: highestBid.output,
-                        //         pools: responseJson.data.pools,
-                        //     })
-                        // }
-                        selectOrderbookTrade(selectedTrade ? { ...selectedTrade, trade: undefined, toDisplay: false } : undefined)
+                        selectOrderbookTrade(selectedTrade ? { ...selectedTrade, trade: undefined } : undefined)
                     }
 
                     // -
-                    return { responseJson }
+                    return orderbookJson
                 },
                 refetchOnWindowFocus: false,
                 refetchInterval: orderBookRefreshIntervalMs,
@@ -246,69 +257,72 @@ export default function Dashboard() {
         ],
     })
 
-    useEffect(() => {
-        if (!ApiOrderbookQuery.isFetching || !ApiOrderbookQuery.isLoading) ApiOrderbookQuery.refetch()
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [sellToken, buyToken])
+    /**
+     * misc
+     */
 
-    // prepare
-    const metrics:
-        | {
-              showOrderbookPlaceholders: boolean
-              orderbook?: AmmAsOrderbook
-              highestBid?: AmmTrade
-              midPrice: number
-              lowestAsk?: AmmTrade
-              spreadPercent: number
-              totalBaseAmountInPools: number
-              totalQuoteAmountInPools: number
-              totalBaseTvlUsd: number
-              totalQuoteTvlUsd: number
-          }
-        | {
-              showOrderbookPlaceholders: boolean
-              orderbook: AmmAsOrderbook
-              highestBid: AmmTrade
-              midPrice: number
-              lowestAsk: AmmTrade
-              spreadPercent: number
-              totalBaseAmountInPools: number
-              totalQuoteAmountInPools: number
-              totalBaseTvlUsd: number
-              totalQuoteTvlUsd: number
-          } = {
-        showOrderbookPlaceholders: true,
-        highestBid: undefined,
-        midPrice: -1,
-        lowestAsk: undefined,
-        spreadPercent: -1,
-        totalBaseAmountInPools: -1,
-        totalQuoteAmountInPools: -1,
-        totalBaseTvlUsd: -1,
-        totalQuoteTvlUsd: -1,
-    }
+    const handleChangeOfAmountIn = async (event: ChangeEvent<HTMLInputElement>) => {
+        try {
+            // parse
+            const parsedNumber = Number(numeral(event.target.value).value())
+            if (isNaN(parsedNumber)) return
+            const newTradeSide = OrderbookSide.BID // always bid
+            const newSelectedTrade: SelectedTrade = {
+                side: newTradeSide,
+                amountIn: parsedNumber,
+                selectedAt: Date.now(),
 
-    // ensure sell / buy are defined
-    if (sellToken && buyToken) {
-        // prepare
-        const key = `${sellToken.address}-${buyToken.address}`
-        metrics.orderbook = getOrderbook(key)
-        metrics.highestBid = getHighestBid(metrics.orderbook)
-        metrics.lowestAsk = getLowestAsk(metrics.orderbook)
-
-        // check 1
-        if (metrics.highestBid && metrics.lowestAsk) {
-            metrics.midPrice = (metrics.highestBid.average_sell_price + 1 / metrics?.lowestAsk.average_sell_price) / 2
-            metrics.spreadPercent = (1 / metrics.lowestAsk.average_sell_price - metrics.highestBid.average_sell_price) / metrics.midPrice
-
-            // check 2
-            if (metrics.orderbook?.base_lqdty && metrics.orderbook?.quote_lqdty) {
-                metrics.totalBaseAmountInPools = metrics.orderbook.base_lqdty.reduce((total, baseAmountInPool) => (total += baseAmountInPool), 0)
-                metrics.totalQuoteAmountInPools = metrics.orderbook.quote_lqdty.reduce((total, quoteAmountInPool) => (total += quoteAmountInPool), 0)
-                metrics.totalBaseTvlUsd = metrics.totalBaseAmountInPools * metrics.orderbook.base_worth_eth * metrics.orderbook.eth_usd
-                metrics.totalQuoteTvlUsd = metrics.totalQuoteAmountInPools * metrics.orderbook.quote_worth_eth * metrics.orderbook.eth_usd
-                metrics.showOrderbookPlaceholders = false
+                // must be calculated
+                trade: undefined,
+                pools: [],
             }
+
+            selectOrderbookTrade(newSelectedTrade)
+            setSellTokenAmountInput(parsedNumber)
+
+            // fetch
+            if (sellToken?.address && buyToken?.address) {
+                // prepare
+                const url = `${APP_ROUTE}/api/local/orderbook?token0=${sellToken?.address}&token1=${buyToken?.address}&pointAmount=${parsedNumber}&pointToken=${sellToken?.address}`
+                const tradeResponse = await fetch(url, { method: 'GET', headers: { 'Content-Type': 'application/json' } })
+                const tradeResponseJson = (await tradeResponse.json()) as StructuredOutput<AmmAsOrderbook>
+                const pair = getAddressPair()
+                const orderbook = getOrderbook(pair)
+                if (!tradeResponseJson.data) return
+                if (!orderbook) return
+
+                // -
+                const newOrderbook = {
+                    ...orderbook,
+                    bids: [...orderbook.bids, ...tradeResponseJson.data.bids],
+                    asks: [...orderbook.asks, ...tradeResponseJson.data.asks],
+                    base_worth_eth: tradeResponseJson.data.base_worth_eth,
+                    quote_worth_eth: tradeResponseJson.data.quote_worth_eth,
+                    block: tradeResponseJson.data.block,
+                }
+                setApiOrderbook(pair, newOrderbook)
+
+                // -
+                const newSelectedTrade = {
+                    side: newTradeSide,
+                    amountIn: parsedNumber,
+                    selectedAt: Date.now(),
+
+                    // must be calculated
+                    trade: newOrderbook.bids.find((bid) => bid.amount === parsedNumber),
+                    pools: newOrderbook.pools,
+
+                    // meta
+                    toDisplay: true,
+                }
+                selectOrderbookTrade(newSelectedTrade)
+            }
+        } catch (error) {
+            toast.error(`Unexepected error while fetching price: ${extractErrorMessage(error)}`, {
+                style: toastStyle,
+            })
+        } finally {
+            // tba
         }
     }
 
@@ -316,7 +330,7 @@ export default function Dashboard() {
         <div className="w-full grid grid-cols-1 md:grid-cols-10 gap-4">
             {/* left */}
             <div className="col-span-1 md:col-span-6 flex flex-col gap-4 xl:col-span-7">
-                {/* metrics */}
+                {/* 1. metrics */}
                 <div className="w-full grid grid-cols-2 md:grid-cols-3 gap-2">
                     {/* bid */}
                     <OrderbookComponentLayout
@@ -329,7 +343,7 @@ export default function Dashboard() {
                         content={
                             <div
                                 className={cn('flex gap-1.5 items-center flex-wrap', {
-                                    'skeleton-loading p-1': metrics.showOrderbookPlaceholders,
+                                    'skeleton-loading p-1': !metrics.highestBid?.average_sell_price,
                                 })}
                             >
                                 <TokenImage size={20} token={buyToken} />
@@ -349,9 +363,11 @@ export default function Dashboard() {
                             </div>
                         }
                         content={
-                            <div className={cn('flex gap-1.5 items-center flex-wrap', { 'skeleton-loading p-1': metrics.showOrderbookPlaceholders })}>
+                            <div className={cn('flex gap-1.5 items-center flex-wrap', { 'skeleton-loading p-1': metrics.midPrice === undefined })}>
                                 <TokenImage size={20} token={buyToken} />
-                                {metrics.midPrice > 0 && <p className="text-milk font-bold text-base">{formatAmount(metrics.midPrice)}</p>}
+                                {metrics.midPrice !== undefined ? (
+                                    <p className="text-milk font-bold text-base">{formatAmount(metrics.midPrice)}</p>
+                                ) : null}
                             </div>
                         }
                     />
@@ -365,51 +381,45 @@ export default function Dashboard() {
                             </div>
                         }
                         content={
-                            <div className={cn('flex gap-1.5 items-center flex-wrap', { 'skeleton-loading p-1': metrics.showOrderbookPlaceholders })}>
+                            <div
+                                className={cn('flex gap-1.5 items-center flex-wrap', {
+                                    'skeleton-loading p-1': metrics?.lowestAsk?.average_sell_price === undefined,
+                                })}
+                            >
                                 <TokenImage size={20} token={buyToken} />
-                                {metrics?.lowestAsk?.average_sell_price && (
+                                {metrics?.lowestAsk?.average_sell_price !== undefined ? (
                                     <p className="text-milk font-bold text-base">{formatAmount(1 / metrics.lowestAsk.average_sell_price)}</p>
-                                )}
+                                ) : null}
                             </div>
                         }
                     />
 
                     {/* spread */}
-                    {!metrics.showOrderbookPlaceholders &&
-                    sellToken?.symbol &&
-                    buyToken?.symbol &&
-                    metrics.lowestAsk &&
-                    metrics.highestBid &&
-                    metrics.midPrice ? (
-                        <OrderbookKeyMetric
-                            title="Spread"
-                            content={
+                    <OrderbookKeyMetric
+                        title="Spread"
+                        content={
+                            !isNaN(Number(metrics.spreadPercent)) ? (
                                 <p className="text-milk font-bold text-base">
                                     {numeral(metrics.spreadPercent).format('0,0.[0000]%')}{' '}
                                     <span className="pl-1 text-milk-400 text-xs">
                                         {numeral(metrics.spreadPercent).multiply(10000).format('0,0.[00]')} bps
                                     </span>
                                 </p>
-                            }
-                        />
-                    ) : (
-                        <OrderbookKeyMetric
-                            title="Spread"
-                            content={
+                            ) : (
                                 <div className="flex gap-1.5 items-center flex-wrap skeleton-loading p-1">
                                     <p className="text-milk-100 font-bold text-sm">-.--%</p>
                                 </div>
-                            }
-                        />
-                    )}
+                            )
+                        }
+                    />
 
                     {/* last block */}
-                    {!metrics.showOrderbookPlaceholders && sellToken?.symbol && buyToken?.symbol && metrics.orderbook ? (
+                    {metrics.orderbook?.block !== undefined ? (
                         <OrderbookComponentLayout
                             title={
                                 <div className="w-full flex justify-between">
                                     <p className="text-milk-600 text-xs">Last block</p>
-                                    <p className="text-milk-600 text-xs">3s</p>
+                                    <p className="text-milk-600 text-xs">-s</p>
                                 </div>
                             }
                             content={
@@ -435,29 +445,23 @@ export default function Dashboard() {
                     )}
 
                     {/* TVL */}
-                    {!metrics.showOrderbookPlaceholders &&
-                    sellToken?.symbol &&
-                    buyToken?.symbol &&
-                    metrics.totalBaseTvlUsd &&
-                    metrics.totalQuoteTvlUsd ? (
-                        <OrderbookKeyMetric
-                            title="Total TVL"
-                            content={
-                                <p className="text-milk font-bold text-base">$ {formatAmount(metrics.totalBaseTvlUsd + metrics.totalQuoteTvlUsd)}</p>
-                            }
-                        />
-                    ) : (
-                        <OrderbookKeyMetric
-                            title="Total TVL"
-                            content={
+                    <OrderbookKeyMetric
+                        title="Total TVL"
+                        content={
+                            metrics.totalBaseTvlUsd === undefined || metrics.totalQuoteTvlUsd === undefined ? (
                                 <div className="flex gap-1.5 items-center flex-wrap skeleton-loading p-1 w-full">
                                     <p className="text-milk-100 font-bold text-sm">$ --- m</p>
                                 </div>
-                            }
-                        />
-                    )}
+                            ) : (
+                                <p className="text-milk font-bold text-base">
+                                    $ {formatAmount(Number(metrics.totalBaseTvlUsd) + Number(metrics.totalQuoteTvlUsd))}
+                                </p>
+                            )
+                        }
+                    />
                 </div>
 
+                {/* 2. chart */}
                 <OrderbookComponentLayout
                     title={
                         <div className="w-full flex justify-between">
@@ -555,11 +559,11 @@ export default function Dashboard() {
                     content={<DepthChart />}
                 />
 
-                {/* routes */}
+                {/* 3. routes */}
                 <OrderbookComponentLayout
                     title={<p className="text-milk text-base font-bold mb-2">Routing</p>}
                     content={
-                        selectedTrade?.toDisplay ? (
+                        selectedTrade?.trade ? (
                             <div className="flex gap-4 w-full p-1">
                                 {/* from */}
                                 <div className="max-w-24 flex items-center border-r border-dashed border-milk-150 pr-4 my-1">
@@ -762,72 +766,7 @@ export default function Dashboard() {
                             type="text"
                             className="text-xl font-bold text-right border-none outline-none ring-0 focus:ring-0 focus:outline-none focus:border-none bg-transparent w-40"
                             value={numeral(sellTokenAmountInput).format('0,0.[00000]')}
-                            onChange={async (e) => {
-                                try {
-                                    // lock
-                                    const parsedNumber = Number(numeral(e.target.value).value())
-                                    if (isNaN(parsedNumber)) return
-                                    const newTradeSide = parsedNumber < metrics.midPrice ? OrderbookSide.BID : OrderbookSide.ASK
-                                    const newSelectedTrade: SelectedTrade = {
-                                        side: newTradeSide,
-                                        amountIn: parsedNumber,
-                                        selectedAt: Date.now(),
-
-                                        // must be calculated
-                                        trade: undefined,
-                                        pools: [],
-
-                                        // meta
-                                        toDisplay: false,
-                                    }
-
-                                    selectOrderbookTrade(newSelectedTrade)
-                                    setSellTokenAmountInput(parsedNumber)
-
-                                    // fetch
-                                    if (sellToken?.address && buyToken?.address) {
-                                        const url = `${APP_ROUTE}/api/local/orderbook?token0=${sellToken?.address}&token1=${buyToken?.address}&pointAmount=${parsedNumber}&pointToken=${sellToken?.address}`
-                                        // console.log('----')
-                                        console.log(parsedNumber, url)
-                                        // console.log('----')
-                                        const tradeResponse = await fetch(url, { method: 'GET', headers: { 'Content-Type': 'application/json' } })
-                                        const tradeResponseJson = (await tradeResponse.json()) as StructuredOutput<AmmAsOrderbook>
-                                        // console.log({ tradeResponseJson })
-                                        const pair = `${sellToken.address}-${buyToken.address}`
-                                        const orderbook = getOrderbook(pair)
-                                        if (orderbook && tradeResponseJson.data) {
-                                            const newOrderbook = {
-                                                ...orderbook,
-                                                bids: [...orderbook.bids, ...tradeResponseJson.data.bids],
-                                                asks: [...orderbook.asks, ...tradeResponseJson.data.asks],
-                                                base_worth_eth: tradeResponseJson.data.base_worth_eth,
-                                                quote_worth_eth: tradeResponseJson.data.quote_worth_eth,
-                                                block: tradeResponseJson.data.block,
-                                            }
-                                            // console.log({ newOrderbook })
-                                            setApiOrderbook(pair, newOrderbook)
-                                            selectOrderbookTrade({
-                                                side: newTradeSide,
-                                                amountIn: parsedNumber,
-                                                selectedAt: Date.now(),
-
-                                                // must be calculated
-                                                trade: newOrderbook.bids.find((bid) => bid.amount === parsedNumber),
-                                                pools: newOrderbook.pools,
-
-                                                // meta
-                                                toDisplay: true,
-                                            })
-                                        }
-                                    }
-                                } catch (error) {
-                                    toast.error(`Unexepected error while fetching price: ${extractErrorMessage(error)}`, {
-                                        style: toastStyle,
-                                    })
-                                } finally {
-                                    // tba
-                                }
-                            }}
+                            onChange={handleChangeOfAmountIn}
                         />
                     </div>
                     {selectedTrade && metrics.midPrice ? (
@@ -917,8 +856,8 @@ export default function Dashboard() {
                             type="text"
                             className={cn('text-xl font-bold text-right border-none outline-none', {
                                 'cursor-not-allowed bg-transparent ring-0 focus:ring-0 focus:outline-none focus:border-none w-40':
-                                    selectedTrade?.toDisplay,
-                                'skeleton-loading ml-auto w-28 h-8 rounded-full text-transparent': !selectedTrade?.toDisplay,
+                                    selectedTrade?.trade,
+                                'skeleton-loading ml-auto w-28 h-8 rounded-full text-transparent': !selectedTrade?.trade,
                             })}
                             value={numeral(buyTokenAmountInput).format('0,0.[00000]')}
                             disabled={true}
@@ -1052,6 +991,8 @@ export default function Dashboard() {
                     </button>
                 )}
             </div>
+
+            {/* modal */}
             <SelectTokenModal />
         </div>
     )

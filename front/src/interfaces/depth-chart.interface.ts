@@ -1,5 +1,9 @@
 import { OrderbookSide } from '@/enums'
 
+/**
+ * orderbook
+ */
+
 export interface Token {
     address: string
     decimals: number
@@ -69,24 +73,9 @@ export interface OrderbookKeyMetrics {
     spread_pct: number
 }
 
-// ---------
-// {
-//     "value": [
-//         1897.798730270239,
-//         2377407.8666922892
-//     ],
-//     "customData": {
-//         "side": "ask",
-//         "distribution": [
-//             0.14,
-//             2.91,
-//             2.72,
-//             0.73,
-//             93.51
-//         ],
-//         "output": 1252.7186517580585
-//     }
-// }
+/**
+ * chart
+ */
 
 export interface EchartOnClickParamsData {
     value: [number, number]
@@ -96,6 +85,10 @@ export interface EchartOnClickParamsData {
         output: number
     }
 }
+
+/**
+ * swap
+ */
 
 export interface SelectedTrade {
     // known
@@ -108,5 +101,21 @@ export interface SelectedTrade {
     pools: AmmPool[]
 
     // meta
-    toDisplay: boolean
+    // toDisplay: boolean
+}
+
+/**
+ * dashboard
+ */
+
+export interface DashboardMetrics {
+    highestBid?: AmmTrade
+    midPrice?: number
+    lowestAsk?: AmmTrade
+    spreadPercent?: number
+    totalBaseAmountInPools?: number
+    totalQuoteAmountInPools?: number
+    totalBaseTvlUsd?: number
+    totalQuoteTvlUsd?: number
+    orderbook?: AmmAsOrderbook
 }
