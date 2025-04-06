@@ -679,6 +679,7 @@ export default function Dashboard() {
                                                                         <p className="text-milk-600 text-right text-xs">
                                                                             {selectedTrade.trade?.distribution[percentIndex]
                                                                                 ? numeral(selectedTrade.trade?.distribution[percentIndex])
+                                                                                      .divide(100)
                                                                                       .multiply(selectedTrade.amountIn)
                                                                                       .format('0,0.[000]')
                                                                                 : '-'}
@@ -709,6 +710,7 @@ export default function Dashboard() {
                                                                         <p className="text-milk-600 text-right text-xs">
                                                                             {selectedTrade.trade?.distributed[percentIndex]
                                                                                 ? numeral(selectedTrade.trade?.distributed[percentIndex])
+                                                                                      .divide(100)
                                                                                       .multiply(selectedTrade.trade?.output)
                                                                                       .format('0,0.[000]')
                                                                                 : '-'}
