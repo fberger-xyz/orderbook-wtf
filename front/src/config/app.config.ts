@@ -2,10 +2,10 @@ import { AppPagePaths, AppThemes, IconIds } from '@/enums'
 import { InterfaceAppLink } from '@/interfaces'
 import { Inter_Tight } from 'next/font/google'
 
-export const APP_KEYWORD = 'tycho-tap2'
+export const APP_KEYWORD = 'Tycho Orderbook'
 export const APP_METADATA = {
     SITE_NAME: 'Tycho Orderbook 🚧',
-    SITE_DOMAIN: `${APP_KEYWORD}.fberger.xyz`,
+    SITE_DOMAIN: 'tycho-orderbook.vercel.app',
     SITE_DESCRIPTION:
         'On-chain liquidity in a familiar limit orderbook interface to read (ticks and depth per tick) and write (execute, confirmation) to',
     SITE_URL: `https://${APP_KEYWORD}.fberger.xyz`,
