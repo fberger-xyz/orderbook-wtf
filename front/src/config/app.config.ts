@@ -8,7 +8,7 @@ export const APP_METADATA = {
     SITE_DOMAIN: 'tycho-orderbook.vercel.app',
     SITE_DESCRIPTION:
         'On-chain liquidity in a familiar limit orderbook interface to read (ticks and depth per tick) and write (execute, confirmation) to',
-    SITE_URL: `https://${APP_KEYWORD}.fberger.xyz`,
+    SITE_URL: `https://tycho-orderbook.vercel.app`,
 }
 
 export const IS_DEV = process.env.NODE_ENV === 'development'
