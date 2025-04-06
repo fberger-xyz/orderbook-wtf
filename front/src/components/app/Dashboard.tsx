@@ -590,7 +590,12 @@ export default function Dashboard() {
 
                 {/* 3. routing - simple for now */}
                 <OrderbookComponentLayout
-                    title={<p className="text-milk text-base font-bold mb-2">Routing</p>}
+                    title={
+                        <div className="flex flex-col mb-2">
+                            <p className="text-milk text-base font-bold">Routing</p>
+                            <p className="text-milk-400 text-xs">Using a simplistic solver</p>
+                        </div>
+                    }
                     content={
                         <div className="flex gap-4 w-full p-1">
                             {/* from */}

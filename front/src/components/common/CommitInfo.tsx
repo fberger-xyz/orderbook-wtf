@@ -17,5 +17,5 @@ export default function CommitInfo() {
         }
     }, [])
     if (!commitDate) return null
-    return <p className="text-xs text-milk-400">WIP 🚧 - Last version deployed on {dayjs.utc(commitDate).format('D MMMM YYYY HH:mm A')} UTC</p>
+    return <p className="text-xs text-milk-400">WIP - Last version deployed on {dayjs.utc(commitDate).format('D MMMM YYYY HH:mm A')} UTC</p>
 }

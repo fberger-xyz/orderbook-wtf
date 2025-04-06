@@ -7,19 +7,6 @@ import utc from 'dayjs/plugin/utc'
 dayjs.extend(utc)
 dayjs.extend(relativeTime)
 
-// export default function CommitInfo() {
-//     const [commitDate, setCommitDate] = useState<null | Date>(null)
-//     useEffect(() => {
-//         const timestamp = process.env.NEXT_PUBLIC_COMMIT_TIMESTAMP
-//         if (timestamp) {
-//             const date = new Date(parseInt(timestamp, 10) * 1000)
-//             setCommitDate(date)
-//         }
-//     }, [])
-//     if (!commitDate) return null
-//     return <p className="text-xs text-milk-400">WIP 🚧 - Last version deployed on {dayjs.utc(commitDate).format('D MMMM YYYY HH:mm A')} UTC</p>
-// }
-
 import { cn } from '@/utils'
 
 export default function Footer(props: { className?: string }) {
@@ -38,7 +25,7 @@ export default function Footer(props: { className?: string }) {
                 <p>2024 © PropellerHeads</p>
                 <p>Alpha Version Notice - {dayjs.utc(commitDate).format('D MMM. YYYY HH:mm A')} UTC</p>
             </div>
-            <p>Made by PropellerHeads</p>
+            <p>Made by PropellerHeads, @xMerso and @fberger_xyz</p>
         </div>
     )
 }
