@@ -55,6 +55,8 @@ export const useAppStore = create<{
     buyTokenAmountInput?: number
     setBuyTokenAmountInput: (buyTokenAmountInput: number) => void
     switchSelectedTokens: () => void
+    isLoadingSomeTrade: boolean
+    setIsLoadingSomeTrade: (isLoadingSomeTrade: boolean) => void
 
     // trade
     selectedTrade?: SelectedTrade
@@ -137,7 +139,15 @@ export const useAppStore = create<{
             buyTokenAmountInput: 0,
             setSellTokenAmountInput: (sellTokenAmountInput) => set(() => ({ sellTokenAmountInput })),
             setBuyTokenAmountInput: (buyTokenAmountInput) => set(() => ({ buyTokenAmountInput })),
-            switchSelectedTokens: () => set((state) => ({ sellToken: state.buyToken, buyToken: state.sellToken })),
+            switchSelectedTokens: () =>
+                set((state) => ({
+                    sellToken: state.buyToken,
+                    buyToken: state.sellToken,
+                    sellTokenAmountInput: state.buyTokenAmountInput,
+                    buyTokenAmountInput: state.sellTokenAmountInput,
+                })),
+            isLoadingSomeTrade: false,
+            setIsLoadingSomeTrade: (isLoadingSomeTrade) => set(() => ({ isLoadingSomeTrade })),
 
             // trade
             selectedTrade: undefined,

@@ -139,6 +139,8 @@ export default function Dashboard() {
         buyTokenAmountInput,
         // setBuyTokenAmountInput,
         switchSelectedTokens,
+        isLoadingSomeTrade,
+        setIsLoadingSomeTrade,
 
         // trade
         selectedTrade,
@@ -199,7 +201,8 @@ export default function Dashboard() {
      */
 
     // load data from rust api
-    useQueries({
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const [ApiTokensQuery, ApiOrderbookQuery] = useQueries({
         queries: [
             // todo status query to update when the api is ready
             {
@@ -245,7 +248,7 @@ export default function Dashboard() {
                         const orderbook = getOrderbook(getAddressPair())
                         setMetrics(getDashboardMetrics(orderbook, sellToken, buyToken))
                         setApiStoreRefreshedAt(Date.now())
-                        selectOrderbookTrade(selectedTrade ? { ...selectedTrade, trade: undefined } : undefined)
+                        if (sellTokenAmountInput) await simulateTradeAndMergeOrderbook(sellTokenAmountInput)
                     }
 
                     // -
@@ -261,15 +264,72 @@ export default function Dashboard() {
      * misc
      */
 
+    const simulateTradeAndMergeOrderbook = async (amountIn: number) => {
+        try {
+            // state
+            setIsLoadingSomeTrade(true)
+
+            // prepare
+            const url = `${APP_ROUTE}/api/local/orderbook?token0=${sellToken?.address}&token1=${buyToken?.address}&pointAmount=${amountIn}&pointToken=${sellToken?.address}`
+            const tradeResponse = await fetch(url, { method: 'GET', headers: { 'Content-Type': 'application/json' } })
+            const tradeResponseJson = (await tradeResponse.json()) as StructuredOutput<AmmAsOrderbook>
+            const pair = getAddressPair()
+            const orderbook = getOrderbook(pair)
+            if (!tradeResponseJson.data) return
+            if (!orderbook) return
+
+            // -
+            const newOrderbook = {
+                ...orderbook,
+                bids: [...orderbook.bids, ...tradeResponseJson.data.bids],
+                asks: [...orderbook.asks, ...tradeResponseJson.data.asks],
+                base_worth_eth: tradeResponseJson.data.base_worth_eth,
+                quote_worth_eth: tradeResponseJson.data.quote_worth_eth,
+                block: tradeResponseJson.data.block,
+            }
+
+            // update store
+            setApiOrderbook(pair, newOrderbook)
+
+            // -
+            const newSelectedTrade = {
+                side: OrderbookSide.BID,
+                amountIn,
+                selectedAt: Date.now(),
+
+                // must be calculated
+                trade: newOrderbook.bids.find((bid) => bid.amount === amountIn),
+                pools: newOrderbook.pools,
+
+                // meta
+                toDisplay: true,
+            }
+
+            // update store
+            selectOrderbookTrade(newSelectedTrade)
+        } catch (error) {
+            toast.error(`Unexepected error while fetching price: ${extractErrorMessage(error)}`, {
+                style: toastStyle,
+            })
+        } finally {
+            // state
+            setIsLoadingSomeTrade(false)
+        }
+    }
+
     const handleChangeOfAmountIn = async (event: ChangeEvent<HTMLInputElement>) => {
         try {
             // parse
-            const parsedNumber = Number(numeral(event.target.value).value())
-            if (isNaN(parsedNumber)) return
+            const amountIn = Number(numeral(event.target.value).value())
+
+            // prevent errors
+            if (isNaN(amountIn)) return
+
+            // prepare
             const newTradeSide = OrderbookSide.BID // always bid
             const newSelectedTrade: SelectedTrade = {
                 side: newTradeSide,
-                amountIn: parsedNumber,
+                amountIn,
                 selectedAt: Date.now(),
 
                 // must be calculated
@@ -277,46 +337,15 @@ export default function Dashboard() {
                 pools: [],
             }
 
+            // update store
             selectOrderbookTrade(newSelectedTrade)
-            setSellTokenAmountInput(parsedNumber)
+            setSellTokenAmountInput(amountIn)
 
-            // fetch
-            if (sellToken?.address && buyToken?.address) {
-                // prepare
-                const url = `${APP_ROUTE}/api/local/orderbook?token0=${sellToken?.address}&token1=${buyToken?.address}&pointAmount=${parsedNumber}&pointToken=${sellToken?.address}`
-                const tradeResponse = await fetch(url, { method: 'GET', headers: { 'Content-Type': 'application/json' } })
-                const tradeResponseJson = (await tradeResponse.json()) as StructuredOutput<AmmAsOrderbook>
-                const pair = getAddressPair()
-                const orderbook = getOrderbook(pair)
-                if (!tradeResponseJson.data) return
-                if (!orderbook) return
+            // prevent errors
+            if (!sellToken?.address || !buyToken?.address) return
 
-                // -
-                const newOrderbook = {
-                    ...orderbook,
-                    bids: [...orderbook.bids, ...tradeResponseJson.data.bids],
-                    asks: [...orderbook.asks, ...tradeResponseJson.data.asks],
-                    base_worth_eth: tradeResponseJson.data.base_worth_eth,
-                    quote_worth_eth: tradeResponseJson.data.quote_worth_eth,
-                    block: tradeResponseJson.data.block,
-                }
-                setApiOrderbook(pair, newOrderbook)
-
-                // -
-                const newSelectedTrade = {
-                    side: newTradeSide,
-                    amountIn: parsedNumber,
-                    selectedAt: Date.now(),
-
-                    // must be calculated
-                    trade: newOrderbook.bids.find((bid) => bid.amount === parsedNumber),
-                    pools: newOrderbook.pools,
-
-                    // meta
-                    toDisplay: true,
-                }
-                selectOrderbookTrade(newSelectedTrade)
-            }
+            // -
+            await simulateTradeAndMergeOrderbook(amountIn)
         } catch (error) {
             toast.error(`Unexepected error while fetching price: ${extractErrorMessage(error)}`, {
                 style: toastStyle,
@@ -559,154 +588,164 @@ export default function Dashboard() {
                     content={<DepthChart />}
                 />
 
-                {/* 3. routes */}
+                {/* 3. routing - simple for now */}
                 <OrderbookComponentLayout
                     title={<p className="text-milk text-base font-bold mb-2">Routing</p>}
                     content={
-                        selectedTrade?.trade ? (
-                            <div className="flex gap-4 w-full p-1">
-                                {/* from */}
-                                <div className="max-w-24 flex items-center border-r border-dashed border-milk-150 pr-4 my-1">
-                                    <TokenImage size={40} token={selectedTrade.side === OrderbookSide.BID ? sellToken : buyToken} />
-                                </div>
-
-                                {/* token % */}
-                                {metrics.orderbook ? (
-                                    <>
-                                        <div className="flex items-center">
-                                            <p className="font-bold text-milk-400 text-sm">100%</p>
-                                            <IconWrapper
-                                                icon={IconIds.CHEVRON_RIGHT}
-                                                className={cn('size-4 text-milk-400', {
-                                                    // 'text-aquamarine': selectedTrade.side === OrderbookSide.BID,
-                                                    // 'text-folly': selectedTrade.side === OrderbookSide.ASK,
-                                                })}
-                                            />
-                                        </div>
-
-                                        {/* details */}
-                                        <div className="flex-grow flex flex-col gap-2">
-                                            {/* tokn */}
-                                            <div className="flex gap-2 items-start">
-                                                <TokenImage size={22} token={selectedTrade.side === OrderbookSide.BID ? buyToken : sellToken} />
-                                                <p className="font-semibold text-milk tracking-wide">
-                                                    {(selectedTrade.side === OrderbookSide.BID ? buyToken : sellToken)?.symbol}
-                                                </p>
-                                            </div>
-
-                                            {/* distribution */}
-                                            <div className="flex w-full justify-center items-center rounded-xl gap-1 border border-milk-150 flex-col px-3 py-2">
-                                                {/* headers */}
-                                                <div className="grid grid-cols-10 w-full rounded-xl py-1 px-4 gap-6 items-center text-xs text-milk-200 font-bold">
-                                                    {/* <p className="col-span-1 text-xs">#</p> */}
-                                                    <p className="col-span-4">Pool</p>
-                                                    <p className="col-span-1 font-bold w-14">Base %</p>
-                                                    <p className="col-span-2">Base</p>
-                                                    <p className="col-span-1 font-bold w-14">Quote %</p>
-                                                    <p className="col-span-2">Quote</p>
-                                                </div>
-                                                {selectedTrade?.trade?.distribution
-                                                    // .sort((curr, next) => next - curr)
-                                                    .map((percent, percentIndex) => {
-                                                        const pool = metrics.orderbook?.pools[percentIndex]
-                                                        const protocolName = pool?.protocol_system ?? 'Unknown'
-                                                        const config = mapProtocolIdToProtocolConfig(protocolName)
-                                                        return (
-                                                            <div
-                                                                key={`${percent}-${percentIndex}`}
-                                                                className="grid grid-cols-10 w-full bg-gray-600/10 hover:bg-gray-600/20 rounded-xl py-1.5 px-4 gap-6 items-center text-xs"
-                                                            >
-                                                                {/* pool */}
-                                                                <LinkWrapper
-                                                                    target="_blank"
-                                                                    href={`https://etherscan.io/contract/${pool?.address}`}
-                                                                    className="col-span-4 flex gap-2 items-center group"
-                                                                >
-                                                                    <div className="flex justify-center rounded-full p-1 border border-milk-200 bg-milk-200/10">
-                                                                        <SvgMapper icon={config.svgId} className="size-3.5" />
-                                                                    </div>
-                                                                    <p className="text-milk-600">
-                                                                        {config.version.toLowerCase()} - {pool?.fee} bps - {pool?.address.slice(0, 5)}
-                                                                    </p>
-                                                                    <IconWrapper
-                                                                        icon={IconIds.OPEN_LINK_IN_NEW_TAB}
-                                                                        className="size-4 text-milk-200 group-hover:text-milk"
-                                                                    />
-                                                                </LinkWrapper>
-
-                                                                {/* input */}
-                                                                <p className="col-span-1 text-milk-600 w-14">
-                                                                    {selectedTrade.trade?.distribution &&
-                                                                    selectedTrade.trade.distribution[percentIndex] > 0
-                                                                        ? numeral(selectedTrade.trade.distribution[percentIndex])
-                                                                              .divide(100)
-                                                                              .format('0,0%')
-                                                                        : '-'}
-                                                                </p>
-                                                                <div className="col-span-2 flex gap-1 items-center">
-                                                                    <p className="text-milk-600 text-right text-xs">
-                                                                        {selectedTrade.trade?.distribution[percentIndex]
-                                                                            ? numeral(selectedTrade.trade?.distribution[percentIndex])
-                                                                                  .multiply(selectedTrade.amountIn)
-                                                                                  .format('0,0.[000]')
-                                                                            : '-'}
-                                                                    </p>
-                                                                    {selectedTrade.trade?.distribution &&
-                                                                        selectedTrade.trade.distribution[percentIndex] > 0 && (
-                                                                            <p className="text-xs text-milk-400">
-                                                                                {
-                                                                                    (selectedTrade.side === OrderbookSide.BID ? sellToken : buyToken)
-                                                                                        ?.symbol
-                                                                                }
-                                                                            </p>
-                                                                        )}
-                                                                </div>
-
-                                                                {/* output */}
-                                                                <p className="col-span-1 text-milk-600 w-14">
-                                                                    {selectedTrade.trade?.distributed &&
-                                                                    selectedTrade.trade.distributed[percentIndex] > 0
-                                                                        ? numeral(selectedTrade.trade.distributed[percentIndex])
-                                                                              .divide(100)
-                                                                              .format('0,0%')
-                                                                        : '-'}
-                                                                </p>
-                                                                <div className="col-span-2 flex gap-1 items-center">
-                                                                    <p className="text-milk-600 text-right text-xs">
-                                                                        {selectedTrade.trade?.distributed[percentIndex]
-                                                                            ? numeral(selectedTrade.trade?.distributed[percentIndex])
-                                                                                  .multiply(selectedTrade.trade?.output)
-                                                                                  .format('0,0.[000]')
-                                                                            : '-'}
-                                                                    </p>
-                                                                    {selectedTrade.trade?.distributed &&
-                                                                        selectedTrade.trade.distributed[percentIndex] > 0 && (
-                                                                            <p className="text-xs text-milk-400">
-                                                                                {
-                                                                                    (selectedTrade.side === OrderbookSide.BID ? buyToken : sellToken)
-                                                                                        ?.symbol
-                                                                                }
-                                                                            </p>
-                                                                        )}
-                                                                </div>
-                                                            </div>
-                                                        )
-                                                    })}
-                                            </div>
-                                        </div>
-                                    </>
-                                ) : (
-                                    <div className="skeleton-loading w-full h-16" />
-                                )}
-
-                                {/* to */}
-                                <div className="max-w-24 flex items-center border-l border-dashed border-milk-150 pl-4 my-1">
-                                    <TokenImage size={40} token={selectedTrade.side === OrderbookSide.BID ? buyToken : sellToken} />
-                                </div>
+                        <div className="flex gap-4 w-full p-1">
+                            {/* from */}
+                            <div className="max-w-24 flex items-center border-r border-dashed border-milk-150 pr-4 my-1">
+                                <TokenImage size={40} token={sellToken} />
                             </div>
-                        ) : (
-                            <div className="skeleton-loading w-full h-16" />
-                        )
+
+                            {/* routes % */}
+                            {ApiOrderbookQuery.isFetching ? (
+                                <div className="skeleton-loading w-full h-16" />
+                            ) : metrics.orderbook ? (
+                                <>
+                                    {selectedTrade ? (
+                                        <>
+                                            <div className="flex items-center">
+                                                <p className="font-bold text-milk-400 text-sm">100%</p>
+                                                <IconWrapper
+                                                    icon={IconIds.CHEVRON_RIGHT}
+                                                    className={cn('size-4 text-milk-400', {
+                                                        // 'text-aquamarine': selectedTrade.side === OrderbookSide.BID,
+                                                        // 'text-folly': selectedTrade.side === OrderbookSide.ASK,
+                                                    })}
+                                                />
+                                            </div>
+
+                                            <div className="flex-grow flex flex-col gap-2">
+                                                {/* tokn */}
+                                                <div className="flex gap-2 items-start">
+                                                    <TokenImage size={22} token={selectedTrade.side === OrderbookSide.BID ? buyToken : sellToken} />
+                                                    <p className="font-semibold text-milk tracking-wide">
+                                                        {(selectedTrade.side === OrderbookSide.BID ? buyToken : sellToken)?.symbol}
+                                                    </p>
+                                                </div>
+
+                                                {/* distribution */}
+                                                <div className="flex w-full justify-center items-center rounded-xl gap-1 border border-milk-150 flex-col px-3 py-2">
+                                                    {/* headers */}
+                                                    <div className="grid grid-cols-10 w-full rounded-xl py-1 px-4 gap-6 items-center text-xs text-milk-200 font-bold">
+                                                        {/* <p className="col-span-1 text-xs">#</p> */}
+                                                        <p className="col-span-4">Pool</p>
+                                                        <p className="col-span-1 font-bold w-14">Base %</p>
+                                                        <p className="col-span-2">Base</p>
+                                                        <p className="col-span-1 font-bold w-14">Quote %</p>
+                                                        <p className="col-span-2">Quote</p>
+                                                    </div>
+                                                    {selectedTrade?.trade?.distribution
+                                                        // .sort((curr, next) => next - curr)
+                                                        .map((percent, percentIndex) => {
+                                                            const pool = metrics.orderbook?.pools[percentIndex]
+                                                            const protocolName = pool?.protocol_system ?? 'Unknown'
+                                                            const config = mapProtocolIdToProtocolConfig(protocolName)
+                                                            return (
+                                                                <div
+                                                                    key={`${percent}-${percentIndex}`}
+                                                                    className="grid grid-cols-10 w-full bg-gray-600/10 hover:bg-gray-600/20 rounded-xl py-1.5 px-4 gap-6 items-center text-xs"
+                                                                >
+                                                                    {/* pool */}
+                                                                    <LinkWrapper
+                                                                        target="_blank"
+                                                                        href={`https://etherscan.io/contract/${pool?.address}`}
+                                                                        className="col-span-4 flex gap-2 items-center group"
+                                                                    >
+                                                                        <div className="flex justify-center rounded-full p-1 border border-milk-200 bg-milk-200/10">
+                                                                            <SvgMapper icon={config.svgId} className="size-3.5" />
+                                                                        </div>
+                                                                        <p className="text-milk-600">
+                                                                            {config.version.toLowerCase()} - {pool?.fee} bps -{' '}
+                                                                            {pool?.address.slice(0, 5)}
+                                                                        </p>
+                                                                        <IconWrapper
+                                                                            icon={IconIds.OPEN_LINK_IN_NEW_TAB}
+                                                                            className="size-4 text-milk-200 group-hover:text-milk"
+                                                                        />
+                                                                    </LinkWrapper>
+
+                                                                    {/* input */}
+                                                                    <p className="col-span-1 text-milk-600 w-14">
+                                                                        {selectedTrade.trade?.distribution &&
+                                                                        selectedTrade.trade.distribution[percentIndex] > 0
+                                                                            ? numeral(selectedTrade.trade.distribution[percentIndex])
+                                                                                  .divide(100)
+                                                                                  .format('0,0%')
+                                                                            : '-'}
+                                                                    </p>
+                                                                    <div className="col-span-2 flex gap-1 items-center">
+                                                                        <p className="text-milk-600 text-right text-xs">
+                                                                            {selectedTrade.trade?.distribution[percentIndex]
+                                                                                ? numeral(selectedTrade.trade?.distribution[percentIndex])
+                                                                                      .multiply(selectedTrade.amountIn)
+                                                                                      .format('0,0.[000]')
+                                                                                : '-'}
+                                                                        </p>
+                                                                        {selectedTrade.trade?.distribution &&
+                                                                            selectedTrade.trade.distribution[percentIndex] > 0 && (
+                                                                                <p className="text-xs text-milk-400">
+                                                                                    {
+                                                                                        (selectedTrade.side === OrderbookSide.BID
+                                                                                            ? sellToken
+                                                                                            : buyToken
+                                                                                        )?.symbol
+                                                                                    }
+                                                                                </p>
+                                                                            )}
+                                                                    </div>
+
+                                                                    {/* output */}
+                                                                    <p className="col-span-1 text-milk-600 w-14">
+                                                                        {selectedTrade.trade?.distributed &&
+                                                                        selectedTrade.trade.distributed[percentIndex] > 0
+                                                                            ? numeral(selectedTrade.trade.distributed[percentIndex])
+                                                                                  .divide(100)
+                                                                                  .format('0,0%')
+                                                                            : '-'}
+                                                                    </p>
+                                                                    <div className="col-span-2 flex gap-1 items-center">
+                                                                        <p className="text-milk-600 text-right text-xs">
+                                                                            {selectedTrade.trade?.distributed[percentIndex]
+                                                                                ? numeral(selectedTrade.trade?.distributed[percentIndex])
+                                                                                      .multiply(selectedTrade.trade?.output)
+                                                                                      .format('0,0.[000]')
+                                                                                : '-'}
+                                                                        </p>
+                                                                        {selectedTrade.trade?.distributed &&
+                                                                            selectedTrade.trade.distributed[percentIndex] > 0 && (
+                                                                                <p className="text-xs text-milk-400">
+                                                                                    {
+                                                                                        (selectedTrade.side === OrderbookSide.BID
+                                                                                            ? buyToken
+                                                                                            : sellToken
+                                                                                        )?.symbol
+                                                                                    }
+                                                                                </p>
+                                                                            )}
+                                                                    </div>
+                                                                </div>
+                                                            )
+                                                        })}
+                                                </div>
+                                            </div>
+                                        </>
+                                    ) : (
+                                        <p className="text-sm font-bold text-milk-200 mx-auto">
+                                            Select any positive amount of {sellToken?.symbol} to sell
+                                        </p>
+                                    )}
+                                </>
+                            ) : (
+                                <div className="skeleton-loading w-full h-16" />
+                            )}
+
+                            {/* to */}
+                            <div className="max-w-24 flex items-center border-l border-dashed border-milk-150 pl-4 my-1">
+                                <TokenImage size={40} token={buyToken} />
+                            </div>
+                        </div>
                     }
                 />
             </div>
@@ -785,12 +824,16 @@ export default function Dashboard() {
                             </div>
 
                             {/* right: input value in $ */}
-                            <p className="text-milk-600 text-xs">
-                                ${' '}
-                                {getBaseValueInUsd(metrics.orderbook)
-                                    ? safeNumeral(selectedTrade.amountIn * (getBaseValueInUsd(metrics.orderbook) as number), '0,0.[00]')
-                                    : '-'}
-                            </p>
+                            {isLoadingSomeTrade ? (
+                                <div className="skeleton-loading w-16 h-4 rounded-full" />
+                            ) : (
+                                <p className="text-milk-600 text-xs">
+                                    ${' '}
+                                    {getBaseValueInUsd(metrics.orderbook)
+                                        ? safeNumeral(selectedTrade.amountIn * (getBaseValueInUsd(metrics.orderbook) as number), '0,0.[00]')
+                                        : '-'}
+                                </p>
+                            )}
                         </div>
                     ) : (
                         <div className="mt-2 flex justify-between items-center">
@@ -809,15 +852,11 @@ export default function Dashboard() {
                 <div className="h-0 w-full flex justify-center items-center z-10">
                     <div className="size-[44px] rounded-xl bg-background p-1">
                         <button
-                            onClick={() => {
-                                // if (!metrics.showOrderbookPlaceholders) switchSelectedTokens()
+                            onClick={async () => {
                                 switchSelectedTokens()
-                                // do nothing
+                                if (sellTokenAmountInput) await simulateTradeAndMergeOrderbook(sellTokenAmountInput)
                             }}
-                            className={cn('size-full rounded-lg bg-milk-600/5 flex items-center justify-center group', {
-                                // 'cursor-not-allowed': metrics.showOrderbookPlaceholders,
-                                // group: !metrics.showOrderbookPlaceholders,
-                            })}
+                            className="size-full rounded-lg bg-milk-600/5 flex items-center justify-center group"
                         >
                             <IconWrapper icon={IconIds.ARROW_DOWN} className="size-5 transition-transform duration-300 group-hover:rotate-180" />
                         </button>
@@ -874,12 +913,16 @@ export default function Dashboard() {
                             </div>
 
                             {/* right: input value in $ */}
-                            <p className="text-milk-600 text-xs">
-                                ${' '}
-                                {buyTokenAmountInput && getQuoteValueInUsd(metrics.orderbook)
-                                    ? numeral(buyTokenAmountInput).multiply(getQuoteValueInUsd(metrics.orderbook)).format('0,0.[00]')
-                                    : '-'}
-                            </p>
+                            {isLoadingSomeTrade ? (
+                                <div className="skeleton-loading w-16 h-4 rounded-full" />
+                            ) : (
+                                <p className="text-milk-600 text-xs">
+                                    ${' '}
+                                    {buyTokenAmountInput && getQuoteValueInUsd(metrics.orderbook)
+                                        ? numeral(buyTokenAmountInput).multiply(getQuoteValueInUsd(metrics.orderbook)).format('0,0.[00]')
+                                        : '-'}
+                                </p>
+                            )}
                         </div>
                     ) : (
                         <div className="mt-2 flex justify-between items-center">
@@ -948,8 +991,13 @@ export default function Dashboard() {
                             </div>
                             <div className="flex justify-between w-full text-milk-400">
                                 <p>Price Impact</p>
-                                <div className="skeleton-loading w-16 h-4 rounded-full" />
-                                {/* todo */}
+                                {isLoadingSomeTrade ? (
+                                    <div className="skeleton-loading w-16 h-4 rounded-full" />
+                                ) : (
+                                    <p>
+                                        {selectedTrade?.trade?.price_impact ? numeral(selectedTrade?.trade?.price_impact).format('0,0.[000]%') : '-'}
+                                    </p>
+                                )}
                             </div>
                             <div className="flex justify-between w-full text-milk-400">
                                 <p>Gas token</p>
@@ -979,7 +1027,10 @@ export default function Dashboard() {
 
                 {/* fees */}
                 {account.isConnected ? (
-                    <button className="bg-folly flex justify-center p-4 rounded-xl border-milk-150 transition-all duration-300 hover:opacity-90">
+                    <button
+                        onClick={() => {}}
+                        className="bg-folly flex justify-center p-4 rounded-xl border-milk-150 transition-all duration-300 hover:opacity-90"
+                    >
                         <p className="font-bold">Swap</p>
                     </button>
                 ) : (

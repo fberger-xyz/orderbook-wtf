@@ -22,7 +22,7 @@ nextjs-portal {
 }
 
 .skeleton-loading {
-    @apply relative overflow-hidden rounded-lg bg-milk-50;
+    @apply relative overflow-hidden rounded-lg bg-milk-150;
 }
 
 .skeleton-loading::before {
