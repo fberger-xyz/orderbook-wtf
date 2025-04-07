@@ -638,15 +638,15 @@ export default function Dashboard() {
                                                                     {/* pool */}
                                                                     <LinkWrapper
                                                                         target="_blank"
-                                                                        href={`https://etherscan.io/contract/${pool?.address}`}
+                                                                        href={`https://etherscan.io/address/${pool?.address}`}
                                                                         className="col-span-3 flex gap-2 items-center group"
                                                                     >
                                                                         <div className="flex justify-center rounded-full p-1 border border-milk-200 bg-milk-200/10">
                                                                             <SvgMapper icon={config.svgId} className="size-3.5" />
                                                                         </div>
-                                                                        <p className="text-milk-600">
-                                                                            {config.version.toLowerCase()} - {pool?.fee} bps -{' '}
-                                                                            {pool?.address.slice(0, 5)}
+                                                                        <p className="text-milk-600 truncate">
+                                                                            {config?.version ? `${config?.version.toLowerCase()} - ` : ''}
+                                                                            {pool?.fee} bps - {pool?.address.slice(0, 5)}
                                                                         </p>
                                                                         <IconWrapper
                                                                             icon={IconIds.OPEN_LINK_IN_NEW_TAB}

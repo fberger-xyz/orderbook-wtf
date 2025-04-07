@@ -33,6 +33,7 @@ const mapProtocolNameToSvgId = (protocolName: string): SvgIds => {
     return svgId
 }
 
+// https://docs.propellerheads.xyz/tycho/for-solvers/supported-protocols
 export const mapProtocolIdToProtocolConfig = (protocolId: string) => {
     const config: { id: string; version: string; name: string; svgId: SvgIds } = {
         id: protocolId.toLowerCase(),
@@ -50,8 +51,13 @@ export const mapProtocolIdToProtocolConfig = (protocolId: string) => {
         config.name = 'Sushiswap V2'
         config.version = 'V2'
     } else if (config.id.includes('pancake')) {
-        config.name = 'PancakeSwap V2'
-        config.version = 'V2'
+        if (config.id.includes('2')) {
+            config.name = 'PancakeSwap V2'
+            config.version = 'V2'
+        } else if (config.id.includes('3')) {
+            config.name = 'PancakeSwap V3'
+            config.version = 'V3'
+        }
     } else if (config.id.includes('curve')) {
         config.name = 'Curve'
         config.version = ''

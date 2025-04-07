@@ -436,6 +436,7 @@ export default function DepthChart() {
         selectedTrade,
         selectOrderbookTrade,
         getAddressPair,
+        switchSelectedTokens,
     } = useAppStore()
     const { apiStoreRefreshedAt, getOrderbook } = useApiStore()
     const [options, setOptions] = useState<null | echarts.EChartsOption>(null)
@@ -536,6 +537,7 @@ export default function DepthChart() {
                             : orderbook.asks.find((ask) => Number(ask.output) === Number(params.data.customData.output)),
                 }
 
+                if (selectedTrade.side === OrderbookSide.ASK) switchSelectedTokens()
                 selectOrderbookTrade(selectedTrade)
             }
         }
