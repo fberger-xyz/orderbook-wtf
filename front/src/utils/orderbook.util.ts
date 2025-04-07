@@ -35,39 +35,36 @@ const mapProtocolNameToSvgId = (protocolName: string): SvgIds => {
 
 export const mapProtocolIdToProtocolConfig = (protocolId: string) => {
     const config: { id: string; version: string; name: string; svgId: SvgIds } = {
-        id: protocolId,
+        id: protocolId.toLowerCase(),
         name: '',
         version: '',
         svgId: mapProtocolNameToSvgId(protocolId),
     }
-    if (protocolId.includes('balancer')) {
+    if (config.id.includes('balancer')) {
         config.name = 'Balance V2'
         config.version = 'V2'
-    }
-    if (protocolId.includes('sushi')) {
+    } else if (config.id.includes('ekubo')) {
+        config.name = 'Ekubo'
+        config.version = 'V2'
+    } else if (config.id.includes('sushi')) {
         config.name = 'Sushiswap V2'
         config.version = 'V2'
-    }
-    if (protocolId.includes('pancake')) {
+    } else if (config.id.includes('pancake')) {
         config.name = 'PancakeSwap V2'
         config.version = 'V2'
-    }
-    if (protocolId.includes('curve')) {
+    } else if (config.id.includes('curve')) {
         config.name = 'Curve'
         config.version = ''
-    }
-    if (protocolId.includes('uniswap')) {
-        if (protocolId.includes('2')) {
+    } else if (config.id.includes('uniswap')) {
+        if (config.id.includes('2')) {
             config.name = 'Uniswap V2'
             config.version = 'V2'
-        }
-        if (protocolId.includes('3')) {
+        } else if (config.id.includes('3')) {
             config.name = 'Uniswap V3'
-            config.version = 'V2'
-        }
-        if (protocolId.includes('4')) {
+            config.version = 'V3'
+        } else if (config.id.includes('4')) {
             config.name = 'Uniswap V4'
-            config.version = 'V2'
+            config.version = 'V4'
         }
     }
     return config

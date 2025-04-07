@@ -429,7 +429,7 @@ export default function Dashboard() {
 
                     {/* TVL */}
                     <OrderbookKeyMetric
-                        title="Total TVL"
+                        title="Pools TVL"
                         content={
                             metrics.totalBaseTvlUsd === undefined || metrics.totalQuoteTvlUsd === undefined ? (
                                 <div className="flex gap-1.5 items-center flex-wrap skeleton-loading p-1 w-full">
@@ -624,7 +624,7 @@ export default function Dashboard() {
                                                             <p className="col-span-2">Base amount</p>
                                                             <p className="col-span-2">Quote amount</p>
                                                             <p className="col-span-1 font-bold w-14">Quote %</p>
-                                                            <p className="col-span-1 font-bold w-14">Execution</p>
+                                                            <p className="col-span-1 font-bold w-14">Simulated</p>
                                                         </div>
                                                         {selectedTrade?.trade?.distribution.map((percent, percentIndex) => {
                                                             const pool = metrics.orderbook?.pools[percentIndex]
@@ -730,7 +730,7 @@ export default function Dashboard() {
                                                                                       selectedTrade.trade?.distribution[percentIndex] *
                                                                                           (selectedTrade.amountIn / 100),
                                                                                   )
-                                                                                  .format('0,0.[00000000]')
+                                                                                  .format('0,0.[000000]')
                                                                             : '-'}
                                                                     </p>
                                                                 </div>

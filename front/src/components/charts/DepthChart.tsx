@@ -309,7 +309,7 @@ const getOptions = (
                     coloredAreas === OrderbookOption.NO
                         ? undefined
                         : {
-                              opacity: 0.3,
+                              opacity: 0.4,
                               color: {
                                   type: 'linear',
                                   x: 0,
