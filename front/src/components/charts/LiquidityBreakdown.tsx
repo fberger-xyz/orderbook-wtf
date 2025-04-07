@@ -10,10 +10,8 @@ import { useAppStore } from '@/stores/app.store'
 import { APP_FONT } from '@/config/app.config'
 import { ErrorBoundaryFallback } from '../common/ErrorBoundaryFallback'
 import { AppColors, formatAmount, getHighestBid, getLowestAsk } from '@/utils'
-import { AmmAsOrderbook, EchartOnClickParamsData, SelectedTrade } from '@/interfaces'
+import { AmmAsOrderbook, SelectedTrade } from '@/interfaces'
 import numeral from 'numeral'
-import toast from 'react-hot-toast'
-import { toastStyle } from '@/config/toasts.config'
 import { useApiStore } from '@/stores/api.store'
 
 type LineDataPoint = {
@@ -424,19 +422,9 @@ const getOptions = (
     }
 }
 
-export default function DepthChart() {
-    const {
-        buyToken,
-        sellToken,
-        storeRefreshedAt,
-        yAxisType,
-        yAxisLogBase,
-        coloredAreas,
-        symbolsInYAxis,
-        selectedTrade,
-        selectOrderbookTrade,
-        getAddressPair,
-    } = useAppStore()
+export default function LiquidityBreakdown() {
+    const { buyToken, sellToken, storeRefreshedAt, yAxisType, yAxisLogBase, coloredAreas, symbolsInYAxis, selectedTrade, getAddressPair } =
+        useAppStore()
     const { apiStoreRefreshedAt, getOrderbook } = useApiStore()
     const [options, setOptions] = useState<null | echarts.EChartsOption>(null)
 
@@ -520,27 +508,6 @@ export default function DepthChart() {
         }
     }, [sellToken?.address, buyToken?.address, apiStoreRefreshedAt, yAxisType, yAxisLogBase, coloredAreas, symbolsInYAxis, selectedTrade])
 
-    const handlePointClick = (params: undefined | { data: EchartOnClickParamsData; dataIndex: number }) => {
-        if (params?.data) {
-            const key = `${sellToken?.address}-${buyToken?.address}`
-            const orderbook = getOrderbook(key)
-            if (orderbook) {
-                const selectedTrade: SelectedTrade = {
-                    selectedAt: Date.now(),
-                    side: params.data?.customData.side,
-                    amountIn: params.data.value[1],
-                    pools: orderbook.pools,
-                    trade:
-                        params.data.customData?.side === OrderbookSide.BID
-                            ? orderbook.bids.find((bid) => Number(bid.output) === Number(params.data.customData.output))
-                            : orderbook.asks.find((ask) => Number(ask.output) === Number(params.data.customData.output)),
-                }
-
-                selectOrderbookTrade(selectedTrade)
-            }
-        }
-    }
-
     return (
         <Suspense fallback={<CustomFallback />}>
             <ErrorBoundary FallbackComponent={ErrorBoundaryFallback}>
@@ -548,13 +515,7 @@ export default function DepthChart() {
                     {!storeRefreshedAt ? (
                         <LoadingArea />
                     ) : options && Array.isArray(options.series) && options.series?.length > 0 && options.series[0].data ? (
-                        <EchartWrapper
-                            options={options}
-                            onPointClick={(params) => {
-                                toast.success(`Trade selected`, { style: toastStyle })
-                                handlePointClick(params as undefined | { data: EchartOnClickParamsData; dataIndex: number })
-                            }}
-                        />
+                        <EchartWrapper options={options} />
                     ) : (
                         <LoadingArea />
                     )}

@@ -22,6 +22,10 @@ export const useAppStore = create<{
     storeRefreshedAt: number
     setStoreRefreshedAt: (storeRefreshedAt: number) => void
     refetchInterval: number
+    showMarketDepthSection: boolean
+    showRoutingSection: boolean
+    showLiquidityBreakdownSection: boolean
+    showSections: (showMarketDepthSection: boolean, showRoutingSection: boolean, showLiquidityBreakdownSection: boolean) => void
 
     /**
      * orderbook
@@ -97,7 +101,12 @@ export const useAppStore = create<{
             setShowMobileMenu: (showMobileMenu) => set(() => ({ showMobileMenu })),
             storeRefreshedAt: -1,
             setStoreRefreshedAt: (storeRefreshedAt) => set(() => ({ storeRefreshedAt })),
-            refetchInterval: (IS_DEV ? 60 : 15) * 1000,
+            refetchInterval: 60 * 1000,
+            showMarketDepthSection: false,
+            showRoutingSection: false,
+            showLiquidityBreakdownSection: true,
+            showSections: (showMarketDepthSection, showRoutingSection, showLiquidityBreakdownSection) =>
+                set(() => ({ showMarketDepthSection, showRoutingSection, showLiquidityBreakdownSection })),
 
             /**
              * orderbook

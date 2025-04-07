@@ -3,7 +3,7 @@
 import { IconIds, OrderbookOption, OrderbookAxisScale, OrderbookSide } from '@/enums'
 import numeral from 'numeral'
 import { useAppStore } from '@/stores/app.store'
-import { ChangeEvent, ReactNode, useEffect, useRef, useState } from 'react'
+import { ChangeEvent, useEffect, useRef, useState } from 'react'
 import IconWrapper from '../common/IconWrapper'
 import TokenImage from './TokenImage'
 import ChainImage from './ChainImage'
@@ -19,8 +19,7 @@ import {
     fetchBalance,
     formatAmount,
     getBaseValueInUsd,
-    getHighestBid,
-    getLowestAsk,
+    getDashboardMetrics,
     getQuoteValueInUsd,
     mapProtocolIdToProtocolConfig,
     safeNumeral,
@@ -32,57 +31,8 @@ import toast from 'react-hot-toast'
 import { toastStyle } from '@/config/toasts.config'
 import LinkWrapper from '../common/LinkWrapper'
 import SvgMapper from '../icons/SvgMapper'
-
-const OrderbookKeyMetric = (props: { title: string; content: ReactNode }) => (
-    <OrderbookComponentLayout title={<p className="text-milk-600 text-xs">{props.title}</p>} content={props.content} />
-)
-const OrderbookComponentLayout = (props: { title: ReactNode; content: ReactNode }) => (
-    <div className="flex flex-col w-full border rounded-xl px-4 py-3 border-milk-100 gap-1 bg-gray-500/5">
-        {props.title}
-        {props.content}
-    </div>
-)
-
-function getDashboardMetrics(orderbook: undefined | AmmAsOrderbook, sellToken: Token | undefined, buyToken: Token | undefined) {
-    const metrics: DashboardMetrics = {
-        orderbook: undefined,
-        highestBid: undefined,
-        midPrice: undefined,
-        lowestAsk: undefined,
-        spreadPercent: undefined,
-        totalBaseAmountInPools: undefined,
-        totalQuoteAmountInPools: undefined,
-        totalBaseTvlUsd: undefined,
-        totalQuoteTvlUsd: undefined,
-    }
-
-    if (!orderbook) return metrics
-    metrics.orderbook = orderbook
-    if (sellToken && buyToken) {
-        metrics.highestBid = getHighestBid(orderbook)
-        metrics.lowestAsk = getLowestAsk(orderbook)
-
-        if (metrics.highestBid && metrics.lowestAsk) {
-            metrics.midPrice = (metrics.highestBid.average_sell_price + 1 / metrics.lowestAsk.average_sell_price) / 2
-            metrics.spreadPercent = (1 / metrics.lowestAsk.average_sell_price - metrics.highestBid.average_sell_price) / metrics.midPrice
-
-            if (orderbook?.base_lqdty && orderbook?.quote_lqdty) {
-                metrics.totalBaseAmountInPools = orderbook.base_lqdty.reduce(
-                    (total: number, baseAmountInPool: number) => (total += baseAmountInPool),
-                    0,
-                )
-                metrics.totalQuoteAmountInPools = orderbook.quote_lqdty.reduce(
-                    (total: number, quoteAmountInPool: number) => (total += quoteAmountInPool),
-                    0,
-                )
-                metrics.totalBaseTvlUsd = metrics.totalBaseAmountInPools * orderbook.base_worth_eth * orderbook.eth_usd
-                metrics.totalQuoteTvlUsd = metrics.totalQuoteAmountInPools * orderbook.quote_worth_eth * orderbook.eth_usd
-            }
-        }
-    }
-
-    return metrics
-}
+import { OrderbookComponentLayout, OrderbookKeyMetric } from './dashboard-sections/Layouts'
+import LiquidityBreakdownSection from './dashboard-sections/LiquidityBreakdownSection'
 
 export default function Dashboard() {
     /**
@@ -106,6 +56,10 @@ export default function Dashboard() {
         // storeRefreshedAt,
         // setStoreRefreshedAt,
         // refetchInterval,
+        showMarketDepthSection,
+        showRoutingSection,
+        showLiquidityBreakdownSection,
+        showSections,
 
         /**
          * orderbook
@@ -431,7 +385,7 @@ export default function Dashboard() {
                                 <p className="text-milk font-bold text-base">
                                     {numeral(metrics.spreadPercent).format('0,0.[0000]%')}{' '}
                                     <span className="pl-1 text-milk-400 text-xs">
-                                        {numeral(metrics.spreadPercent).multiply(10000).format('0,0.[00]')} bps
+                                        {numeral(metrics.spreadPercent).multiply(10000).format('0,0')} bps
                                     </span>
                                 </p>
                             ) : (
@@ -482,168 +436,197 @@ export default function Dashboard() {
                                     <p className="text-milk-100 font-bold text-sm">$ --- m</p>
                                 </div>
                             ) : (
-                                <p className="text-milk font-bold text-base">
-                                    $ {formatAmount(Number(metrics.totalBaseTvlUsd) + Number(metrics.totalQuoteTvlUsd))}
-                                </p>
+                                <div className="flex gap-2 items-baseline">
+                                    <p className="text-milk font-bold text-base">
+                                        $ {formatAmount(metrics.totalBaseTvlUsd + metrics.totalQuoteTvlUsd)}
+                                    </p>
+                                    {/* <p className="text-milk-150 font-bold text-sm">
+                                        $ {formatAmount(metrics.totalBaseTvlUsd)} of {sellToken?.symbol}
+                                    </p> */}
+                                    <p className="text-milk-200 font-bold text-sm">
+                                        {numeral(metrics.totalBaseTvlUsd / (metrics.totalBaseTvlUsd + metrics.totalQuoteTvlUsd)).format('0,0.%')}{' '}
+                                        {sellToken?.symbol} and{' '}
+                                        {numeral(metrics.totalQuoteTvlUsd / (metrics.totalBaseTvlUsd + metrics.totalQuoteTvlUsd)).format('0,0.%')}{' '}
+                                        {buyToken?.symbol}
+                                    </p>
+                                </div>
                             )
                         }
                     />
                 </div>
-
                 {/* 2. chart */}
                 <OrderbookComponentLayout
                     title={
                         <div className="w-full flex justify-between">
                             {/* title */}
-                            <p className="text-milk text-base font-bold">Market depth</p>
-                            <button onClick={() => showChartOptions(!openChartOptions)} className="relative">
-                                <div className="flex items-center gap-1 hover:bg-milk-100/5 transition-colors duration-300 rounded-lg px-2.5 py-1.5">
-                                    <p className="text-milk text-sm">Options</p>
-                                    <IconWrapper icon={IconIds.TRIANGLE_DOWN} className="size-4" />
-                                </div>
-
-                                {/* options dropdown */}
-                                {/* todo make it open left aligned */}
-                                <div
-                                    ref={chartOptionsDropdown}
-                                    className={cn(
-                                        // `z-20 absolute mt-2 w-52 rounded-2xl backdrop-blur-lg border border-milk-150 shadow-lg p-3 transition-all origin-top-left flex flex-col gap-5`,
-                                        `z-20 absolute right-0 mt-2 w-52 rounded-2xl backdrop-blur-lg border border-milk-150 shadow-lg p-3 transition-all origin-top-right flex flex-col gap-5`,
-                                        {
-                                            'scale-100 opacity-100': openChartOptions,
-                                            'scale-95 opacity-0 pointer-events-none': !openChartOptions,
-                                        },
-                                    )}
+                            <div className="flex gap-2 items-center">
+                                <p className="text-milk text-base font-bold">Market depth</p>
+                                <button
+                                    onClick={() => showSections(!showMarketDepthSection, showRoutingSection, showLiquidityBreakdownSection)}
+                                    className="flex rounded-full hover:bg-gray-600/30 transition-colors duration-300"
                                 >
-                                    {/* option */}
-                                    <div className="flex flex-col w-full items-start gap-0.5">
-                                        <p className="text-milk-600 text-sm font-bold">Y Axis scale</p>
-                                        <div className="grid grid-cols-2 w-full gap-1">
-                                            {[OrderbookAxisScale.VALUE, OrderbookAxisScale.LOG].map((type, typeIndex) => (
-                                                <div
-                                                    key={`${type}-${typeIndex}`}
-                                                    className={cn('flex items-center gap-2 w-full px-4 py-1.5 rounded-lg transition', {
-                                                        'text-white bg-gray-600/20': yAxisType === type,
-                                                        'text-milk-400 hover:bg-gray-600/20': yAxisType !== type,
-                                                    })}
-                                                    onClick={() => setYAxisType(type)}
-                                                >
-                                                    <p className="text-sm mx-auto">
-                                                        {type === OrderbookAxisScale.VALUE ? 'Linear' : `Log ${yAxisLogBase}`}
-                                                    </p>
-                                                </div>
-                                            ))}
-                                        </div>
+                                    <IconWrapper icon={showMarketDepthSection ? IconIds.TRIANGLE_UP : IconIds.TRIANGLE_DOWN} className="size-4" />
+                                </button>
+                            </div>
+                            {showMarketDepthSection && (
+                                <button onClick={() => showChartOptions(!openChartOptions)} className="relative">
+                                    <div className="flex items-center gap-1 hover:bg-milk-100/5 transition-colors duration-300 rounded-lg px-2.5 py-1.5">
+                                        <p className="text-milk text-sm">Options</p>
+                                        <IconWrapper icon={IconIds.TRIANGLE_DOWN} className="size-4" />
                                     </div>
 
-                                    {/* option */}
-                                    <div className="flex flex-col w-full items-start gap-0.5">
-                                        <p className="text-milk-600 text-sm font-bold">Colored areas</p>
-                                        <div className="grid grid-cols-2 w-full gap-1">
-                                            {[OrderbookOption.YES, OrderbookOption.NO].map((option, optionIndex) => (
-                                                <div
-                                                    key={`${option}-${optionIndex}`}
-                                                    className={cn('flex items-center gap-2 w-full px-4 py-1.5 rounded-lg transition', {
-                                                        'text-white bg-gray-600/20': coloredAreas === option,
-                                                        'text-milk-400 hover:bg-gray-600/20': coloredAreas !== option,
-                                                    })}
-                                                    onClick={() =>
-                                                        setColoredAreas(
-                                                            coloredAreas === OrderbookOption.YES ? OrderbookOption.NO : OrderbookOption.YES,
-                                                        )
-                                                    }
-                                                >
-                                                    <p className="text-sm mx-auto">{option}</p>
-                                                </div>
-                                            ))}
+                                    {/* options dropdown */}
+                                    {/* todo make it open left aligned */}
+                                    <div
+                                        ref={chartOptionsDropdown}
+                                        className={cn(
+                                            // `z-20 absolute mt-2 w-52 rounded-2xl backdrop-blur-lg border border-milk-150 shadow-lg p-3 transition-all origin-top-left flex flex-col gap-5`,
+                                            `z-20 absolute right-0 mt-2 w-52 rounded-2xl backdrop-blur-lg border border-milk-150 shadow-lg p-3 transition-all origin-top-right flex flex-col gap-5`,
+                                            {
+                                                'scale-100 opacity-100': openChartOptions,
+                                                'scale-95 opacity-0 pointer-events-none': !openChartOptions,
+                                            },
+                                        )}
+                                    >
+                                        {/* option */}
+                                        <div className="flex flex-col w-full items-start gap-0.5">
+                                            <p className="text-milk-600 text-sm font-bold">Y Axis scale</p>
+                                            <div className="grid grid-cols-2 w-full gap-1">
+                                                {[OrderbookAxisScale.VALUE, OrderbookAxisScale.LOG].map((type, typeIndex) => (
+                                                    <div
+                                                        key={`${type}-${typeIndex}`}
+                                                        className={cn('flex items-center gap-2 w-full px-4 py-1.5 rounded-lg transition', {
+                                                            'text-white bg-gray-600/20': yAxisType === type,
+                                                            'text-milk-400 hover:bg-gray-600/20': yAxisType !== type,
+                                                        })}
+                                                        onClick={() => setYAxisType(type)}
+                                                    >
+                                                        <p className="text-sm mx-auto">
+                                                            {type === OrderbookAxisScale.VALUE ? 'Linear' : `Log ${yAxisLogBase}`}
+                                                        </p>
+                                                    </div>
+                                                ))}
+                                            </div>
                                         </div>
-                                    </div>
 
-                                    {/* titles */}
-                                    <div className="flex flex-col w-full items-start gap-0.5">
-                                        <p className="text-milk-600 text-sm font-bold">Symbols in Y axis labels</p>
-                                        <div className="grid grid-cols-2 w-full gap-1">
-                                            {[OrderbookOption.YES, OrderbookOption.NO].map((option, optionIndex) => (
-                                                <div
-                                                    key={`${option}-${optionIndex}`}
-                                                    className={cn('flex items-center gap-2 w-full px-4 py-1.5 rounded-lg transition', {
-                                                        'text-white bg-gray-600/20': symbolsInYAxis === option,
-                                                        'text-milk-400 hover:bg-gray-600/20': symbolsInYAxis !== option,
-                                                    })}
-                                                    onClick={() =>
-                                                        setSymbolsInYAxis(
-                                                            symbolsInYAxis === OrderbookOption.YES ? OrderbookOption.NO : OrderbookOption.YES,
-                                                        )
-                                                    }
-                                                >
-                                                    <p className="text-sm mx-auto">{option}</p>
-                                                </div>
-                                            ))}
+                                        {/* option */}
+                                        <div className="flex flex-col w-full items-start gap-0.5">
+                                            <p className="text-milk-600 text-sm font-bold">Colored areas</p>
+                                            <div className="grid grid-cols-2 w-full gap-1">
+                                                {[OrderbookOption.YES, OrderbookOption.NO].map((option, optionIndex) => (
+                                                    <div
+                                                        key={`${option}-${optionIndex}`}
+                                                        className={cn('flex items-center gap-2 w-full px-4 py-1.5 rounded-lg transition', {
+                                                            'text-white bg-gray-600/20': coloredAreas === option,
+                                                            'text-milk-400 hover:bg-gray-600/20': coloredAreas !== option,
+                                                        })}
+                                                        onClick={() =>
+                                                            setColoredAreas(
+                                                                coloredAreas === OrderbookOption.YES ? OrderbookOption.NO : OrderbookOption.YES,
+                                                            )
+                                                        }
+                                                    >
+                                                        <p className="text-sm mx-auto">{option}</p>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+
+                                        {/* titles */}
+                                        <div className="flex flex-col w-full items-start gap-0.5">
+                                            <p className="text-milk-600 text-sm font-bold">Symbols in Y axis labels</p>
+                                            <div className="grid grid-cols-2 w-full gap-1">
+                                                {[OrderbookOption.YES, OrderbookOption.NO].map((option, optionIndex) => (
+                                                    <div
+                                                        key={`${option}-${optionIndex}`}
+                                                        className={cn('flex items-center gap-2 w-full px-4 py-1.5 rounded-lg transition', {
+                                                            'text-white bg-gray-600/20': symbolsInYAxis === option,
+                                                            'text-milk-400 hover:bg-gray-600/20': symbolsInYAxis !== option,
+                                                        })}
+                                                        onClick={() =>
+                                                            setSymbolsInYAxis(
+                                                                symbolsInYAxis === OrderbookOption.YES ? OrderbookOption.NO : OrderbookOption.YES,
+                                                            )
+                                                        }
+                                                    >
+                                                        <p className="text-sm mx-auto">{option}</p>
+                                                    </div>
+                                                ))}
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            </button>
+                                </button>
+                            )}
                         </div>
                     }
-                    content={<DepthChart />}
+                    content={showMarketDepthSection ? <DepthChart /> : null}
                 />
-
                 {/* 3. routing - simple for now */}
                 <OrderbookComponentLayout
                     title={
                         <div className="flex flex-col mb-2">
-                            <p className="text-milk text-base font-bold">Routing</p>
+                            <div className="flex gap-2 items-center">
+                                <p className="text-milk text-base font-bold">Routing</p>
+                                <button
+                                    onClick={() => showSections(showMarketDepthSection, !showRoutingSection, showLiquidityBreakdownSection)}
+                                    className="flex rounded-full hover:bg-gray-600/30 transition-colors duration-300"
+                                >
+                                    <IconWrapper icon={showRoutingSection ? IconIds.TRIANGLE_UP : IconIds.TRIANGLE_DOWN} className="size-4" />
+                                </button>
+                            </div>
                             <p className="text-milk-400 text-xs">Using a simplistic solver</p>
                         </div>
                     }
                     content={
-                        <div className="flex gap-4 w-full p-1">
-                            {/* from */}
-                            <div className="max-w-24 flex items-center border-r border-dashed border-milk-150 pr-4 my-1">
-                                <TokenImage size={40} token={sellToken} />
-                            </div>
+                        showRoutingSection ? (
+                            <div className="flex gap-4 w-full p-1">
+                                {/* from */}
+                                <div className="max-w-24 flex items-center border-r border-dashed border-milk-150 pr-4 my-1">
+                                    <TokenImage size={40} token={sellToken} />
+                                </div>
 
-                            {/* routes % */}
-                            {ApiOrderbookQuery.isFetching ? (
-                                <div className="skeleton-loading w-full h-16" />
-                            ) : metrics.orderbook ? (
-                                <>
-                                    {selectedTrade ? (
-                                        <>
-                                            <div className="flex items-center">
-                                                <p className="font-bold text-milk-400 text-sm">100%</p>
-                                                <IconWrapper
-                                                    icon={IconIds.CHEVRON_RIGHT}
-                                                    className={cn('size-4 text-milk-400', {
-                                                        // 'text-aquamarine': selectedTrade.side === OrderbookSide.BID,
-                                                        // 'text-folly': selectedTrade.side === OrderbookSide.ASK,
-                                                    })}
-                                                />
-                                            </div>
-
-                                            <div className="flex-grow flex flex-col gap-2">
-                                                {/* tokn */}
-                                                <div className="flex gap-2 items-start">
-                                                    <TokenImage size={22} token={selectedTrade.side === OrderbookSide.BID ? buyToken : sellToken} />
-                                                    <p className="font-semibold text-milk tracking-wide">
-                                                        {(selectedTrade.side === OrderbookSide.BID ? buyToken : sellToken)?.symbol}
-                                                    </p>
+                                {/* routes % */}
+                                {ApiOrderbookQuery.isFetching ? (
+                                    <div className="skeleton-loading w-full h-16" />
+                                ) : metrics.orderbook ? (
+                                    <>
+                                        {selectedTrade ? (
+                                            <>
+                                                <div className="flex items-center">
+                                                    <p className="font-bold text-milk-400 text-sm">100%</p>
+                                                    <IconWrapper
+                                                        icon={IconIds.CHEVRON_RIGHT}
+                                                        className={cn('size-4 text-milk-400', {
+                                                            // 'text-aquamarine': selectedTrade.side === OrderbookSide.BID,
+                                                            // 'text-folly': selectedTrade.side === OrderbookSide.ASK,
+                                                        })}
+                                                    />
                                                 </div>
 
-                                                {/* distribution */}
-                                                <div className="flex w-full justify-center items-center rounded-xl gap-1 border border-milk-150 flex-col px-3 py-2">
-                                                    {/* headers */}
-                                                    <div className="grid grid-cols-10 w-full rounded-xl py-1 px-4 gap-6 items-center text-xs text-milk-200 font-bold">
-                                                        {/* <p className="col-span-1 text-xs">#</p> */}
-                                                        <p className="col-span-4">Pool</p>
-                                                        <p className="col-span-1 font-bold w-14">Base %</p>
-                                                        <p className="col-span-2">Base</p>
-                                                        <p className="col-span-1 font-bold w-14">Quote %</p>
-                                                        <p className="col-span-2">Quote</p>
+                                                <div className="flex-grow flex flex-col gap-2">
+                                                    {/* tokn */}
+                                                    <div className="flex gap-2 items-start">
+                                                        <TokenImage
+                                                            size={22}
+                                                            token={selectedTrade.side === OrderbookSide.BID ? buyToken : sellToken}
+                                                        />
+                                                        <p className="font-semibold text-milk tracking-wide">
+                                                            {(selectedTrade.side === OrderbookSide.BID ? buyToken : sellToken)?.symbol}
+                                                        </p>
                                                     </div>
-                                                    {selectedTrade?.trade?.distribution
-                                                        // .sort((curr, next) => next - curr)
-                                                        .map((percent, percentIndex) => {
+
+                                                    {/* distribution */}
+                                                    <div className="flex w-full justify-center items-center rounded-xl gap-1 border border-milk-150 flex-col px-3 py-2">
+                                                        {/* headers */}
+                                                        <div className="grid grid-cols-10 w-full rounded-xl py-1 px-4 gap-6 items-center text-xs text-milk-200 font-bold">
+                                                            <p className="col-span-3">Pool</p>
+                                                            <p className="col-span-1 font-bold w-14">Base %</p>
+                                                            <p className="col-span-2">Base amount</p>
+                                                            <p className="col-span-2">Quote amount</p>
+                                                            <p className="col-span-1 font-bold w-14">Quote %</p>
+                                                            <p className="col-span-1 font-bold w-14">Execution</p>
+                                                        </div>
+                                                        {selectedTrade?.trade?.distribution.map((percent, percentIndex) => {
                                                             const pool = metrics.orderbook?.pools[percentIndex]
                                                             const protocolName = pool?.protocol_system ?? 'Unknown'
                                                             const config = mapProtocolIdToProtocolConfig(protocolName)
@@ -656,7 +639,7 @@ export default function Dashboard() {
                                                                     <LinkWrapper
                                                                         target="_blank"
                                                                         href={`https://etherscan.io/contract/${pool?.address}`}
-                                                                        className="col-span-4 flex gap-2 items-center group"
+                                                                        className="col-span-3 flex gap-2 items-center group"
                                                                     >
                                                                         <div className="flex justify-center rounded-full p-1 border border-milk-200 bg-milk-200/10">
                                                                             <SvgMapper icon={config.svgId} className="size-3.5" />
@@ -703,14 +686,6 @@ export default function Dashboard() {
                                                                     </div>
 
                                                                     {/* output */}
-                                                                    <p className="col-span-1 text-milk-600 w-14">
-                                                                        {selectedTrade.trade?.distributed &&
-                                                                        selectedTrade.trade.distributed[percentIndex] > 0
-                                                                            ? numeral(selectedTrade.trade.distributed[percentIndex])
-                                                                                  .divide(100)
-                                                                                  .format('0,0%')
-                                                                            : '-'}
-                                                                    </p>
                                                                     <div className="col-span-2 flex gap-1 items-center">
                                                                         <p className="text-milk-600 text-right text-xs">
                                                                             {selectedTrade.trade?.distributed[percentIndex]
@@ -732,29 +707,59 @@ export default function Dashboard() {
                                                                                 </p>
                                                                             )}
                                                                     </div>
+                                                                    <p className="col-span-1 text-milk-600 w-14">
+                                                                        {selectedTrade.trade?.distributed &&
+                                                                        selectedTrade.trade.distributed[percentIndex] > 0
+                                                                            ? numeral(selectedTrade.trade.distributed[percentIndex])
+                                                                                  .divide(100)
+                                                                                  .format('0,0%')
+                                                                            : '-'}
+                                                                    </p>
+
+                                                                    {/* execution */}
+                                                                    <p className="col-span-1 text-milk-600 w-14 truncate">
+                                                                        {selectedTrade.trade?.distribution &&
+                                                                        selectedTrade.trade.distribution[percentIndex] > 0 &&
+                                                                        selectedTrade.trade?.distributed &&
+                                                                        selectedTrade.trade.distributed[percentIndex] > 0
+                                                                            ? numeral(
+                                                                                  selectedTrade.trade?.distributed[percentIndex] *
+                                                                                      (selectedTrade.trade?.output / 100),
+                                                                              )
+                                                                                  .divide(
+                                                                                      selectedTrade.trade?.distribution[percentIndex] *
+                                                                                          (selectedTrade.amountIn / 100),
+                                                                                  )
+                                                                                  .format('0,0.[00000000]')
+                                                                            : '-'}
+                                                                    </p>
                                                                 </div>
                                                             )
                                                         })}
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        </>
-                                    ) : (
-                                        <p className="text-sm font-bold text-milk-200 mx-auto">
-                                            Select any positive amount of {sellToken?.symbol} to sell
-                                        </p>
-                                    )}
-                                </>
-                            ) : (
-                                <div className="skeleton-loading w-full h-16" />
-                            )}
+                                            </>
+                                        ) : (
+                                            <p className="text-sm font-bold text-milk-200 mx-auto">
+                                                Select any positive amount of {sellToken?.symbol} to sell
+                                            </p>
+                                        )}
+                                    </>
+                                ) : (
+                                    <div className="skeleton-loading w-full h-16" />
+                                )}
 
-                            {/* to */}
-                            <div className="max-w-24 flex items-center border-l border-dashed border-milk-150 pl-4 my-1">
-                                <TokenImage size={40} token={buyToken} />
+                                {/* to */}
+                                <div className="max-w-24 flex items-center border-l border-dashed border-milk-150 pl-4 my-1">
+                                    <TokenImage size={40} token={buyToken} />
+                                </div>
                             </div>
-                        </div>
+                        ) : null
                     }
                 />
+
+                {/* section */}
+                <LiquidityBreakdownSection metrics={metrics} />
             </div>
 
             {/* right */}

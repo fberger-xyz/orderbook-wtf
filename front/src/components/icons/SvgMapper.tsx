@@ -12,7 +12,7 @@ function SvgWrapper(props: { children: ReactNode; className?: string }) {
     return <div className={cn('flex items-center justify-center relative', props.className)}>{props.children}</div>
 }
 
-export default function SvgMapper(props: { icon: SvgIds; className?: string }) {
+export default function SvgMapper(props: { icon?: SvgIds; className?: string }) {
     // chains
     if (props.icon === SvgIds.MAINNET) return <MainnetSVG className={props.className} />
     if (props.icon === SvgIds.ARBITRUM) return <ArbitrumSVG className={props.className} />
@@ -53,5 +53,5 @@ export default function SvgMapper(props: { icon: SvgIds; className?: string }) {
         )
 
     // fallback
-    return null
+    return <span className={cn('rounded-full bg-gray-500', props.className)} />
 }
