@@ -73,9 +73,6 @@ export default function LiquidityBreakdownSection(props: { metrics: ReturnType<t
         )
 
     // prepare
-    // console.log('orderbook?.pools?.length', orderbook?.pools?.length)
-    // console.log('orderbook?.base_lqdty?.length', orderbook?.base_lqdty?.length)
-    // console.log('orderbook?.quote_lqdty?.length', orderbook?.quote_lqdty?.length)
     const eth_usd = orderbook.eth_usd
     const base_worth_eth = orderbook.base_worth_eth
     const quote_worth_eth = orderbook.quote_worth_eth
@@ -115,8 +112,6 @@ export default function LiquidityBreakdownSection(props: { metrics: ReturnType<t
         totals.quote.amount += pools[poolIndex].liquidity.quote.amount
         totals.quote.usd += pools[poolIndex].liquidity.quote.usd
     }
-
-    // compute percents
 
     return (
         <OrderbookComponentLayout

@@ -8,11 +8,11 @@ export const APP_METADATA = {
     SITE_DOMAIN: 'tycho-orderbook.vercel.app',
     SITE_DESCRIPTION:
         'On-chain liquidity in a familiar limit orderbook interface to read (ticks and depth per tick) and write (execute, confirmation) to',
-    SITE_URL: `https://tycho-orderbook.vercel.app`,
+    SITE_URL: process.env.APP_METADATA_SITE_URL,
 }
 
 export const IS_DEV = process.env.NODE_ENV === 'development'
-export const APP_ROUTE = IS_DEV ? 'http://localhost:3000' : APP_METADATA.SITE_URL
+export const APP_ROUTE = IS_DEV ? 'http://localhost:3000' : process.env.APP_METADATA_SITE_URL
 export const PUBLIC_STREAM_API_URL = process.env.NEXT_PUBLIC_STREAM_API_URL
     ? process.env.NEXT_PUBLIC_STREAM_API_URL
     : 'http://localhost:42042/api/ethereum'
