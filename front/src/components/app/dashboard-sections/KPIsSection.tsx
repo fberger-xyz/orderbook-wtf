@@ -93,7 +93,10 @@ export default function KPIsSection() {
                     metrics && !isNaN(Number(metrics?.spreadPercent)) ? (
                         <p className="text-milk font-semibold text-base">
                             {numeral(metrics?.spreadPercent).format('0,0.[0000]%')}{' '}
-                            <span className="pl-1 text-milk-400 text-xs">{numeral(metrics?.spreadPercent).multiply(10000).format('0,0')} bps</span>
+                            <span className="pl-1 text-milk-400 text-xs">
+                                {numeral(metrics?.spreadPercent).multiply(10000).format('0,0')} bp
+                                {metrics?.spreadPercent && metrics?.spreadPercent > 10000 ? 's' : ''}
+                            </span>
                         </p>
                     ) : (
                         <div className="flex gap-1.5 items-center flex-wrap skeleton-loading p-1">
