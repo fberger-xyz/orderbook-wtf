@@ -5,7 +5,7 @@ import { initOutput } from '@/utils'
 
 export async function GET() {
     const res = initOutput<Token[]>()
-    const url = `${PUBLIC_STREAM_API_URL}/tokens`
+    const url = `${PUBLIC_STREAM_API_URL}/ethereum/tokens`
     try {
         // prepare request
         const controller = new AbortController()

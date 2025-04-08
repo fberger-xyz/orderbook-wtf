@@ -13,7 +13,7 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
         <PageWrapper>
             <CenteredContent>
                 <div className="my-10 flex w-fit flex-col items-center gap-10">
-                    <p className="font-bold text-milk text-lg">Something went wrong!</p>
+                    <p className="font-semibold text-milk text-lg">Something went wrong!</p>
                     <div className="flex w-full flex-col items-center gap-2 rounded-xl border border-milk-200 p-4">
                         <p className="text-milk-400">Application logs</p>
                         <pre className="text-orange-500 max-h-96 overflow-y-auto rounded-xl p-5 text-xs text-center text-wrap bg-milk-50">
@@ -24,9 +24,9 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
                         <p className="text-sm text-milk-600">Please</p>
                         <button
                             onClick={() => reset()}
-                            className="flex w-full text-aquamarine items-center justify-center gap-2.5 rounded-xl border-2 border-aquamarine bg-very-light-hover px-2 py-1.5 font-bold sm:py-2"
+                            className="flex w-full text-aquamarine items-center justify-center gap-2.5 rounded-xl border-2 border-aquamarine bg-very-light-hover px-2 py-1.5 font-semibold sm:py-2"
                         >
-                            <p className="font-bold">Try a refresh</p>
+                            <p className="font-semibold">Try a refresh</p>
                             <IconWrapper icon={IconIds.UPDATE_NOW} className="size-6" />
                         </button>
                         <p className="text-sm text-milk-600">Or reachout on telegram</p>

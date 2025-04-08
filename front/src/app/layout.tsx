@@ -14,7 +14,6 @@ import Header from '@/components/layouts/Header'
 export const metadata: Metadata = {
     title: APP_METADATA.SITE_NAME,
     description: APP_METADATA.SITE_DESCRIPTION,
-    // applicationName: APP_METADATA.SITE_NAME,
     metadataBase: new URL(APP_METADATA.SITE_URL),
     manifest: '/manifest.json',
     appleWebApp: {

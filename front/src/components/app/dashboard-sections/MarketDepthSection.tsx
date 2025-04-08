@@ -55,20 +55,17 @@ export default function MarketDepthSection() {
         <OrderbookComponentLayout
             title={
                 <div className="w-full flex justify-between">
-                    {/* title */}
-                    <div className="flex gap-2 items-center">
-                        <p className="text-milk text-base font-bold">Market depth</p>
-                        <button
-                            onClick={() => showSections(!showMarketDepthSection, showRoutingSection, showLiquidityBreakdownSection)}
-                            className="flex rounded-full hover:bg-gray-600/30 transition-colors duration-300"
-                        >
-                            <IconWrapper icon={showMarketDepthSection ? IconIds.TRIANGLE_UP : IconIds.TRIANGLE_DOWN} className="size-4" />
-                        </button>
-                    </div>
+                    <button
+                        onClick={() => showSections(!showMarketDepthSection, showRoutingSection, showLiquidityBreakdownSection)}
+                        className="flex gap-1 items-center rounded-lg px-2.5 py-1.5 hover:bg-milk-100/5 transition-colors duration-300 -ml-1"
+                    >
+                        <p className="text-milk text-base font-semibold">Market depth</p>
+                        <IconWrapper icon={showMarketDepthSection ? IconIds.TRIANGLE_UP : IconIds.TRIANGLE_DOWN} className="size-4" />
+                    </button>
                     {showMarketDepthSection && (
                         <button onClick={() => showChartOptions(!openChartOptions)} className="relative">
                             <div className="flex items-center gap-1 hover:bg-milk-100/5 transition-colors duration-300 rounded-lg px-2.5 py-1.5">
-                                <p className="text-milk text-sm">Options</p>
+                                <p className="text-milk text-sm">Settings</p>
                                 <IconWrapper icon={IconIds.TRIANGLE_DOWN} className="size-4" />
                             </div>
 
@@ -87,7 +84,7 @@ export default function MarketDepthSection() {
                             >
                                 {/* option */}
                                 <div className="flex flex-col w-full items-start gap-0.5">
-                                    <p className="text-milk-600 text-sm font-bold">Y Axis scale</p>
+                                    <p className="text-milk-600 text-sm font-semibold">Y Axis scale</p>
                                     <div className="grid grid-cols-2 w-full gap-1">
                                         {[OrderbookAxisScale.VALUE, OrderbookAxisScale.LOG].map((type, typeIndex) => (
                                             <div
@@ -108,7 +105,7 @@ export default function MarketDepthSection() {
 
                                 {/* option */}
                                 <div className="flex flex-col w-full items-start gap-0.5">
-                                    <p className="text-milk-600 text-sm font-bold">Colored areas</p>
+                                    <p className="text-milk-600 text-sm font-semibold">Colored areas</p>
                                     <div className="grid grid-cols-2 w-full gap-1">
                                         {[OrderbookOption.YES, OrderbookOption.NO].map((option, optionIndex) => (
                                             <div
@@ -129,7 +126,7 @@ export default function MarketDepthSection() {
 
                                 {/* titles */}
                                 <div className="flex flex-col w-full items-start gap-0.5">
-                                    <p className="text-milk-600 text-sm font-bold">Symbols in Y axis labels</p>
+                                    <p className="text-milk-600 text-sm font-semibold">Symbols in Y axis labels</p>
                                     <div className="grid grid-cols-2 w-full gap-1">
                                         {[OrderbookOption.YES, OrderbookOption.NO].map((option, optionIndex) => (
                                             <div

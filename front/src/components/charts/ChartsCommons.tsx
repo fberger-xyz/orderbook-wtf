@@ -28,7 +28,7 @@ export function ChartBackground(props: { children: ReactNode; className?: string
 export function ChartLayout({ ...props }: { title: string; subtitle?: string; chart: ReactNode; className?: string }) {
     return (
         <div className={cn('flex w-full flex-col items-center', props.className)}>
-            <p className="mx-auto truncate font-bold text-primary">{props.title}</p>
+            <p className="mx-auto truncate font-semibold text-primary">{props.title}</p>
             {props.subtitle && <p className={cn('mx-auto truncate pb-0.5 text-inactive text-xs')}>{props.subtitle}</p>}
             {props.chart}
         </div>

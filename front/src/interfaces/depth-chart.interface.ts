@@ -113,9 +113,9 @@ export interface DashboardMetrics {
     midPrice?: number
     lowestAsk?: AmmTrade
     spreadPercent?: number
-    totalBaseAmountInPools?: number
-    totalQuoteAmountInPools?: number
-    totalBaseTvlUsd?: number
-    totalQuoteTvlUsd?: number
+    totalBaseAmountInPools: number
+    totalQuoteAmountInPools: number
+    totalBaseTvlUsd: number
+    totalQuoteTvlUsd: number
     orderbook?: AmmAsOrderbook
 }

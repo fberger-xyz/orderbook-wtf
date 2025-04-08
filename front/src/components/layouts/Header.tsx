@@ -17,7 +17,7 @@ export default function Header(props: { className?: string }) {
     return (
         <div className={cn('flex justify-between items-start w-full px-7 py-4', props.className)}>
             <div className="flex gap-2 items-center flex-col md:flex-row">
-                <TychoSVG className="h-5" />
+                <TychoSVG className="h-6" />
                 <p className="text-milk-600 font-light opacity-50">Orderbook</p>
             </div>
             <div className="flex flex-wrap justify-end items-center gap-2 z-20">
@@ -63,14 +63,14 @@ export default function Header(props: { className?: string }) {
                                 <ChainImage networkName="arbitrum_2" className="size-6 opacity-50" />
                                 <p>Arbitrum</p>
                             </div>
-                            <p className="bg-white/20 px-1 font-bold rounded-sm text-xs text-background">SOON</p>
+                            <p className="bg-white/20 px-1 font-semibold rounded-sm text-xs text-background">SOON</p>
                         </div>
                         <div className="flex items-center gap-2 px-4 py-2 text-gray-500 cursor-not-allowed mt-1 rounded-lg">
                             <div className="flex items-center gap-2">
                                 <ChainImage networkName="base" className="size-6 opacity-50" />
                                 <p>Base</p>
                             </div>
-                            <p className="bg-white/20 px-1 font-bold rounded-sm text-xs text-background">SOON</p>
+                            <p className="bg-white/20 px-1 font-semibold rounded-sm text-xs text-background">SOON</p>
                         </div>
                     </div>
                 </button>

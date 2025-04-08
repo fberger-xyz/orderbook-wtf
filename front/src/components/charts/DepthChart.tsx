@@ -9,7 +9,7 @@ import { ChartBackground, CustomFallback, LoadingArea } from './ChartsCommons'
 import { useAppStore } from '@/stores/app.store'
 import { APP_FONT } from '@/config/app.config'
 import { ErrorBoundaryFallback } from '../common/ErrorBoundaryFallback'
-import { AppColors, formatAmount, getHighestBid, getLowestAsk } from '@/utils'
+import { AppColors, bestSideSymbol, formatAmount, getHighestBid, getLowestAsk } from '@/utils'
 import { AmmAsOrderbook, EchartOnClickParamsData, SelectedTrade } from '@/interfaces'
 import numeral from 'numeral'
 import toast from 'react-hot-toast'
@@ -43,9 +43,6 @@ type LineDataPoint = {
         }
     }
 }
-
-const customSymbolPath =
-    'path://M21.9583 31.4167H19.75C19.2917 31.4167 18.8993 31.2535 18.5729 30.9271C18.2465 30.6007 18.0833 30.2083 18.0833 29.75V27.5417L16.4792 25.9167C16.3264 25.75 16.2083 25.566 16.125 25.3646C16.0417 25.1632 16 24.9583 16 24.75C16 24.5417 16.0417 24.3368 16.125 24.1354C16.2083 23.934 16.3264 23.75 16.4792 23.5833L18.0833 21.9583V19.75C18.0833 19.2917 18.2465 18.8993 18.5729 18.5729C18.8993 18.2465 19.2917 18.0833 19.75 18.0833H21.9583L23.5833 16.4792C23.75 16.3264 23.934 16.2083 24.1354 16.125C24.3368 16.0417 24.5417 16 24.75 16C24.9583 16 25.1632 16.0417 25.3646 16.125C25.566 16.2083 25.75 16.3264 25.9167 16.4792L27.5417 18.0833H29.75C30.2083 18.0833 30.6007 18.2465 30.9271 18.5729C31.2535 18.8993 31.4167 19.2917 31.4167 19.75V21.9583L33.0208 23.5833C33.1736 23.75 33.2917 23.934 33.375 24.1354C33.4583 24.3368 33.5 24.5417 33.5 24.75C33.5 24.9583 33.4583 25.1632 33.375 25.3646C33.2917 25.566 33.1736 25.75 33.0208 25.9167L31.4167 27.5417V29.75C31.4167 30.2083 31.2535 30.6007 30.9271 30.9271C30.6007 31.2535 30.2083 31.4167 29.75 31.4167H27.5417L25.9167 33.0208C25.75 33.1736 25.566 33.2917 25.3646 33.375C25.1632 33.4583 24.9583 33.5 24.75 33.5C24.5417 33.5 24.3368 33.4583 24.1354 33.375C23.934 33.2917 23.75 33.1736 23.5833 33.0208L21.9583 31.4167Z'
 
 const getOptions = (
     orderbook: AmmAsOrderbook,
@@ -201,8 +198,8 @@ const getOptions = (
                     moveHandleStyle: { color: AppColors.milk[400] },
                 },
                 rangeMode: ['value', 'value'],
-                left: '20%',
-                right: '20%',
+                left: '10%',
+                right: '10%',
             },
             {
                 xAxisIndex: 0,
@@ -467,7 +464,7 @@ export default function DepthChart() {
                         },
                     }
                     if (trade === highestBid) {
-                        point.symbol = customSymbolPath
+                        point.symbol = bestSideSymbol
                         point.symbolSize = 18
                         point.itemStyle = {
                             borderWidth: 1,
@@ -492,7 +489,7 @@ export default function DepthChart() {
                         },
                     }
                     if (trade === lowestAsk) {
-                        point.symbol = customSymbolPath
+                        point.symbol = bestSideSymbol
                         point.symbolSize = 18
                         point.itemStyle = {
                             borderWidth: 1,

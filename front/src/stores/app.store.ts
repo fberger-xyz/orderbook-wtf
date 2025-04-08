@@ -121,7 +121,7 @@ export const useAppStore = create<{
             yAxisLogBase: 10,
             setYAxisType: (yAxisType) => set(() => ({ yAxisType })),
             setYAxisLogBase: (yAxisLogBase) => set(() => ({ yAxisLogBase })),
-            coloredAreas: OrderbookOption.YES,
+            coloredAreas: OrderbookOption.NO,
             setColoredAreas: (coloredAreas) => set(() => ({ coloredAreas })),
             symbolsInYAxis: OrderbookOption.NO,
             setSymbolsInYAxis: (symbolsInYAxis) => set(() => ({ symbolsInYAxis })),

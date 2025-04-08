@@ -6,7 +6,7 @@ import { extractErrorMessage, initOutput } from '@/utils'
 
 export async function GET(req: NextRequest) {
     const res = initOutput<AmmAsOrderbook>()
-    const url = `${PUBLIC_STREAM_API_URL}/orderbook` // todo select vm http endpoint in production
+    const url = `${PUBLIC_STREAM_API_URL}/ethereum/orderbook` // todo select vm http endpoint in production
 
     // safe exec
     try {

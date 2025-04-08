@@ -227,7 +227,7 @@ export default function SwapSection(props: { metrics: ReturnType<typeof getDashb
             <div className="col-span-1 md:col-span-4 flex flex-col gap-0.5 xl:col-span-3">
                 {/* sell */}
                 <div
-                    className={cn('flex flex-col gap-1 p-4 rounded-xl border-milk-150 w-full', {
+                    className={cn('flex flex-col gap-4 p-4 rounded-xl border-milk-150 w-full', {
                         'bg-folly/20': account.isConnected && sellToken?.address && sellTokenAmountInput && sellTokenBalance < sellTokenAmountInput,
                         'bg-milk-600/5': !(
                             account.isConnected &&
@@ -245,17 +245,9 @@ export default function SwapSection(props: { metrics: ReturnType<typeof getDashb
                             sellTokenBalance &&
                             sellTokenAmountInput &&
                             sellTokenBalance < sellTokenAmountInput ? (
-                                <p className="text-folly font-bold text-xs pr-2">Exceeds Balance</p>
+                                <p className="text-folly font-semibold text-xs pr-2">Exceeds Balance</p>
                             ) : null}
-                            <button
-                                onClick={() => {}}
-                                className={cn('flex transition-colors duration-300 opacity-80 px-2.5 py-1.5 rounded-lg', {
-                                    'bg-milk-100/5': true,
-                                    'hover:opacity-100 hover:bg-milk-100/5': false,
-                                })}
-                            >
-                                <p className="font-bold text-aquamarine text-xs">Best bid</p>
-                            </button>
+                            <p className="text-aquamarine text-xs">Best bid</p>
                         </div>
                     </div>
                     <div className="flex justify-between gap-3">
@@ -276,7 +268,7 @@ export default function SwapSection(props: { metrics: ReturnType<typeof getDashb
                         </button>
                         <input
                             type="text"
-                            className="text-xl font-bold text-right border-none outline-none ring-0 focus:ring-0 focus:outline-none focus:border-none bg-transparent w-40"
+                            className="text-xl font-semibold text-right border-none outline-none ring-0 focus:ring-0 focus:outline-none focus:border-none bg-transparent w-40"
                             value={numeral(sellTokenAmountInput).format('0,0.[00000]')}
                             onChange={handleChangeOfAmountIn}
                         />
@@ -291,7 +283,7 @@ export default function SwapSection(props: { metrics: ReturnType<typeof getDashb
                                 </p>
                                 {account.isConnected && sellToken?.address && (
                                     <button onClick={() => setSellTokenAmountInput(sellTokenBalance)} className="pl-1">
-                                        <p className="text-folly font-bold text-xs">MAX</p>
+                                        <p className="text-folly font-semibold text-xs">MAX</p>
                                     </button>
                                 )}
                             </div>
@@ -309,7 +301,7 @@ export default function SwapSection(props: { metrics: ReturnType<typeof getDashb
                             )}
                         </div>
                     ) : (
-                        <div className="mt-2 flex justify-between items-center">
+                        <div className="flex justify-between items-center">
                             <div className="flex justify-between gap-1 items-center">
                                 <IconWrapper icon={IconIds.WALLET} className="size-4 text-milk-400" />
                                 <p className="text-milk-400 text-xs">
@@ -337,7 +329,7 @@ export default function SwapSection(props: { metrics: ReturnType<typeof getDashb
                 </div>
 
                 {/* buy */}
-                <div className="bg-milk-600/5 flex flex-col gap-3 p-4 rounded-xl border-milk-150 w-full">
+                <div className="bg-milk-600/5 flex flex-col gap-4 p-4 rounded-xl border-milk-150 w-full">
                     <p className="text-milk-600 text-xs">Buy</p>
                     <div className="flex justify-between gap-3 w-full">
                         <button
@@ -355,7 +347,7 @@ export default function SwapSection(props: { metrics: ReturnType<typeof getDashb
                             )}
                             <IconWrapper icon={IconIds.TRIANGLE_DOWN} className="size-4" />
                         </button>
-                        {/* <p className="text-xl font-bold text-right border-none outline-none ring-0 focus:ring-0 focus:outline-none focus:border-none bg-transparent w-40 cursor-not-allowed">
+                        {/* <p className="text-xl font-semibold text-right border-none outline-none ring-0 focus:ring-0 focus:outline-none focus:border-none bg-transparent w-40 cursor-not-allowed">
                             {selectedTrade
                                 ? safeNumeral(
                                       selectedTrade.amountIn *
@@ -366,7 +358,7 @@ export default function SwapSection(props: { metrics: ReturnType<typeof getDashb
                         </p> */}
                         <input
                             type="text"
-                            className={cn('text-xl font-bold text-right border-none outline-none', {
+                            className={cn('text-xl font-semibold text-right border-none outline-none', {
                                 'cursor-not-allowed bg-transparent ring-0 focus:ring-0 focus:outline-none focus:border-none w-40':
                                     selectedTrade?.trade,
                                 'skeleton-loading ml-auto w-28 h-8 rounded-full text-transparent': !selectedTrade?.trade,
@@ -398,7 +390,7 @@ export default function SwapSection(props: { metrics: ReturnType<typeof getDashb
                             )}
                         </div>
                     ) : (
-                        <div className="mt-2 flex justify-between items-center">
+                        <div className="flex justify-between items-center">
                             <div className="flex justify-between gap-1 items-center">
                                 <IconWrapper icon={IconIds.WALLET} className="size-4 text-milk-400" />
                                 <p className="text-milk-400 text-xs">
@@ -504,14 +496,14 @@ export default function SwapSection(props: { metrics: ReturnType<typeof getDashb
                         onClick={() => {}}
                         className="bg-folly flex justify-center p-4 rounded-xl border-milk-150 transition-all duration-300 hover:opacity-90"
                     >
-                        <p className="font-bold">Swap</p>
+                        <p className="font-semibold">Swap</p>
                     </button>
                 ) : (
                     <button
                         onClick={() => setOpen(true)}
                         className="bg-folly flex justify-center p-4 rounded-xl border-milk-150 transition-all duration-300 hover:opacity-90"
                     >
-                        <p className="font-bold">Connect wallet</p>
+                        <p className="font-semibold">Connect wallet</p>
                     </button>
                 )}
             </div>
