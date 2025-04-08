@@ -2,17 +2,16 @@ import { AppPagePaths, AppThemes, IconIds } from '@/enums'
 import { InterfaceAppLink } from '@/interfaces'
 import { Inter_Tight } from 'next/font/google'
 
-export const APP_KEYWORD = 'Tycho Orderbook'
+export const IS_DEV = process.env.NODE_ENV === 'development'
+export const APP_ROUTE = IS_DEV ? 'http://localhost:3000' : String(process.env.APP_METADATA_SITE_URL)
 export const APP_METADATA = {
     SITE_NAME: 'Tycho Orderbook',
-    SITE_DOMAIN: 'tycho-orderbook.vercel.app',
+    SITE_DOMAIN: APP_ROUTE?.replace('http://', '')?.replace('https://', ''),
     SITE_DESCRIPTION:
         'On-chain liquidity in a familiar limit orderbook interface to read (ticks and depth per tick) and write (execute, confirmation) to',
-    SITE_URL: process.env.APP_METADATA_SITE_URL,
+    SITE_URL: APP_ROUTE,
 }
 
-export const IS_DEV = process.env.NODE_ENV === 'development'
-export const APP_ROUTE = IS_DEV ? 'http://localhost:3000' : process.env.APP_METADATA_SITE_URL
 export const PUBLIC_STREAM_API_URL = process.env.NEXT_PUBLIC_STREAM_API_URL
     ? process.env.NEXT_PUBLIC_STREAM_API_URL
     : 'http://localhost:42042/api/ethereum'
