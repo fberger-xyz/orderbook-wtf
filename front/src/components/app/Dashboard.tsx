@@ -2,9 +2,8 @@
 
 import { OrderbookSide } from '@/enums'
 import { useAppStore } from '@/stores/app.store'
-import { useState } from 'react'
-import { AmmAsOrderbook, DashboardMetrics, StructuredOutput, Token } from '@/interfaces'
-import { extractErrorMessage, getDashboardMetrics } from '@/utils'
+import { AmmAsOrderbook, StructuredOutput, Token } from '@/interfaces'
+import { extractErrorMessage } from '@/utils'
 import { useQueries } from '@tanstack/react-query'
 import { useApiStore } from '@/stores/api.store'
 import { APP_ROUTE } from '@/config/app.config'
@@ -20,8 +19,6 @@ export default function Dashboard() {
     const { sellToken, sellTokenAmountInput, buyToken, setIsLoadingSomeTrade, selectOrderbookTrade, getAddressPair } = useAppStore()
 
     const { orderBookRefreshIntervalMs, setApiTokens, setApiOrderbook, setApiStoreRefreshedAt, getOrderbook } = useApiStore()
-
-    const [metrics, setMetrics] = useState<DashboardMetrics>(getDashboardMetrics(undefined, undefined, undefined))
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [ApiTokensQuery, ApiOrderbookQuery] = useQueries({
@@ -78,8 +75,6 @@ export default function Dashboard() {
                         setApiOrderbook(getAddressPair(), orderbookJson.data)
                         if (sellTokenAmountInput) await simulateTradeAndMergeOrderbook(sellTokenAmountInput)
                         toast.success(`${sellToken.symbol}-${buyToken.symbol} orderbook data updated just now`, { style: toastStyle })
-                        const orderbook = getOrderbook(getAddressPair())
-                        setMetrics(getDashboardMetrics(orderbook, sellToken, buyToken))
                         setApiStoreRefreshedAt(Date.now())
                     }
 
@@ -154,12 +149,12 @@ export default function Dashboard() {
     return (
         <div className="w-full grid grid-cols-1 md:grid-cols-10 gap-4">
             <div className="col-span-1 md:col-span-6 flex flex-col gap-4 xl:col-span-7">
-                <KPIsSection metrics={metrics} />
+                <KPIsSection />
                 <MarketDepthSection />
-                <RoutingSection metrics={metrics} />
-                <LiquidityBreakdownSection metrics={metrics} />
+                <RoutingSection />
+                <LiquidityBreakdownSection />
             </div>
-            <SwapSection metrics={metrics} />
+            <SwapSection />
         </div>
     )
 }

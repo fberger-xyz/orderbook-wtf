@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 import { APP_METADATA, IS_DEV } from '@/config/app.config'
-import { AmmAsOrderbook, SelectedTrade, Token } from '@/interfaces'
+import { SelectedTrade, Token } from '@/interfaces'
 import { hardcodedTokensList } from '@/data/back-tokens'
 import { OrderbookOption, OrderbookAxisScale } from '@/enums'
 
@@ -30,10 +30,6 @@ export const useAppStore = create<{
     /**
      * orderbook
      */
-
-    // data
-    loadedOrderbooks: Record<string, undefined | AmmAsOrderbook>
-    saveLoadedOrderbook: (pair: string, orderbook?: AmmAsOrderbook) => void
 
     // chart
     yAxisType: OrderbookAxisScale
@@ -111,10 +107,6 @@ export const useAppStore = create<{
             /**
              * orderbook
              */
-
-            // data
-            loadedOrderbooks: {},
-            saveLoadedOrderbook: (pair, orderbook) => set((state) => ({ loadedOrderbooks: { ...state.loadedOrderbooks, [pair]: orderbook } })),
 
             // chart
             yAxisType: OrderbookAxisScale.VALUE,

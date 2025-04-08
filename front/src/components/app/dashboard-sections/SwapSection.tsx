@@ -11,7 +11,7 @@ import { AmmAsOrderbook, SelectedTrade, StructuredOutput, Token } from '@/interf
 import SelectTokenModal from '../SelectTokenModal'
 import { useModal } from 'connectkit'
 import { useAccount } from 'wagmi'
-import { cn, extractErrorMessage, fetchBalance, formatAmount, getBaseValueInUsd, getDashboardMetrics, getQuoteValueInUsd, safeNumeral } from '@/utils'
+import { cn, extractErrorMessage, fetchBalance, formatAmount, getBaseValueInUsd, getQuoteValueInUsd, safeNumeral } from '@/utils'
 import { useApiStore } from '@/stores/api.store'
 import { APP_ROUTE, IS_DEV } from '@/config/app.config'
 import toast from 'react-hot-toast'
@@ -95,7 +95,7 @@ const TradeDetails = ({ isLoading, selectedTrade, sellToken }: TradeDetailsProps
     </div>
 )
 
-export default function SwapSection(props: { metrics: ReturnType<typeof getDashboardMetrics> }) {
+export default function SwapSection() {
     const {
         sellToken,
         sellTokenAmountInput,
@@ -112,7 +112,7 @@ export default function SwapSection(props: { metrics: ReturnType<typeof getDashb
         getAddressPair,
     } = useAppStore()
 
-    const { setApiOrderbook, getOrderbook } = useApiStore()
+    const { metrics, setApiOrderbook, getOrderbook } = useApiStore()
     const account = useAccount()
     const [openTradeDetails, showTradeDetails] = useState(false)
     const [buyTokenBalance, setBuyTokenBalance] = useState(-1)
@@ -259,7 +259,7 @@ export default function SwapSection(props: { metrics: ReturnType<typeof getDashb
                             onChange={handleChangeOfAmountIn}
                         />
                     </div>
-                    {selectedTrade && props.metrics.midPrice ? (
+                    {selectedTrade && metrics.midPrice ? (
                         <div className="mt-2 flex justify-between items-center">
                             <div className="flex items-center gap-1">
                                 <TokenBalance balance={sellTokenBalance} isConnected={account.isConnected} />
@@ -274,8 +274,8 @@ export default function SwapSection(props: { metrics: ReturnType<typeof getDashb
                             ) : (
                                 <p className="text-milk-600 text-xs">
                                     ${' '}
-                                    {getBaseValueInUsd(props.metrics.orderbook)
-                                        ? safeNumeral(selectedTrade.amountIn * (getBaseValueInUsd(props.metrics.orderbook) as number), '0,0.[00]')
+                                    {getBaseValueInUsd(metrics.orderbook)
+                                        ? safeNumeral(selectedTrade.amountIn * (getBaseValueInUsd(metrics.orderbook) as number), '0,0.[00]')
                                         : '-'}
                                 </p>
                             )}
@@ -335,8 +335,8 @@ export default function SwapSection(props: { metrics: ReturnType<typeof getDashb
                             ) : (
                                 <p className="text-milk-600 text-xs">
                                     ${' '}
-                                    {buyTokenAmountInput && getQuoteValueInUsd(props.metrics.orderbook)
-                                        ? numeral(buyTokenAmountInput).multiply(getQuoteValueInUsd(props.metrics.orderbook)).format('0,0.[00]')
+                                    {buyTokenAmountInput && getQuoteValueInUsd(metrics.orderbook)
+                                        ? numeral(buyTokenAmountInput).multiply(getQuoteValueInUsd(metrics.orderbook)).format('0,0.[00]')
                                         : '-'}
                                 </p>
                             )}
@@ -356,10 +356,10 @@ export default function SwapSection(props: { metrics: ReturnType<typeof getDashb
                 <div className="bg-milk-600/5 flex flex-col gap-6 px-2 py-4 rounded-xl border-milk-150 text-xs">
                     {/* Summary */}
                     <div className="flex w-full justify-between items-center">
-                        {sellToken && buyToken && props.metrics.highestBid && props.metrics.orderbook ? (
+                        {sellToken && buyToken && metrics.highestBid && metrics.orderbook ? (
                             <p className="text-milk-600 truncate pl-2">
-                                1 {sellToken.symbol} = {formatAmount(props.metrics.midPrice)} {buyToken.symbol} (${' '}
-                                {formatAmount(getBaseValueInUsd(props.metrics.orderbook))})
+                                1 {sellToken.symbol} = {formatAmount(metrics.midPrice)} {buyToken.symbol} (${' '}
+                                {formatAmount(getBaseValueInUsd(metrics.orderbook))})
                             </p>
                         ) : sellToken && buyToken ? (
                             <div className="flex items-center gap-1">
@@ -379,8 +379,8 @@ export default function SwapSection(props: { metrics: ReturnType<typeof getDashb
                             <ChainImage networkName="ethereum" className="size-4" />
                             <p className="text-milk-600">
                                 ${' '}
-                                {props.metrics.highestBid?.gas_costs_usd
-                                    ? numeral(props.metrics.highestBid.gas_costs_usd.reduce((cost, curr) => (cost += curr), 0)).format('0,0.[00]')
+                                {metrics.highestBid?.gas_costs_usd
+                                    ? numeral(metrics.highestBid.gas_costs_usd.reduce((cost, curr) => (cost += curr), 0)).format('0,0.[00]')
                                     : '-'}
                             </p>
                             <IconWrapper

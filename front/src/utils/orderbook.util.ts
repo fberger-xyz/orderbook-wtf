@@ -1,5 +1,5 @@
 import { SvgIds } from '@/enums'
-import { AmmAsOrderbook, DashboardMetrics, Token } from '@/interfaces'
+import { AmmAsOrderbook, DashboardMetrics } from '@/interfaces'
 
 export const getHighestBid = (orderbook?: AmmAsOrderbook) => {
     if (!orderbook) return undefined
@@ -76,7 +76,7 @@ export const mapProtocolIdToProtocolConfig = (protocolId: string) => {
     return config
 }
 
-export const getDashboardMetrics = (orderbook: undefined | AmmAsOrderbook, sellToken: Token | undefined, buyToken: Token | undefined) => {
+export const getDashboardMetrics = (orderbook: undefined | AmmAsOrderbook) => {
     const metrics: DashboardMetrics = {
         orderbook: undefined,
         highestBid: undefined,
@@ -91,26 +91,21 @@ export const getDashboardMetrics = (orderbook: undefined | AmmAsOrderbook, sellT
 
     if (!orderbook) return metrics
     metrics.orderbook = orderbook
-    if (sellToken && buyToken) {
-        metrics.highestBid = getHighestBid(orderbook)
-        metrics.lowestAsk = getLowestAsk(orderbook)
+    metrics.highestBid = getHighestBid(orderbook)
+    metrics.lowestAsk = getLowestAsk(orderbook)
 
-        if (metrics.highestBid && metrics.lowestAsk) {
-            metrics.midPrice = (metrics.highestBid.average_sell_price + 1 / metrics.lowestAsk.average_sell_price) / 2
-            metrics.spreadPercent = (1 / metrics.lowestAsk.average_sell_price - metrics.highestBid.average_sell_price) / metrics.midPrice
+    if (metrics.highestBid && metrics.lowestAsk) {
+        metrics.midPrice = (metrics.highestBid.average_sell_price + 1 / metrics.lowestAsk.average_sell_price) / 2
+        metrics.spreadPercent = (1 / metrics.lowestAsk.average_sell_price - metrics.highestBid.average_sell_price) / metrics.midPrice
 
-            if (orderbook?.base_lqdty && orderbook?.quote_lqdty) {
-                metrics.totalBaseAmountInPools = orderbook.base_lqdty.reduce(
-                    (total: number, baseAmountInPool: number) => (total += baseAmountInPool),
-                    0,
-                )
-                metrics.totalQuoteAmountInPools = orderbook.quote_lqdty.reduce(
-                    (total: number, quoteAmountInPool: number) => (total += quoteAmountInPool),
-                    0,
-                )
-                metrics.totalBaseTvlUsd = metrics.totalBaseAmountInPools * orderbook.base_worth_eth * orderbook.eth_usd
-                metrics.totalQuoteTvlUsd = metrics.totalQuoteAmountInPools * orderbook.quote_worth_eth * orderbook.eth_usd
-            }
+        if (orderbook?.base_lqdty && orderbook?.quote_lqdty) {
+            metrics.totalBaseAmountInPools = orderbook.base_lqdty.reduce((total: number, baseAmountInPool: number) => (total += baseAmountInPool), 0)
+            metrics.totalQuoteAmountInPools = orderbook.quote_lqdty.reduce(
+                (total: number, quoteAmountInPool: number) => (total += quoteAmountInPool),
+                0,
+            )
+            metrics.totalBaseTvlUsd = metrics.totalBaseAmountInPools * orderbook.base_worth_eth * orderbook.eth_usd
+            metrics.totalQuoteTvlUsd = metrics.totalQuoteAmountInPools * orderbook.quote_worth_eth * orderbook.eth_usd
         }
     }
 

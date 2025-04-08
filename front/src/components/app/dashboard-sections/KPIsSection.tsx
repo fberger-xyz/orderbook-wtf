@@ -3,7 +3,7 @@
 import { IconIds } from '@/enums'
 import numeral from 'numeral'
 import { useAppStore } from '@/stores/app.store'
-import { AppColors, cn, formatAmount, getDashboardMetrics } from '@/utils'
+import { AppColors, cn, formatAmount } from '@/utils'
 import IconWrapper from '@/components/common/IconWrapper'
 import LinkWrapper from '@/components/common/LinkWrapper'
 import TokenImage from '../TokenImage'
@@ -14,9 +14,9 @@ import { CountdownCircleTimer } from 'react-countdown-circle-timer'
 import { useEffect, useState } from 'react'
 import { useApiStore } from '@/stores/api.store'
 
-export default function KPIsSection(props: { metrics?: ReturnType<typeof getDashboardMetrics> }) {
+export default function KPIsSection() {
     const { sellToken, buyToken } = useAppStore()
-    const { orderBookRefreshIntervalMs, apiStoreRefreshedAt } = useApiStore()
+    const { orderBookRefreshIntervalMs, apiStoreRefreshedAt, metrics } = useApiStore()
     const [timerKey, setTimerKey] = useState(0)
 
     useEffect(() => {
@@ -37,12 +37,12 @@ export default function KPIsSection(props: { metrics?: ReturnType<typeof getDash
                 content={
                     <div
                         className={cn('flex gap-1.5 items-center flex-wrap', {
-                            'skeleton-loading p-1': !props.metrics || props.metrics?.highestBid?.average_sell_price === undefined,
+                            'skeleton-loading p-1': !metrics || metrics?.highestBid?.average_sell_price === undefined,
                         })}
                     >
                         <TokenImage size={20} token={buyToken} />
-                        {props.metrics?.highestBid?.average_sell_price && (
-                            <p className="text-milk font-semibold text-base">{formatAmount(props.metrics?.highestBid.average_sell_price)}</p>
+                        {metrics?.highestBid?.average_sell_price && (
+                            <p className="text-milk font-semibold text-base">{formatAmount(metrics?.highestBid.average_sell_price)}</p>
                         )}
                     </div>
                 }
@@ -57,13 +57,11 @@ export default function KPIsSection(props: { metrics?: ReturnType<typeof getDash
                 content={
                     <div
                         className={cn('flex gap-1.5 items-center flex-wrap', {
-                            'skeleton-loading p-1': !props.metrics || props.metrics?.midPrice === undefined,
+                            'skeleton-loading p-1': !metrics || metrics?.midPrice === undefined,
                         })}
                     >
                         <TokenImage size={20} token={buyToken} />
-                        {props.metrics?.midPrice !== undefined && (
-                            <p className="text-milk font-semibold text-base">{formatAmount(props.metrics?.midPrice)}</p>
-                        )}
+                        {metrics?.midPrice !== undefined && <p className="text-milk font-semibold text-base">{formatAmount(metrics?.midPrice)}</p>}
                     </div>
                 }
             />
@@ -78,12 +76,12 @@ export default function KPIsSection(props: { metrics?: ReturnType<typeof getDash
                 content={
                     <div
                         className={cn('flex gap-1.5 items-center flex-wrap', {
-                            'skeleton-loading p-1': !props.metrics || props.metrics?.lowestAsk?.average_sell_price === undefined,
+                            'skeleton-loading p-1': !metrics || metrics?.lowestAsk?.average_sell_price === undefined,
                         })}
                     >
                         <TokenImage size={20} token={buyToken} />
-                        {props.metrics?.lowestAsk?.average_sell_price !== undefined && (
-                            <p className="text-milk font-semibold text-base">{formatAmount(1 / props.metrics?.lowestAsk.average_sell_price)}</p>
+                        {metrics?.lowestAsk?.average_sell_price !== undefined && (
+                            <p className="text-milk font-semibold text-base">{formatAmount(1 / metrics?.lowestAsk.average_sell_price)}</p>
                         )}
                     </div>
                 }
@@ -92,12 +90,10 @@ export default function KPIsSection(props: { metrics?: ReturnType<typeof getDash
             <OrderbookKeyMetric
                 title="Spread"
                 content={
-                    props.metrics && !isNaN(Number(props.metrics?.spreadPercent)) ? (
+                    metrics && !isNaN(Number(metrics?.spreadPercent)) ? (
                         <p className="text-milk font-semibold text-base">
-                            {numeral(props.metrics?.spreadPercent).format('0,0.[0000]%')}{' '}
-                            <span className="pl-1 text-milk-400 text-xs">
-                                {numeral(props.metrics?.spreadPercent).multiply(10000).format('0,0')} bps
-                            </span>
+                            {numeral(metrics?.spreadPercent).format('0,0.[0000]%')}{' '}
+                            <span className="pl-1 text-milk-400 text-xs">{numeral(metrics?.spreadPercent).multiply(10000).format('0,0')} bps</span>
                         </p>
                     ) : (
                         <div className="flex gap-1.5 items-center flex-wrap skeleton-loading p-1">
@@ -107,7 +103,7 @@ export default function KPIsSection(props: { metrics?: ReturnType<typeof getDash
                 }
             />
 
-            {props.metrics?.orderbook?.block !== undefined ? (
+            {metrics?.orderbook?.block !== undefined ? (
                 <OrderbookComponentLayout
                     title={
                         <div className="w-full flex justify-between">
@@ -132,10 +128,10 @@ export default function KPIsSection(props: { metrics?: ReturnType<typeof getDash
                     content={
                         <LinkWrapper
                             target="_blank"
-                            href={`https://etherscan.io/block/${props.metrics?.orderbook.block}`}
+                            href={`https://etherscan.io/block/${metrics?.orderbook.block}`}
                             className="flex gap-1 items-center group"
                         >
-                            <p className="text-milk font-semibold text-base">{numeral(props.metrics?.orderbook.block).format('0,0')}</p>
+                            <p className="text-milk font-semibold text-base">{numeral(metrics?.orderbook.block).format('0,0')}</p>
                             <IconWrapper icon={IconIds.OPEN_LINK_IN_NEW_TAB} className="size-4 text-milk-200 group-hover:text-milk" />
                         </LinkWrapper>
                     }
@@ -156,20 +152,20 @@ export default function KPIsSection(props: { metrics?: ReturnType<typeof getDash
                     <Tooltip
                         placement="top"
                         content={
-                            props.metrics && (
+                            metrics && (
                                 <div className="rounded-2xl backdrop-blur border border-milk-150 shadow-lg p-3 -mb-1">
                                     <div className="flex gap-1 text-milk text-sm">
                                         <p>
-                                            {numeral(
-                                                props.metrics?.totalBaseTvlUsd / (props.metrics?.totalBaseTvlUsd + props.metrics?.totalQuoteTvlUsd),
-                                            ).format('0,0.%')}{' '}
+                                            {numeral(metrics?.totalBaseTvlUsd / (metrics?.totalBaseTvlUsd + metrics?.totalQuoteTvlUsd)).format(
+                                                '0,0.%',
+                                            )}{' '}
                                         </p>
                                         <TokenImage size={20} token={sellToken} />
                                         <p>
                                             {sellToken?.symbol} and{' '}
-                                            {numeral(
-                                                props.metrics?.totalQuoteTvlUsd / (props.metrics?.totalBaseTvlUsd + props.metrics?.totalQuoteTvlUsd),
-                                            ).format('0,0.%')}{' '}
+                                            {numeral(metrics?.totalQuoteTvlUsd / (metrics?.totalBaseTvlUsd + metrics?.totalQuoteTvlUsd)).format(
+                                                '0,0.%',
+                                            )}{' '}
                                         </p>
                                         <TokenImage size={20} token={buyToken} />
                                         <p>{buyToken?.symbol}</p>
@@ -185,14 +181,14 @@ export default function KPIsSection(props: { metrics?: ReturnType<typeof getDash
                     </Tooltip>
                 }
                 content={
-                    props.metrics?.totalBaseTvlUsd === undefined || props.metrics?.totalQuoteTvlUsd === undefined ? (
+                    metrics?.totalBaseTvlUsd === undefined || metrics?.totalQuoteTvlUsd === undefined ? (
                         <div className="flex gap-1.5 items-center flex-wrap skeleton-loading p-1 w-full">
                             <p className="text-milk-100 font-semibold text-sm">$ --- m</p>
                         </div>
                     ) : (
                         <div className="w-full flex items-start gap-1 group">
                             <p className="text-milk font-semibold text-base">
-                                $ {formatAmount(props.metrics?.totalBaseTvlUsd + props.metrics?.totalQuoteTvlUsd)}
+                                $ {formatAmount(metrics?.totalBaseTvlUsd + metrics?.totalQuoteTvlUsd)}
                             </p>
                         </div>
                     )

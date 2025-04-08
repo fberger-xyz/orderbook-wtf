@@ -4,12 +4,13 @@ import { IconIds, OrderbookSide } from '@/enums'
 import numeral from 'numeral'
 import { useAppStore } from '@/stores/app.store'
 import { AmmPool } from '@/interfaces'
-import { getDashboardMetrics, mapProtocolIdToProtocolConfig } from '@/utils'
+import { mapProtocolIdToProtocolConfig } from '@/utils'
 import { OrderbookComponentLayout } from './Layouts'
 import IconWrapper from '@/components/common/IconWrapper'
 import LinkWrapper from '@/components/common/LinkWrapper'
 import SvgMapper from '@/components/icons/SvgMapper'
 import TokenImage from '../TokenImage'
+import { useApiStore } from '@/stores/api.store'
 
 type PoolLiquidity = {
     base: { amount: number; usd: number }
@@ -58,10 +59,11 @@ const formatPercentage = (value: number): string => {
     return `${value.toFixed(2)}%`
 }
 
-export default function RoutingSection(props: { metrics: ReturnType<typeof getDashboardMetrics> }) {
+export default function RoutingSection() {
     const { showMarketDepthSection, showRoutingSection, showLiquidityBreakdownSection, selectedTrade, showSections } = useAppStore()
+    const { metrics } = useApiStore()
 
-    const orderbook = props.metrics?.orderbook
+    const orderbook = metrics?.orderbook
     if (!orderbook) {
         return (
             <OrderbookComponentLayout
