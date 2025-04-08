@@ -3,7 +3,7 @@ import { InterfaceAppLink } from '@/interfaces'
 import { Inter } from 'next/font/google'
 
 export const IS_DEV = process.env.NODE_ENV === 'development'
-export const APP_ROUTE = IS_DEV ? 'http://localhost:3000' : 'https://orderbook.wtf'
+export const APP_ROUTE = IS_DEV ? 'http://localhost:3000' : 'https://www.orderbook.wtf'
 export const APP_METADATA = {
     SITE_NAME: 'Tycho Orderbook',
     SITE_DOMAIN: 'https://orderbook.wtf',

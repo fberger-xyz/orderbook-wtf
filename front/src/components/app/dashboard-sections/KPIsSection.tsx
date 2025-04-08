@@ -10,6 +10,9 @@ import TokenImage from '../TokenImage'
 import { OrderbookComponentLayout, OrderbookKeyMetric } from './Layouts'
 import BestSideIcon from '@/components/icons/bestSide.icon'
 import { Tooltip } from '@nextui-org/tooltip'
+import { CountdownCircleTimer } from 'react-countdown-circle-timer'
+import { useEffect, useState } from 'react'
+import { useApiStore } from '@/stores/api.store'
 
 export default function KPIsSection(props: { metrics: ReturnType<typeof getDashboardMetrics> }) {
     /**
@@ -17,6 +20,11 @@ export default function KPIsSection(props: { metrics: ReturnType<typeof getDashb
      */
 
     const { sellToken, buyToken } = useAppStore()
+    const { orderBookRefreshIntervalMs, apiStoreRefreshedAt } = useApiStore()
+    const [timerKey, setTimerKey] = useState(0)
+    useEffect(() => {
+        setTimerKey((prev) => prev + 1)
+    }, [apiStoreRefreshedAt])
 
     return (
         <div className="w-full grid grid-cols-2 md:grid-cols-3 gap-2">
@@ -47,7 +55,6 @@ export default function KPIsSection(props: { metrics: ReturnType<typeof getDashb
                 title={
                     <div className="w-full flex items-start gap-1 group">
                         <p className="text-milk-600 text-xs">Mid-price</p>
-                        {/* <IconWrapper icon={IconIds.INFORMATION} className="size-3.5 text-milk-200 group-hover:text-milk cursor-pointer" /> */}
                     </div>
                 }
                 content={
@@ -106,8 +113,22 @@ export default function KPIsSection(props: { metrics: ReturnType<typeof getDashb
                 <OrderbookComponentLayout
                     title={
                         <div className="w-full flex justify-between">
-                            <p className="text-milk-600 text-xs">Last block</p>
-                            <p className="text-milk-600 text-xs">-s</p>
+                            <p className="text-milk-600 text-xs">Last block {apiStoreRefreshedAt}</p>
+                            <CountdownCircleTimer
+                                key={timerKey}
+                                isPlaying
+                                duration={orderBookRefreshIntervalMs / 1000}
+                                initialRemainingTime={
+                                    apiStoreRefreshedAt > 0
+                                        ? Math.max((orderBookRefreshIntervalMs - (Date.now() - apiStoreRefreshedAt)) / 1000, 0)
+                                        : orderBookRefreshIntervalMs / 1000
+                                }
+                                colors={AppColors.folly}
+                                trailColor={AppColors.background}
+                                size={16}
+                                strokeWidth={1.5}
+                                trailStrokeWidth={1.5}
+                            />
                         </div>
                     }
                     content={
@@ -139,7 +160,7 @@ export default function KPIsSection(props: { metrics: ReturnType<typeof getDashb
                         placement="top"
                         content={
                             props.metrics ? (
-                                <div className="rounded-2xl backdrop-blur-lg border border-milk-150 shadow-lg p-3 -mb-1">
+                                <div className="rounded-2xl backdrop-blur border border-milk-150 shadow-lg p-3 -mb-1">
                                     <div className="flex gap-1 text-milk text-sm">
                                         <p>
                                             {numeral(
