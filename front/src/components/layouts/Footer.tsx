@@ -23,7 +23,9 @@ export default function Footer(props: { className?: string }) {
         <div className={cn('w-full flex justify-between items-end py-6 px-8 text-milk-600/50 font-light text-sm', props.className)}>
             <div className="flex md:gap-10 flex-col md:flex-row">
                 <p>2024 © PropellerHeads</p>
-                <p>Alpha Version Notice - {dayjs.utc(commitDate).format('D MMM. YYYY HH:mm A')} UTC</p>
+                <p>
+                    Alpha Version Notice <span className="opacity-50">{dayjs.utc(commitDate).format('D MMM. YYYY HH:mm A')} UTC</span>
+                </p>
             </div>
             <p>Made by PropellerHeads, @xMerso and @fberger_xyz</p>
         </div>

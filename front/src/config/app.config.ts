@@ -12,7 +12,7 @@ export const APP_METADATA = {
     SITE_URL: APP_ROUTE,
 }
 
-export const PUBLIC_STREAM_API_URL = process.env.NEXT_PUBLIC_STREAM_API_URL ? process.env.NEXT_PUBLIC_STREAM_API_URL : 'http://localhost:42042/api'
+export const PUBLIC_STREAM_API_URL = IS_DEV ? 'http://localhost:42042/api' : String(process.env.NEXT_PUBLIC_STREAM_API_URL)
 export const DEBUG = false
 export const DATE_FORMAT = 'ddd. D MMM. YYYY'
 export const TIME_FORMAT = 'hh:mm A'
