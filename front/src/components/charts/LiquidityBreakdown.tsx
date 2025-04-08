@@ -94,7 +94,7 @@ const getOptions = (
                     const usagePercent = numeral(percent / 100).format('0,0%')
                     const isPoolUsed = usagePercent !== '0%'
                     const poolBps = numeral(parseInt(hexaPercent, 16)).divide(100).format('0,0.[0]')
-                    return `<span style="color:${isPoolUsed ? AppColors.milk[600] : AppColors.milk[200]}">- ${usagePercent} in ${protocolName} ${poolBps}bps</span>`
+                    return `<span style="color:${isPoolUsed ? AppColors.milk[600] : AppColors.milk[200]}">- ${usagePercent} in ${protocolName} ${poolBps}bp${Number(poolBps) > 1 ? 's' : ''}</span>`
                 })
 
                 return [

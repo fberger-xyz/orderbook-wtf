@@ -61,12 +61,7 @@ export default function LiquidityBreakdownSection(props: { metrics: ReturnType<t
                         <IconWrapper icon={showLiquidityBreakdownSection ? IconIds.TRIANGLE_UP : IconIds.TRIANGLE_DOWN} className="size-4" />
                     </button>
                 }
-                content={
-                    <div className="flex flex-col gap-2">
-                        <p className="text-milk-400 text-xs">Breakdown</p>
-                        <div className="skeleton-loading w-full h-16" />
-                    </div>
-                }
+                content={null}
             />
         )
     }
@@ -244,7 +239,7 @@ export default function LiquidityBreakdownSection(props: { metrics: ReturnType<t
                                 ))}
 
                             {/* Totals */}
-                            <div className="grid grid-cols-10 w-full rounded-xl py-1 px-4 gap-5 items-center text-xs text-milk-200 font-semibold">
+                            <div className="grid grid-cols-10 w-full rounded-xl py-1 px-4 gap-5 items-center text-xs text-milk-200">
                                 <p className="col-span-2">Total</p>
 
                                 {/* Base token */}

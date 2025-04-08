@@ -45,11 +45,36 @@ export default function EchartWrapper(props: InterfaceEchartWrapperProps) {
 
             // @ts-expect-error: poorly typed
             const grid3DOptions = currentOptions?.grid3D ? { grid3D: currentOptions.grid3D } : {}
-            const dataZoomOptions = currentOptions?.dataZoom ? { dataZoom: currentOptions.dataZoom } : {}
+            // const dataZoomOptions = currentOptions?.dataZoom ? { dataZoom: currentOptions.dataZoom } : {}
 
             // set option
-            // @ts-expect-error: poorly typed
-            myChart.current.setOption({ ...props.options, ...dataZoomOptions, ...grid3DOptions }, { notMerge: true })
+            // myChart.current.setOption({ ...props.options, ...dataZoomOptions, ...grid3DOptions }, { notMerge: true })
+            myChart.current.setOption(
+                // @ts-expect-error: poorly typed
+                { ...props.options, ...grid3DOptions },
+                {
+                    notMerge: true, // the new option object replaces the existing one completely.
+                    // notMerge: false, // Default - ECharts merges the new options with the existing ones
+
+                    /**
+                     * lazyUpdate?: boolean
+                        Default: false
+                        What it does:
+                        - If true, ECharts will not immediately update the chart after setOption is called.
+                        - Instead, it waits until the next frame, allowing multiple setOption calls to be batched for better performance.
+                        Use case: Useful when you're calling setOption multiple times in a row and want to avoid unnecessary renders.
+                     */
+                    // lazyUpdate,
+
+                    /**
+                     * Default: false
+                        What it does:
+                        When true, calling setOption won’t trigger any event dispatch (like rendered, finished, etc.).
+                        Use case: Good for silent updates where you don’t want side effects like re-triggering chart-related events.
+                     */
+                    silent: true,
+                },
+            )
 
             // attach click event listener
             // eslint-disable-next-line @typescript-eslint/no-explicit-any

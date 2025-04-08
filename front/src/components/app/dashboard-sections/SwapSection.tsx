@@ -136,31 +136,49 @@ export default function SwapSection(props: { metrics: ReturnType<typeof getDashb
         try {
             setIsLoadingSomeTrade(true)
 
+            // prevent errors
+            const pair = getAddressPair()
+            const orderbook = getOrderbook(pair)
+            if (!orderbook) return
+
+            // fetch data
             const url = `${APP_ROUTE}/api/local/orderbook?token0=${sellToken?.address}&token1=${buyToken?.address}&pointAmount=${amountIn}&pointToken=${sellToken?.address}`
             const tradeResponse = await fetch(url, { method: 'GET', headers: { 'Content-Type': 'application/json' } })
             const tradeResponseJson = (await tradeResponse.json()) as StructuredOutput<AmmAsOrderbook>
-            const pair = getAddressPair()
-            const orderbook = getOrderbook(pair)
             if (!tradeResponseJson.data || !orderbook) return
 
+            // nb: can only be a bid for now
+            const side = OrderbookSide.BID
+
+            // prevent errors
+            if (!side) return
+
+            // ease access
+            const newTradeEntry = tradeResponseJson.data?.bids.length > 0 ? tradeResponseJson.data.bids[0] : null
+
+            // prevent errors
+            if (!newTradeEntry) return
+
+            // new orderbook
+            // nb: make sure we have the same amount of pools
             const newOrderbook = {
-                ...orderbook,
-                bids: [...orderbook.bids, ...tradeResponseJson.data.bids],
-                asks: [...orderbook.asks, ...tradeResponseJson.data.asks],
-                base_worth_eth: tradeResponseJson.data.base_worth_eth,
-                quote_worth_eth: tradeResponseJson.data.quote_worth_eth,
-                block: tradeResponseJson.data.block,
+                ...tradeResponseJson.data,
+
+                // filter out previous entry for same trade
+                bids: [...orderbook.bids.filter((bid) => newTradeEntry.amount !== bid.amount), ...tradeResponseJson.data.bids],
+                asks: orderbook.asks,
             }
 
+            /// update state
             setApiOrderbook(pair, newOrderbook)
 
             const newSelectedTrade = {
                 side: OrderbookSide.BID,
                 amountIn,
                 selectedAt: Date.now(),
-                trade: newOrderbook.bids.find((bid) => bid.amount === amountIn),
+                trade: newTradeEntry,
                 pools: newOrderbook.pools,
-                toDisplay: true,
+                xAxis: newTradeEntry.average_sell_price,
             }
 
             selectOrderbookTrade(newSelectedTrade)
@@ -184,6 +202,7 @@ export default function SwapSection(props: { metrics: ReturnType<typeof getDashb
                 selectedAt: Date.now(),
                 trade: undefined,
                 pools: [],
+                xAxis: -1,
             }
 
             selectOrderbookTrade(newSelectedTrade)
@@ -393,6 +412,9 @@ export default function SwapSection(props: { metrics: ReturnType<typeof getDashb
                         <p className="font-semibold">Connect wallet</p>
                     </button>
                 )}
+
+                {/* Debug */}
+                <pre className="text-xs p-2">{JSON.stringify(selectedTrade, null, 2)}</pre>
             </div>
 
             {/* Token selection modal */}

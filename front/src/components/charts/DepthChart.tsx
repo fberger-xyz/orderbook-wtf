@@ -54,6 +54,7 @@ const getOptions = (
     symbolsInYAxis: OrderbookOption,
     selectedTrade?: SelectedTrade,
 ): echarts.EChartsOption => {
+    console.log({ selectedTrade })
     return {
         tooltip: {
             trigger: 'axis',
@@ -279,8 +280,8 @@ const getOptions = (
             fontFamily: APP_FONT.style.fontFamily,
         },
         grid: {
-            left: '5%',
-            right: '5%',
+            left: '7%',
+            right: '7%',
             top: selectedTrade ? '40' : '20',
             bottom: '100',
         },
@@ -293,7 +294,7 @@ const getOptions = (
                 smooth: true,
                 lineStyle: { width: 0.5, color: AppColors.aquamarine, opacity: 0.5 },
                 symbol: 'circle',
-                symbolSize: 7,
+                symbolSize: 8,
                 itemStyle: {
                     color: AppColors.background,
                     borderColor: AppColors.aquamarine,
@@ -319,37 +320,36 @@ const getOptions = (
                                   ],
                               },
                           },
-                markLine:
-                    selectedTrade?.trade && selectedTrade.side === OrderbookSide.BID
-                        ? {
-                              symbol: ['circle', 'none'],
-                              animation: false,
-                              data: [
-                                  {
-                                      symbolSize: 6,
-                                      lineStyle: {
-                                          color: AppColors.aquamarine,
-                                          opacity: 1,
-                                      },
-                                      xAxis: selectedTrade.trade?.average_sell_price,
-                                      label: {
-                                          formatter: (bidMarlineParams) => {
-                                              return [
-                                                  `${numeral(selectedTrade.amountIn).format('0.0,[000]')} ${orderbook.base.symbol}`,
-                                                  `at ${bidMarlineParams.value} ${orderbook.base.symbol}/${orderbook.quote.symbol}`,
-                                                  `= ${selectedTrade.trade?.output ? `${numeral(selectedTrade.trade.output).format('0,0.[000]')} ${orderbook.quote.symbol}` : '...computing'}`,
-                                              ].join('\n')
-                                          },
-                                          color: AppColors.aquamarine,
-                                          show: true,
-                                          position: 'end',
-                                          fontSize: 11,
-                                          opacity: 0.8,
-                                      },
+                markLine: selectedTrade?.trade
+                    ? {
+                          symbol: ['circle', 'none'],
+                          animation: false,
+                          data: [
+                              {
+                                  symbolSize: 6,
+                                  lineStyle: {
+                                      color: AppColors.aquamarine,
+                                      opacity: 1,
                                   },
-                              ],
-                          }
-                        : undefined,
+                                  xAxis: selectedTrade.xAxis,
+                                  label: {
+                                      //   formatter: (bidMarlineParams) => {
+                                      //       return [
+                                      //           `${numeral(selectedTrade.amountIn).format('0.0,[000]')} ${orderbook.base.symbol}`,
+                                      //           `at ${bidMarlineParams.value} ${orderbook.base.symbol}/${orderbook.quote.symbol}`,
+                                      //           `= ${selectedTrade.trade?.output ? `${numeral(selectedTrade.trade.output).format('0,0.[000]')} ${orderbook.quote.symbol}` : '...computing'}`,
+                                      //       ].join('\n')
+                                      //   },
+                                      color: AppColors.aquamarine,
+                                      show: true,
+                                      position: 'end',
+                                      fontSize: 10,
+                                      opacity: 0.8,
+                                  },
+                              },
+                          ],
+                      }
+                    : undefined,
             },
             {
                 yAxisIndex: 1,
@@ -359,7 +359,7 @@ const getOptions = (
                 smooth: true,
                 lineStyle: { width: 0.5, color: AppColors.folly, opacity: 0.5 },
                 symbol: 'circle',
-                symbolSize: 7,
+                symbolSize: 8,
                 itemStyle: {
                     color: AppColors.background,
                     borderColor: AppColors.folly,
@@ -385,37 +385,38 @@ const getOptions = (
                                   ],
                               },
                           },
-                markLine:
-                    selectedTrade?.trade && selectedTrade.side === OrderbookSide.ASK
-                        ? {
-                              symbol: ['circle', 'none'],
-                              animation: false,
-                              data: [
-                                  {
-                                      symbolSize: 6,
-                                      lineStyle: {
-                                          color: AppColors.folly,
-                                          opacity: 1,
-                                      },
-                                      xAxis: 1 / (selectedTrade.trade?.average_sell_price ?? 1),
-                                      label: {
-                                          formatter: (askMarlineParams) => {
-                                              return [
-                                                  `${numeral(selectedTrade.amountIn).format('0.0,[000]')} ${orderbook.quote.symbol}`,
-                                                  `at ${askMarlineParams.value} ${orderbook.base.symbol}/${orderbook.quote.symbol}`,
-                                                  `= ${selectedTrade.trade?.output ? `${numeral(selectedTrade.trade?.output).format('0,0.[000]')} ${orderbook.base.symbol}` : '...computing'}`,
-                                              ].join('\n')
-                                          },
-                                          color: AppColors.folly,
-                                          show: true,
-                                          position: 'end',
-                                          fontSize: 11,
-                                          opacity: 0.8,
-                                      },
-                                  },
-                              ],
-                          }
-                        : undefined,
+                // markLine:
+                //     selectedTrade?.trade && selectedTrade.side === OrderbookSide.ASK
+                //         ? {
+                //               symbol: ['circle', 'none'],
+                //               animation: false,
+                //               data: [
+                //                   {
+                //                       symbolSize: 6,
+                //                       lineStyle: {
+                //                           color: AppColors.folly,
+                //                           opacity: 1,
+                //                       },
+                //                       xAxis: selectedTrade.xAxis,
+                //                       // xAxis: selectedTrade.trade?.average_sell_price,
+                //                       label: {
+                //                           formatter: (askMarlineParams) => {
+                //                               return [
+                //                                   `${numeral(selectedTrade.amountIn).format('0.0,[000]')} ${orderbook.quote.symbol}`,
+                //                                   `at ${askMarlineParams.value} ${orderbook.base.symbol}/${orderbook.quote.symbol}`,
+                //                                   `= ${selectedTrade.trade?.output ? `${numeral(selectedTrade.trade?.output).format('0,0.[000]')} ${orderbook.base.symbol}` : '...computing'}`,
+                //                               ].join('\n')
+                //                           },
+                //                           color: AppColors.folly,
+                //                           show: true,
+                //                           position: 'end',
+                //                           fontSize: 10,
+                //                           opacity: 0.8,
+                //                       },
+                //                   },
+                //               ],
+                //           }
+                //         : undefined,
             },
         ],
     }
@@ -433,7 +434,7 @@ export default function DepthChart() {
         selectedTrade,
         selectOrderbookTrade,
         getAddressPair,
-        switchSelectedTokens,
+        // switchSelectedTokens,
     } = useAppStore()
     const { apiStoreRefreshedAt, getOrderbook } = useApiStore()
     const [options, setOptions] = useState<null | echarts.EChartsOption>(null)
@@ -465,7 +466,7 @@ export default function DepthChart() {
                     }
                     if (trade === highestBid) {
                         point.symbol = bestSideSymbol
-                        point.symbolSize = 18
+                        point.symbolSize = 20
                         point.itemStyle = {
                             borderWidth: 1,
                             borderColor: AppColors.jagger[500],
@@ -490,7 +491,7 @@ export default function DepthChart() {
                     }
                     if (trade === lowestAsk) {
                         point.symbol = bestSideSymbol
-                        point.symbolSize = 18
+                        point.symbolSize = 20
                         point.itemStyle = {
                             borderWidth: 1,
                             borderColor: AppColors.jagger[500],
@@ -519,24 +520,58 @@ export default function DepthChart() {
     }, [sellToken?.address, buyToken?.address, apiStoreRefreshedAt, yAxisType, yAxisLogBase, coloredAreas, symbolsInYAxis, selectedTrade])
 
     const handlePointClick = (params: undefined | { data: EchartOnClickParamsData; dataIndex: number }) => {
+        const debug = true
+        const fnName = 'handlePointClick'
         if (params?.data) {
+            // debug
+            if (debug) console.log('---------')
+            if (debug) console.log(fnName, 'ok data', params?.data)
+
             const key = `${sellToken?.address}-${buyToken?.address}`
             const orderbook = getOrderbook(key)
             if (orderbook) {
-                const selectedTrade: SelectedTrade = {
+                // debug
+                if (debug) console.log(fnName, 'ok orderbook')
+
+                // find
+                const side = params.data.customData?.side
+
+                // prevent errors
+                if (!side) return
+                if (side === OrderbookSide.ASK) {
+                    toast(`Can't select Asks for now`, { style: toastStyle })
+                    return
+                }
+
+                // debug
+                if (debug) console.log(fnName, 'ok side', side)
+
+                const trade =
+                    side === OrderbookSide.BID
+                        ? orderbook.bids.find((bid) => String(bid.amount) === String(params.data.value[1]))
+                        : orderbook.asks.find((ask) => String(ask.amount) === String(params.data.value[1]))
+
+                // prevent errors
+                if (!trade) return
+
+                // notify
+                toast.success(`New trade selected`, { style: toastStyle })
+
+                // debug
+                if (debug) console.log(fnName, 'ok trade', trade)
+
+                // update markline
+                selectOrderbookTrade({
                     selectedAt: Date.now(),
                     side: params.data?.customData.side,
                     amountIn: params.data.value[1],
                     pools: orderbook.pools,
-                    trade:
-                        params.data.customData?.side === OrderbookSide.BID
-                            ? orderbook.bids.find((bid) => Number(bid.output) === Number(params.data.customData.output))
-                            : orderbook.asks.find((ask) => Number(ask.output) === Number(params.data.customData.output)),
-                }
-
-                if (selectedTrade.side === OrderbookSide.ASK) switchSelectedTokens()
-                selectOrderbookTrade(selectedTrade)
+                    trade,
+                    xAxis: trade.average_sell_price,
+                })
             }
+        } else {
+            if (debug) console.log(fnName, 'missing data in params')
         }
     }
 
@@ -549,10 +584,7 @@ export default function DepthChart() {
                     ) : options && Array.isArray(options.series) && options.series?.length > 0 && options.series[0].data ? (
                         <EchartWrapper
                             options={options}
-                            onPointClick={(params) => {
-                                toast.success(`Trade selected`, { style: toastStyle })
-                                handlePointClick(params as undefined | { data: EchartOnClickParamsData; dataIndex: number })
-                            }}
+                            onPointClick={(params) => handlePointClick(params as undefined | { data: EchartOnClickParamsData; dataIndex: number })}
                         />
                     ) : (
                         <LoadingArea />

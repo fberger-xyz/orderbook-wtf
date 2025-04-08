@@ -95,13 +95,11 @@ export interface SelectedTrade {
     side: OrderbookSide
     amountIn: number
     selectedAt: number
+    xAxis: number
 
     // must be calculated
     trade?: AmmTrade
     pools: AmmPool[]
-
-    // meta
-    // toDisplay: boolean
 }
 
 /**

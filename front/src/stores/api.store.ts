@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { AmmAsOrderbook, Token } from '@/interfaces'
+import { IS_DEV } from '@/config/app.config'
 
 export const useApiStore = create<{
     apiTokens: Token[]
@@ -13,7 +14,7 @@ export const useApiStore = create<{
 }>((set, get) => ({
     apiTokens: [],
     apiOrderbooks: {},
-    orderBookRefreshIntervalMs: 30 * 1000,
+    orderBookRefreshIntervalMs: (IS_DEV ? 10 : 30) * 1000,
     apiStoreRefreshedAt: -1,
     setApiTokens: (apiTokens) => set(() => ({ apiTokens })),
     setApiOrderbook: (key, orderbook) => set((state) => ({ apiOrderbooks: { ...state.apiOrderbooks, [key]: orderbook } })),

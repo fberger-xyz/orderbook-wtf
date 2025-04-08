@@ -46,38 +46,47 @@ export default function Dashboard() {
                 queryKey: ['ApiOrderbookQuery', sellToken?.address, buyToken?.address],
                 enabled: true,
                 queryFn: async () => {
+                    // prevent errors
                     if (!sellToken?.address || !buyToken?.address) return null
 
+                    // fetch all orderbook
                     const url = `${APP_ROUTE}/api/local/orderbook?token0=${sellToken.address}&token1=${buyToken.address}`
                     const orderbookResponse = await fetch(url, {
                         method: 'GET',
                         headers: { 'Content-Type': 'application/json' },
                     })
+
+                    // parse
                     const orderbookJson = (await orderbookResponse.json()) as StructuredOutput<AmmAsOrderbook>
 
+                    // prevent request errors
                     if (orderbookJson.error) {
-                        if (orderbookJson.error.includes('pair has 0 associated components')) {
+                        if (orderbookJson.error.includes('pair has 0 associated components'))
                             toast.error(`No pool for pair ${sellToken.symbol}-${buyToken.symbol} > select another pair`, { style: toastStyle })
-                        } else {
-                            toast.error(`${orderbookJson.error}`, { style: toastStyle })
-                        }
-                    } else if (!orderbookJson.data?.bids || !orderbookJson.data?.asks) {
+                        else toast.error(`${orderbookJson.error}`, { style: toastStyle })
+                        return orderbookJson
+                    }
+
+                    // prevent format errors
+                    if (!orderbookJson.data?.bids || !orderbookJson.data?.asks) {
                         toast.error(`Bad orderbook format`, { style: toastStyle })
-                    } else if (orderbookJson.data) {
+                        return orderbookJson
+                    }
+
+                    // handle store update
+                    if (orderbookJson.data) {
                         setApiOrderbook(getAddressPair(), orderbookJson.data)
+                        if (sellTokenAmountInput) await simulateTradeAndMergeOrderbook(sellTokenAmountInput)
                         toast.success(`${sellToken.symbol}-${buyToken.symbol} orderbook data updated just now`, { style: toastStyle })
                         const orderbook = getOrderbook(getAddressPair())
                         setMetrics(getDashboardMetrics(orderbook, sellToken, buyToken))
                         setApiStoreRefreshedAt(Date.now())
-                        if (sellTokenAmountInput) {
-                            await simulateTradeAndMergeOrderbook(sellTokenAmountInput)
-                        }
                     }
 
                     return orderbookJson
                 },
                 refetchOnWindowFocus: false,
-                refetchInterval: orderBookRefreshIntervalMs,
+                refetchInterval: orderBookRefreshIntervalMs - 2000,
             },
         ],
     })
@@ -86,36 +95,52 @@ export default function Dashboard() {
         try {
             setIsLoadingSomeTrade(true)
 
+            // prevent errors
+            const pair = getAddressPair()
+            const orderbook = getOrderbook(pair)
+            if (!orderbook) return
+
+            // fetch trade data
             const url = `${APP_ROUTE}/api/local/orderbook?token0=${sellToken?.address}&token1=${buyToken?.address}&pointAmount=${amountIn}&pointToken=${sellToken?.address}`
             const tradeResponse = await fetch(url, {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' },
             })
             const tradeResponseJson = (await tradeResponse.json()) as StructuredOutput<AmmAsOrderbook>
+            if (!tradeResponseJson.data) return
 
-            const pair = getAddressPair()
-            const orderbook = getOrderbook(pair)
+            // nb: can only be a bid for now
+            const side = OrderbookSide.BID
 
-            if (!tradeResponseJson.data || !orderbook) return
+            // prevent errors
+            if (!side) return
 
+            // ease access
+            const newTradeEntry = tradeResponseJson.data?.bids.length > 0 ? tradeResponseJson.data.bids[0] : null
+
+            // prevent errors
+            if (!newTradeEntry) return
+
+            // new orderbook
+            // nb: make sure we have the same amount of pools
             const newOrderbook = {
-                ...orderbook,
-                bids: [...orderbook.bids, ...tradeResponseJson.data.bids],
-                asks: [...orderbook.asks, ...tradeResponseJson.data.asks],
-                base_worth_eth: tradeResponseJson.data.base_worth_eth,
-                quote_worth_eth: tradeResponseJson.data.quote_worth_eth,
-                block: tradeResponseJson.data.block,
+                ...tradeResponseJson.data,
+
+                // filter out previous entry for same trade
+                bids: [...orderbook.bids.filter((bid) => newTradeEntry.amount !== bid.amount), ...tradeResponseJson.data.bids],
+                asks: orderbook.asks,
             }
 
+            // update state
             setApiOrderbook(pair, newOrderbook)
 
             const newSelectedTrade = {
                 side: OrderbookSide.BID,
                 amountIn,
                 selectedAt: Date.now(),
-                trade: newOrderbook.bids.find((bid) => bid.amount === amountIn),
+                trade: newTradeEntry,
                 pools: newOrderbook.pools,
-                toDisplay: true,
+                xAxis: newTradeEntry.average_sell_price,
             }
 
             selectOrderbookTrade(newSelectedTrade)

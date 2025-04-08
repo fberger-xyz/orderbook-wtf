@@ -77,7 +77,7 @@ export default function RoutingSection(props: { metrics: ReturnType<typeof getDa
                         <p className="text-milk-400 text-xs">Using a simplistic solver</p>
                     </div>
                 }
-                content={<div className="skeleton-loading w-full h-16" />}
+                content={null}
             />
         )
     }
