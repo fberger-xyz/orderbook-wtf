@@ -102,49 +102,49 @@ export default function Dashboard() {
             // state
             setIsLoadingSomeTrade(true)
 
-            // prepare
+    // prepare
             const url = `${APP_ROUTE}/api/local/orderbook?token0=${sellToken?.address}&token1=${buyToken?.address}&pointAmount=${amountIn}&pointToken=${sellToken?.address}`
-            const tradeResponse = await fetch(url, { method: 'GET', headers: { 'Content-Type': 'application/json' } })
-            const tradeResponseJson = (await tradeResponse.json()) as StructuredOutput<AmmAsOrderbook>
+                                        const tradeResponse = await fetch(url, { method: 'GET', headers: { 'Content-Type': 'application/json' } })
+                                        const tradeResponseJson = (await tradeResponse.json()) as StructuredOutput<AmmAsOrderbook>
             const pair = getAddressPair()
-            const orderbook = getOrderbook(pair)
+                                        const orderbook = getOrderbook(pair)
             if (!tradeResponseJson.data) return
             if (!orderbook) return
 
             // -
-            const newOrderbook = {
-                ...orderbook,
-                bids: [...orderbook.bids, ...tradeResponseJson.data.bids],
-                asks: [...orderbook.asks, ...tradeResponseJson.data.asks],
-                base_worth_eth: tradeResponseJson.data.base_worth_eth,
-                quote_worth_eth: tradeResponseJson.data.quote_worth_eth,
-                block: tradeResponseJson.data.block,
-            }
+                                            const newOrderbook = {
+                                                ...orderbook,
+                                                bids: [...orderbook.bids, ...tradeResponseJson.data.bids],
+                                                asks: [...orderbook.asks, ...tradeResponseJson.data.asks],
+                                                base_worth_eth: tradeResponseJson.data.base_worth_eth,
+                                                quote_worth_eth: tradeResponseJson.data.quote_worth_eth,
+                                                block: tradeResponseJson.data.block,
+                                            }
 
             // update store
-            setApiOrderbook(pair, newOrderbook)
+                                            setApiOrderbook(pair, newOrderbook)
 
             // -
             const newSelectedTrade = {
                 side: OrderbookSide.BID,
                 amountIn,
-                selectedAt: Date.now(),
+                                                selectedAt: Date.now(),
 
-                // must be calculated
+                                                // must be calculated
                 trade: newOrderbook.bids.find((bid) => bid.amount === amountIn),
-                pools: newOrderbook.pools,
+                                                pools: newOrderbook.pools,
 
-                // meta
-                toDisplay: true,
-            }
+                                                // meta
+                                                toDisplay: true,
+                                        }
 
             // update store
             selectOrderbookTrade(newSelectedTrade)
-        } catch (error) {
-            toast.error(`Unexepected error while fetching price: ${extractErrorMessage(error)}`, {
-                style: toastStyle,
-            })
-        } finally {
+                                } catch (error) {
+                                    toast.error(`Unexepected error while fetching price: ${extractErrorMessage(error)}`, {
+                                        style: toastStyle,
+                                    })
+                                } finally {
             // state
             setIsLoadingSomeTrade(false)
         }
