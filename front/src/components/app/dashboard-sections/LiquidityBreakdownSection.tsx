@@ -129,14 +129,14 @@ export default function LiquidityBreakdownSection(props: { metrics: ReturnType<t
                         <div className="flex w-full justify-center items-center rounded-xl gap-1 border border-milk-150 flex-col px-3 py-2">
                             {/* 1 headers */}
                             <div className="grid grid-cols-10 w-full rounded-xl py-1 px-4 gap-5 items-end text-xs text-milk-200">
-                                <p className="col-span-2">Pool</p>
+                                <p className="col-span-2">Pools</p>
 
                                 {/* base */}
                                 <div className="flex flex-col col-span-3 gap-2">
                                     <div className="flex gap-2 border-b pb-1.5 justify-center items-start border-milk-150 pr-2">
                                         <TokenImage size={14} token={orderbook.base} />
-                                        <p className="font-semibold">{orderbook.base.symbol}</p>
-                                        <p className="text-milk-150">Base</p>
+                                        <p className="font-semibold text-milk">{orderbook.base.symbol}</p>
+                                        {/* <p className="text-milk-150">Base</p> */}
                                     </div>
                                     <div className="grid grid-cols-3 w-full pr-2">
                                         <p className="col-span-1 text-right">Balance</p>
@@ -149,8 +149,8 @@ export default function LiquidityBreakdownSection(props: { metrics: ReturnType<t
                                 <div className="flex flex-col col-span-3 gap-2">
                                     <div className="flex gap-2 border-b pb-1.5 justify-center items-start border-milk-150 pr-2">
                                         <TokenImage size={14} token={orderbook.quote} />
-                                        <p className="font-semibold">{orderbook.quote.symbol}</p>
-                                        <p className="text-milk-150">Quote</p>
+                                        <p className="font-semibold text-milk">{orderbook.quote.symbol}</p>
+                                        {/* <p className="text-milk-150">Quote</p> */}
                                     </div>
                                     <div className="grid grid-cols-3 w-full pr-2">
                                         <p className="col-span-1 text-right">Balance</p>
@@ -163,9 +163,9 @@ export default function LiquidityBreakdownSection(props: { metrics: ReturnType<t
                                 <div className="flex flex-col col-span-2 gap-2">
                                     <div className="flex gap-2 border-b pb-1.5 justify-center items-start border-milk-150 pr-2">
                                         <TokenImage size={14} token={orderbook.base} />
-                                        <p>+</p>
+                                        <p className="font-semibold text-milk">+</p>
                                         <TokenImage size={14} token={orderbook.quote} />
-                                        <p className="text-milk-150">Base + Quote</p>
+                                        {/* <p className="text-milk-150">Base + Quote</p> */}
                                     </div>
                                     <div className="grid grid-cols-2 w-full pr-2">
                                         <p className="col-span-1 text-right">m$</p>
@@ -194,7 +194,7 @@ export default function LiquidityBreakdownSection(props: { metrics: ReturnType<t
                                             <div className="flex justify-center rounded-full p-1 border border-milk-200 bg-milk-200/10">
                                                 <SvgMapper icon={pool.config?.svgId} className="size-3.5" />
                                             </div>
-                                            <p className="text-milk-600 truncate">
+                                            <p className="text-milk-600 truncate group-hover:underline">
                                                 {pool.config?.version ? `${pool.config?.version.toLowerCase()} - ` : ''}
                                                 {pool.details.fee} bps - {pool?.details?.address.slice(0, 5)}
                                             </p>

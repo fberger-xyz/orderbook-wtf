@@ -172,7 +172,7 @@ export default function RoutingSection(props: { metrics: ReturnType<typeof getDa
                                                                     <div className="flex justify-center rounded-full p-1 border border-milk-200 bg-milk-200/10">
                                                                         <SvgMapper icon={config.svgId} className="size-3.5" />
                                                                     </div>
-                                                                    <p className="text-milk-600 truncate">
+                                                                    <p className="text-milk-600 truncate group-hover:underline">
                                                                         {config?.version ? `${config?.version.toLowerCase()} - ` : ''}
                                                                         {pool?.fee} bps - {pool?.address.slice(0, 5)}
                                                                     </p>
