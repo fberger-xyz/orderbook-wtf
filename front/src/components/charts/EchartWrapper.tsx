@@ -53,7 +53,7 @@ export default function EchartWrapper(props: InterfaceEchartWrapperProps) {
                 // @ts-expect-error: poorly typed
                 { ...props.options, ...grid3DOptions },
                 {
-                    notMerge: true, // the new option object replaces the existing one completely.
+                    notMerge: false, // the new option object replaces the existing one completely.
                     // notMerge: false, // Default - ECharts merges the new options with the existing ones
 
                     /**

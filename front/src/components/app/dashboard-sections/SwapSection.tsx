@@ -13,7 +13,7 @@ import { useModal } from 'connectkit'
 import { useAccount } from 'wagmi'
 import { cn, extractErrorMessage, fetchBalance, formatAmount, getBaseValueInUsd, getDashboardMetrics, getQuoteValueInUsd, safeNumeral } from '@/utils'
 import { useApiStore } from '@/stores/api.store'
-import { APP_ROUTE } from '@/config/app.config'
+import { APP_ROUTE, IS_DEV } from '@/config/app.config'
 import toast from 'react-hot-toast'
 import { toastStyle } from '@/config/toasts.config'
 
@@ -293,6 +293,7 @@ export default function SwapSection(props: { metrics: ReturnType<typeof getDashb
                     <div className="size-[44px] rounded-xl bg-background p-1">
                         <button
                             onClick={async () => {
+                                setApiOrderbook(getAddressPair(), undefined)
                                 switchSelectedTokens()
                                 if (sellTokenAmountInput) await simulateTradeAndMergeOrderbook(sellTokenAmountInput)
                             }}
@@ -414,7 +415,7 @@ export default function SwapSection(props: { metrics: ReturnType<typeof getDashb
                 )}
 
                 {/* Debug */}
-                <pre className="text-xs p-2">{JSON.stringify(selectedTrade, null, 2)}</pre>
+                {IS_DEV && <pre className="text-xs p-2">{JSON.stringify(selectedTrade, null, 2)}</pre>}
             </div>
 
             {/* Token selection modal */}

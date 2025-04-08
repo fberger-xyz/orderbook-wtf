@@ -14,7 +14,7 @@ import { CountdownCircleTimer } from 'react-countdown-circle-timer'
 import { useEffect, useState } from 'react'
 import { useApiStore } from '@/stores/api.store'
 
-export default function KPIsSection(props: { metrics: ReturnType<typeof getDashboardMetrics> }) {
+export default function KPIsSection(props: { metrics?: ReturnType<typeof getDashboardMetrics> }) {
     const { sellToken, buyToken } = useAppStore()
     const { orderBookRefreshIntervalMs, apiStoreRefreshedAt } = useApiStore()
     const [timerKey, setTimerKey] = useState(0)
@@ -37,12 +37,12 @@ export default function KPIsSection(props: { metrics: ReturnType<typeof getDashb
                 content={
                     <div
                         className={cn('flex gap-1.5 items-center flex-wrap', {
-                            'skeleton-loading p-1': !props.metrics.highestBid?.average_sell_price,
+                            'skeleton-loading p-1': !props.metrics || props.metrics?.highestBid?.average_sell_price === undefined,
                         })}
                     >
                         <TokenImage size={20} token={buyToken} />
-                        {props.metrics.highestBid?.average_sell_price && (
-                            <p className="text-milk font-semibold text-base">{formatAmount(props.metrics.highestBid.average_sell_price)}</p>
+                        {props.metrics?.highestBid?.average_sell_price && (
+                            <p className="text-milk font-semibold text-base">{formatAmount(props.metrics?.highestBid.average_sell_price)}</p>
                         )}
                     </div>
                 }
@@ -55,10 +55,14 @@ export default function KPIsSection(props: { metrics: ReturnType<typeof getDashb
                     </div>
                 }
                 content={
-                    <div className={cn('flex gap-1.5 items-center flex-wrap', { 'skeleton-loading p-1': props.metrics.midPrice === undefined })}>
+                    <div
+                        className={cn('flex gap-1.5 items-center flex-wrap', {
+                            'skeleton-loading p-1': !props.metrics || props.metrics?.midPrice === undefined,
+                        })}
+                    >
                         <TokenImage size={20} token={buyToken} />
-                        {props.metrics.midPrice !== undefined && (
-                            <p className="text-milk font-semibold text-base">{formatAmount(props.metrics.midPrice)}</p>
+                        {props.metrics?.midPrice !== undefined && (
+                            <p className="text-milk font-semibold text-base">{formatAmount(props.metrics?.midPrice)}</p>
                         )}
                     </div>
                 }
@@ -74,12 +78,12 @@ export default function KPIsSection(props: { metrics: ReturnType<typeof getDashb
                 content={
                     <div
                         className={cn('flex gap-1.5 items-center flex-wrap', {
-                            'skeleton-loading p-1': props.metrics?.lowestAsk?.average_sell_price === undefined,
+                            'skeleton-loading p-1': !props.metrics || props.metrics?.lowestAsk?.average_sell_price === undefined,
                         })}
                     >
                         <TokenImage size={20} token={buyToken} />
                         {props.metrics?.lowestAsk?.average_sell_price !== undefined && (
-                            <p className="text-milk font-semibold text-base">{formatAmount(1 / props.metrics.lowestAsk.average_sell_price)}</p>
+                            <p className="text-milk font-semibold text-base">{formatAmount(1 / props.metrics?.lowestAsk.average_sell_price)}</p>
                         )}
                     </div>
                 }
@@ -88,11 +92,11 @@ export default function KPIsSection(props: { metrics: ReturnType<typeof getDashb
             <OrderbookKeyMetric
                 title="Spread"
                 content={
-                    !isNaN(Number(props.metrics.spreadPercent)) ? (
+                    props.metrics && !isNaN(Number(props.metrics?.spreadPercent)) ? (
                         <p className="text-milk font-semibold text-base">
-                            {numeral(props.metrics.spreadPercent).format('0,0.[0000]%')}{' '}
+                            {numeral(props.metrics?.spreadPercent).format('0,0.[0000]%')}{' '}
                             <span className="pl-1 text-milk-400 text-xs">
-                                {numeral(props.metrics.spreadPercent).multiply(10000).format('0,0')} bps
+                                {numeral(props.metrics?.spreadPercent).multiply(10000).format('0,0')} bps
                             </span>
                         </p>
                     ) : (
@@ -103,7 +107,7 @@ export default function KPIsSection(props: { metrics: ReturnType<typeof getDashb
                 }
             />
 
-            {props.metrics.orderbook?.block !== undefined ? (
+            {props.metrics?.orderbook?.block !== undefined ? (
                 <OrderbookComponentLayout
                     title={
                         <div className="w-full flex justify-between">
@@ -128,10 +132,10 @@ export default function KPIsSection(props: { metrics: ReturnType<typeof getDashb
                     content={
                         <LinkWrapper
                             target="_blank"
-                            href={`https://etherscan.io/block/${props.metrics.orderbook.block}`}
+                            href={`https://etherscan.io/block/${props.metrics?.orderbook.block}`}
                             className="flex gap-1 items-center group"
                         >
-                            <p className="text-milk font-semibold text-base">{numeral(props.metrics.orderbook.block).format('0,0')}</p>
+                            <p className="text-milk font-semibold text-base">{numeral(props.metrics?.orderbook.block).format('0,0')}</p>
                             <IconWrapper icon={IconIds.OPEN_LINK_IN_NEW_TAB} className="size-4 text-milk-200 group-hover:text-milk" />
                         </LinkWrapper>
                     }
@@ -157,14 +161,14 @@ export default function KPIsSection(props: { metrics: ReturnType<typeof getDashb
                                     <div className="flex gap-1 text-milk text-sm">
                                         <p>
                                             {numeral(
-                                                props.metrics.totalBaseTvlUsd / (props.metrics.totalBaseTvlUsd + props.metrics.totalQuoteTvlUsd),
+                                                props.metrics?.totalBaseTvlUsd / (props.metrics?.totalBaseTvlUsd + props.metrics?.totalQuoteTvlUsd),
                                             ).format('0,0.%')}{' '}
                                         </p>
                                         <TokenImage size={20} token={sellToken} />
                                         <p>
                                             {sellToken?.symbol} and{' '}
                                             {numeral(
-                                                props.metrics.totalQuoteTvlUsd / (props.metrics.totalBaseTvlUsd + props.metrics.totalQuoteTvlUsd),
+                                                props.metrics?.totalQuoteTvlUsd / (props.metrics?.totalBaseTvlUsd + props.metrics?.totalQuoteTvlUsd),
                                             ).format('0,0.%')}{' '}
                                         </p>
                                         <TokenImage size={20} token={buyToken} />
@@ -181,14 +185,14 @@ export default function KPIsSection(props: { metrics: ReturnType<typeof getDashb
                     </Tooltip>
                 }
                 content={
-                    props.metrics.totalBaseTvlUsd === undefined || props.metrics.totalQuoteTvlUsd === undefined ? (
+                    props.metrics?.totalBaseTvlUsd === undefined || props.metrics?.totalQuoteTvlUsd === undefined ? (
                         <div className="flex gap-1.5 items-center flex-wrap skeleton-loading p-1 w-full">
                             <p className="text-milk-100 font-semibold text-sm">$ --- m</p>
                         </div>
                     ) : (
                         <div className="w-full flex items-start gap-1 group">
                             <p className="text-milk font-semibold text-base">
-                                $ {formatAmount(props.metrics.totalBaseTvlUsd + props.metrics.totalQuoteTvlUsd)}
+                                $ {formatAmount(props.metrics?.totalBaseTvlUsd + props.metrics?.totalQuoteTvlUsd)}
                             </p>
                         </div>
                     )

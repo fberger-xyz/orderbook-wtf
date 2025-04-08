@@ -333,13 +333,13 @@ const getOptions = (
                                   },
                                   xAxis: selectedTrade.xAxis,
                                   label: {
-                                      //   formatter: (bidMarlineParams) => {
-                                      //       return [
-                                      //           `${numeral(selectedTrade.amountIn).format('0.0,[000]')} ${orderbook.base.symbol}`,
-                                      //           `at ${bidMarlineParams.value} ${orderbook.base.symbol}/${orderbook.quote.symbol}`,
-                                      //           `= ${selectedTrade.trade?.output ? `${numeral(selectedTrade.trade.output).format('0,0.[000]')} ${orderbook.quote.symbol}` : '...computing'}`,
-                                      //       ].join('\n')
-                                      //   },
+                                      formatter: (bidMarlineParams) => {
+                                          return [
+                                              `${numeral(selectedTrade.amountIn).format('0.0,[000]')} ${orderbook.base.symbol}`,
+                                              `at ${bidMarlineParams.value} ${orderbook.base.symbol}/${orderbook.quote.symbol}`,
+                                              `= ${selectedTrade.trade?.output ? `${numeral(selectedTrade.trade.output).format('0,0.[000]')} ${orderbook.quote.symbol}` : '...computing'}`,
+                                          ].join('\n')
+                                      },
                                       color: AppColors.aquamarine,
                                       show: true,
                                       position: 'end',
