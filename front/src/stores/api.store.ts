@@ -17,7 +17,7 @@ export const useApiStore = create<{
     apiTokens: [],
     apiOrderbooks: {},
     metrics: getDashboardMetrics(undefined),
-    orderBookRefreshIntervalMs: (IS_DEV ? 10 : 30) * 1000,
+    orderBookRefreshIntervalMs: (IS_DEV ? 12 : 30) * 1000,
     apiStoreRefreshedAt: -1,
     setApiTokens: (apiTokens) => set(() => ({ apiTokens })),
     setApiOrderbook: (key, orderbook) =>

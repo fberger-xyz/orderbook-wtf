@@ -331,7 +331,7 @@ const getOptions = (
                                       color: AppColors.aquamarine,
                                       opacity: 1,
                                   },
-                                  xAxis: selectedTrade.xAxis,
+                                  xAxis: Number(selectedTrade.xAxis),
                                   label: {
                                       formatter: (bidMarlineParams) => {
                                           return [
@@ -517,7 +517,7 @@ export default function DepthChart() {
         } else {
             setOptions(null)
         }
-    }, [sellToken?.address, buyToken?.address, apiStoreRefreshedAt, yAxisType, yAxisLogBase, coloredAreas, symbolsInYAxis, selectedTrade])
+    }, [apiStoreRefreshedAt, yAxisType, yAxisLogBase, coloredAreas, symbolsInYAxis, selectedTrade])
 
     const handlePointClick = (params: undefined | { data: EchartOnClickParamsData; dataIndex: number }) => {
         const debug = true

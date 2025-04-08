@@ -415,7 +415,7 @@ export default function SwapSection() {
                 )}
 
                 {/* Debug */}
-                {IS_DEV && <pre className="text-xs p-2">{JSON.stringify(selectedTrade, null, 2)}</pre>}
+                {IS_DEV && <pre className="text-xs p-2">{JSON.stringify({ ...selectedTrade, pools: 'hidden' }, null, 2)}</pre>}
             </div>
 
             {/* Token selection modal */}

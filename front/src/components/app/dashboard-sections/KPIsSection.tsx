@@ -122,7 +122,9 @@ export default function KPIsSection() {
                                 size={16}
                                 strokeWidth={1.5}
                                 trailStrokeWidth={1.5}
-                            />
+                            >
+                                {({ remainingTime }) => <p className="text-[7px] text-milk-200">{remainingTime}</p>}
+                            </CountdownCircleTimer>
                         </div>
                     }
                     content={
