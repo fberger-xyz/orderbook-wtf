@@ -23,7 +23,9 @@ export default function KPIsSection(props: { metrics: ReturnType<typeof getDashb
     const { orderBookRefreshIntervalMs, apiStoreRefreshedAt } = useApiStore()
     const [timerKey, setTimerKey] = useState(0)
     useEffect(() => {
-        setTimerKey((prev) => prev + 1)
+        if (apiStoreRefreshedAt > 0) {
+            setTimerKey((prev) => prev + 1)
+        }
     }, [apiStoreRefreshedAt])
 
     return (
@@ -113,7 +115,7 @@ export default function KPIsSection(props: { metrics: ReturnType<typeof getDashb
                 <OrderbookComponentLayout
                     title={
                         <div className="w-full flex justify-between">
-                            <p className="text-milk-600 text-xs">Last block {apiStoreRefreshedAt}</p>
+                            <p className="text-milk-600 text-xs">Last block</p>
                             <CountdownCircleTimer
                                 key={timerKey}
                                 isPlaying
