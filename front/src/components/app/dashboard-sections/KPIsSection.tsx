@@ -15,13 +15,10 @@ import { useEffect, useState } from 'react'
 import { useApiStore } from '@/stores/api.store'
 
 export default function KPIsSection(props: { metrics: ReturnType<typeof getDashboardMetrics> }) {
-    /**
-     * zustand
-     */
-
     const { sellToken, buyToken } = useAppStore()
     const { orderBookRefreshIntervalMs, apiStoreRefreshedAt } = useApiStore()
     const [timerKey, setTimerKey] = useState(0)
+
     useEffect(() => {
         if (apiStoreRefreshedAt > 0) {
             setTimerKey((prev) => prev + 1)
@@ -30,7 +27,6 @@ export default function KPIsSection(props: { metrics: ReturnType<typeof getDashb
 
     return (
         <div className="w-full grid grid-cols-2 md:grid-cols-3 gap-2">
-            {/* bid */}
             <OrderbookComponentLayout
                 title={
                     <div className="w-full flex items-center gap-1">
@@ -52,7 +48,6 @@ export default function KPIsSection(props: { metrics: ReturnType<typeof getDashb
                 }
             />
 
-            {/* mid price */}
             <OrderbookComponentLayout
                 title={
                     <div className="w-full flex items-start gap-1 group">
@@ -62,14 +57,13 @@ export default function KPIsSection(props: { metrics: ReturnType<typeof getDashb
                 content={
                     <div className={cn('flex gap-1.5 items-center flex-wrap', { 'skeleton-loading p-1': props.metrics.midPrice === undefined })}>
                         <TokenImage size={20} token={buyToken} />
-                        {props.metrics.midPrice !== undefined ? (
+                        {props.metrics.midPrice !== undefined && (
                             <p className="text-milk font-semibold text-base">{formatAmount(props.metrics.midPrice)}</p>
-                        ) : null}
+                        )}
                     </div>
                 }
             />
 
-            {/* ask */}
             <OrderbookComponentLayout
                 title={
                     <div className="w-full flex items-center gap-1">
@@ -84,14 +78,13 @@ export default function KPIsSection(props: { metrics: ReturnType<typeof getDashb
                         })}
                     >
                         <TokenImage size={20} token={buyToken} />
-                        {props.metrics?.lowestAsk?.average_sell_price !== undefined ? (
+                        {props.metrics?.lowestAsk?.average_sell_price !== undefined && (
                             <p className="text-milk font-semibold text-base">{formatAmount(1 / props.metrics.lowestAsk.average_sell_price)}</p>
-                        ) : null}
+                        )}
                     </div>
                 }
             />
 
-            {/* spread */}
             <OrderbookKeyMetric
                 title="Spread"
                 content={
@@ -110,7 +103,6 @@ export default function KPIsSection(props: { metrics: ReturnType<typeof getDashb
                 }
             />
 
-            {/* last block */}
             {props.metrics.orderbook?.block !== undefined ? (
                 <OrderbookComponentLayout
                     title={
@@ -155,13 +147,12 @@ export default function KPIsSection(props: { metrics: ReturnType<typeof getDashb
                 />
             )}
 
-            {/* TVL */}
             <OrderbookComponentLayout
                 title={
                     <Tooltip
                         placement="top"
                         content={
-                            props.metrics ? (
+                            props.metrics && (
                                 <div className="rounded-2xl backdrop-blur border border-milk-150 shadow-lg p-3 -mb-1">
                                     <div className="flex gap-1 text-milk text-sm">
                                         <p>
@@ -180,7 +171,7 @@ export default function KPIsSection(props: { metrics: ReturnType<typeof getDashb
                                         <p>{buyToken?.symbol}</p>
                                     </div>
                                 </div>
-                            ) : null
+                            )
                         }
                     >
                         <div className="w-full flex items-start gap-1 group">

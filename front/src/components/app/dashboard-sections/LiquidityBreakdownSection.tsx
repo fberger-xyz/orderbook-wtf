@@ -11,21 +11,45 @@ import LinkWrapper from '@/components/common/LinkWrapper'
 import SvgMapper from '@/components/icons/SvgMapper'
 import TokenImage from '../TokenImage'
 
-type PoolLiquidity = { base: { amount: number; usd: number }; quote: { amount: number; usd: number } }
+type PoolLiquidity = {
+    base: { amount: number; usd: number }
+    quote: { amount: number; usd: number }
+}
+
+type PoolData = {
+    poolIndex: number
+    details: AmmPool
+    config?: ReturnType<typeof mapProtocolIdToProtocolConfig>
+    liquidity: PoolLiquidity
+}
+
+type PoolsData = {
+    pools: PoolData[]
+    totals: PoolLiquidity
+}
+
+const PoolLink = ({ pool, config }: { pool: AmmPool | undefined; config?: ReturnType<typeof mapProtocolIdToProtocolConfig> }) => {
+    if (!pool) return null
+
+    return (
+        <LinkWrapper target="_blank" href={`https://etherscan.io/address/${pool.address}`} className="col-span-2 flex gap-2 items-center group">
+            <div className="flex justify-center rounded-full p-1 border border-milk-200 bg-milk-200/10">
+                <SvgMapper icon={config?.svgId} className="size-3.5" />
+            </div>
+            <p className="text-milk-600 truncate group-hover:underline w-full">
+                {config?.version ? `${config?.version.toLowerCase()} - ` : ''}
+                {pool.fee} bps - {pool?.address.slice(0, 5)}
+            </p>
+            <IconWrapper icon={IconIds.OPEN_LINK_IN_NEW_TAB} className="size-4 text-milk-200 group-hover:text-milk" />
+        </LinkWrapper>
+    )
+}
 
 export default function LiquidityBreakdownSection(props: { metrics: ReturnType<typeof getDashboardMetrics> }) {
-    /**
-     * zustand
-     */
-
     const { showMarketDepthSection, showRoutingSection, showLiquidityBreakdownSection, showSections } = useAppStore()
 
-    /**
-     * logic to improve
-     */
-
     const orderbook = props.metrics?.orderbook
-    if (!orderbook)
+    if (!orderbook) {
         return (
             <OrderbookComponentLayout
                 title={
@@ -45,8 +69,9 @@ export default function LiquidityBreakdownSection(props: { metrics: ReturnType<t
                 }
             />
         )
+    }
 
-    if (orderbook?.pools?.length !== orderbook?.base_lqdty?.length || orderbook?.base_lqdty?.length !== orderbook?.quote_lqdty?.length)
+    if (orderbook?.pools?.length !== orderbook?.base_lqdty?.length || orderbook?.base_lqdty?.length !== orderbook?.quote_lqdty?.length) {
         return (
             <OrderbookComponentLayout
                 title={
@@ -69,20 +94,14 @@ export default function LiquidityBreakdownSection(props: { metrics: ReturnType<t
                 }
             />
         )
+    }
 
-    // prepare
+    // Prepare data
     const eth_usd = orderbook.eth_usd
     const base_worth_eth = orderbook.base_worth_eth
     const quote_worth_eth = orderbook.quote_worth_eth
-    const { pools, totals } = orderbook?.pools.reduce<{
-        pools: {
-            poolIndex: number
-            details: AmmPool
-            config?: ReturnType<typeof mapProtocolIdToProtocolConfig>
-            liquidity: PoolLiquidity
-        }[]
-        totals: PoolLiquidity
-    }>(
+
+    const { pools, totals } = orderbook?.pools.reduce<PoolsData>(
         (acc, curr, currIndex) => {
             let existingPoolIndex = acc.pools.findIndex((entry) => entry.poolIndex === currIndex)
             if (existingPoolIndex < 0) {
@@ -103,13 +122,13 @@ export default function LiquidityBreakdownSection(props: { metrics: ReturnType<t
         { pools: [], totals: { base: { amount: 0, usd: 0 }, quote: { amount: 0, usd: 0 } } },
     )
 
-    // compute totals
-    for (let poolIndex = 0; poolIndex < pools.length; poolIndex++) {
-        totals.base.amount += pools[poolIndex].liquidity.base.amount
-        totals.base.usd += pools[poolIndex].liquidity.base.usd
-        totals.quote.amount += pools[poolIndex].liquidity.quote.amount
-        totals.quote.usd += pools[poolIndex].liquidity.quote.usd
-    }
+    // Compute totals
+    pools.forEach((pool) => {
+        totals.base.amount += pool.liquidity.base.amount
+        totals.base.usd += pool.liquidity.base.usd
+        totals.quote.amount += pool.liquidity.quote.amount
+        totals.quote.usd += pool.liquidity.quote.usd
+    })
 
     return (
         <OrderbookComponentLayout
@@ -127,16 +146,15 @@ export default function LiquidityBreakdownSection(props: { metrics: ReturnType<t
                     <div className="flex flex-col gap-2">
                         <p className="text-milk-400 text-xs">Breakdown</p>
                         <div className="flex w-full justify-center items-center rounded-xl gap-1 border border-milk-150 flex-col px-3 py-2">
-                            {/* 1 headers */}
+                            {/* Headers */}
                             <div className="grid grid-cols-10 w-full rounded-xl py-1 px-4 gap-5 items-end text-xs text-milk-200">
                                 <p className="col-span-2">Pools</p>
 
-                                {/* base */}
+                                {/* Base token */}
                                 <div className="flex flex-col col-span-3 gap-2">
                                     <div className="flex gap-2 border-b pb-1.5 justify-center items-start border-milk-150 pr-2">
                                         <TokenImage size={14} token={orderbook.base} />
                                         <p className="font-semibold text-milk">{orderbook.base.symbol}</p>
-                                        {/* <p className="text-milk-150">Base</p> */}
                                     </div>
                                     <div className="grid grid-cols-3 w-full pr-2">
                                         <p className="col-span-1 text-right">Balance</p>
@@ -145,12 +163,11 @@ export default function LiquidityBreakdownSection(props: { metrics: ReturnType<t
                                     </div>
                                 </div>
 
-                                {/* quote */}
+                                {/* Quote token */}
                                 <div className="flex flex-col col-span-3 gap-2">
                                     <div className="flex gap-2 border-b pb-1.5 justify-center items-start border-milk-150 pr-2">
                                         <TokenImage size={14} token={orderbook.quote} />
                                         <p className="font-semibold text-milk">{orderbook.quote.symbol}</p>
-                                        {/* <p className="text-milk-150">Quote</p> */}
                                     </div>
                                     <div className="grid grid-cols-3 w-full pr-2">
                                         <p className="col-span-1 text-right">Balance</p>
@@ -159,13 +176,12 @@ export default function LiquidityBreakdownSection(props: { metrics: ReturnType<t
                                     </div>
                                 </div>
 
-                                {/* tvl */}
+                                {/* TVL */}
                                 <div className="flex flex-col col-span-2 gap-2">
                                     <div className="flex gap-2 border-b pb-1.5 justify-center items-start border-milk-150 pr-2">
                                         <TokenImage size={14} token={orderbook.base} />
                                         <p className="font-semibold text-milk">+</p>
                                         <TokenImage size={14} token={orderbook.quote} />
-                                        {/* <p className="text-milk-150">Base + Quote</p> */}
                                     </div>
                                     <div className="grid grid-cols-2 w-full pr-2">
                                         <p className="col-span-1 text-right">m$</p>
@@ -174,7 +190,7 @@ export default function LiquidityBreakdownSection(props: { metrics: ReturnType<t
                                 </div>
                             </div>
 
-                            {/* 2 content */}
+                            {/* Pool rows */}
                             {pools
                                 .sort(
                                     (curr, next) =>
@@ -185,23 +201,9 @@ export default function LiquidityBreakdownSection(props: { metrics: ReturnType<t
                                         key={`${pool.poolIndex}`}
                                         className="grid grid-cols-10 w-full bg-gray-600/10 hover:bg-gray-600/20 rounded-xl py-1.5 px-4 gap-5 items-center text-xs"
                                     >
-                                        {/* pool */}
-                                        <LinkWrapper
-                                            target="_blank"
-                                            href={`https://etherscan.io/address/${pool?.details.address}`}
-                                            className="col-span-2 flex gap-2 items-center group"
-                                        >
-                                            <div className="flex justify-center rounded-full p-1 border border-milk-200 bg-milk-200/10">
-                                                <SvgMapper icon={pool.config?.svgId} className="size-3.5" />
-                                            </div>
-                                            <p className="text-milk-600 truncate group-hover:underline">
-                                                {pool.config?.version ? `${pool.config?.version.toLowerCase()} - ` : ''}
-                                                {pool.details.fee} bps - {pool?.details?.address.slice(0, 5)}
-                                            </p>
-                                            <IconWrapper icon={IconIds.OPEN_LINK_IN_NEW_TAB} className="size-4 text-milk-200 group-hover:text-milk" />
-                                        </LinkWrapper>
+                                        <PoolLink pool={pool.details} config={pool.config} />
 
-                                        {/* base */}
+                                        {/* Base token */}
                                         <div className="col-span-3 grid grid-cols-3 w-full">
                                             <p className="col-span-1 text-milk-600 text-right">
                                                 {numeral(pool.liquidity.base.amount).format('0,0a')}
@@ -214,7 +216,7 @@ export default function LiquidityBreakdownSection(props: { metrics: ReturnType<t
                                             </p>
                                         </div>
 
-                                        {/* quote */}
+                                        {/* Quote token */}
                                         <div className="col-span-3 grid grid-cols-3 w-full">
                                             <p className="col-span-1 text-milk-600 text-right">
                                                 {numeral(pool.liquidity.quote.amount).format('0,0a')}
@@ -227,7 +229,7 @@ export default function LiquidityBreakdownSection(props: { metrics: ReturnType<t
                                             </p>
                                         </div>
 
-                                        {/* tvl */}
+                                        {/* TVL */}
                                         <div className="col-span-2 grid grid-cols-2 w-full">
                                             <p className="col-span-1 text-milk-600 text-right">
                                                 {numeral(pool.liquidity.base.usd).add(pool.liquidity.quote.usd).divide(1000000).format('0,0')} m$
@@ -241,25 +243,25 @@ export default function LiquidityBreakdownSection(props: { metrics: ReturnType<t
                                     </div>
                                 ))}
 
-                            {/* 3 totals */}
+                            {/* Totals */}
                             <div className="grid grid-cols-10 w-full rounded-xl py-1 px-4 gap-5 items-center text-xs text-milk-200 font-semibold">
                                 <p className="col-span-2">Total</p>
 
-                                {/* base */}
+                                {/* Base token */}
                                 <div className="col-span-3 grid grid-cols-3 w-full">
                                     <p className="col-span-1 text-right">{numeral(totals.base.amount).divide(1000).format('0,0')} k</p>
                                     <p className="col-span-1 text-right">{numeral(totals.base.usd).divide(1000000).format('0,0')} m$</p>
                                     <p className="col-span-1 text-right">100%</p>
                                 </div>
 
-                                {/* quote */}
+                                {/* Quote token */}
                                 <div className="col-span-3 grid grid-cols-3 w-full">
                                     <p className="col-span-1 text-right">{numeral(totals.quote.amount).divide(1000).format('0,0')} k</p>
                                     <p className="col-span-1 text-right">{numeral(totals.quote.usd).divide(1000000).format('0,0')} m$</p>
                                     <p className="col-span-1 text-right">100%</p>
                                 </div>
 
-                                {/* tvl */}
+                                {/* TVL */}
                                 <div className="col-span-2 grid grid-cols-2 w-full">
                                     <p className="col-span-1 text-right">
                                         {numeral(totals.base.usd + totals.quote.usd)

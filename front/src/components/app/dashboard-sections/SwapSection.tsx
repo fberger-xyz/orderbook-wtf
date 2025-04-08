@@ -7,7 +7,7 @@ import { ChangeEvent, useEffect, useState } from 'react'
 import IconWrapper from '../../common/IconWrapper'
 import TokenImage from '../TokenImage'
 import ChainImage from '../ChainImage'
-import { AmmAsOrderbook, SelectedTrade, StructuredOutput } from '@/interfaces'
+import { AmmAsOrderbook, SelectedTrade, StructuredOutput, Token } from '@/interfaces'
 import SelectTokenModal from '../SelectTokenModal'
 import { useModal } from 'connectkit'
 import { useAccount } from 'wagmi'
@@ -17,103 +17,108 @@ import { APP_ROUTE } from '@/config/app.config'
 import toast from 'react-hot-toast'
 import { toastStyle } from '@/config/toasts.config'
 
+type TokenBalanceProps = {
+    balance: number
+    isConnected: boolean
+}
+
+const TokenBalance = ({ balance, isConnected }: TokenBalanceProps) => (
+    <div className="flex justify-between gap-1 items-center">
+        <IconWrapper icon={IconIds.WALLET} className="size-4 text-milk-400" />
+        <p className="text-milk-400 text-xs">{isConnected && balance >= 0 ? formatAmount(balance) : 0}</p>
+    </div>
+)
+
+type TokenSelectorProps = {
+    token: Token | undefined
+    onClick: () => void
+}
+
+const TokenSelector = ({ token, onClick }: TokenSelectorProps) => (
+    <button
+        onClick={onClick}
+        className="flex rounded-full bg-gray-600/30 transition-colors duration-300 hover:bg-gray-600/50 items-center gap-1.5 pl-1.5 pr-2 py-1.5 min-w-fit"
+    >
+        <TokenImage size={24} token={token} />
+        {token ? (
+            <p className="font-semibold tracking-wide">{token.symbol}</p>
+        ) : (
+            <div className="skeleton-loading flex w-16 h-6 items-center justify-center rounded-full" />
+        )}
+        <IconWrapper icon={IconIds.TRIANGLE_DOWN} className="size-4" />
+    </button>
+)
+
+type TradeDetailsProps = {
+    isLoading: boolean
+    selectedTrade: SelectedTrade | null
+    sellToken: Token | undefined
+}
+
+const TradeDetails = ({ isLoading, selectedTrade, sellToken }: TradeDetailsProps) => (
+    <div className="flex flex-col gap-2 text-xs px-2">
+        <div className="flex justify-between w-full text-milk-400">
+            <p>Expected output</p>
+            <div className="skeleton-loading w-16 h-4 rounded-full" />
+        </div>
+        <div className="flex justify-between w-full text-milk-400">
+            <p>Minimum received after slippage (0.2%)</p>
+            <div className="skeleton-loading w-16 h-4 rounded-full" />
+        </div>
+        <div className="flex justify-between w-full text-milk-400">
+            <p>Price Impact</p>
+            {isLoading ? (
+                <div className="skeleton-loading w-16 h-4 rounded-full" />
+            ) : (
+                <p>{selectedTrade?.trade?.price_impact ? numeral(selectedTrade?.trade?.price_impact).format('0,0.[000]%') : '-'}</p>
+            )}
+        </div>
+        <div className="flex justify-between w-full text-milk-400">
+            <p>Gas token</p>
+            <div className="flex gap-1 items-center">
+                {sellToken ? (
+                    <TokenImage size={16} token={sellToken} />
+                ) : (
+                    <span className="animate-pulse rounded-full bg-milk-150" style={{ width: 16, height: 16 }} />
+                )}
+                {sellToken ? (
+                    <p className="font-semibold tracking-wide">{sellToken.symbol}</p>
+                ) : (
+                    <div className="skeleton-loading flex w-16 h-6 items-center justify-center rounded-full" />
+                )}
+            </div>
+        </div>
+        <div className="flex justify-between w-full text-milk-400">
+            <p>Network Fee</p>
+            <div className="skeleton-loading w-16 h-4 rounded-full" />
+        </div>
+    </div>
+)
+
 export default function SwapSection(props: { metrics: ReturnType<typeof getDashboardMetrics> }) {
-    /**
-     * zustand
-     */
-
     const {
-        /**
-         * store
-         */
-
-        // hasHydrated,
-        // setHasHydrated,
-
-        /**
-         * ui
-         */
-
-        // showMobileMenu,
-        // setShowMobileMenu,
-        // storeRefreshedAt,
-        // setStoreRefreshedAt,
-        // refetchInterval,
-        // showMarketDepthSection,
-        // showRoutingSection,
-        // showLiquidityBreakdownSection,
-        // showSections,
-
-        /**
-         * orderbook
-         */
-
-        // data
-        // loadedOrderbooks,
-        // saveLoadedOrderbook,
-
-        // chart
-        // yAxisType,
-        // yAxisLogBase,
-        // setYAxisType,
-        // setYAxisLogBase,
-        // coloredAreas,
-        // setColoredAreas,
-        // symbolsInYAxis,
-        // setSymbolsInYAxis,
-
-        /**
-         * swap
-         */
-
-        // inputs
         sellToken,
-        // selectSellToken,
         sellTokenAmountInput,
         setSellTokenAmountInput,
         buyToken,
-        // selectBuyToken,
         buyTokenAmountInput,
-        // setBuyTokenAmountInput,
         switchSelectedTokens,
         isLoadingSomeTrade,
         setIsLoadingSomeTrade,
-
-        // trade
         selectedTrade,
         selectOrderbookTrade,
-
-        /**
-         * modal
-         */
-
-        // showSelectTokenModal,
         setShowSelectTokenModal,
-        // selectTokenModalFor,
         setSelectTokenModalFor,
-        // selectTokenModalSearch,
-        // setSelectTokenModalSearch,
-
-        /**
-         * computeds
-         */
-
         getAddressPair,
     } = useAppStore()
+
     const { setApiOrderbook, getOrderbook } = useApiStore()
-
-    /**
-     * swap
-     */
-
-    // actions
     const account = useAccount()
     const [openTradeDetails, showTradeDetails] = useState(false)
     const [buyTokenBalance, setBuyTokenBalance] = useState(-1)
     const [sellTokenBalance, setSellTokenBalance] = useState(-1)
     const { setOpen } = useModal()
 
-    // balances
     useEffect(() => {
         if (account.status === 'connected' && account.address && account.chainId) {
             if (buyToken?.address)
@@ -127,25 +132,17 @@ export default function SwapSection(props: { metrics: ReturnType<typeof getDashb
         }
     }, [account.address, account.chainId, account.status, buyToken?.address, sellToken?.address])
 
-    /**
-     * misc
-     */
-
     const simulateTradeAndMergeOrderbook = async (amountIn: number) => {
         try {
-            // state
             setIsLoadingSomeTrade(true)
 
-            // prepare
             const url = `${APP_ROUTE}/api/local/orderbook?token0=${sellToken?.address}&token1=${buyToken?.address}&pointAmount=${amountIn}&pointToken=${sellToken?.address}`
             const tradeResponse = await fetch(url, { method: 'GET', headers: { 'Content-Type': 'application/json' } })
             const tradeResponseJson = (await tradeResponse.json()) as StructuredOutput<AmmAsOrderbook>
             const pair = getAddressPair()
             const orderbook = getOrderbook(pair)
-            if (!tradeResponseJson.data) return
-            if (!orderbook) return
+            if (!tradeResponseJson.data || !orderbook) return
 
-            // -
             const newOrderbook = {
                 ...orderbook,
                 bids: [...orderbook.bids, ...tradeResponseJson.data.bids],
@@ -155,77 +152,57 @@ export default function SwapSection(props: { metrics: ReturnType<typeof getDashb
                 block: tradeResponseJson.data.block,
             }
 
-            // update store
             setApiOrderbook(pair, newOrderbook)
 
-            // -
             const newSelectedTrade = {
                 side: OrderbookSide.BID,
                 amountIn,
                 selectedAt: Date.now(),
-
-                // must be calculated
                 trade: newOrderbook.bids.find((bid) => bid.amount === amountIn),
                 pools: newOrderbook.pools,
-
-                // meta
                 toDisplay: true,
             }
 
-            // update store
             selectOrderbookTrade(newSelectedTrade)
         } catch (error) {
             toast.error(`Unexepected error while fetching price: ${extractErrorMessage(error)}`, {
                 style: toastStyle,
             })
         } finally {
-            // state
             setIsLoadingSomeTrade(false)
         }
     }
 
     const handleChangeOfAmountIn = async (event: ChangeEvent<HTMLInputElement>) => {
         try {
-            // parse
             const amountIn = Number(numeral(event.target.value).value())
-
-            // prevent errors
             if (isNaN(amountIn)) return
 
-            // prepare
-            const newTradeSide = OrderbookSide.BID // always bid
             const newSelectedTrade: SelectedTrade = {
-                side: newTradeSide,
+                side: OrderbookSide.BID,
                 amountIn,
                 selectedAt: Date.now(),
-
-                // must be calculated
                 trade: undefined,
                 pools: [],
             }
 
-            // update store
             selectOrderbookTrade(newSelectedTrade)
             setSellTokenAmountInput(amountIn)
 
-            // prevent errors
             if (!sellToken?.address || !buyToken?.address) return
 
-            // -
             await simulateTradeAndMergeOrderbook(amountIn)
         } catch (error) {
             toast.error(`Unexepected error while fetching price: ${extractErrorMessage(error)}`, {
                 style: toastStyle,
             })
-        } finally {
-            // tba
         }
     }
 
     return (
         <>
             <div className="col-span-1 md:col-span-4 flex flex-col gap-0.5 xl:col-span-3">
-                {/* sell */}
+                {/* Sell section */}
                 <div
                     className={cn('flex flex-col gap-4 p-4 rounded-xl border-milk-150 w-full', {
                         'bg-folly/20': account.isConnected && sellToken?.address && sellTokenAmountInput && sellTokenBalance < sellTokenAmountInput,
@@ -241,31 +218,21 @@ export default function SwapSection(props: { metrics: ReturnType<typeof getDashb
                         <p className="text-milk-600 text-xs">Sell</p>
                         <div className="flex items-center">
                             {account.isConnected &&
-                            sellToken?.address &&
-                            sellTokenBalance &&
-                            sellTokenAmountInput &&
-                            sellTokenBalance < sellTokenAmountInput ? (
-                                <p className="text-folly font-semibold text-xs pr-2">Exceeds Balance</p>
-                            ) : null}
+                                sellToken?.address &&
+                                sellTokenBalance &&
+                                sellTokenAmountInput &&
+                                sellTokenBalance < sellTokenAmountInput && <p className="text-folly font-semibold text-xs pr-2">Exceeds Balance</p>}
                             <p className="text-aquamarine text-xs">Best bid</p>
                         </div>
                     </div>
                     <div className="flex justify-between gap-3">
-                        <button
+                        <TokenSelector
+                            token={sellToken}
                             onClick={() => {
                                 setSelectTokenModalFor('sell')
                                 setShowSelectTokenModal(true)
                             }}
-                            className="flex rounded-full bg-gray-600/30 transition-colors duration-300 hover:bg-gray-600/50 items-center gap-1.5 pl-1.5 pr-2 py-1.5 min-w-fit"
-                        >
-                            <TokenImage size={24} token={sellToken} />
-                            {sellToken ? (
-                                <p className="font-semibold tracking-wide">{sellToken.symbol}</p>
-                            ) : (
-                                <div className="skeleton-loading flex w-16 h-6 items-center justify-center rounded-full" />
-                            )}
-                            <IconWrapper icon={IconIds.TRIANGLE_DOWN} className="size-4" />
-                        </button>
+                        />
                         <input
                             type="text"
                             className="text-xl font-semibold text-right border-none outline-none ring-0 focus:ring-0 focus:outline-none focus:border-none bg-transparent w-40"
@@ -275,20 +242,14 @@ export default function SwapSection(props: { metrics: ReturnType<typeof getDashb
                     </div>
                     {selectedTrade && props.metrics.midPrice ? (
                         <div className="mt-2 flex justify-between items-center">
-                            {/* left: balance */}
-                            <div className="flex justify-between gap-1 items-center">
-                                <IconWrapper icon={IconIds.WALLET} className="size-4 text-milk-400" />
-                                <p className="text-milk-400 text-xs">
-                                    {account.isConnected && sellTokenBalance >= 0 ? formatAmount(sellTokenBalance) : 0}
-                                </p>
+                            <div className="flex items-center gap-1">
+                                <TokenBalance balance={sellTokenBalance} isConnected={account.isConnected} />
                                 {account.isConnected && sellToken?.address && (
                                     <button onClick={() => setSellTokenAmountInput(sellTokenBalance)} className="pl-1">
                                         <p className="text-folly font-semibold text-xs">MAX</p>
                                     </button>
                                 )}
                             </div>
-
-                            {/* right: input value in $ */}
                             {isLoadingSomeTrade ? (
                                 <div className="skeleton-loading w-16 h-4 rounded-full" />
                             ) : (
@@ -302,18 +263,13 @@ export default function SwapSection(props: { metrics: ReturnType<typeof getDashb
                         </div>
                     ) : (
                         <div className="flex justify-between items-center">
-                            <div className="flex justify-between gap-1 items-center">
-                                <IconWrapper icon={IconIds.WALLET} className="size-4 text-milk-400" />
-                                <p className="text-milk-400 text-xs">
-                                    {account.isConnected && buyTokenBalance >= 0 ? formatAmount(buyTokenBalance) : 0}
-                                </p>
-                            </div>
+                            <TokenBalance balance={buyTokenBalance} isConnected={account.isConnected} />
                             <div className="skeleton-loading w-16 h-4 rounded-full" />
                         </div>
                     )}
                 </div>
 
-                {/* arrow */}
+                {/* Token switch button */}
                 <div className="h-0 w-full flex justify-center items-center z-10">
                     <div className="size-[44px] rounded-xl bg-background p-1">
                         <button
@@ -328,34 +284,17 @@ export default function SwapSection(props: { metrics: ReturnType<typeof getDashb
                     </div>
                 </div>
 
-                {/* buy */}
+                {/* Buy section */}
                 <div className="bg-milk-600/5 flex flex-col gap-4 p-4 rounded-xl border-milk-150 w-full">
                     <p className="text-milk-600 text-xs">Buy</p>
                     <div className="flex justify-between gap-3 w-full">
-                        <button
+                        <TokenSelector
+                            token={buyToken}
                             onClick={() => {
                                 setSelectTokenModalFor('buy')
                                 setShowSelectTokenModal(true)
                             }}
-                            className="flex rounded-full bg-gray-600/30 transition-colors duration-300 hover:bg-gray-600/50 items-center gap-1.5 pl-1.5 pr-2 py-1.5 min-w-fit"
-                        >
-                            <TokenImage size={24} token={buyToken} />
-                            {buyToken ? (
-                                <p className="font-semibold tracking-wide">{buyToken.symbol}</p>
-                            ) : (
-                                <div className="skeleton-loading flex w-16 h-6 items-center justify-center rounded-full" />
-                            )}
-                            <IconWrapper icon={IconIds.TRIANGLE_DOWN} className="size-4" />
-                        </button>
-                        {/* <p className="text-xl font-semibold text-right border-none outline-none ring-0 focus:ring-0 focus:outline-none focus:border-none bg-transparent w-40 cursor-not-allowed">
-                            {selectedTrade
-                                ? safeNumeral(
-                                      selectedTrade.amountIn *
-                                          (selectedTrade.side === OrderbookSide.ASK ? 1 / selectedTrade.price : selectedTrade.price),
-                                      '0,0.[00000]',
-                                  )
-                                : '-'}
-                        </p> */}
+                        />
                         <input
                             type="text"
                             className={cn('text-xl font-semibold text-right border-none outline-none', {
@@ -370,14 +309,7 @@ export default function SwapSection(props: { metrics: ReturnType<typeof getDashb
 
                     {selectedTrade ? (
                         <div className="flex justify-between items-center">
-                            <div className="flex justify-between gap-1 items-center">
-                                <IconWrapper icon={IconIds.WALLET} className="size-4 text-milk-400" />
-                                <p className="text-milk-400 text-xs">
-                                    {account.isConnected && sellTokenBalance >= 0 ? formatAmount(sellTokenBalance) : 0}
-                                </p>
-                            </div>
-
-                            {/* right: input value in $ */}
+                            <TokenBalance balance={sellTokenBalance} isConnected={account.isConnected} />
                             {isLoadingSomeTrade ? (
                                 <div className="skeleton-loading w-16 h-4 rounded-full" />
                             ) : (
@@ -391,23 +323,18 @@ export default function SwapSection(props: { metrics: ReturnType<typeof getDashb
                         </div>
                     ) : (
                         <div className="flex justify-between items-center">
-                            <div className="flex justify-between gap-1 items-center">
-                                <IconWrapper icon={IconIds.WALLET} className="size-4 text-milk-400" />
-                                <p className="text-milk-400 text-xs">
-                                    {account.isConnected && sellTokenBalance >= 0 ? formatAmount(sellTokenBalance) : 0}
-                                </p>
-                            </div>
+                            <TokenBalance balance={sellTokenBalance} isConnected={account.isConnected} />
                             <div className="skeleton-loading w-16 h-4 rounded-full" />
                         </div>
                     )}
                 </div>
 
-                {/* separator */}
+                {/* Separator */}
                 <div className="h-0 w-full" />
 
-                {/* fees */}
+                {/* Trade details section */}
                 <div className="bg-milk-600/5 flex flex-col gap-6 px-2 py-4 rounded-xl border-milk-150 text-xs">
-                    {/* summary */}
+                    {/* Summary */}
                     <div className="flex w-full justify-between items-center">
                         {sellToken && buyToken && props.metrics.highestBid && props.metrics.orderbook ? (
                             <p className="text-milk-600 truncate pl-2">
@@ -443,54 +370,14 @@ export default function SwapSection(props: { metrics: ReturnType<typeof getDashb
                         </button>
                     </div>
 
-                    {/* details */}
-                    {openTradeDetails && (
-                        <div className="flex flex-col gap-2 text-xs px-2">
-                            <div className="flex justify-between w-full text-milk-400">
-                                <p>Expected output</p>
-                                <div className="skeleton-loading w-16 h-4 rounded-full" />
-                            </div>
-                            <div className="flex justify-between w-full text-milk-400">
-                                <p>Minimum received after slippage (0.2%)</p>
-                                <div className="skeleton-loading w-16 h-4 rounded-full" />
-                            </div>
-                            <div className="flex justify-between w-full text-milk-400">
-                                <p>Price Impact</p>
-                                {isLoadingSomeTrade ? (
-                                    <div className="skeleton-loading w-16 h-4 rounded-full" />
-                                ) : (
-                                    <p>
-                                        {selectedTrade?.trade?.price_impact ? numeral(selectedTrade?.trade?.price_impact).format('0,0.[000]%') : '-'}
-                                    </p>
-                                )}
-                            </div>
-                            <div className="flex justify-between w-full text-milk-400">
-                                <p>Gas token</p>
-                                <div className="flex gap-1 items-center">
-                                    {sellToken ? (
-                                        <TokenImage size={16} token={sellToken} />
-                                    ) : (
-                                        <span className="animate-pulse rounded-full bg-milk-150" style={{ width: 16, height: 16 }} />
-                                    )}
-                                    {sellToken ? (
-                                        <p className="font-semibold tracking-wide">{sellToken.symbol}</p>
-                                    ) : (
-                                        <div className="skeleton-loading flex w-16 h-6 items-center justify-center rounded-full" />
-                                    )}
-                                </div>
-                            </div>
-                            <div className="flex justify-between w-full text-milk-400">
-                                <p>Network Fee</p>
-                                <div className="skeleton-loading w-16 h-4 rounded-full" />
-                            </div>
-                        </div>
-                    )}
+                    {/* Trade details */}
+                    {openTradeDetails && <TradeDetails isLoading={isLoadingSomeTrade} selectedTrade={selectedTrade ?? null} sellToken={sellToken} />}
                 </div>
 
-                {/* separator */}
+                {/* Separator */}
                 <div className="h-0 w-full" />
 
-                {/* fees */}
+                {/* Swap button */}
                 {account.isConnected ? (
                     <button
                         onClick={() => {}}
@@ -508,7 +395,7 @@ export default function SwapSection(props: { metrics: ReturnType<typeof getDashb
                 )}
             </div>
 
-            {/* modal */}
+            {/* Token selection modal */}
             <SelectTokenModal />
         </>
     )

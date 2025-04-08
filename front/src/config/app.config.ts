@@ -1,4 +1,4 @@
-import { AppPagePaths, AppThemes, IconIds } from '@/enums'
+import { AppPagePaths } from '@/enums'
 import { InterfaceAppLink } from '@/interfaces'
 import { Inter } from 'next/font/google'
 
@@ -16,13 +16,6 @@ export const PUBLIC_STREAM_API_URL = IS_DEV ? 'http://localhost:42042/api' : Str
 export const DEBUG = false
 export const DATE_FORMAT = 'ddd. D MMM. YYYY'
 export const TIME_FORMAT = 'hh:mm A'
-export const DEFAULT_THEME = AppThemes.LIGHT
-
-export const APP_THEMES: Partial<Record<AppThemes, { index: number; iconId: IconIds }>> = {
-    [AppThemes.LIGHT]: { index: 0, iconId: IconIds.THEME_LIGHT },
-    [AppThemes.DARK]: { index: 1, iconId: IconIds.THEME_DARK },
-}
-
 export const APP_PAGES: InterfaceAppLink[] = [
     {
         name: 'Home',
