@@ -12,7 +12,7 @@ import { useClickOutside } from '@/hooks/useClickOutside'
 import { useAppStore } from '@/stores/app.store'
 
 export default function Header(props: { className?: string }) {
-    const { currentChainName } = useAppStore()
+    const { currentChainName, setCurrentChain } = useAppStore()
     const [openNetworkDropown, setOpenNetworkDropown] = useState(false)
     const networkDropown = useRef<HTMLDivElement>(null)
     useClickOutside(networkDropown, () => setOpenNetworkDropown(false))
@@ -37,7 +37,7 @@ export default function Header(props: { className?: string }) {
                 {/* networks */}
                 <button onClick={() => setOpenNetworkDropown(!openNetworkDropown)} className="relative">
                     <div className="flex items-center gap-1 bg-milk-100/5 transition-colors duration-300 hover:bg-milk-100/10 rounded-xl h-10 px-3">
-                        <ChainImage networkName="ethereum" className="size-5" />
+                        <ChainImage networkName={currentChainName} className="size-5" />
                         <IconWrapper icon={IconIds.TRIANGLE_DOWN} className="size-5" />
                     </div>
 
@@ -54,26 +54,34 @@ export default function Header(props: { className?: string }) {
                         )}
                     >
                         {/* Ethereum */}
-                        {['ethereum', 'base', 'arbitrum'].map((chainName) => {
-                            if (currentChainName === chainName)
+                        {[
+                            { name: 'ethereum', supported: true },
+                            { name: 'base', supported: true },
+                            { name: 'arbitrum_2', supported: false },
+                        ].map((chainConfig) => {
+                            if (chainConfig.supported)
                                 return (
-                                    <div
-                                        key={chainName}
-                                        className="flex items-center gap-2 w-full px-4 py-2 text-white hover:bg-gray-600/20 rounded-lg transition"
+                                    <button
+                                        key={chainConfig.name}
+                                        onClick={() => setCurrentChain(chainConfig.name)}
+                                        className={cn('flex items-center gap-2 w-full px-4 py-2 text-white rounded-lg transition', {
+                                            'bg-gray-600/20': currentChainName === chainConfig.name,
+                                            'hover:bg-gray-600/10': currentChainName !== chainConfig.name,
+                                        })}
                                     >
-                                        <ChainImage networkName={chainName} className="size-6" />
-                                        <p className="text-milk-600 capitalize">{chainName}</p>
-                                    </div>
+                                        <ChainImage networkName={chainConfig.name} className="size-6" />
+                                        <p className="text-milk-600 capitalize">{chainConfig.name}</p>
+                                    </button>
                                 )
                             else
                                 return (
                                     <div
-                                        key={chainName}
+                                        key={chainConfig.name}
                                         className="flex items-center gap-2 px-4 py-2 text-gray-500 cursor-not-allowed mt-1 rounded-lg"
                                     >
                                         <div className="flex items-center gap-2">
-                                            <ChainImage networkName={chainName} className="size-6 opacity-50" />
-                                            <p className="capitalize">{chainName}</p>
+                                            <ChainImage networkName={chainConfig.name} className="size-6 opacity-50" />
+                                            <p className="capitalize">{chainConfig.name.replace('_2', '')}</p>
                                         </div>
                                         <p className="bg-white/20 px-1 font-semibold rounded-sm text-xs text-background">SOON</p>
                                     </div>
