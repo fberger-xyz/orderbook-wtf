@@ -2,7 +2,7 @@
 
 import { OrderbookSide } from '@/enums'
 import { useAppStore } from '@/stores/app.store'
-import { AmmAsOrderbook, StructuredOutput, Token } from '@/interfaces'
+import { AmmAsOrderbook, RustApiPair, StructuredOutput, Token } from '@/interfaces'
 import { extractErrorMessage } from '@/utils'
 import { useQueries } from '@tanstack/react-query'
 import { useApiStore } from '@/stores/api.store'
@@ -18,10 +18,10 @@ import KPIsSection from './dashboard-sections/KPIsSection'
 export default function Dashboard() {
     const { sellToken, sellTokenAmountInput, buyToken, setIsLoadingSomeTrade, selectOrderbookTrade, getAddressPair } = useAppStore()
 
-    const { orderBookRefreshIntervalMs, setApiTokens, setApiOrderbook, setApiStoreRefreshedAt, getOrderbook } = useApiStore()
+    const { orderBookRefreshIntervalMs, setApiTokens, setApiPairs, setApiOrderbook, setApiStoreRefreshedAt, getOrderbook } = useApiStore()
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const [ApiTokensQuery, ApiOrderbookQuery] = useQueries({
+    const [ApiTokensQuery, ApiPairsQuery, ApiOrderbookQuery] = useQueries({
         queries: [
             {
                 queryKey: ['ApiTokensQuery'],
@@ -40,12 +40,25 @@ export default function Dashboard() {
                 refetchInterval: 1000 * 60 * 5,
             },
             {
-                queryKey: ['ApiOrderbookQuery', sellToken?.address, buyToken?.address],
+                queryKey: ['ApiPairsQuery'],
                 enabled: true,
                 queryFn: async () => {
-                    // prevent errors
-                    if (!sellToken?.address || !buyToken?.address) return null
-
+                    const pairsEndpoint = `${APP_ROUTE}/api/local/pairs`
+                    const pairsResponse = await fetch(pairsEndpoint, {
+                        method: 'GET',
+                        headers: { 'Content-Type': 'application/json' },
+                    })
+                    const pairsResponseJson = (await pairsResponse.json()) as StructuredOutput<RustApiPair[]>
+                    setApiPairs(pairsResponseJson.data ?? [])
+                    return pairsResponseJson.data
+                },
+                refetchOnWindowFocus: false,
+                refetchInterval: 1000 * 60 * 5,
+            },
+            {
+                queryKey: ['ApiOrderbookQuery', sellToken.address, buyToken.address],
+                enabled: true,
+                queryFn: async () => {
                     // fetch all orderbook
                     const url = `${APP_ROUTE}/api/local/orderbook?token0=${sellToken.address}&token1=${buyToken.address}`
                     const orderbookResponse = await fetch(url, {
@@ -96,7 +109,7 @@ export default function Dashboard() {
             if (!orderbook) return
 
             // fetch trade data
-            const url = `${APP_ROUTE}/api/local/orderbook?token0=${sellToken?.address}&token1=${buyToken?.address}&pointAmount=${amountIn}&pointToken=${sellToken?.address}`
+            const url = `${APP_ROUTE}/api/local/orderbook?token0=${sellToken.address}&token1=${buyToken.address}&pointAmount=${amountIn}&pointToken=${sellToken.address}`
             const tradeResponse = await fetch(url, {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' },

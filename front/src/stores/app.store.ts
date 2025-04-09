@@ -46,12 +46,12 @@ export const useAppStore = create<{
      */
 
     // inputs
-    sellToken?: Token
-    selectSellToken: (sellToken?: Token) => void
+    sellToken: Token
+    selectSellToken: (sellToken: Token) => void
     sellTokenAmountInput?: number
     setSellTokenAmountInput: (sellTokenAmountInput: number) => void
-    buyToken?: Token
-    selectBuyToken: (buyToken?: Token) => void
+    buyToken: Token
+    selectBuyToken: (buyToken: Token) => void
     buyTokenAmountInput?: number
     setBuyTokenAmountInput: (buyTokenAmountInput: number) => void
     switchSelectedTokens: () => void
@@ -127,14 +127,14 @@ export const useAppStore = create<{
             sellToken: hardcodedTokensList[1], // todo put this as null
             selectSellToken: (sellToken) =>
                 set((state) => {
-                    console.log(`selectsellToken: ${sellToken?.symbol} (prev=${state.sellToken?.symbol})`)
+                    console.log(`selectsellToken: ${sellToken.symbol} (prev=${state.sellToken.symbol})`)
                     return { sellToken }
                 }),
             sellTokenAmountInput: 0,
             buyToken: hardcodedTokensList[0], // todo put this as null
             selectBuyToken: (buyToken) =>
                 set((state) => {
-                    console.log(`selectBuyToken: ${buyToken?.symbol} (prev=${state.buyToken?.symbol})`)
+                    console.log(`selectBuyToken: ${buyToken.symbol} (prev=${state.buyToken.symbol})`)
                     return { buyToken }
                 }),
             buyTokenAmountInput: 0,
@@ -176,8 +176,8 @@ export const useAppStore = create<{
              */
 
             // -
-            getAddressPair: () => `${get().sellToken?.address}-${get().buyToken?.address}`,
-            getSymbolPair: () => `${get().sellToken?.symbol}-${get().buyToken?.symbol}`,
+            getAddressPair: () => `${get().sellToken.address}-${get().buyToken.address}`,
+            getSymbolPair: () => `${get().sellToken.symbol}-${get().buyToken.symbol}`,
         }),
         {
             name: IS_DEV

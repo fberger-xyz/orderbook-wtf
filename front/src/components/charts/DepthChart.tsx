@@ -527,7 +527,7 @@ export default function DepthChart() {
             if (debug) console.log('---------')
             if (debug) console.log(fnName, 'ok data', params?.data)
 
-            const key = `${sellToken?.address}-${buyToken?.address}`
+            const key = `${sellToken.address}-${buyToken.address}`
             const orderbook = getOrderbook(key)
             if (orderbook) {
                 // debug

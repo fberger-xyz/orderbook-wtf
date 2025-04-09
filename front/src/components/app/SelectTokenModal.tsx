@@ -26,14 +26,19 @@ export default function SelectTokenModal() {
         setShowSelectTokenModal,
         setSelectTokenModalSearch,
     } = useAppStore()
-    const { apiTokens } = useApiStore()
+    const { apiTokens, apiPairs } = useApiStore()
     const account = useAccount()
     const modalRef = useRef<HTMLDivElement>(null)
     const searchInput = useRef<HTMLInputElement>(null)
     useEffect(() => searchInput.current?.focus(), [showSelectTokenModal])
     useKeyboardShortcut({ key: 'Escape', onKeyPressed: () => setShowSelectTokenModal(false) })
     useClickOutside(modalRef, () => setShowSelectTokenModal(false))
-    const tokensList = apiTokens.length ? apiTokens : hardcodedTokensList
+    const existingPairs = apiPairs.filter((pair) =>
+        [pair.addrbase, pair.addrquote].includes((selectTokenModalFor === 'buy' ? sellToken : buyToken).address),
+    )
+    const tokensList = apiTokens.length
+        ? apiTokens.filter((token) => existingPairs.some((pair) => [pair.addrbase, pair.addrquote].includes(token.address)))
+        : hardcodedTokensList // prevent edge cases for now
     if (!showSelectTokenModal) return null
     return (
         <Backdrop>
@@ -93,13 +98,13 @@ export default function SelectTokenModal() {
                                     await sleep(200)
                                     setShowSelectTokenModal(false)
                                 }}
-                                disabled={token.address === (selectTokenModalFor === 'buy' ? sellToken?.address : buyToken?.address)}
+                                disabled={token.address === (selectTokenModalFor === 'buy' ? sellToken.address : buyToken.address)}
                                 className={cn('flex gap-2 border border-milk-200 py-2.5 px-3 rounded-lg items-center', {
                                     'border-folly': [
-                                        selectTokenModalFor === 'buy' ? buyToken?.symbol.toLowerCase() : sellToken?.symbol.toLowerCase(),
+                                        selectTokenModalFor === 'buy' ? buyToken.symbol.toLowerCase() : sellToken.symbol.toLowerCase(),
                                     ].includes(token.symbol.toLowerCase()),
                                     'opacity-30 cursor-not-allowed':
-                                        token.address === (selectTokenModalFor === 'buy' ? sellToken?.address : buyToken?.address),
+                                        token.address === (selectTokenModalFor === 'buy' ? sellToken.address : buyToken.address),
                                 })}
                             >
                                 <TokenImage token={token} size={20} className="size-fit h-5" />
@@ -121,24 +126,24 @@ export default function SelectTokenModal() {
                                         key={`${token}-${tokenIndex}`}
                                         onClick={async () => {
                                             if (selectTokenModalFor === 'buy') {
-                                                if (buyToken?.address === token.address) return
+                                                if (buyToken.address === token.address) return
                                                 selectBuyToken(token)
                                             } else {
-                                                if (sellToken?.address === token.address) return
+                                                if (sellToken.address === token.address) return
                                                 selectSellToken(token)
                                             }
                                             await sleep(200)
                                             setShowSelectTokenModal(false)
                                         }}
-                                        disabled={token.address === (selectTokenModalFor === 'buy' ? sellToken?.address : buyToken?.address)}
+                                        disabled={token.address === (selectTokenModalFor === 'buy' ? sellToken.address : buyToken.address)}
                                         className={cn(
                                             'px-2.5 py-2 rounded-xl flex justify-between hover:bg-very-light-hover group hover:bg-milk-600/5',
                                             {
                                                 'bg-milk-600/5': [
-                                                    selectTokenModalFor === 'buy' ? buyToken?.symbol.toLowerCase() : sellToken?.symbol.toLowerCase(),
+                                                    selectTokenModalFor === 'buy' ? buyToken.symbol.toLowerCase() : sellToken.symbol.toLowerCase(),
                                                 ].includes(token.symbol.toLowerCase()),
                                                 'opacity-30 cursor-not-allowed':
-                                                    token.address === (selectTokenModalFor === 'buy' ? sellToken?.address : buyToken?.address),
+                                                    token.address === (selectTokenModalFor === 'buy' ? sellToken.address : buyToken.address),
                                             },
                                         )}
                                     >
@@ -160,7 +165,6 @@ export default function SelectTokenModal() {
 
                     <p className="p-4 text-base text-milk-400">Popular tokens</p>
                     {tokensList
-                        // .filter((token) => token.address !== (selectTokenModalFor === 'buy' ? sellToken?.address : buyToken?.address))
                         .slice(account.isConnected ? 3 : 0, 200)
                         .filter((token) => token.symbol.toLowerCase().includes(selectTokenModalSearch.toLowerCase()))
                         .map((token, tokenIndex) => (
@@ -168,22 +172,22 @@ export default function SelectTokenModal() {
                                 key={`${token}-${tokenIndex}`}
                                 onClick={async () => {
                                     if (selectTokenModalFor === 'buy') {
-                                        if (buyToken?.address === token.address) return
+                                        if (buyToken.address === token.address) return
                                         selectBuyToken(token)
                                     } else {
-                                        if (sellToken?.address === token.address) return
+                                        if (sellToken.address === token.address) return
                                         selectSellToken(token)
                                     }
                                     await sleep(200)
                                     setShowSelectTokenModal(false)
                                 }}
-                                disabled={token.address === (selectTokenModalFor === 'buy' ? sellToken?.address : buyToken?.address)}
+                                disabled={token.address === (selectTokenModalFor === 'buy' ? sellToken.address : buyToken.address)}
                                 className={cn('px-2.5 py-2 rounded-xl flex justify-between hover:bg-very-light-hover group hover:bg-milk-600/5', {
                                     'bg-milk-600/5': [
-                                        selectTokenModalFor === 'buy' ? buyToken?.symbol.toLowerCase() : sellToken?.symbol.toLowerCase(),
+                                        selectTokenModalFor === 'buy' ? buyToken.symbol.toLowerCase() : sellToken.symbol.toLowerCase(),
                                     ].includes(token.symbol.toLowerCase()),
                                     'opacity-30 cursor-not-allowed':
-                                        token.address === (selectTokenModalFor === 'buy' ? sellToken?.address : buyToken?.address),
+                                        token.address === (selectTokenModalFor === 'buy' ? sellToken.address : buyToken.address),
                                 })}
                             >
                                 <div className="flex items-center gap-4">
@@ -193,7 +197,7 @@ export default function SelectTokenModal() {
                                         <p className="text-xs text-milk-400">{shortenAddress(token.address)}</p>
                                     </div>
                                 </div>
-                                {[selectTokenModalFor === 'buy' ? buyToken?.symbol.toLowerCase() : sellToken?.symbol.toLowerCase()].includes(
+                                {[selectTokenModalFor === 'buy' ? buyToken.symbol.toLowerCase() : sellToken.symbol.toLowerCase()].includes(
                                     token.symbol.toLowerCase(),
                                 ) && (
                                     <div className="flex flex-col items-end">

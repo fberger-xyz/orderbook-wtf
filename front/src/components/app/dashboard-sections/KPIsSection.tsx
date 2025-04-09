@@ -167,13 +167,13 @@ export default function KPIsSection() {
                                         </p>
                                         <TokenImage size={20} token={sellToken} />
                                         <p>
-                                            {sellToken?.symbol} and{' '}
+                                            {sellToken.symbol} and{' '}
                                             {numeral(metrics?.totalQuoteTvlUsd / (metrics?.totalBaseTvlUsd + metrics?.totalQuoteTvlUsd)).format(
                                                 '0,0.%',
                                             )}{' '}
                                         </p>
                                         <TokenImage size={20} token={buyToken} />
-                                        <p>{buyToken?.symbol}</p>
+                                        <p>{buyToken.symbol}</p>
                                     </div>
                                 </div>
                             )

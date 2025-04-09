@@ -506,7 +506,7 @@ export default function LiquidityBreakdown() {
         } else {
             setOptions(null)
         }
-    }, [sellToken?.address, buyToken?.address, apiStoreRefreshedAt, yAxisType, yAxisLogBase, coloredAreas, symbolsInYAxis, selectedTrade])
+    }, [sellToken.address, buyToken.address, apiStoreRefreshedAt, yAxisType, yAxisLogBase, coloredAreas, symbolsInYAxis, selectedTrade])
 
     return (
         <Suspense fallback={<CustomFallback />}>

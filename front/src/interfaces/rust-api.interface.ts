@@ -23,4 +23,9 @@ export interface RustApiLiquidityPoolToken {
 // todo
 
 // pairs endpoint
-// todo
+export interface RustApiPair {
+    base: string
+    quote: string
+    addrbase: string
+    addrquote: string
+}

@@ -13,7 +13,7 @@ import { useModal } from 'connectkit'
 import { useAccount } from 'wagmi'
 import { cn, extractErrorMessage, fetchBalance, formatAmount, getBaseValueInUsd, getQuoteValueInUsd, safeNumeral } from '@/utils'
 import { useApiStore } from '@/stores/api.store'
-import { APP_ROUTE, IS_DEV } from '@/config/app.config'
+import { APP_ROUTE } from '@/config/app.config'
 import toast from 'react-hot-toast'
 import { toastStyle } from '@/config/toasts.config'
 
@@ -121,16 +121,14 @@ export default function SwapSection() {
 
     useEffect(() => {
         if (account.status === 'connected' && account.address && account.chainId) {
-            if (buyToken?.address)
-                fetchBalance(account.address, account.chainId, buyToken.address as `0x${string}`).then((balance) =>
-                    setBuyTokenBalance(isNaN(balance) ? -1 : balance),
-                )
-            if (sellToken?.address)
-                fetchBalance(account.address, account.chainId, sellToken.address as `0x${string}`).then((balance) =>
-                    setSellTokenBalance(isNaN(balance) ? -1 : balance),
-                )
+            fetchBalance(account.address, account.chainId, buyToken.address as `0x${string}`).then((balance) =>
+                setBuyTokenBalance(isNaN(balance) ? -1 : balance),
+            )
+            fetchBalance(account.address, account.chainId, sellToken.address as `0x${string}`).then((balance) =>
+                setSellTokenBalance(isNaN(balance) ? -1 : balance),
+            )
         }
-    }, [account.address, account.chainId, account.status, buyToken?.address, sellToken?.address])
+    }, [account.address, account.chainId, account.status, buyToken.address, sellToken.address])
 
     const simulateTradeAndMergeOrderbook = async (amountIn: number) => {
         try {
@@ -142,7 +140,7 @@ export default function SwapSection() {
             if (!orderbook) return
 
             // fetch data
-            const url = `${APP_ROUTE}/api/local/orderbook?token0=${sellToken?.address}&token1=${buyToken?.address}&pointAmount=${amountIn}&pointToken=${sellToken?.address}`
+            const url = `${APP_ROUTE}/api/local/orderbook?token0=${sellToken.address}&token1=${buyToken.address}&pointAmount=${amountIn}&pointToken=${sellToken.address}`
             const tradeResponse = await fetch(url, { method: 'GET', headers: { 'Content-Type': 'application/json' } })
             const tradeResponseJson = (await tradeResponse.json()) as StructuredOutput<AmmAsOrderbook>
             if (!tradeResponseJson.data || !orderbook) return
@@ -208,8 +206,6 @@ export default function SwapSection() {
             selectOrderbookTrade(newSelectedTrade)
             setSellTokenAmountInput(amountIn)
 
-            if (!sellToken?.address || !buyToken?.address) return
-
             await simulateTradeAndMergeOrderbook(amountIn)
         } catch (error) {
             toast.error(`Unexepected error while fetching price: ${extractErrorMessage(error)}`, {
@@ -224,23 +220,16 @@ export default function SwapSection() {
                 {/* Sell section */}
                 <div
                     className={cn('flex flex-col gap-4 p-4 rounded-xl border-milk-150 w-full', {
-                        'bg-folly/20': account.isConnected && sellToken?.address && sellTokenAmountInput && sellTokenBalance < sellTokenAmountInput,
-                        'bg-milk-600/5': !(
-                            account.isConnected &&
-                            sellToken?.address &&
-                            sellTokenAmountInput &&
-                            sellTokenBalance < sellTokenAmountInput
-                        ),
+                        'bg-folly/20': account.isConnected && sellToken.address && sellTokenAmountInput && sellTokenBalance < sellTokenAmountInput,
+                        'bg-milk-600/5': !(account.isConnected && sellTokenAmountInput && sellTokenBalance < sellTokenAmountInput),
                     })}
                 >
                     <div className="flex justify-between">
                         <p className="text-milk-600 text-xs">Sell</p>
                         <div className="flex items-center">
-                            {account.isConnected &&
-                                sellToken?.address &&
-                                sellTokenBalance &&
-                                sellTokenAmountInput &&
-                                sellTokenBalance < sellTokenAmountInput && <p className="text-folly font-semibold text-xs pr-2">Exceeds Balance</p>}
+                            {account.isConnected && sellTokenBalance && sellTokenAmountInput && sellTokenBalance < sellTokenAmountInput && (
+                                <p className="text-folly font-semibold text-xs pr-2">Exceeds Balance</p>
+                            )}
                             <p className="text-aquamarine text-xs">Best bid</p>
                         </div>
                     </div>
@@ -265,7 +254,7 @@ export default function SwapSection() {
                         <div className="mt-2 flex justify-between items-center">
                             <div className="flex items-center gap-1">
                                 <TokenBalance balance={sellTokenBalance} isConnected={account.isConnected} />
-                                {account.isConnected && sellToken?.address && (
+                                {account.isConnected && sellToken.address && (
                                     <button onClick={() => setSellTokenAmountInput(sellTokenBalance)} className="pl-1">
                                         <p className="text-folly font-semibold text-xs">MAX</p>
                                     </button>
@@ -419,7 +408,7 @@ export default function SwapSection() {
                 )}
 
                 {/* Debug */}
-                {IS_DEV && <pre className="text-xs p-2">{JSON.stringify({ ...selectedTrade, pools: 'hidden' }, null, 2)}</pre>}
+                {/* {IS_DEV && <pre className="text-xs p-2">{JSON.stringify({ ...selectedTrade, pools: 'hidden' }, null, 2)}</pre>} */}
             </div>
 
             {/* Token selection modal */}
