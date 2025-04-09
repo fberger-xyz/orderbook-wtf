@@ -56,7 +56,7 @@ export default function Header(props: { className?: string }) {
                         {/* Ethereum */}
                         {[
                             { name: 'ethereum', supported: true },
-                            { name: 'base', supported: true },
+                            { name: 'base', supported: false },
                             { name: 'arbitrum_2', supported: false },
                         ].map((chainConfig) => {
                             if (chainConfig.supported)

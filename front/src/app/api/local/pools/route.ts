@@ -1,12 +1,15 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { RustApiLiquidityPool, StructuredOutput } from '@/interfaces'
 import { PUBLIC_STREAM_API_URL } from '@/config/app.config'
 import { initOutput } from '@/utils'
 
-export async function GET() {
+export async function GET(req: NextRequest) {
     const res = initOutput<RustApiLiquidityPool[]>()
-    const url = `${PUBLIC_STREAM_API_URL}/ethereum/components`
     try {
+        const { searchParams } = new URL(req.url)
+        const chainName = searchParams.get('chain')
+        const url = `${PUBLIC_STREAM_API_URL}/${chainName}/components`
+
         // prepare request
         const controller = new AbortController()
         const timeoutId = setTimeout(() => controller.abort(), 60000) // 60 seconds timeout

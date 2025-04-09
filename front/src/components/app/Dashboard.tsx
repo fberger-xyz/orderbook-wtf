@@ -16,7 +16,7 @@ import SwapSection from './dashboard-sections/SwapSection'
 import KPIsSection from './dashboard-sections/KPIsSection'
 
 export default function Dashboard() {
-    const { sellToken, sellTokenAmountInput, buyToken, setIsLoadingSomeTrade, selectOrderbookTrade, getAddressPair } = useAppStore()
+    const { sellToken, sellTokenAmountInput, buyToken, currentChainName, setIsLoadingSomeTrade, selectOrderbookTrade, getAddressPair } = useAppStore()
 
     const { orderBookRefreshIntervalMs, setApiTokens, setApiPairs, setApiOrderbook, setApiStoreRefreshedAt, getOrderbook } = useApiStore()
 
@@ -24,10 +24,10 @@ export default function Dashboard() {
     const [ApiTokensQuery, ApiPairsQuery, ApiOrderbookQuery] = useQueries({
         queries: [
             {
-                queryKey: ['ApiTokensQuery'],
+                queryKey: ['ApiTokensQuery', currentChainName],
                 enabled: true,
                 queryFn: async () => {
-                    const tokensEndpoint = `${APP_ROUTE}/api/local/tokens`
+                    const tokensEndpoint = `${APP_ROUTE}/api/local/tokens?chain=${currentChainName}`
                     const tokensResponse = await fetch(tokensEndpoint, {
                         method: 'GET',
                         headers: { 'Content-Type': 'application/json' },
@@ -40,10 +40,10 @@ export default function Dashboard() {
                 refetchInterval: 1000 * 60 * 5,
             },
             {
-                queryKey: ['ApiPairsQuery'],
+                queryKey: ['ApiPairsQuery', currentChainName],
                 enabled: true,
                 queryFn: async () => {
-                    const pairsEndpoint = `${APP_ROUTE}/api/local/pairs`
+                    const pairsEndpoint = `${APP_ROUTE}/api/local/pairs?chain=${currentChainName}`
                     const pairsResponse = await fetch(pairsEndpoint, {
                         method: 'GET',
                         headers: { 'Content-Type': 'application/json' },
@@ -56,11 +56,11 @@ export default function Dashboard() {
                 refetchInterval: 1000 * 60 * 5,
             },
             {
-                queryKey: ['ApiOrderbookQuery', sellToken.address, buyToken.address],
+                queryKey: ['ApiOrderbookQuery', currentChainName, sellToken.address, buyToken.address],
                 enabled: true,
                 queryFn: async () => {
                     // fetch all orderbook
-                    const url = `${APP_ROUTE}/api/local/orderbook?token0=${sellToken.address}&token1=${buyToken.address}`
+                    const url = `${APP_ROUTE}/api/local/orderbook?chain=${currentChainName}&token0=${sellToken.address}&token1=${buyToken.address}`
                     const orderbookResponse = await fetch(url, {
                         method: 'GET',
                         headers: { 'Content-Type': 'application/json' },

@@ -1,12 +1,15 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { StructuredOutput, Token } from '@/interfaces'
 import { PUBLIC_STREAM_API_URL } from '@/config/app.config'
 import { initOutput } from '@/utils'
 
-export async function GET() {
+export async function GET(req: NextRequest) {
     const res = initOutput<Token[]>()
-    const url = `${PUBLIC_STREAM_API_URL}/ethereum/tokens`
     try {
+        const { searchParams } = new URL(req.url)
+        const chainName = searchParams.get('chain')
+        const url = `${PUBLIC_STREAM_API_URL}/${chainName}/tokens`
+
         // prepare request
         const controller = new AbortController()
         const timeoutId = setTimeout(() => controller.abort(), 60000) // 60 seconds timeout

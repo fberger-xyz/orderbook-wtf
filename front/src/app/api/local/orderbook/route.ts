@@ -6,12 +6,13 @@ import { extractErrorMessage, initOutput } from '@/utils'
 
 export async function GET(req: NextRequest) {
     const res = initOutput<AmmAsOrderbook>()
-    const url = `${PUBLIC_STREAM_API_URL}/ethereum/orderbook` // todo select vm http endpoint in production
 
     // safe exec
     try {
         // validation
         const { searchParams } = new URL(req.url)
+        const chainName = searchParams.get('chain')
+        const url = `${PUBLIC_STREAM_API_URL}/${chainName}/orderbook`
         const token0 = searchParams.get('token0')
         const token1 = searchParams.get('token1')
         const pointToken = searchParams.get('pointToken')
