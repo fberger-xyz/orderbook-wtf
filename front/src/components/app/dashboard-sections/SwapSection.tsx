@@ -259,7 +259,9 @@ export default function SwapSection() {
                             onChange={handleChangeOfAmountIn}
                         />
                     </div>
-                    {selectedTrade && metrics.midPrice ? (
+
+                    {/* Last row  */}
+                    {selectedTrade ? (
                         <div className="mt-2 flex justify-between items-center">
                             <div className="flex items-center gap-1">
                                 <TokenBalance balance={sellTokenBalance} isConnected={account.isConnected} />
@@ -283,7 +285,7 @@ export default function SwapSection() {
                     ) : (
                         <div className="flex justify-between items-center">
                             <TokenBalance balance={buyTokenBalance} isConnected={account.isConnected} />
-                            <div className="skeleton-loading w-16 h-4 rounded-full" />
+                            <p className="text-milk-600 text-xs">$ 0</p>
                         </div>
                     )}
                 </div>
@@ -319,14 +321,16 @@ export default function SwapSection() {
                             type="text"
                             className={cn('text-xl font-semibold text-right border-none outline-none', {
                                 'cursor-not-allowed bg-transparent ring-0 focus:ring-0 focus:outline-none focus:border-none w-40':
-                                    selectedTrade?.trade,
-                                'skeleton-loading ml-auto w-28 h-8 rounded-full text-transparent': !selectedTrade?.trade,
+                                    selectedTrade?.trade || sellTokenAmountInput === 0,
+                                'skeleton-loading ml-auto w-28 h-8 rounded-full text-transparent':
+                                    !selectedTrade?.trade && sellTokenAmountInput !== 0,
                             })}
                             value={numeral(buyTokenAmountInput).format('0,0.[00000]')}
                             disabled={true}
                         />
                     </div>
 
+                    {/* Last row  */}
                     {selectedTrade ? (
                         <div className="flex justify-between items-center">
                             <TokenBalance balance={sellTokenBalance} isConnected={account.isConnected} />
@@ -335,16 +339,16 @@ export default function SwapSection() {
                             ) : (
                                 <p className="text-milk-600 text-xs">
                                     ${' '}
-                                    {buyTokenAmountInput && getQuoteValueInUsd(metrics.orderbook)
+                                    {sellTokenAmountInput !== 0 && buyTokenAmountInput && getQuoteValueInUsd(metrics.orderbook)
                                         ? numeral(buyTokenAmountInput).multiply(getQuoteValueInUsd(metrics.orderbook)).format('0,0.[00]')
-                                        : '-'}
+                                        : '0'}
                                 </p>
                             )}
                         </div>
                     ) : (
                         <div className="flex justify-between items-center">
                             <TokenBalance balance={sellTokenBalance} isConnected={account.isConnected} />
-                            <div className="skeleton-loading w-16 h-4 rounded-full" />
+                            <p className="text-milk-600 text-xs">$ 0</p>
                         </div>
                     )}
                 </div>
