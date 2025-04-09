@@ -40,6 +40,6 @@ export async function GET(req: NextRequest) {
         // res
         return NextResponse.json(res)
     } catch (error) {
-        return NextResponse.json({ ...res, error: `Unexpected error while fetching ${url}` }, { status: 500 })
+        return NextResponse.json({ ...res, error: `Unexpected error while fetching pools` }, { status: 500 })
     }
 }
