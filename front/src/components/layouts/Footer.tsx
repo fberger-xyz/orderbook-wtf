@@ -8,6 +8,7 @@ dayjs.extend(utc)
 dayjs.extend(relativeTime)
 
 import { cn } from '@/utils'
+import LinkWrapper from '../common/LinkWrapper'
 
 export default function Footer(props: { className?: string }) {
     const [commitDate, setCommitDate] = useState<null | Date>(null)
@@ -27,7 +28,20 @@ export default function Footer(props: { className?: string }) {
                     Alpha Version Notice <span className="opacity-50">{dayjs.utc(commitDate).format('D MMM. YYYY HH:mm A')} UTC</span>
                 </p>
             </div>
-            <p>Made by PropellerHeads, @xMerso and @fberger_xyz</p>
+            <p className="text-wrap">
+                Made by
+                <LinkWrapper href="https://x.com/PropellerSwap" target="_blank" className="hover:underline hover:text-aquamarine pl-1">
+                    PropellerHeads
+                </LinkWrapper>
+                ,
+                <LinkWrapper href="https://x.com/0xMerso" target="_blank" className="hover:underline hover:text-aquamarine px-1">
+                    @xMerso
+                </LinkWrapper>
+                and
+                <LinkWrapper href="https://x.com/fberger_xyz" target="_blank" className="hover:underline hover:text-aquamarine px-1">
+                    @fberger_xyz
+                </LinkWrapper>
+            </p>
         </div>
     )
 }

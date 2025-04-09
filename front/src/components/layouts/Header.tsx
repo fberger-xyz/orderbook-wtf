@@ -9,8 +9,10 @@ import TychoSVG from '../icons/tycho-svg.icon'
 import ChainImage from '../app/ChainImage'
 import { useRef, useState } from 'react'
 import { useClickOutside } from '@/hooks/useClickOutside'
+import { useAppStore } from '@/stores/app.store'
 
 export default function Header(props: { className?: string }) {
+    const { currentChainName } = useAppStore()
     const [openNetworkDropown, setOpenNetworkDropown] = useState(false)
     const networkDropown = useRef<HTMLDivElement>(null)
     useClickOutside(networkDropown, () => setOpenNetworkDropown(false))
@@ -52,26 +54,31 @@ export default function Header(props: { className?: string }) {
                         )}
                     >
                         {/* Ethereum */}
-                        <div className="flex items-center gap-2 w-full px-4 py-2 text-white hover:bg-gray-600/20 rounded-lg transition">
-                            <ChainImage networkName="ethereum" className="size-6" />
-                            <p className="text-milk-600">Ethereum</p>
-                        </div>
-
-                        {/* Disabled */}
-                        <div className="flex items-center gap-2 px-4 py-2 text-gray-500 cursor-not-allowed mt-1 rounded-lg">
-                            <div className="flex items-center gap-2">
-                                <ChainImage networkName="arbitrum_2" className="size-6 opacity-50" />
-                                <p>Arbitrum</p>
-                            </div>
-                            <p className="bg-white/20 px-1 font-semibold rounded-sm text-xs text-background">SOON</p>
-                        </div>
-                        <div className="flex items-center gap-2 px-4 py-2 text-gray-500 cursor-not-allowed mt-1 rounded-lg">
-                            <div className="flex items-center gap-2">
-                                <ChainImage networkName="base" className="size-6 opacity-50" />
-                                <p>Base</p>
-                            </div>
-                            <p className="bg-white/20 px-1 font-semibold rounded-sm text-xs text-background">SOON</p>
-                        </div>
+                        {['ethereum', 'base', 'arbitrum'].map((chainName) => {
+                            if (currentChainName === chainName)
+                                return (
+                                    <div
+                                        key={chainName}
+                                        className="flex items-center gap-2 w-full px-4 py-2 text-white hover:bg-gray-600/20 rounded-lg transition"
+                                    >
+                                        <ChainImage networkName={chainName} className="size-6" />
+                                        <p className="text-milk-600 capitalize">{chainName}</p>
+                                    </div>
+                                )
+                            else
+                                return (
+                                    <div
+                                        key={chainName}
+                                        className="flex items-center gap-2 px-4 py-2 text-gray-500 cursor-not-allowed mt-1 rounded-lg"
+                                    >
+                                        <div className="flex items-center gap-2">
+                                            <ChainImage networkName={chainName} className="size-6 opacity-50" />
+                                            <p className="capitalize">{chainName}</p>
+                                        </div>
+                                        <p className="bg-white/20 px-1 font-semibold rounded-sm text-xs text-background">SOON</p>
+                                    </div>
+                                )
+                        })}
                     </div>
                 </button>
 

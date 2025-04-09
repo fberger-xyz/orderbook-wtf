@@ -26,6 +26,8 @@ export const useAppStore = create<{
     showRoutingSection: boolean
     showLiquidityBreakdownSection: boolean
     showSections: (showMarketDepthSection: boolean, showRoutingSection: boolean, showLiquidityBreakdownSection: boolean) => void
+    currentChainName: 'ethereum' | 'base' | 'arbitrum_2'
+    setCurrentChain: (currentChainName: 'ethereum' | 'base' | 'arbitrum_2') => void
 
     /**
      * orderbook
@@ -103,6 +105,8 @@ export const useAppStore = create<{
             showLiquidityBreakdownSection: true,
             showSections: (showMarketDepthSection, showRoutingSection, showLiquidityBreakdownSection) =>
                 set(() => ({ showMarketDepthSection, showRoutingSection, showLiquidityBreakdownSection })),
+            currentChainName: 'ethereum',
+            setCurrentChain: (currentChainName) => set(() => ({ currentChainName })),
 
             /**
              * orderbook

@@ -3,7 +3,7 @@
 import { IconIds, OrderbookSide } from '@/enums'
 import numeral from 'numeral'
 import { useAppStore } from '@/stores/app.store'
-import { ChangeEvent, useEffect, useState } from 'react'
+import { ChangeEvent, useEffect, useState, useRef } from 'react'
 import IconWrapper from '../../common/IconWrapper'
 import TokenImage from '../TokenImage'
 import ChainImage from '../ChainImage'
@@ -119,6 +119,8 @@ export default function SwapSection() {
     const [sellTokenBalance, setSellTokenBalance] = useState(-1)
     const { setOpen } = useModal()
 
+    const debounceTimeout = useRef<NodeJS.Timeout | null>(null)
+
     useEffect(() => {
         if (account.status === 'connected' && account.address && account.chainId) {
             fetchBalance(account.address, account.chainId, buyToken.address as `0x${string}`).then((balance) =>
@@ -206,7 +208,10 @@ export default function SwapSection() {
             selectOrderbookTrade(newSelectedTrade)
             setSellTokenAmountInput(amountIn)
 
-            await simulateTradeAndMergeOrderbook(amountIn)
+            if (debounceTimeout.current) clearTimeout(debounceTimeout.current)
+            debounceTimeout.current = setTimeout(() => {
+                simulateTradeAndMergeOrderbook(amountIn)
+            }, 800) // 800ms debounce delay
         } catch (error) {
             toast.error(`Unexepected error while fetching price: ${extractErrorMessage(error)}`, {
                 style: toastStyle,

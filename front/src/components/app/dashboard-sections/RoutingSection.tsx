@@ -59,6 +59,25 @@ const formatPercentage = (value: number): string => {
     return `${value.toFixed(2)}%`
 }
 
+const calculateLiquidity = (
+    orderbook: { base_lqdty: number[]; quote_lqdty: number[] },
+    currIndex: number,
+    base_worth_eth: number,
+    quote_worth_eth: number,
+    eth_usd: number
+) => {
+    return {
+        base: {
+            amount: orderbook.base_lqdty[currIndex],
+            usd: orderbook.base_lqdty[currIndex] * base_worth_eth * eth_usd,
+        },
+        quote: {
+            amount: orderbook.quote_lqdty[currIndex],
+            usd: orderbook.quote_lqdty[currIndex] * quote_worth_eth * eth_usd,
+        },
+    };
+};
+
 export default function RoutingSection() {
     const { showMarketDepthSection, showRoutingSection, showLiquidityBreakdownSection, selectedTrade, showSections } = useAppStore()
     const { metrics } = useApiStore()
@@ -96,14 +115,16 @@ export default function RoutingSection() {
                     poolIndex: currIndex,
                     details: curr,
                     config: mapProtocolIdToProtocolConfig(curr.protocol_type_name),
-                    liquidity: { base: { amount: 0, usd: 0 }, quote: { amount: 0, usd: 0 } },
+                    liquidity: calculateLiquidity(orderbook, currIndex, base_worth_eth, quote_worth_eth, eth_usd),
                 })
                 existingPoolIndex = acc.pools.findIndex((entry) => entry.poolIndex === currIndex)
+            } else {
+                const liquidity = calculateLiquidity(orderbook, currIndex, base_worth_eth, quote_worth_eth, eth_usd)
+                acc.pools[existingPoolIndex].liquidity.base.amount += liquidity.base.amount
+                acc.pools[existingPoolIndex].liquidity.base.usd += liquidity.base.usd
+                acc.pools[existingPoolIndex].liquidity.quote.amount += liquidity.quote.amount
+                acc.pools[existingPoolIndex].liquidity.quote.usd += liquidity.quote.usd
             }
-            acc.pools[existingPoolIndex].liquidity.base.amount += orderbook.base_lqdty[currIndex]
-            acc.pools[existingPoolIndex].liquidity.base.usd += orderbook.base_lqdty[currIndex] * base_worth_eth * eth_usd
-            acc.pools[existingPoolIndex].liquidity.quote.amount += orderbook.quote_lqdty[currIndex]
-            acc.pools[existingPoolIndex].liquidity.quote.usd += orderbook.quote_lqdty[currIndex] * quote_worth_eth * eth_usd
             return acc
         },
         { pools: [], totals: { base: { amount: 0, usd: 0 }, quote: { amount: 0, usd: 0 } } },
