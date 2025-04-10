@@ -60,7 +60,7 @@ export default function Dashboard() {
                 enabled: true,
                 queryFn: async () => {
                     // -
-                    const debug = true
+                    const debug = false
 
                     // fetch all orderbook
                     const url = `${APP_ROUTE}/api/local/orderbook?chain=${currentChainName}&token0=${sellToken.address}&token1=${buyToken.address}`

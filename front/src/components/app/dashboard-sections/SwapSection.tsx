@@ -17,6 +17,8 @@ import { APP_ROUTE } from '@/config/app.config'
 import toast from 'react-hot-toast'
 import { toastStyle } from '@/config/toasts.config'
 
+const rawAmountFormat = '0,0.[0000000000000]'
+
 type TokenBalanceProps = {
     balance: number
     isConnected: boolean
@@ -99,7 +101,9 @@ export default function SwapSection() {
     const {
         sellToken,
         sellTokenAmountInput,
+        sellTokenAmountInputRaw,
         setSellTokenAmountInput,
+        setSellTokenAmountInputRaw,
         buyToken,
         buyTokenAmountInput,
         switchSelectedTokens,
@@ -117,7 +121,6 @@ export default function SwapSection() {
     const account = useAccount()
     const [openTradeDetails, showTradeDetails] = useState(false)
     const [buyTokenBalance, setBuyTokenBalance] = useState(-1)
-    const [sellTokenAmountInputRaw, setSellTokenAmountInputRaw] = useState('')
     const [sellTokenBalance, setSellTokenBalance] = useState(-1)
     const { setOpen } = useModal()
 
@@ -195,7 +198,7 @@ export default function SwapSection() {
 
     const handleChangeOfAmountIn = async (event: ChangeEvent<HTMLInputElement>) => {
         try {
-            // save raw
+            // prepare
             const raw = event.target.value
             setSellTokenAmountInputRaw(raw)
 
@@ -256,16 +259,16 @@ export default function SwapSection() {
                         />
                         <input
                             type="text"
-                            className="text-xl font-semibold text-right border-none outline-none ring-0 focus:ring-0 focus:outline-none focus:border-none bg-transparent w-40"
+                            className="text-xl font-semibold text-right border-none outline-none ring-0 focus:ring-0 focus:outline-none focus:border-none bg-transparent w-full"
                             value={
-                                typeof numeral(sellTokenAmountInputRaw).value === 'number'
-                                    ? numeral(sellTokenAmountInputRaw).format('0,0.[0000000000000]')
+                                typeof numeral(sellTokenAmountInputRaw).value() === 'number'
+                                    ? numeral(sellTokenAmountInputRaw).format(rawAmountFormat)
                                     : sellTokenAmountInputRaw
                             }
                             onChange={handleChangeOfAmountIn}
-                            onBlur={() => {
-                                setSellTokenAmountInputRaw(numeral(sellTokenAmountInput).format('0,0.[0000000000000]'))
-                            }}
+                            // onBlur={() => {
+                            //     setSellTokenAmountInputRaw(numeral(sellTokenAmountInput).format(rawAmountFormat))
+                            // }}
                         />
                     </div>
 
@@ -275,7 +278,13 @@ export default function SwapSection() {
                             <div className="flex items-center gap-1">
                                 <TokenBalance balance={sellTokenBalance} isConnected={account.isConnected} />
                                 {account.isConnected && sellToken.address && (
-                                    <button onClick={() => setSellTokenAmountInput(sellTokenBalance)} className="pl-1">
+                                    <button
+                                        onClick={() => {
+                                            setSellTokenAmountInput(sellTokenBalance)
+                                            setSellTokenAmountInputRaw(numeral(sellTokenBalance).format(rawAmountFormat))
+                                        }}
+                                        className="pl-1"
+                                    >
                                         <p className="text-folly font-semibold text-xs">MAX</p>
                                     </button>
                                 )}

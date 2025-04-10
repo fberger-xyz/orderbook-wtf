@@ -51,7 +51,9 @@ export const useAppStore = create<{
     sellToken: Token
     selectSellToken: (sellToken: Token) => void
     sellTokenAmountInput?: number
+    sellTokenAmountInputRaw: string | number
     setSellTokenAmountInput: (sellTokenAmountInput: number) => void
+    setSellTokenAmountInputRaw: (sellTokenAmountInputRaw: string | number) => void
     buyToken: Token
     selectBuyToken: (buyToken: Token) => void
     buyTokenAmountInput?: number
@@ -135,6 +137,7 @@ export const useAppStore = create<{
                     return { sellToken }
                 }),
             sellTokenAmountInput: 0,
+            sellTokenAmountInputRaw: '0',
             buyToken: hardcodedTokensList[0], // todo put this as null
             selectBuyToken: (buyToken) =>
                 set((state) => {
@@ -142,6 +145,7 @@ export const useAppStore = create<{
                     return { buyToken }
                 }),
             buyTokenAmountInput: 0,
+            setSellTokenAmountInputRaw: (sellTokenAmountInputRaw) => set(() => ({ sellTokenAmountInputRaw })),
             setSellTokenAmountInput: (sellTokenAmountInput) => set(() => ({ sellTokenAmountInput })),
             setBuyTokenAmountInput: (buyTokenAmountInput) => set(() => ({ buyTokenAmountInput })),
             switchSelectedTokens: () =>
@@ -196,6 +200,7 @@ export const useAppStore = create<{
                     // reset
                     state?.selectOrderbookTrade(undefined)
                     state?.setSellTokenAmountInput(0)
+                    state?.setSellTokenAmountInputRaw(0)
                     state?.setBuyTokenAmountInput(0)
 
                     // pre select default tokens if need be
