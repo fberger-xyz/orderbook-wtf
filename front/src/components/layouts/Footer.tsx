@@ -25,7 +25,7 @@ export default function Footer(props: { className?: string }) {
             <div className="flex md:gap-10 flex-col md:flex-row">
                 <p>2024 © PropellerHeads</p>
                 <p>
-                    Alpha Version Notice <span className="opacity-50">deployed {dayjs.utc(commitDate).format('D MMM. YYYY HH:mm A')} UTC</span>
+                    Alpha Version Notice <span className="opacity-50">deployed on {dayjs.utc(commitDate).format('D MMM. YYYY HH:mm A')} UTC</span>
                 </p>
             </div>
             <p className="text-wrap">
