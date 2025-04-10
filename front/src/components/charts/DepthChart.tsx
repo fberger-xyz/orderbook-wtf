@@ -9,7 +9,15 @@ import { ChartBackground, CustomFallback, LoadingArea } from './ChartsCommons'
 import { useAppStore } from '@/stores/app.store'
 import { APP_FONT } from '@/config/app.config'
 import { ErrorBoundaryFallback } from '../common/ErrorBoundaryFallback'
-import { AppColors, bestSideSymbol, formatAmount, getHighestBid, getLowestAsk, mapProtocolIdToProtocolConfig } from '@/utils'
+import {
+    AppColors,
+    bestSideSymbol,
+    formatAmount,
+    formatAmountDependingOnPrice,
+    getHighestBid,
+    getLowestAsk,
+    mapProtocolIdToProtocolConfig,
+} from '@/utils'
 import { AmmAsOrderbook, EchartOnClickParamsData, SelectedTrade } from '@/interfaces'
 import numeral from 'numeral'
 import toast from 'react-hot-toast'
@@ -24,6 +32,7 @@ type LineDataPoint = {
         side: OrderbookSide
         distribution: number[]
         output: number
+        priceImpact: number
     }
     itemStyle?: {
         borderWidth: number
@@ -125,12 +134,15 @@ const getOptions = (
                             </div>`
                             : `<span>${config.name}</span>`
 
-                        const versionAndBps = iconPath ? `<span>${config.version} ${pool.fee}bps</span>` : `<span>${pool.fee}bps</span>`
+                        const versionAndBps = iconPath
+                            ? `<span>${config.version} ${pool.fee} bp${pool.fee >= 2 ? 's' : ''}</span>`
+                            : `<span>${pool.fee} bp${pool.fee >= 2 ? 's' : ''}</span>`
 
                         return {
                             percent,
-                            htmlContent: `<div style="display:flex; align-items:center; gap:5px; color:${percent > 0 ? AppColors.milk[600] : AppColors.milk[200]}">
-                                <span>- ${numeral(percent).format('0,0.00')}% > </span>
+                            // > 0.5 = 1 because of rounding
+                            htmlContent: `<div style="display:flex; align-items:center; gap:5px; color:${percent > 0.5 ? AppColors.milk[600] : AppColors.milk[200]}">
+                                <span>- ${numeral(percent).format('0,0')}% </span>
                                 ${iconOrProtocolName}
                                 ${versionAndBps}
                             </div>`,
@@ -147,12 +159,13 @@ const getOptions = (
 
                 return [
                     `<strong>You sell</strong> <span style="color:${AppColors.milk[200]}">see Y axis</span>`,
-                    `<span style="color:${AppColors.milk[600]}">${numeral(input).format('0,0.[00000]')} ${sellTokenSymbol}</span>`,
+                    `<span style="color:${AppColors.milk[600]}">${formatAmountDependingOnPrice(input, price)} ${sellTokenSymbol}</span>`,
                     `<br/><strong>At price</strong> <span style="color:${AppColors.milk[200]}">see X axis</span>`,
                     `<span style="color:${AppColors.milk[600]}">1 ${orderbook.base.symbol} = ${numeral(price).format('0,0.[00000]')} ${orderbook.quote.symbol}</span>`,
                     `<span style="color:${AppColors.milk[600]}">1 ${orderbook.quote.symbol} = ${numeral(1 / price).format('0,0.[00000]')} ${orderbook.base.symbol}</span>`,
                     `<br/><strong>You buy</strong>`,
-                    `<span style="color:${AppColors.milk[600]}">${numeral(output).format('0,0.[00000]')} ${buyTokenSymbol}</span>`,
+                    `<span style="color:${AppColors.milk[600]}">${formatAmountDependingOnPrice(output, price)} ${buyTokenSymbol}</span>`,
+                    `<span style="color:${AppColors.milk[400]}">Price impact: ${numeral(custom?.priceImpact).format('0,0.[00]%')}</span>`,
                     distributionSection,
                 ].join('<br/>')
             },
@@ -499,6 +512,7 @@ export default function DepthChart() {
                             side: OrderbookSide.BID,
                             distribution: trade.distribution,
                             output: trade.average_sell_price * trade.amount,
+                            priceImpact: trade.price_impact,
                         },
                         emphasis: {
                             symbolSize: 30,
@@ -532,6 +546,7 @@ export default function DepthChart() {
                             side: OrderbookSide.ASK,
                             distribution: trade.distribution,
                             output: trade.average_sell_price * trade.amount,
+                            priceImpact: trade.price_impact,
                         },
                     }
                     if (trade === lowestAsk) {

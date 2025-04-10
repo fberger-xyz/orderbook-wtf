@@ -94,8 +94,8 @@ export default function KPIsSection() {
                         <p className="text-milk font-semibold text-base">
                             {numeral(metrics?.spreadPercent).format('0,0.[0000]%')}{' '}
                             <span className="pl-1 text-milk-400 text-xs">
-                                {numeral(metrics?.spreadPercent).multiply(10000).format('0,0')} bp
-                                {metrics?.spreadPercent && metrics?.spreadPercent > 10000 ? 's' : ''}
+                                {numeral(metrics.spreadPercent).multiply(10000).format('0,0')} bp
+                                {Number(metrics.spreadPercent) * 10000 >= 2 ? 's' : ''}
                             </span>
                         </p>
                     ) : (
@@ -186,7 +186,7 @@ export default function KPIsSection() {
                     </Tooltip>
                 }
                 content={
-                    metrics?.totalBaseTvlUsd === undefined || metrics?.totalQuoteTvlUsd === undefined ? (
+                    !metrics || metrics.totalBaseTvlUsd === 0 || metrics.totalQuoteTvlUsd === 0 ? (
                         <div className="flex gap-1.5 items-center flex-wrap skeleton-loading p-1 w-full">
                             <p className="text-milk-100 font-semibold text-sm">$ --- m</p>
                         </div>

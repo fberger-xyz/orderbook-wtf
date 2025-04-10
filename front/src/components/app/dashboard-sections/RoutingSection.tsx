@@ -184,13 +184,13 @@ export default function RoutingSection() {
                                                 {/* Distribution table */}
                                                 <div className="flex w-full justify-center items-center rounded-xl gap-1 border border-milk-150 flex-col px-3 py-2">
                                                     {/* Headers */}
-                                                    <div className="grid grid-cols-10 w-full rounded-xl py-1 px-4 gap-6 items-center text-xs text-milk-200">
+                                                    <div className="grid grid-cols-11 w-full rounded-xl py-1 px-4 gap-6 items-center text-xs text-milk-200">
                                                         <p className="col-span-3">Pool</p>
-                                                        <p className="col-span-1 w-14">Base %</p>
-                                                        <p className="col-span-2">Base amount</p>
-                                                        <p className="col-span-2">Quote amount</p>
-                                                        <p className="col-span-1 w-14">Quote %</p>
-                                                        <p className="col-span-1 w-14">Simulated</p>
+                                                        <p className="col-span-1 w-14">In %</p>
+                                                        <p className="col-span-2">Amount in</p>
+                                                        <p className="col-span-2">Amount out</p>
+                                                        <p className="col-span-1 w-14">Out %</p>
+                                                        <p className="col-span-2 w-14">Price</p>
                                                     </div>
 
                                                     {/* Pool rows */}
@@ -203,7 +203,7 @@ export default function RoutingSection() {
                                                             return (
                                                                 <div
                                                                     key={`${percent}-${percentIndex}`}
-                                                                    className="grid grid-cols-10 w-full bg-gray-600/10 hover:bg-gray-600/20 rounded-xl py-1.5 px-4 gap-6 items-center text-xs"
+                                                                    className="grid grid-cols-11 w-full bg-gray-600/10 hover:bg-gray-600/20 rounded-xl py-1.5 px-4 gap-6 items-center text-xs"
                                                                 >
                                                                     <PoolLink pool={pool} config={config} />
 
@@ -263,7 +263,7 @@ export default function RoutingSection() {
                                                                     </p>
 
                                                                     {/* Execution price */}
-                                                                    <p className="col-span-1 text-milk-600 w-14 truncate">
+                                                                    <p className="col-span-2 text-milk-600 w-14 truncate">
                                                                         {trade.distribution[percentIndex] > 0 && trade.distributed[percentIndex] > 0
                                                                             ? formatAmount(
                                                                                   (trade.distributed[percentIndex] * trade.output) /
@@ -279,13 +279,13 @@ export default function RoutingSection() {
                                                     })()}
 
                                                     {/* Totals */}
-                                                    <div className="grid grid-cols-10 w-full rounded-xl py-1 px-4 gap-6 items-center text-xs text-milk-200">
+                                                    <div className="grid grid-cols-11 w-full rounded-xl py-1 px-4 gap-6 items-center text-xs text-milk-200">
                                                         <p className="col-span-3">Total</p>
-                                                        <p className="col-span-1 w-14">{formatPercentage(100)}</p>
+                                                        <p className="col-span-1">{formatPercentage(100)}</p>
                                                         <p className="col-span-2">{formatAmount(selectedTrade.amountIn)}</p>
                                                         <p className="col-span-2">{formatAmount(selectedTrade.trade.output)}</p>
-                                                        <p className="col-span-1 w-14">{formatPercentage(100)}</p>
-                                                        <p className="col-span-1 w-14"></p>
+                                                        <p className="col-span-1">{formatPercentage(100)}</p>
+                                                        <p className="col-span-2"></p>
                                                     </div>
                                                 </div>
                                             </div>

@@ -13,6 +13,7 @@ import TokenImage from './TokenImage'
 import { hardcodedTokensList } from '@/data/back-tokens'
 import { useAccount } from 'wagmi'
 import { useApiStore } from '@/stores/api.store'
+import { Tooltip } from '@nextui-org/tooltip'
 
 export default function SelectTokenModal() {
     const {
@@ -31,8 +32,17 @@ export default function SelectTokenModal() {
     const modalRef = useRef<HTMLDivElement>(null)
     const searchInput = useRef<HTMLInputElement>(null)
     useEffect(() => searchInput.current?.focus(), [showSelectTokenModal])
-    useKeyboardShortcut({ key: 'Escape', onKeyPressed: () => setShowSelectTokenModal(false) })
-    useClickOutside(modalRef, () => setShowSelectTokenModal(false))
+    useKeyboardShortcut({
+        key: 'Escape',
+        onKeyPressed: () => {
+            setShowSelectTokenModal(false)
+            setSelectTokenModalSearch('')
+        },
+    })
+    useClickOutside(modalRef, () => {
+        setShowSelectTokenModal(false)
+        setSelectTokenModalSearch('')
+    })
     const existingPairs = apiPairs.filter((pair) =>
         [pair.addrbase, pair.addrquote].includes((selectTokenModalFor === 'buy' ? sellToken : buyToken).address),
     )
@@ -51,9 +61,27 @@ export default function SelectTokenModal() {
             >
                 {/* 1 header */}
                 <div className="p-4 flex w-full items-center justify-between focus:ring-2 focus:ring-folly focus:ring-offset-2 cursor-pointer">
-                    <p className="font-semibold text-xl">Select a token</p>
+                    <Tooltip
+                        placement="top"
+                        content={
+                            <div className="rounded-2xl backdrop-blur border border-milk-150 shadow-lg p-3 -mb-1">
+                                <p className="flex gap-1 text-milk text-sm">
+                                    We only display tokens for which a single-hop exchange path exists, meaning that a liquidity pool contains base
+                                    tokens and quote tokens.
+                                </p>
+                            </div>
+                        }
+                    >
+                        <div className="flex items-center gap-1.5 group">
+                            <p className="font-semibold text-xl">Select a token</p>
+                            <IconWrapper icon={IconIds.INFORMATION} className="size-4 text-milk-200 group-hover:text-milk cursor-pointer" />
+                        </div>
+                    </Tooltip>
                     <button
-                        onClick={() => setShowSelectTokenModal(false)}
+                        onClick={() => {
+                            setShowSelectTokenModal(false)
+                            setSelectTokenModalSearch('')
+                        }}
                         className="rounded-xl hover:bg-very-light-hover hover:text-milk-600 focus:outline-none p-2 transition-colors duration-300"
                     >
                         <IconWrapper icon={IconIds.CLOSE} className="size-6" />
@@ -207,6 +235,7 @@ export default function SelectTokenModal() {
                                 )}
                             </button>
                         ))}
+                    <span className="h-2" />
                 </div>
             </motion.div>
         </Backdrop>

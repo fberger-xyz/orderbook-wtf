@@ -123,8 +123,10 @@ export default function SwapSection() {
     const [buyTokenBalance, setBuyTokenBalance] = useState(-1)
     const [sellTokenBalance, setSellTokenBalance] = useState(-1)
     const { setOpen } = useModal()
-
     const debounceTimeout = useRef<NodeJS.Timeout | null>(null)
+
+    // todo: improve this
+    if (sellTokenAmountInputRaw === 0 && sellTokenAmountInput !== 0) setSellTokenAmountInputRaw(sellTokenAmountInput)
 
     useEffect(() => {
         if (account.status === 'connected' && account.address && account.chainId) {
@@ -172,6 +174,7 @@ export default function SwapSection() {
                 // filter out previous entry for same trade
                 bids: [...orderbook.bids.filter((bid) => newTradeEntry.amount !== bid.amount), ...tradeResponseJson.data.bids],
                 asks: orderbook.asks,
+                pools: orderbook.pools,
             }
 
             /// update state
@@ -249,6 +252,9 @@ export default function SwapSection() {
                             <p className="text-aquamarine text-xs">Best bid</p>
                         </div>
                     </div>
+                    {/* <pre>={sellTokenAmountInput}</pre>
+                    <pre>raw={sellTokenAmountInputRaw}</pre>
+                    <pre>typeof {typeof numeral(sellTokenAmountInputRaw).value()}</pre> */}
                     <div className="flex justify-between gap-3">
                         <TokenSelector
                             token={sellToken}
@@ -261,14 +267,14 @@ export default function SwapSection() {
                             type="text"
                             className="text-xl font-semibold text-right border-none outline-none ring-0 focus:ring-0 focus:outline-none focus:border-none bg-transparent w-full"
                             value={
+                                // if number
                                 typeof numeral(sellTokenAmountInputRaw).value() === 'number'
-                                    ? numeral(sellTokenAmountInputRaw).format(rawAmountFormat)
-                                    : sellTokenAmountInputRaw
+                                    ? // display it
+                                      numeral(sellTokenAmountInputRaw).format(rawAmountFormat)
+                                    : // else display it raw
+                                      sellTokenAmountInputRaw
                             }
                             onChange={handleChangeOfAmountIn}
-                            // onBlur={() => {
-                            //     setSellTokenAmountInputRaw(numeral(sellTokenAmountInput).format(rawAmountFormat))
-                            // }}
                         />
                     </div>
 

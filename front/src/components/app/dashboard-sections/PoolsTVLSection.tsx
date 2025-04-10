@@ -4,7 +4,7 @@ import { IconIds } from '@/enums'
 import numeral from 'numeral'
 import { useAppStore } from '@/stores/app.store'
 import { AmmPool } from '@/interfaces'
-import { mapProtocolIdToProtocolConfig } from '@/utils'
+import { cleanOutput, mapProtocolIdToProtocolConfig } from '@/utils'
 import { OrderbookComponentLayout } from './Layouts'
 import IconWrapper from '@/components/common/IconWrapper'
 import LinkWrapper from '@/components/common/LinkWrapper'
@@ -46,7 +46,7 @@ const PoolLink = ({ pool, config }: { pool: AmmPool | undefined; config?: Return
     )
 }
 
-export default function LiquidityBreakdownSection() {
+export default function PoolsTVLSection() {
     const { showMarketDepthSection, showRoutingSection, showLiquidityBreakdownSection, showSections } = useAppStore()
     const { metrics } = useApiStore()
 
@@ -203,38 +203,42 @@ export default function LiquidityBreakdownSection() {
                                         {/* Base token */}
                                         <div className="col-span-3 grid grid-cols-3 w-full">
                                             <p className="col-span-1 text-milk-600 text-right">
-                                                {numeral(pool.liquidity.base.amount).format('0,0a')}
+                                                {cleanOutput(numeral(pool.liquidity.base.amount).format('0,0a'))}
                                             </p>
                                             <p className="col-span-1 text-milk-600 text-right">
-                                                {numeral(pool.liquidity.base.usd).divide(1000000).format('0,0')} m$
+                                                {cleanOutput(`${numeral(pool.liquidity.base.usd).divide(1000000).format('0,0')} m$`)}
                                             </p>
                                             <p className="col-span-1 text-milk-600 text-right">
-                                                {numeral(pool.liquidity.base.amount).divide(totals.base.amount).format('0,0%')}
+                                                {cleanOutput(numeral(pool.liquidity.base.amount).divide(totals.base.amount).format('0,0%'))}
                                             </p>
                                         </div>
 
                                         {/* Quote token */}
                                         <div className="col-span-3 grid grid-cols-3 w-full">
                                             <p className="col-span-1 text-milk-600 text-right">
-                                                {numeral(pool.liquidity.quote.amount).format('0,0a')}
+                                                {cleanOutput(numeral(pool.liquidity.quote.amount).format('0,0a'))}
                                             </p>
                                             <p className="col-span-1 text-milk-600 text-right">
-                                                {numeral(pool.liquidity.quote.usd).divide(1000000).format('0,0')} m$
+                                                {cleanOutput(`${numeral(pool.liquidity.quote.usd).divide(1000000).format('0,0')} m$`)}
                                             </p>
                                             <p className="col-span-1 text-milk-600 text-right">
-                                                {numeral(pool.liquidity.quote.amount).divide(totals.quote.amount).format('0,0%')}
+                                                {cleanOutput(numeral(pool.liquidity.quote.amount).divide(totals.quote.amount).format('0,0%'))}
                                             </p>
                                         </div>
 
                                         {/* TVL */}
                                         <div className="col-span-2 grid grid-cols-2 w-full">
                                             <p className="col-span-1 text-milk-600 text-right">
-                                                {numeral(pool.liquidity.base.usd).add(pool.liquidity.quote.usd).divide(1000000).format('0,0')} m$
+                                                {cleanOutput(
+                                                    `${numeral(pool.liquidity.base.usd).add(pool.liquidity.quote.usd).divide(1000000).format('0,0')} m$`,
+                                                )}
                                             </p>
                                             <p className="col-span-1 text-milk-600 text-right">
-                                                {numeral(pool.liquidity.base.usd + pool.liquidity.quote.usd)
-                                                    .divide(totals.base.usd + totals.quote.usd)
-                                                    .format('0,0%')}
+                                                {cleanOutput(
+                                                    numeral(pool.liquidity.base.usd + pool.liquidity.quote.usd)
+                                                        .divide(totals.base.usd + totals.quote.usd)
+                                                        .format('0,0%'),
+                                                )}
                                             </p>
                                         </div>
                                     </div>
@@ -246,24 +250,26 @@ export default function LiquidityBreakdownSection() {
 
                                 {/* Base token */}
                                 <div className="col-span-3 grid grid-cols-3 w-full">
-                                    <p className="col-span-1 text-right">{numeral(totals.base.amount).divide(1000).format('0,0')} k</p>
-                                    <p className="col-span-1 text-right">{numeral(totals.base.usd).divide(1000000).format('0,0')} m$</p>
+                                    <p className="col-span-1 text-right">{cleanOutput(numeral(totals.base.amount).divide(1000).format('0,0'))} k</p>
+                                    <p className="col-span-1 text-right">{cleanOutput(numeral(totals.base.usd).divide(1000000).format('0,0'))} m$</p>
                                     <p className="col-span-1 text-right">100%</p>
                                 </div>
 
                                 {/* Quote token */}
                                 <div className="col-span-3 grid grid-cols-3 w-full">
-                                    <p className="col-span-1 text-right">{numeral(totals.quote.amount).divide(1000).format('0,0')} k</p>
-                                    <p className="col-span-1 text-right">{numeral(totals.quote.usd).divide(1000000).format('0,0')} m$</p>
+                                    <p className="col-span-1 text-right">{cleanOutput(numeral(totals.quote.amount).divide(1000).format('0,0'))} k</p>
+                                    <p className="col-span-1 text-right">{cleanOutput(numeral(totals.quote.usd).divide(1000000).format('0,0'))} m$</p>
                                     <p className="col-span-1 text-right">100%</p>
                                 </div>
 
                                 {/* TVL */}
                                 <div className="col-span-2 grid grid-cols-2 w-full">
                                     <p className="col-span-1 text-right">
-                                        {numeral(totals.base.usd + totals.quote.usd)
-                                            .divide(1000000)
-                                            .format('0,0')}{' '}
+                                        {cleanOutput(
+                                            numeral(totals.base.usd + totals.quote.usd)
+                                                .divide(1000000)
+                                                .format('0,0'),
+                                        )}{' '}
                                         m$
                                     </p>
                                     <p className="col-span-1 text-right">100%</p>

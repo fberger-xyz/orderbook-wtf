@@ -54,6 +54,39 @@ export const formatAmount = (amount?: number | string) => {
     }
 }
 
+const priceFormatMap = [
+    { limit: 1000000000, format: '0,0.[000000]' },
+    { limit: 1000000, format: '0,0.[00000]' },
+    { limit: 10000, format: '0,0.[0000]' },
+    { limit: 1000, format: '0,0.[00]' },
+    { limit: 100, format: '0,0.[000]' },
+    { limit: 10, format: '0,0.[0]a' },
+    { limit: 2, format: '0,0a' },
+]
+export const formatAmountDependingOnPrice = (amount: number | string, usdPrice: number) => {
+    try {
+        const num = Number(amount)
+        if (isNaN(num) || num < 0) return amount
+        const absAmount = Math.abs(num)
+
+        // map
+        for (const { limit, format } of priceFormatMap)
+            if (usdPrice < limit) {
+                const output = numeral(absAmount).format(format)
+                if (String(output).toLowerCase().includes('nan')) return 'n/a'
+                return output
+            }
+
+        // else
+        const output = numeral(absAmount).format('0,0.[0]a')
+        if (String(output).toLowerCase().includes('nan')) return 'n/a'
+        return output
+    } catch {
+        // return `error ${amount}`
+        return `Error`
+    }
+}
+
 export const roundToDecimals = (value: number, decimals: number): number => {
     const factor = 10 ** decimals
     return Math.round(value * factor) / factor
@@ -157,4 +190,12 @@ export const safeNumeral = (value: number, format: string): string => {
         console.error({ error })
         return 'Error'
     }
+}
+
+export const cleanOutput = (output: string | number, defaultOutput = '-'): string => {
+    const strOutput = String(output).replaceAll(' ', '')
+    if (strOutput === '0') return defaultOutput
+    if (strOutput === '0%') return defaultOutput
+    if (strOutput === '0m$') return defaultOutput
+    return String(output)
 }

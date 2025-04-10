@@ -9,7 +9,7 @@ import { useApiStore } from '@/stores/api.store'
 import { APP_ROUTE } from '@/config/app.config'
 import toast from 'react-hot-toast'
 import { toastStyle } from '@/config/toasts.config'
-import LiquidityBreakdownSection from './dashboard-sections/LiquidityBreakdownSection'
+import PoolsTVLSection from './dashboard-sections/PoolsTVLSection'
 import RoutingSection from './dashboard-sections/RoutingSection'
 import MarketDepthSection from './dashboard-sections/MarketDepthSection'
 import SwapSection from './dashboard-sections/SwapSection'
@@ -167,7 +167,7 @@ export default function Dashboard() {
             selectOrderbookTrade(newSelectedTrade)
 
             // notify
-            toast.success(`Refreshed selected trade simulation`, { style: toastStyle })
+            // toast.success(`Simulation`, { style: toastStyle })
         } catch (error) {
             toast.error(`Unexpected error while fetching price: ${extractErrorMessage(error)}`, { style: toastStyle })
         } finally {
@@ -181,7 +181,7 @@ export default function Dashboard() {
                 <KPIsSection />
                 <MarketDepthSection />
                 <RoutingSection />
-                <LiquidityBreakdownSection />
+                <PoolsTVLSection />
             </div>
             <SwapSection />
         </div>

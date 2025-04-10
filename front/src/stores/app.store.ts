@@ -50,7 +50,7 @@ export const useAppStore = create<{
     // inputs
     sellToken: Token
     selectSellToken: (sellToken: Token) => void
-    sellTokenAmountInput?: number
+    sellTokenAmountInput: number
     sellTokenAmountInputRaw: string | number
     setSellTokenAmountInput: (sellTokenAmountInput: number) => void
     setSellTokenAmountInputRaw: (sellTokenAmountInputRaw: string | number) => void
@@ -134,10 +134,12 @@ export const useAppStore = create<{
             selectSellToken: (sellToken) =>
                 set((state) => {
                     console.log(`selectsellToken: ${sellToken.symbol} (prev=${state.sellToken.symbol})`)
-                    return { sellToken }
+                    // reset from
+                    // return { sellToken }
+                    return { sellToken, sellTokenAmountInput: 0, sellTokenAmountInputRaw: 0 }
                 }),
             sellTokenAmountInput: 0,
-            sellTokenAmountInputRaw: '0',
+            sellTokenAmountInputRaw: 0,
             buyToken: hardcodedTokensList[0], // todo put this as null
             selectBuyToken: (buyToken) =>
                 set((state) => {
@@ -153,6 +155,7 @@ export const useAppStore = create<{
                     sellToken: state.buyToken,
                     buyToken: state.sellToken,
                     sellTokenAmountInput: state.buyTokenAmountInput,
+                    sellTokenAmountInputRaw: state.buyTokenAmountInput,
                     buyTokenAmountInput: state.sellTokenAmountInput,
                 })),
             isLoadingSomeTrade: false,
@@ -197,11 +200,12 @@ export const useAppStore = create<{
                 if (state && !state.hasHydrated) {
                     state.setHasHydrated(true)
 
+                    // console.log({ state })
                     // reset
-                    state?.selectOrderbookTrade(undefined)
-                    state?.setSellTokenAmountInput(0)
-                    state?.setSellTokenAmountInputRaw(0)
-                    state?.setBuyTokenAmountInput(0)
+                    // state?.selectOrderbookTrade(undefined)
+                    // state?.setSellTokenAmountInput(0)
+                    // state?.setSellTokenAmountInputRaw(state?.sellTokenAmountInput)
+                    // state?.setBuyTokenAmountInput(0)
 
                     // pre select default tokens if need be
                     // if (!state.buyToken)
