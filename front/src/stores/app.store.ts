@@ -136,7 +136,7 @@ export const useAppStore = create<{
                     console.log(`selectsellToken: ${sellToken.symbol} (prev=${state.sellToken.symbol})`)
                     // reset from
                     // return { sellToken }
-                    return { sellToken, sellTokenAmountInput: 0, sellTokenAmountInputRaw: 0 }
+                    return { sellToken, sellTokenAmountInput: 1, sellTokenAmountInputRaw: 1 }
                 }),
             sellTokenAmountInput: 0,
             sellTokenAmountInputRaw: 0,
