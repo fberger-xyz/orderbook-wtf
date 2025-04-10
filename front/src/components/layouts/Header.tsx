@@ -65,7 +65,7 @@ export default function Header(props: { className?: string }) {
                                         key={chainConfig.name}
                                         onClick={() => setCurrentChain(chainConfig.name)}
                                         className={cn('flex items-center gap-2 w-full px-4 py-2 text-white rounded-lg transition', {
-                                            'bg-gray-600/20': currentChainName === chainConfig.name,
+                                            'hover:bg-gray-600/20': currentChainName === chainConfig.name,
                                             'hover:bg-gray-600/10': currentChainName !== chainConfig.name,
                                         })}
                                     >

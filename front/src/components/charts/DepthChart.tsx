@@ -3,13 +3,13 @@
 import * as echarts from 'echarts'
 import { ErrorBoundary } from 'react-error-boundary'
 import { Suspense, useEffect, useState } from 'react'
-import { OrderbookOption, OrderbookSide } from '@/enums'
+import { OrderbookOption, OrderbookSide, SvgIds } from '@/enums'
 import EchartWrapper from './EchartWrapper'
 import { ChartBackground, CustomFallback, LoadingArea } from './ChartsCommons'
 import { useAppStore } from '@/stores/app.store'
 import { APP_FONT } from '@/config/app.config'
 import { ErrorBoundaryFallback } from '../common/ErrorBoundaryFallback'
-import { AppColors, bestSideSymbol, formatAmount, getHighestBid, getLowestAsk } from '@/utils'
+import { AppColors, bestSideSymbol, formatAmount, getHighestBid, getLowestAsk, mapProtocolIdToProtocolConfig } from '@/utils'
 import { AmmAsOrderbook, EchartOnClickParamsData, SelectedTrade } from '@/interfaces'
 import numeral from 'numeral'
 import toast from 'react-hot-toast'
@@ -44,6 +44,22 @@ type LineDataPoint = {
     }
 }
 
+const mapSvgIdToImagePath = (svgId?: SvgIds): string | null => {
+    switch (svgId) {
+        case SvgIds.BALANCERV2:
+            return '/Balancer.svg'
+        case SvgIds.CURVE:
+            return '/Curve.svg'
+        case SvgIds.UNISWAPV2:
+        case SvgIds.UNISWAPV3:
+        case SvgIds.UNISWAPV4:
+            return '/Uniswap.svg'
+        // add more if needed
+        default:
+            return null
+    }
+}
+
 const getOptions = (
     orderbook: AmmAsOrderbook,
     bids: LineDataPoint[],
@@ -54,7 +70,6 @@ const getOptions = (
     symbolsInYAxis: OrderbookOption,
     selectedTrade?: SelectedTrade,
 ): echarts.EChartsOption => {
-    console.log({ selectedTrade })
     return {
         tooltip: {
             trigger: 'axis',
@@ -77,39 +92,69 @@ const getOptions = (
             },
             extraCssText: 'backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);',
             formatter: (params) => {
+                // cast
                 const [firstSerieDataPoints] = Array.isArray(params) ? params : [params]
 
+                // prepare
                 const { value, data } = firstSerieDataPoints
                 const [price, input] = value as [number, number]
-
                 const custom = (data as LineDataPoint).customData
-                const side = custom?.side
+                const sellTokenSymbol = custom?.side === OrderbookSide.BID ? orderbook.base.symbol : orderbook.quote.symbol
+                const buyTokenSymbol = custom?.side === OrderbookSide.BID ? orderbook.quote.symbol : orderbook.base.symbol
                 const distribution = custom?.distribution ?? []
                 const output = custom?.output ?? 0
 
-                const distributionLines = distribution.map((percent, percentIndex) => {
-                    const protocolName = orderbook.pools[percentIndex]?.protocol_system ?? 'Unknown'
-                    const attributes = orderbook.pools[percentIndex]?.static_attributes ?? []
-                    const hexaPercent = attributes.find((entry) => entry[0].toLowerCase() === 'fee')?.[1] ?? '0'
-                    const usagePercent = numeral(percent / 100).format('0,0%')
-                    const isPoolUsed = usagePercent !== '0%'
-                    const poolBps = numeral(parseInt(hexaPercent, 16)).divide(100).format('0,0.[0]')
-                    return `<span style="color:${isPoolUsed ? AppColors.milk[600] : AppColors.milk[200]}">- ${usagePercent} in ${protocolName} ${poolBps}bps</span>`
-                })
+                // map distrib
+                const distributionLines = distribution
+                    .map((percent, percentIndex) => {
+                        const pool = orderbook.pools[percentIndex]
+                        if (!pool) return null
+                        const config = mapProtocolIdToProtocolConfig(pool.protocol_type_name)
+                        const iconPath = mapSvgIdToImagePath(config.svgId)
+                        const iconOrProtocolName = iconPath
+                            ? `<div style="
+                                display:flex;
+                                justify-content:center;
+                                align-items:center;
+                                padding:2px;
+                                border-radius:9999px;
+                                border:1px solid ${AppColors.milk[200]};
+                                background-color:rgba(255,255,255,0.1);
+                            ">
+                                <img src="${iconPath}" width="11" height="11" style="display:block;" />
+                            </div>`
+                            : `<span>${config.name}</span>`
+
+                        const versionAndBps = iconPath ? `<span>${config.version} ${pool.fee}bps</span>` : `<span>${pool.fee}bps</span>`
+
+                        return {
+                            percent,
+                            htmlContent: `<div style="display:flex; align-items:center; gap:5px; color:${percent > 0 ? AppColors.milk[600] : AppColors.milk[200]}">
+                                <span>- ${numeral(percent).format('0,0.00')}% > </span>
+                                ${iconOrProtocolName}
+                                ${versionAndBps}
+                            </div>`,
+                        }
+                    })
+                    .filter((line) => !!line)
+
+                const distributionSection = [
+                    `<br/><strong>Routing</strong> <span style="color:${AppColors.milk[200]}"></span>`,
+                    `<div style="display:flex; flex-direction:column; gap:0">`,
+                    ...distributionLines.sort((curr, next) => next.percent - curr.percent).map((curr) => curr.htmlContent),
+                    `</div>`,
+                ].join('')
 
                 return [
                     `<strong>You sell</strong> <span style="color:${AppColors.milk[200]}">see Y axis</span>`,
-                    `${numeral(input).format('0,0.[00000]')} ${side === OrderbookSide.BID ? orderbook.base.symbol : orderbook.quote.symbol}`,
+                    `<span style="color:${AppColors.milk[600]}">${numeral(input).format('0,0.[00000]')} ${sellTokenSymbol}</span>`,
                     `<br/><strong>At price</strong> <span style="color:${AppColors.milk[200]}">see X axis</span>`,
-                    `1 ${orderbook.base.symbol} = ${numeral(price).format('0,0.[00000]')} ${orderbook.quote.symbol}`,
-                    `1 ${orderbook.quote.symbol} = ${numeral(1 / price).format('0,0.[00000]')} ${orderbook.base.symbol}`,
-                    `<br/><strong>To buy</strong>`,
-                    `${numeral(output).format('0,0.[00000]')} ${side === OrderbookSide.BID ? orderbook.quote.symbol : orderbook.base.symbol}`,
-                    `<br/><strong>Distribution</strong>`,
-                    ...distributionLines,
-                ]
-                    .filter(Boolean)
-                    .join('<br/>')
+                    `<span style="color:${AppColors.milk[600]}">1 ${orderbook.base.symbol} = ${numeral(price).format('0,0.[00000]')} ${orderbook.quote.symbol}</span>`,
+                    `<span style="color:${AppColors.milk[600]}">1 ${orderbook.quote.symbol} = ${numeral(1 / price).format('0,0.[00000]')} ${orderbook.base.symbol}</span>`,
+                    `<br/><strong>You buy</strong>`,
+                    `<span style="color:${AppColors.milk[600]}">${numeral(output).format('0,0.[00000]')} ${buyTokenSymbol}</span>`,
+                    distributionSection,
+                ].join('<br/>')
             },
         },
         toolbox: {
@@ -520,7 +565,7 @@ export default function DepthChart() {
     }, [apiStoreRefreshedAt, yAxisType, yAxisLogBase, coloredAreas, symbolsInYAxis, selectedTrade])
 
     const handlePointClick = (params: undefined | { data: EchartOnClickParamsData; dataIndex: number }) => {
-        const debug = true
+        const debug = false
         const fnName = 'handlePointClick'
         if (params?.data) {
             // debug

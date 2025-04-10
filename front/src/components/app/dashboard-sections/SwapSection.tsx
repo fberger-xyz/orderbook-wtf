@@ -110,12 +110,14 @@ export default function SwapSection() {
         setShowSelectTokenModal,
         setSelectTokenModalFor,
         getAddressPair,
+        currentChainName,
     } = useAppStore()
 
     const { metrics, setApiOrderbook, getOrderbook } = useApiStore()
     const account = useAccount()
     const [openTradeDetails, showTradeDetails] = useState(false)
     const [buyTokenBalance, setBuyTokenBalance] = useState(-1)
+    const [sellTokenAmountInputRaw, setSellTokenAmountInputRaw] = useState('')
     const [sellTokenBalance, setSellTokenBalance] = useState(-1)
     const { setOpen } = useModal()
 
@@ -142,7 +144,7 @@ export default function SwapSection() {
             if (!orderbook) return
 
             // fetch data
-            const url = `${APP_ROUTE}/api/local/orderbook?token0=${sellToken.address}&token1=${buyToken.address}&pointAmount=${amountIn}&pointToken=${sellToken.address}`
+            const url = `${APP_ROUTE}/api/local/orderbook?chain=${currentChainName}&token0=${sellToken.address}&token1=${buyToken.address}&pointAmount=${amountIn}&pointToken=${sellToken.address}`
             const tradeResponse = await fetch(url, { method: 'GET', headers: { 'Content-Type': 'application/json' } })
             const tradeResponseJson = (await tradeResponse.json()) as StructuredOutput<AmmAsOrderbook>
             if (!tradeResponseJson.data || !orderbook) return
@@ -193,7 +195,13 @@ export default function SwapSection() {
 
     const handleChangeOfAmountIn = async (event: ChangeEvent<HTMLInputElement>) => {
         try {
-            const amountIn = Number(numeral(event.target.value).value())
+            // save raw
+            const raw = event.target.value
+            setSellTokenAmountInputRaw(raw)
+
+            // parse
+            const parsed = numeral(raw).value()
+            const amountIn = typeof parsed === 'number' ? parsed : NaN
             if (isNaN(amountIn)) return
 
             const newSelectedTrade: SelectedTrade = {
@@ -249,8 +257,15 @@ export default function SwapSection() {
                         <input
                             type="text"
                             className="text-xl font-semibold text-right border-none outline-none ring-0 focus:ring-0 focus:outline-none focus:border-none bg-transparent w-40"
-                            value={numeral(sellTokenAmountInput).format('0,0.[00000]')}
+                            value={
+                                typeof numeral(sellTokenAmountInputRaw).value === 'number'
+                                    ? numeral(sellTokenAmountInputRaw).format('0,0.[0000000000000]')
+                                    : sellTokenAmountInputRaw
+                            }
                             onChange={handleChangeOfAmountIn}
+                            onBlur={() => {
+                                setSellTokenAmountInputRaw(numeral(sellTokenAmountInput).format('0,0.[0000000000000]'))
+                            }}
                         />
                     </div>
 
@@ -265,16 +280,12 @@ export default function SwapSection() {
                                     </button>
                                 )}
                             </div>
-                            {isLoadingSomeTrade ? (
-                                <div className="skeleton-loading w-16 h-4 rounded-full" />
-                            ) : (
-                                <p className="text-milk-600 text-xs">
-                                    ${' '}
-                                    {getBaseValueInUsd(metrics.orderbook)
-                                        ? safeNumeral(selectedTrade.amountIn * (getBaseValueInUsd(metrics.orderbook) as number), '0,0.[00]')
-                                        : '-'}
-                                </p>
-                            )}
+                            <p className="text-milk-600 text-xs">
+                                ${' '}
+                                {getBaseValueInUsd(metrics.orderbook)
+                                    ? safeNumeral(selectedTrade.amountIn * (getBaseValueInUsd(metrics.orderbook) as number), '0,0.[00]')
+                                    : '-'}
+                            </p>
                         </div>
                     ) : (
                         <div className="flex justify-between items-center">
@@ -314,9 +325,9 @@ export default function SwapSection() {
                         <input
                             type="text"
                             className={cn('text-xl font-semibold text-right border-none outline-none', {
-                                'cursor-not-allowed bg-transparent ring-0 focus:ring-0 focus:outline-none focus:border-none w-40':
+                                'cursor-not-allowed bg-transparent ring-0 focus:ring-0 focus:outline-none focus:border-none w-full':
                                     selectedTrade?.trade || sellTokenAmountInput === 0,
-                                'skeleton-loading ml-auto w-28 h-8 rounded-full text-transparent':
+                                'skeleton-loading ml-auto w-1/2 h-8 rounded-full text-transparent':
                                     !selectedTrade?.trade && sellTokenAmountInput !== 0,
                             })}
                             value={numeral(buyTokenAmountInput).format('0,0.[00000]')}

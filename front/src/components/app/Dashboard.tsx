@@ -59,6 +59,9 @@ export default function Dashboard() {
                 queryKey: ['ApiOrderbookQuery', currentChainName, sellToken.address, buyToken.address],
                 enabled: true,
                 queryFn: async () => {
+                    // -
+                    const debug = true
+
                     // fetch all orderbook
                     const url = `${APP_ROUTE}/api/local/orderbook?chain=${currentChainName}&token0=${sellToken.address}&token1=${buyToken.address}`
                     const orderbookResponse = await fetch(url, {
@@ -86,7 +89,9 @@ export default function Dashboard() {
                     // handle store update
                     if (orderbookJson.data) {
                         setApiOrderbook(getAddressPair(), orderbookJson.data)
-                        if (sellTokenAmountInput) await simulateTradeAndMergeOrderbook(sellTokenAmountInput)
+                        const mustRefreshSelectingTradeToo = sellTokenAmountInput !== undefined && sellTokenAmountInput > 0
+                        if (debug) console.log(`ApiOrderbookQuery: mustRefreshSelectingTradeToo =`, mustRefreshSelectingTradeToo)
+                        if (mustRefreshSelectingTradeToo) await simulateTradeAndMergeOrderbook(sellTokenAmountInput)
                         toast.success(`${sellToken.symbol}-${buyToken.symbol} orderbook data updated just now`, { style: toastStyle })
                         setApiStoreRefreshedAt(Date.now())
                     }
@@ -100,6 +105,7 @@ export default function Dashboard() {
     })
 
     const simulateTradeAndMergeOrderbook = async (amountIn: number) => {
+        const debug = false
         try {
             setIsLoadingSomeTrade(true)
 
@@ -108,8 +114,11 @@ export default function Dashboard() {
             const orderbook = getOrderbook(pair)
             if (!orderbook) return
 
+            // notify
+            // toast(`Refreshing selected trade ...`, { style: toastStyle })
+
             // fetch trade data
-            const url = `${APP_ROUTE}/api/local/orderbook?token0=${sellToken.address}&token1=${buyToken.address}&pointAmount=${amountIn}&pointToken=${sellToken.address}`
+            const url = `${APP_ROUTE}/api/local/orderbook?chain=${currentChainName}&token0=${sellToken.address}&token1=${buyToken.address}&pointAmount=${amountIn}&pointToken=${sellToken.address}`
             const tradeResponse = await fetch(url, {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' },
@@ -126,6 +135,9 @@ export default function Dashboard() {
             // ease access
             const newTradeEntry = tradeResponseJson.data?.bids.length > 0 ? tradeResponseJson.data.bids[0] : null
 
+            // -
+            if (debug) console.log(`Dashboard/simulateTradeAndMergeOrderbook`, { newTradeEntry })
+
             // prevent errors
             if (!newTradeEntry) return
 
@@ -137,11 +149,13 @@ export default function Dashboard() {
                 // filter out previous entry for same trade
                 bids: [...orderbook.bids.filter((bid) => newTradeEntry.amount !== bid.amount), ...tradeResponseJson.data.bids],
                 asks: orderbook.asks,
+                pools: orderbook.pools,
             }
 
             // update state
             setApiOrderbook(pair, newOrderbook)
 
+            // -
             const newSelectedTrade = {
                 side: OrderbookSide.BID,
                 amountIn,
@@ -150,8 +164,10 @@ export default function Dashboard() {
                 pools: newOrderbook.pools,
                 xAxis: newTradeEntry.average_sell_price,
             }
-
             selectOrderbookTrade(newSelectedTrade)
+
+            // notify
+            toast.success(`Refreshed selected trade simulation`, { style: toastStyle })
         } catch (error) {
             toast.error(`Unexpected error while fetching price: ${extractErrorMessage(error)}`, { style: toastStyle })
         } finally {

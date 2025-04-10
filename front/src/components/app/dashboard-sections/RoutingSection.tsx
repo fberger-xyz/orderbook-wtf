@@ -64,7 +64,7 @@ const calculateLiquidity = (
     currIndex: number,
     base_worth_eth: number,
     quote_worth_eth: number,
-    eth_usd: number
+    eth_usd: number,
 ) => {
     return {
         base: {
@@ -75,8 +75,8 @@ const calculateLiquidity = (
             amount: orderbook.quote_lqdty[currIndex],
             usd: orderbook.quote_lqdty[currIndex] * quote_worth_eth * eth_usd,
         },
-    };
-};
+    }
+}
 
 export default function RoutingSection() {
     const { showMarketDepthSection, showRoutingSection, showLiquidityBreakdownSection, selectedTrade, showSections } = useAppStore()
