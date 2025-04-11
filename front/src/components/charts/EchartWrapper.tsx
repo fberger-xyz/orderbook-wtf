@@ -48,10 +48,10 @@ export default function EchartWrapper(props: InterfaceEchartWrapperProps) {
             // const dataZoomOptions = currentOptions?.dataZoom ? { dataZoom: currentOptions.dataZoom } : {}
 
             // set option
-            // myChart.current.setOption({ ...props.options, ...dataZoomOptions, ...grid3DOptions }, { notMerge: true })
             myChart.current.setOption(
                 // @ts-expect-error: poorly typed
                 { ...props.options, ...grid3DOptions },
+                // { ...props.options, ...grid3DOptions, ...dataZoomOptions },
                 {
                     // notMerge: true, // the new option object replaces the existing one completely.
                     notMerge: true, // Default - ECharts merges the new options with the existing ones

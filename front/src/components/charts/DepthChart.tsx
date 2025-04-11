@@ -599,7 +599,7 @@ export default function DepthChart() {
                 // prevent errors
                 if (!side) return
                 if (side === OrderbookSide.ASK) {
-                    toast(`Can't select Asks for now`, { style: toastStyle })
+                    toast(`Can't select asks, only bids.`, { style: toastStyle })
                     return
                 }
 
