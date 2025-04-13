@@ -181,7 +181,7 @@ export default function PoolsTVLSection() {
                                         key={`${pool.poolIndex}`}
                                         className="grid grid-cols-10 w-full bg-gray-600/10 hover:bg-gray-600/20 rounded-xl py-1.5 px-4 gap-5 items-center text-xs"
                                     >
-                                        <PoolLink currentChainId={currentChainId} pool={pool.details} config={pool.config} />
+                                        <PoolLink currentChainId={currentChainId} pool={pool.details} config={pool.config} className="col-span-2" />
 
                                         {/* Base token */}
                                         <div className="col-span-3 grid grid-cols-3 w-full">

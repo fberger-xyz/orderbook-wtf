@@ -4,7 +4,7 @@ import { IconIds, OrderbookSide } from '@/enums'
 import numeral from 'numeral'
 import { useAppStore } from '@/stores/app.store'
 import { AmmPool } from '@/interfaces'
-import { mapProtocolIdToProtocolConfig } from '@/utils'
+import { cleanOutput, mapProtocolIdToProtocolConfig } from '@/utils'
 import { OrderbookComponentLayout } from './Layouts'
 import IconWrapper from '@/components/common/IconWrapper'
 import TokenImage from '../TokenImage'
@@ -30,10 +30,6 @@ type PoolsData = {
 
 const formatAmount = (value: number): string => {
     return numeral(value).format('0,0.[000]')
-}
-
-const formatPercentage = (value: number): string => {
-    return `${value.toFixed(2)}%`
 }
 
 const calculateLiquidity = (
@@ -182,13 +178,16 @@ export default function RoutingSection() {
                                                                     key={`${percent}-${percentIndex}`}
                                                                     className="grid grid-cols-11 w-full bg-gray-600/10 hover:bg-gray-600/20 rounded-xl py-1.5 px-4 gap-6 items-center text-xs"
                                                                 >
-                                                                    <PoolLink currentChainId={currentChainId} pool={pool} config={config} />
+                                                                    <PoolLink
+                                                                        currentChainId={currentChainId}
+                                                                        pool={pool}
+                                                                        config={config}
+                                                                        className="col-span-3"
+                                                                    />
 
                                                                     {/* Input distribution */}
                                                                     <p className="col-span-1 text-milk-600 w-14">
-                                                                        {trade.distribution[percentIndex] > 0
-                                                                            ? formatPercentage(trade.distribution[percentIndex])
-                                                                            : '-'}
+                                                                        {cleanOutput(numeral(trade.distribution[percentIndex]).format('0,0.0%'))}
                                                                     </p>
 
                                                                     {/* Base amount */}
@@ -234,9 +233,7 @@ export default function RoutingSection() {
 
                                                                     {/* Output distribution */}
                                                                     <p className="col-span-1 text-milk-600 w-14">
-                                                                        {trade.distributed[percentIndex] > 0
-                                                                            ? formatPercentage(trade.distributed[percentIndex])
-                                                                            : '-'}
+                                                                        {cleanOutput(numeral(trade.distributed[percentIndex]).format('0,0.0%'))}
                                                                     </p>
 
                                                                     {/* Execution price */}
@@ -258,10 +255,11 @@ export default function RoutingSection() {
                                                     {/* Totals */}
                                                     <div className="grid grid-cols-11 w-full rounded-xl py-1 px-4 gap-6 items-center text-xs text-milk-200">
                                                         <p className="col-span-3">Total</p>
-                                                        <p className="col-span-1">{formatPercentage(100)}</p>
+                                                        <p className="col-span-1">{cleanOutput(numeral(100).format('0,0.0%'))}</p>
+                                                        <p className="col-span-1">{cleanOutput(numeral(100).format('0,0.0%'))}</p>
                                                         <p className="col-span-2">{formatAmount(selectedTrade.amountIn)}</p>
                                                         <p className="col-span-2">{formatAmount(selectedTrade.trade.output)}</p>
-                                                        <p className="col-span-1">{formatPercentage(100)}</p>
+                                                        <p className="col-span-1">{cleanOutput(numeral(100).format('0,0.0%'))}</p>
                                                         <p className="col-span-2"></p>
                                                     </div>
 
