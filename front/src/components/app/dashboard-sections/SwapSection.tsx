@@ -297,8 +297,8 @@ export default function SwapSection() {
                             </div>
                             <p className="text-milk-600 text-xs">
                                 ${' '}
-                                {getBaseValueInUsd(metrics.orderbook)
-                                    ? safeNumeral(selectedTrade.amountIn * (getBaseValueInUsd(metrics.orderbook) as number), '0,0.[00]')
+                                {getBaseValueInUsd(metrics?.orderbook)
+                                    ? safeNumeral(selectedTrade.amountIn * (getBaseValueInUsd(metrics?.orderbook) as number), '0,0.[00]')
                                     : '-'}
                             </p>
                         </div>
@@ -359,8 +359,8 @@ export default function SwapSection() {
                             ) : (
                                 <p className="text-milk-600 text-xs">
                                     ${' '}
-                                    {sellTokenAmountInput !== 0 && buyTokenAmountInput && getQuoteValueInUsd(metrics.orderbook)
-                                        ? numeral(buyTokenAmountInput).multiply(getQuoteValueInUsd(metrics.orderbook)).format('0,0.[00]')
+                                    {sellTokenAmountInput !== 0 && buyTokenAmountInput && getQuoteValueInUsd(metrics?.orderbook)
+                                        ? numeral(buyTokenAmountInput).multiply(getQuoteValueInUsd(metrics?.orderbook)).format('0,0.[00]')
                                         : '0'}
                                 </p>
                             )}
@@ -380,7 +380,7 @@ export default function SwapSection() {
                 <div className="bg-milk-600/5 flex flex-col gap-6 px-2 py-4 rounded-xl border-milk-150 text-xs">
                     {/* Summary */}
                     <div className="flex w-full justify-between items-center">
-                        {sellToken && buyToken && metrics.highestBid && metrics.orderbook ? (
+                        {sellToken && buyToken && metrics?.highestBid && metrics.orderbook ? (
                             <p className="text-milk-600 truncate pl-2">
                                 1 {sellToken.symbol} = {formatAmount(metrics.midPrice)} {buyToken.symbol} (${' '}
                                 {formatAmount(getBaseValueInUsd(metrics.orderbook))})
@@ -403,8 +403,8 @@ export default function SwapSection() {
                             <ChainImage oneInchId={CHAINS_CONFIG[AppSupportedChains.ETHEREUM].oneInchId} className="size-4" />
                             <p className="text-milk-600">
                                 ${' '}
-                                {metrics.highestBid?.gas_costs_usd
-                                    ? numeral(metrics.highestBid.gas_costs_usd.reduce((cost, curr) => (cost += curr), 0)).format('0,0.[00]')
+                                {metrics?.highestBid?.gas_costs_usd
+                                    ? numeral(metrics?.highestBid.gas_costs_usd.reduce((cost, curr) => (cost += curr), 0)).format('0,0.[00]')
                                     : '-'}
                             </p>
                             <IconWrapper

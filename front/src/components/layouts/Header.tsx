@@ -11,9 +11,11 @@ import { useRef, useState } from 'react'
 import { useClickOutside } from '@/hooks/useClickOutside'
 import { useAppStore } from '@/stores/app.store'
 import { CHAINS_CONFIG } from '@/config/app.config'
+import { useApiStore } from '@/stores/api.store'
 
 export default function Header(props: { className?: string }) {
     const { currentChainId, setCurrentChain } = useAppStore()
+    const { setMetrics } = useApiStore()
     const [openNetworkDropown, setOpenNetworkDropown] = useState(false)
     const networkDropown = useRef<HTMLDivElement>(null)
     useClickOutside(networkDropown, () => setOpenNetworkDropown(false))
@@ -60,7 +62,10 @@ export default function Header(props: { className?: string }) {
                                 return (
                                     <button
                                         key={chainConfig.name}
-                                        onClick={() => setCurrentChain(chainConfig.id)}
+                                        onClick={() => {
+                                            setCurrentChain(chainConfig.id)
+                                            setMetrics(undefined)
+                                        }}
                                         className={cn('flex items-center gap-2 w-full px-4 py-2 text-white rounded-lg transition', {
                                             'bg-gray-600/20': currentChainId === chainConfig.id,
                                             'hover:bg-gray-600/10': currentChainId !== chainConfig.id,

@@ -8,13 +8,14 @@ export const useApiStore = create<{
     apiTokens: Record<AppSupportedChains, Token[]>
     apiPairs: Record<AppSupportedChains, RustApiPair[]>
     apiOrderbooks: Record<string, undefined | AmmAsOrderbook>
-    metrics: DashboardMetrics
+    metrics?: DashboardMetrics
     orderBookRefreshIntervalMs: number
     apiStoreRefreshedAt: number
     setApiTokens: (key: string, pairs: Token[]) => void
     setApiPairs: (key: string, pairs: RustApiPair[]) => void
     setApiOrderbook: (key: string, orderbook?: AmmAsOrderbook) => void
     setApiStoreRefreshedAt: (apiStoreRefreshedAt: number) => void
+    setMetrics: (metrics?: DashboardMetrics) => void
     getOrderbook: (key: string) => undefined | AmmAsOrderbook
 }>((set, get) => ({
     apiTokens: {
@@ -45,5 +46,6 @@ export const useApiStore = create<{
             metrics: getDashboardMetrics(orderbook),
         })),
     setApiStoreRefreshedAt: (apiStoreRefreshedAt) => set(() => ({ apiStoreRefreshedAt })),
+    setMetrics: (metrics) => set(() => ({ metrics })),
     getOrderbook: (key) => get().apiOrderbooks[key],
 }))

@@ -26,7 +26,7 @@ export default function KPIsSection() {
     }, [apiStoreRefreshedAt])
 
     return (
-        <div className="w-full grid grid-cols-2 md:grid-cols-3 gap-2">
+        <div className="w-full grid grid-cols-2 md:grid-cols-3 2xl:grid-cols-6 gap-2">
             <OrderbookComponentLayout
                 title={
                     <div className="w-full flex items-center gap-1">
@@ -42,7 +42,9 @@ export default function KPIsSection() {
                     >
                         <TokenImage size={20} token={buyToken} />
                         {metrics?.highestBid?.average_sell_price && (
-                            <p className="text-milk font-semibold text-base">{formatAmount(metrics?.highestBid.average_sell_price)}</p>
+                            <p className="text-milk font-semibold text-base">
+                                {numeral(metrics?.highestBid?.average_sell_price).format('0,0.[0000]')}
+                            </p>
                         )}
                     </div>
                 }
@@ -61,7 +63,9 @@ export default function KPIsSection() {
                         })}
                     >
                         <TokenImage size={20} token={buyToken} />
-                        {metrics?.midPrice !== undefined && <p className="text-milk font-semibold text-base">{formatAmount(metrics?.midPrice)}</p>}
+                        {metrics?.midPrice !== undefined && (
+                            <p className="text-milk font-semibold text-base">{numeral(metrics?.midPrice).format('0,0.[0000]')}</p>
+                        )}
                     </div>
                 }
             />
@@ -81,7 +85,9 @@ export default function KPIsSection() {
                     >
                         <TokenImage size={20} token={buyToken} />
                         {metrics?.lowestAsk?.average_sell_price !== undefined && (
-                            <p className="text-milk font-semibold text-base">{formatAmount(1 / metrics?.lowestAsk.average_sell_price)}</p>
+                            <p className="text-milk font-semibold text-base">
+                                {numeral(1 / metrics?.lowestAsk.average_sell_price).format('0,0.[0000]')}
+                            </p>
                         )}
                     </div>
                 }
