@@ -21,15 +21,17 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
                             {JSON.stringify(extractErrorMessage(error), null, 2)}
                         </pre>
                     </div>
-                    <div className="flex w-full flex-col items-center gap-3">
+                    <div className="flex w-full flex-col items-center gap-4">
                         <p className="text-sm text-milk-600">Please</p>
+
                         <button
                             onClick={() => reset()}
                             className="flex w-full text-aquamarine items-center justify-center gap-2.5 rounded-xl border-2 border-aquamarine bg-very-light-hover px-2 py-1.5 font-semibold sm:py-2"
                         >
-                            <p className="font-semibold">Try a refresh</p>
+                            <p className="font-semibold">Reload page</p>
                             <IconWrapper icon={IconIds.UPDATE_NOW} className="size-6" />
                         </button>
+
                         <p className="text-sm text-milk-600">
                             Or reach out for help on telegram:
                             <LinkWrapper href="https://t.me/+B4CNQwv7dgIyYTJl" target="_blank" className="hover:underline hover:text-aquamarine pl-1">

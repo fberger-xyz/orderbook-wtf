@@ -11,7 +11,6 @@ import LinkWrapper from '@/components/common/LinkWrapper'
 import SvgMapper from '@/components/icons/SvgMapper'
 import TokenImage from '../TokenImage'
 import { useApiStore } from '@/stores/api.store'
-import { IS_DEV } from '@/config/app.config'
 
 type PoolLiquidity = {
     base: { amount: number; usd: number }
@@ -83,7 +82,7 @@ export default function PoolsTVLSection() {
                 }
                 content={
                     <div className="flex flex-col gap-2">
-                        <p className="text-milk-400 text-xs">Breakdown</p>
+                        <p className="text-milk-400 text-xs">Breakdown by token</p>
                         <div className="flex flex-col items-center justify-center h-14">
                             <p className="text-orange-400 text-xs">Invalid orderbook format</p>
                             <p className="text-milk-400 text-xs">Ask @xMerso and @fberger_xyz for a fix</p>
@@ -142,7 +141,7 @@ export default function PoolsTVLSection() {
             content={
                 showLiquidityBreakdownSection ? (
                     <div className="flex flex-col gap-2">
-                        <p className="text-milk-400 text-xs">Breakdown</p>
+                        <p className="text-milk-400 text-xs">Breakdown by token</p>
                         <div className="flex w-full justify-center items-center rounded-xl gap-1 border border-milk-150 flex-col px-3 py-2">
                             {/* Headers */}
                             <div className="grid grid-cols-10 w-full rounded-xl py-1 px-4 gap-5 items-end text-xs text-milk-200">
@@ -150,7 +149,7 @@ export default function PoolsTVLSection() {
 
                                 {/* Base token */}
                                 <div className="flex flex-col col-span-3 gap-2">
-                                    <div className="flex gap-2 border-b pb-1.5 justify-center items-start border-milk-150 pr-2">
+                                    <div className="flex gap-2 border-b pb-1.5 justify-center items-start border-milk-400 pr-2">
                                         <TokenImage size={14} token={orderbook.base} />
                                         <p className="font-semibold text-milk">{orderbook.base.symbol}</p>
                                     </div>
@@ -163,7 +162,7 @@ export default function PoolsTVLSection() {
 
                                 {/* Quote token */}
                                 <div className="flex flex-col col-span-3 gap-2">
-                                    <div className="flex gap-2 border-b pb-1.5 justify-center items-start border-milk-150 pr-2">
+                                    <div className="flex gap-2 border-b pb-1.5 justify-center items-start border-milk-400 pr-2">
                                         <TokenImage size={14} token={orderbook.quote} />
                                         <p className="font-semibold text-milk">{orderbook.quote.symbol}</p>
                                     </div>
@@ -176,10 +175,11 @@ export default function PoolsTVLSection() {
 
                                 {/* TVL */}
                                 <div className="flex flex-col col-span-2 gap-2">
-                                    <div className="flex gap-2 border-b pb-1.5 justify-center items-start border-milk-150 pr-2">
-                                        <TokenImage size={14} token={orderbook.base} />
+                                    <div className="flex gap-2 border-b pb-1.5 justify-center items-start border-milk-400 pr-2">
+                                        {/* <TokenImage size={14} token={orderbook.base} />
                                         <p className="font-semibold text-milk">+</p>
-                                        <TokenImage size={14} token={orderbook.quote} />
+                                        <TokenImage size={14} token={orderbook.quote} /> */}
+                                        <p className="font-semibold text-milk">Pool TVL</p>
                                     </div>
                                     <div className="grid grid-cols-2 w-full pr-2">
                                         <p className="col-span-1 text-right">m$</p>
@@ -278,8 +278,8 @@ export default function PoolsTVLSection() {
                             </div>
                         </div>
 
-                        {IS_DEV && <pre>{JSON.stringify(orderbook?.pools.length)}</pre>}
-                        {IS_DEV && <pre>{JSON.stringify(orderbook?.pools, null, 2)}</pre>}
+                        {/* {IS_DEV && <pre>{JSON.stringify(orderbook?.pools.length)}</pre>}
+                        {IS_DEV && <pre>{JSON.stringify(orderbook?.pools, null, 2)}</pre>} */}
                     </div>
                 ) : null
             }

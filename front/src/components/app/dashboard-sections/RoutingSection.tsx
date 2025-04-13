@@ -11,7 +11,6 @@ import LinkWrapper from '@/components/common/LinkWrapper'
 import SvgMapper from '@/components/icons/SvgMapper'
 import TokenImage from '../TokenImage'
 import { useApiStore } from '@/stores/api.store'
-import { IS_DEV } from '@/config/app.config'
 
 type PoolLiquidity = {
     base: { amount: number; usd: number }
@@ -93,15 +92,14 @@ export default function RoutingSection() {
         return (
             <OrderbookComponentLayout
                 title={
-                    <div className="flex flex-col mb-2">
+                    <div className="flex flex-col">
                         <button
                             onClick={() => showSections(showMarketDepthSection, !showRoutingSection, showLiquidityBreakdownSection)}
-                            className="flex gap-1 items-center rounded-lg px-2 hover:bg-milk-100/5 transition-colors duration-300 -ml-1 w-fit"
+                            className="flex gap-1 items-center rounded-lg px-2.5 py-1.5 hover:bg-milk-100/5 transition-colors duration-300 -ml-1 w-fit"
                         >
                             <p className="text-milk text-base font-semibold">Routing</p>
                             <IconWrapper icon={showRoutingSection ? IconIds.TRIANGLE_UP : IconIds.TRIANGLE_DOWN} className="size-4" />
                         </button>
-                        <p className="text-milk-400 text-xs">Using a simplistic solver</p>
                     </div>
                 }
                 content={null}
@@ -206,6 +204,7 @@ export default function RoutingSection() {
                                                             const pool = orderbook.pools[percentIndex]
                                                             const protocolName = pool?.protocol_system
                                                             const config = mapProtocolIdToProtocolConfig(protocolName)
+                                                            if (!trade.distribution[percentIndex]) return null
                                                             return (
                                                                 <div
                                                                     key={`${percent}-${percentIndex}`}
@@ -295,8 +294,8 @@ export default function RoutingSection() {
                                                     </div>
 
                                                     {/* Debug */}
-                                                    {IS_DEV && <pre>{JSON.stringify(selectedTrade?.pools.length, null, 2)}</pre>}
-                                                    {IS_DEV && <pre>{JSON.stringify(selectedTrade?.pools, null, 2)}</pre>}
+                                                    {/* {IS_DEV && <pre>{JSON.stringify(selectedTrade?.pools.length, null, 2)}</pre>}
+                                                    {IS_DEV && <pre>{JSON.stringify(selectedTrade?.pools, null, 2)}</pre>} */}
                                                 </div>
                                             </div>
                                         </>

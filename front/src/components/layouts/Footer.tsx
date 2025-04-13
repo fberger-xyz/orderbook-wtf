@@ -21,7 +21,12 @@ export default function Footer(props: { className?: string }) {
     }, [])
     if (!commitDate) return null
     return (
-        <div className={cn('w-full flex justify-between items-end py-6 px-8 text-milk-600/50 font-light text-sm', props.className)}>
+        <div
+            className={cn(
+                'w-full flex flex-col md:flex-row md:justify-between md:items-end py-6 px-8 text-milk-600/50 font-light text-sm',
+                props.className,
+            )}
+        >
             <div className="flex md:gap-10 flex-col md:flex-row">
                 <p>2024 © PropellerHeads</p>
                 <p>

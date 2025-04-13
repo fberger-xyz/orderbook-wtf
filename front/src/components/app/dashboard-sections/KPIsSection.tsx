@@ -101,7 +101,7 @@ export default function KPIsSection() {
                             {numeral(metrics?.spreadPercent).format('0,0.[0000]%')}{' '}
                             <span className="pl-1 text-milk-400 text-xs">
                                 {cleanOutput(numeral(metrics.spreadPercent).multiply(10000).format('0,0'))} bp
-                                {Number(metrics.spreadPercent) * 10000 >= 2 ? 's' : ''}
+                                {Math.abs(Number(metrics.spreadPercent)) * 10000 >= 2 ? 's' : ''}
                             </span>
                         </p>
                     ) : (

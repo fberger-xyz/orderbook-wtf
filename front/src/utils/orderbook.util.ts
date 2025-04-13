@@ -23,7 +23,8 @@ export const getQuoteValueInUsd = (orderbook?: AmmAsOrderbook): undefined | numb
     return orderbook?.quote_worth_eth * orderbook.eth_usd
 }
 
-const mapProtocolNameToSvgId = (protocolName: string): SvgIds => {
+const mapProtocolNameToSvgId = (protocolName: string): undefined | SvgIds => {
+    if (!protocolName) return undefined
     let svgId = SvgIds.BALANCERV2
     if (protocolName.includes('balancer')) svgId = SvgIds.BALANCERV2
     if (protocolName.includes('sushi')) svgId = SvgIds.SUSHISWAPV2
@@ -35,8 +36,8 @@ const mapProtocolNameToSvgId = (protocolName: string): SvgIds => {
 
 // https://docs.propellerheads.xyz/tycho/for-solvers/supported-protocols
 export const mapProtocolIdToProtocolConfig = (protocolId: string) => {
-    const config: { id: string; version: string; name: string; svgId: SvgIds } = {
-        id: protocolId.toLowerCase(),
+    const config: { id: string; version: string; name: string; svgId?: SvgIds } = {
+        id: (protocolId ?? '').toLowerCase(),
         name: '',
         version: '',
         svgId: mapProtocolNameToSvgId(protocolId),

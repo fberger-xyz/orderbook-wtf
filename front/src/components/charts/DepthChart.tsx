@@ -60,10 +60,17 @@ const mapSvgIdToImagePath = (svgId?: SvgIds): string | null => {
         case SvgIds.CURVE:
             return '/Curve.svg'
         case SvgIds.UNISWAPV2:
+            return '/Uniswap.svg'
         case SvgIds.UNISWAPV3:
+            return '/Uniswap.svg'
         case SvgIds.UNISWAPV4:
             return '/Uniswap.svg'
-        // add more if needed
+        case SvgIds.PANCAKESWAPV2:
+            return '/PancakeSwap.svg'
+        case SvgIds.CURVE:
+            return '/Curve.svg'
+        case SvgIds.SUSHISWAPV2:
+            return '/Sushiswap.svg'
         default:
             return null
     }
@@ -495,11 +502,20 @@ export default function DepthChart() {
         getAddressPair,
         // switchSelectedTokens,
     } = useAppStore()
-    const { apiStoreRefreshedAt, getOrderbook } = useApiStore()
+    const { apiStoreRefreshedAt, metrics, getOrderbook } = useApiStore()
     const [options, setOptions] = useState<null | echarts.EChartsOption>(null)
 
     useEffect(() => {
+        const debug = true
+
+        // get possibly undefined orderbook
         const orderbook = getOrderbook(getAddressPair())
+
+        // debug
+        if (debug) console.log('useEffect: orderbook', orderbook)
+
+        // logic
+        if (!metrics) setOptions(null)
         if (orderbook?.bids && orderbook?.asks) {
             const highestBid = getHighestBid(orderbook)
             const lowestAsk = getLowestAsk(orderbook)
@@ -578,7 +594,7 @@ export default function DepthChart() {
         } else {
             setOptions(null)
         }
-    }, [currentChainId, apiStoreRefreshedAt, yAxisType, yAxisLogBase, coloredAreas, symbolsInYAxis, selectedTrade])
+    }, [currentChainId, metrics, apiStoreRefreshedAt, yAxisType, yAxisLogBase, coloredAreas, symbolsInYAxis, selectedTrade])
 
     const handlePointClick = (params: undefined | { data: EchartOnClickParamsData; dataIndex: number }) => {
         const debug = false
@@ -592,7 +608,7 @@ export default function DepthChart() {
             const orderbook = getOrderbook(key)
             if (orderbook) {
                 // debug
-                if (debug) console.log(fnName, 'ok orderbook')
+                if (debug) console.log(fnName, 'orderbook found', orderbook)
 
                 // find
                 const side = params.data.customData?.side

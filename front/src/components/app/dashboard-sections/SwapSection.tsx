@@ -225,7 +225,7 @@ export default function SwapSection() {
             if (debounceTimeout.current) clearTimeout(debounceTimeout.current)
             debounceTimeout.current = setTimeout(() => {
                 simulateTradeAndMergeOrderbook(amountIn)
-            }, 800) // 800ms debounce delay
+            }, 1000) // 1000ms debounce delay
         } catch (error) {
             toast.error(`Unexepected error while fetching price: ${extractErrorMessage(error)}`, {
                 style: toastStyle,
