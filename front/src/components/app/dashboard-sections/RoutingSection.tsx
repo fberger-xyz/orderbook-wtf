@@ -187,7 +187,9 @@ export default function RoutingSection() {
 
                                                                     {/* Input distribution */}
                                                                     <p className="col-span-1 text-milk-600 w-14">
-                                                                        {cleanOutput(numeral(trade.distribution[percentIndex]).format('0,0.0%'))}
+                                                                        {cleanOutput(
+                                                                            numeral(trade.distribution[percentIndex]).divide(100).format('0,0.0%'),
+                                                                        )}
                                                                     </p>
 
                                                                     {/* Base amount */}
@@ -233,7 +235,9 @@ export default function RoutingSection() {
 
                                                                     {/* Output distribution */}
                                                                     <p className="col-span-1 text-milk-600 w-14">
-                                                                        {cleanOutput(numeral(trade.distributed[percentIndex]).format('0,0.0%'))}
+                                                                        {cleanOutput(
+                                                                            numeral(trade.distributed[percentIndex]).divide(100).format('0,0.0%'),
+                                                                        )}
                                                                     </p>
 
                                                                     {/* Execution price */}
