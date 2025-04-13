@@ -27,12 +27,7 @@ export default function Header(props: { className?: string }) {
             </div>
             <div className="flex flex-wrap justify-end items-center gap-2 z-20">
                 {/* docs */}
-                <LinkWrapper
-                    // href="https://github.com/propeller-heads/tycho-x/blob/main/TAP-2.md"
-                    href="https://tycho-orderbook.gitbook.io/docs"
-                    target="_blank"
-                    className="flex items-center gap-1 px-2.5"
-                >
+                <LinkWrapper href="https://tycho-orderbook.gitbook.io/docs" target="_blank" className="flex items-center gap-1 px-2.5 cursor-alias">
                     <p className="text-milk text-sm">Docs</p>
                     <IconWrapper icon={IconIds.OPEN_LINK_IN_NEW_TAB} className="size-4" />
                 </LinkWrapper>
@@ -48,7 +43,6 @@ export default function Header(props: { className?: string }) {
                     <div
                         ref={networkDropown}
                         className={cn(
-                            // `absolute mt-2 w-52 rounded-2xl backdrop-blur-lg border-milk-150 border-2 shadow-lg p-2.5 transition-all origin-top-right`,
                             `absolute right-0 mt-2 w-52 rounded-2xl backdrop-blur-lg border-milk-150 border-2 shadow-lg p-2.5 transition-all origin-top-right`,
                             {
                                 'scale-100 opacity-100': openNetworkDropown,

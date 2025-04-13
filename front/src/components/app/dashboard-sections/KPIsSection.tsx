@@ -141,7 +141,7 @@ export default function KPIsSection() {
                         <LinkWrapper
                             target="_blank"
                             href={`${CHAINS_CONFIG[currentChainId].explorerRoot}/block/${metrics?.orderbook.block}`}
-                            className="flex gap-1 items-center group"
+                            className="flex gap-1 items-center group cursor-alias"
                         >
                             <p className="text-milk font-semibold text-base">{cleanOutput(numeral(metrics?.orderbook.block).format('0,0'))}</p>
                             <IconWrapper icon={IconIds.OPEN_LINK_IN_NEW_TAB} className="size-4 text-milk-200 group-hover:text-milk" />

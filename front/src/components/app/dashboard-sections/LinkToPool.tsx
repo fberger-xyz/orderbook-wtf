@@ -25,7 +25,7 @@ export default function PoolLink({
         <LinkWrapper
             target="_blank"
             href={`${CHAINS_CONFIG[currentChainId].explorerRoot}/address/${pool.address}`}
-            className={cn('flex gap-2 items-center group', className)}
+            className={cn('flex gap-2 items-center group cursor-alias', className)}
         >
             <div className="flex justify-center rounded-full p-1 border border-milk-200 bg-milk-200/10">
                 <SvgMapper icon={config?.svgId} className="size-3.5" />

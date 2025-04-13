@@ -36,15 +36,15 @@ export default function Footer(props: { className?: string }) {
             </div>
             <p className="text-wrap">
                 Made by
-                <LinkWrapper href={AppUrls.PROPELLERHEADS_X} target="_blank" className="hover:underline hover:text-aquamarine pl-1">
+                <LinkWrapper href={AppUrls.PROPELLERHEADS_X} target="_blank" className="cursor-alias hover:underline hover:text-aquamarine pl-1">
                     PropellerHeads
                 </LinkWrapper>
                 ,
-                <LinkWrapper href={AppUrls.MERSO_X} target="_blank" className="hover:underline hover:text-aquamarine px-1">
+                <LinkWrapper href={AppUrls.MERSO_X} target="_blank" className="cursor-alias hover:underline hover:text-aquamarine px-1">
                     @xMerso
                 </LinkWrapper>
                 and
-                <LinkWrapper href={AppUrls.FBERGER_X} target="_blank" className="hover:underline hover:text-aquamarine px-1">
+                <LinkWrapper href={AppUrls.FBERGER_X} target="_blank" className="cursor-alias hover:underline hover:text-aquamarine px-1">
                     @fberger_xyz
                 </LinkWrapper>
             </p>
