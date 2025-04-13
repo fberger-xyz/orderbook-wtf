@@ -29,7 +29,7 @@ export default function SelectTokenModal() {
         setShowSelectTokenModal,
         setSelectTokenModalSearch,
     } = useAppStore()
-    const { apiTokens, apiPairs } = useApiStore()
+    const { apiTokens, apiPairs, setMetrics } = useApiStore()
     const account = useAccount()
     const modalRef = useRef<HTMLDivElement>(null)
     const searchInput = useRef<HTMLInputElement>(null)
@@ -211,9 +211,11 @@ export default function SelectTokenModal() {
                                     if (selectTokenModalFor === 'buy') {
                                         if (buyToken.address === token.address) return
                                         selectBuyToken(token)
+                                        setMetrics(undefined)
                                     } else {
                                         if (sellToken.address === token.address) return
                                         selectSellToken(token)
+                                        setMetrics(undefined)
                                     }
                                     await sleep(200)
                                     setShowSelectTokenModal(false)

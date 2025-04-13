@@ -6,7 +6,7 @@ import { AmmAsOrderbook, RustApiPair, StructuredOutput, Token } from '@/interfac
 import { extractErrorMessage } from '@/utils'
 import { useQueries } from '@tanstack/react-query'
 import { useApiStore } from '@/stores/api.store'
-import { APP_ROUTE, CHAINS_CONFIG } from '@/config/app.config'
+import { APP_ROUTE, CHAINS_CONFIG, IS_DEV } from '@/config/app.config'
 import toast from 'react-hot-toast'
 import { toastStyle } from '@/config/toasts.config'
 import PoolsTVLSection from './dashboard-sections/PoolsTVLSection'
@@ -18,7 +18,7 @@ import KPIsSection from './dashboard-sections/KPIsSection'
 export default function Dashboard() {
     const { sellToken, sellTokenAmountInput, buyToken, currentChainId, setIsLoadingSomeTrade, selectOrderbookTrade, getAddressPair } = useAppStore()
 
-    const { orderBookRefreshIntervalMs, setApiTokens, setApiPairs, setApiOrderbook, setApiStoreRefreshedAt, getOrderbook } = useApiStore()
+    const { orderBookRefreshIntervalMs, metrics, setApiTokens, setApiPairs, setApiOrderbook, setApiStoreRefreshedAt, getOrderbook } = useApiStore()
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [ApiTokensQuery, ApiPairsQuery, ApiOrderbookQuery] = useQueries({
@@ -199,6 +199,7 @@ export default function Dashboard() {
                 <PoolsTVLSection />
             </div>
             <SwapSection />
+            {IS_DEV && <pre>{JSON.stringify(metrics, null, 2)}</pre>}
         </div>
     )
 }

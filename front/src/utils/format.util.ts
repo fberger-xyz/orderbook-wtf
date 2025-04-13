@@ -197,5 +197,6 @@ export const cleanOutput = (output: string | number, defaultOutput = '-'): strin
     if (strOutput === '0') return defaultOutput
     if (strOutput === '0%') return defaultOutput
     if (strOutput === '0m$') return defaultOutput
+    if (strOutput === 'NaN') return defaultOutput
     return String(output)
 }

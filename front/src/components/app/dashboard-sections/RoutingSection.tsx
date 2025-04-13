@@ -11,6 +11,7 @@ import LinkWrapper from '@/components/common/LinkWrapper'
 import SvgMapper from '@/components/icons/SvgMapper'
 import TokenImage from '../TokenImage'
 import { useApiStore } from '@/stores/api.store'
+import { IS_DEV } from '@/config/app.config'
 
 type PoolLiquidity = {
     base: { amount: number; usd: number }
@@ -35,7 +36,12 @@ type PoolLinkProps = {
 }
 
 const PoolLink = ({ pool, config }: PoolLinkProps) => {
-    if (!pool) return null
+    if (!pool)
+        return (
+            <div className="col-span-3 flex gap-2 items-center group">
+                <pre>{JSON.stringify({ pool, config }, null, 2)}</pre>
+            </div>
+        )
 
     return (
         <LinkWrapper target="_blank" href={`https://etherscan.io/address/${pool.address}`} className="col-span-3 flex gap-2 items-center group">
@@ -43,7 +49,7 @@ const PoolLink = ({ pool, config }: PoolLinkProps) => {
                 <SvgMapper icon={config?.svgId} className="size-3.5" />
             </div>
             <p className="text-milk-600 truncate group-hover:underline">
-                {config?.version ? `${config?.version.toLowerCase()} - ` : ''}
+                {config?.version ? `${config?.version?.toLowerCase()} - ` : ''}
                 {pool.fee} bps - {pool.address.slice(0, 5)}
             </p>
             <IconWrapper icon={IconIds.OPEN_LINK_IN_NEW_TAB} className="size-4 text-milk-200 group-hover:text-milk" />
@@ -198,7 +204,7 @@ export default function RoutingSection() {
                                                         const trade = selectedTrade.trade
                                                         return trade.distribution.map((percent, percentIndex) => {
                                                             const pool = orderbook.pools[percentIndex]
-                                                            const protocolName = pool?.protocol_system ?? 'Unknown'
+                                                            const protocolName = pool?.protocol_system
                                                             const config = mapProtocolIdToProtocolConfig(protocolName)
                                                             return (
                                                                 <div
@@ -287,6 +293,10 @@ export default function RoutingSection() {
                                                         <p className="col-span-1">{formatPercentage(100)}</p>
                                                         <p className="col-span-2"></p>
                                                     </div>
+
+                                                    {/* Debug */}
+                                                    {IS_DEV && <pre>{JSON.stringify(selectedTrade?.pools.length, null, 2)}</pre>}
+                                                    {IS_DEV && <pre>{JSON.stringify(selectedTrade?.pools, null, 2)}</pre>}
                                                 </div>
                                             </div>
                                         </>

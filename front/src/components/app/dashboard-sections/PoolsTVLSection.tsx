@@ -11,6 +11,7 @@ import LinkWrapper from '@/components/common/LinkWrapper'
 import SvgMapper from '@/components/icons/SvgMapper'
 import TokenImage from '../TokenImage'
 import { useApiStore } from '@/stores/api.store'
+import { IS_DEV } from '@/config/app.config'
 
 type PoolLiquidity = {
     base: { amount: number; usd: number }
@@ -276,6 +277,9 @@ export default function PoolsTVLSection() {
                                 </div>
                             </div>
                         </div>
+
+                        {IS_DEV && <pre>{JSON.stringify(orderbook?.pools.length)}</pre>}
+                        {IS_DEV && <pre>{JSON.stringify(orderbook?.pools, null, 2)}</pre>}
                     </div>
                 ) : null
             }

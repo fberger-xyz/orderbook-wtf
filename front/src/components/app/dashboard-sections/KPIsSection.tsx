@@ -3,7 +3,7 @@
 import { IconIds } from '@/enums'
 import numeral from 'numeral'
 import { useAppStore } from '@/stores/app.store'
-import { AppColors, cn, formatAmount } from '@/utils'
+import { AppColors, cleanOutput, cn, formatAmount } from '@/utils'
 import IconWrapper from '@/components/common/IconWrapper'
 import LinkWrapper from '@/components/common/LinkWrapper'
 import TokenImage from '../TokenImage'
@@ -43,7 +43,7 @@ export default function KPIsSection() {
                         <TokenImage size={20} token={buyToken} />
                         {metrics?.highestBid?.average_sell_price && (
                             <p className="text-milk font-semibold text-base">
-                                {numeral(metrics?.highestBid?.average_sell_price).format('0,0.[0000]')}
+                                {cleanOutput(numeral(metrics?.highestBid?.average_sell_price).format('0,0.[0000]'))}
                             </p>
                         )}
                     </div>
@@ -64,7 +64,7 @@ export default function KPIsSection() {
                     >
                         <TokenImage size={20} token={buyToken} />
                         {metrics?.midPrice !== undefined && (
-                            <p className="text-milk font-semibold text-base">{numeral(metrics?.midPrice).format('0,0.[0000]')}</p>
+                            <p className="text-milk font-semibold text-base">{cleanOutput(numeral(metrics?.midPrice).format('0,0.[0000]'))}</p>
                         )}
                     </div>
                 }
@@ -86,7 +86,7 @@ export default function KPIsSection() {
                         <TokenImage size={20} token={buyToken} />
                         {metrics?.lowestAsk?.average_sell_price !== undefined && (
                             <p className="text-milk font-semibold text-base">
-                                {numeral(1 / metrics?.lowestAsk.average_sell_price).format('0,0.[0000]')}
+                                {cleanOutput(numeral(1 / metrics?.lowestAsk.average_sell_price).format('0,0.[0000]'))}
                             </p>
                         )}
                     </div>
@@ -100,7 +100,7 @@ export default function KPIsSection() {
                         <p className="text-milk font-semibold text-base">
                             {numeral(metrics?.spreadPercent).format('0,0.[0000]%')}{' '}
                             <span className="pl-1 text-milk-400 text-xs">
-                                {numeral(metrics.spreadPercent).multiply(10000).format('0,0')} bp
+                                {cleanOutput(numeral(metrics.spreadPercent).multiply(10000).format('0,0'))} bp
                                 {Number(metrics.spreadPercent) * 10000 >= 2 ? 's' : ''}
                             </span>
                         </p>
@@ -142,7 +142,7 @@ export default function KPIsSection() {
                             href={`https://etherscan.io/block/${metrics?.orderbook.block}`}
                             className="flex gap-1 items-center group"
                         >
-                            <p className="text-milk font-semibold text-base">{numeral(metrics?.orderbook.block).format('0,0')}</p>
+                            <p className="text-milk font-semibold text-base">{cleanOutput(numeral(metrics?.orderbook.block).format('0,0'))}</p>
                             <IconWrapper icon={IconIds.OPEN_LINK_IN_NEW_TAB} className="size-4 text-milk-200 group-hover:text-milk" />
                         </LinkWrapper>
                     }
@@ -167,16 +167,20 @@ export default function KPIsSection() {
                                 <div className="rounded-2xl backdrop-blur border border-milk-150 shadow-lg p-3 -mb-1">
                                     <div className="flex gap-1 text-milk text-sm">
                                         <p>
-                                            {numeral(metrics?.totalBaseTvlUsd / (metrics?.totalBaseTvlUsd + metrics?.totalQuoteTvlUsd)).format(
-                                                '0,0.%',
-                                            )}{' '}
+                                            {cleanOutput(
+                                                numeral(metrics?.totalBaseTvlUsd / (metrics?.totalBaseTvlUsd + metrics?.totalQuoteTvlUsd)).format(
+                                                    '0,0.%',
+                                                ),
+                                            )}
                                         </p>
                                         <TokenImage size={20} token={sellToken} />
                                         <p>
                                             {sellToken.symbol} and{' '}
-                                            {numeral(metrics?.totalQuoteTvlUsd / (metrics?.totalBaseTvlUsd + metrics?.totalQuoteTvlUsd)).format(
-                                                '0,0.%',
-                                            )}{' '}
+                                            {cleanOutput(
+                                                numeral(metrics?.totalQuoteTvlUsd / (metrics?.totalBaseTvlUsd + metrics?.totalQuoteTvlUsd)).format(
+                                                    '0,0.%',
+                                                ),
+                                            )}
                                         </p>
                                         <TokenImage size={20} token={buyToken} />
                                         <p>{buyToken.symbol}</p>

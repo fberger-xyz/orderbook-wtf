@@ -42,7 +42,7 @@ export const mapProtocolIdToProtocolConfig = (protocolId: string) => {
         svgId: mapProtocolNameToSvgId(protocolId),
     }
     if (config.id.includes('balancer')) {
-        config.name = 'Balance v2'
+        config.name = 'Balancer v2'
         config.version = 'v2'
     } else if (config.id.includes('ekubo')) {
         config.name = 'Ekubo'
