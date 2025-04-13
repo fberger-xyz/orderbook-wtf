@@ -35,7 +35,7 @@ export const CHAINS_CONFIG = {
         supported: true,
         buyToken: undefined, // todo
         sellToken: undefined, // todo
-        explorerRoot: '`https://etherscan.io',
+        explorerRoot: 'https://etherscan.io',
     },
     [AppSupportedChains.BASE]: {
         id: AppSupportedChains.BASE,
