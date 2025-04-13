@@ -255,11 +255,10 @@ export default function RoutingSection() {
                                                     {/* Totals */}
                                                     <div className="grid grid-cols-11 w-full rounded-xl py-1 px-4 gap-6 items-center text-xs text-milk-200">
                                                         <p className="col-span-3">Total</p>
-                                                        <p className="col-span-1">{cleanOutput(numeral(100).format('0,0.0%'))}</p>
-                                                        <p className="col-span-1">{cleanOutput(numeral(100).format('0,0.0%'))}</p>
+                                                        <p className="col-span-1">{cleanOutput(numeral(1).format('0,0.0%'))}</p>
                                                         <p className="col-span-2">{formatAmount(selectedTrade.amountIn)}</p>
                                                         <p className="col-span-2">{formatAmount(selectedTrade.trade.output)}</p>
-                                                        <p className="col-span-1">{cleanOutput(numeral(100).format('0,0.0%'))}</p>
+                                                        <p className="col-span-1">{cleanOutput(numeral(1).format('0,0.0%'))}</p>
                                                         <p className="col-span-2"></p>
                                                     </div>
 
