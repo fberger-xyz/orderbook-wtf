@@ -13,9 +13,10 @@ import { Tooltip } from '@nextui-org/tooltip'
 import { CountdownCircleTimer } from 'react-countdown-circle-timer'
 import { useEffect, useState } from 'react'
 import { useApiStore } from '@/stores/api.store'
+import { CHAINS_CONFIG } from '@/config/app.config'
 
 export default function KPIsSection() {
-    const { sellToken, buyToken } = useAppStore()
+    const { sellToken, buyToken, currentChainId } = useAppStore()
     const { orderBookRefreshIntervalMs, apiStoreRefreshedAt, metrics } = useApiStore()
     const [timerKey, setTimerKey] = useState(0)
 
@@ -139,7 +140,7 @@ export default function KPIsSection() {
                     content={
                         <LinkWrapper
                             target="_blank"
-                            href={`https://etherscan.io/block/${metrics?.orderbook.block}`}
+                            href={`${CHAINS_CONFIG[currentChainId].explorerRoot}/block/${metrics?.orderbook.block}`}
                             className="flex gap-1 items-center group"
                         >
                             <p className="text-milk font-semibold text-base">{cleanOutput(numeral(metrics?.orderbook.block).format('0,0'))}</p>

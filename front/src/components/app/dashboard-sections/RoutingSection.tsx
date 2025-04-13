@@ -7,10 +7,9 @@ import { AmmPool } from '@/interfaces'
 import { mapProtocolIdToProtocolConfig } from '@/utils'
 import { OrderbookComponentLayout } from './Layouts'
 import IconWrapper from '@/components/common/IconWrapper'
-import LinkWrapper from '@/components/common/LinkWrapper'
-import SvgMapper from '@/components/icons/SvgMapper'
 import TokenImage from '../TokenImage'
 import { useApiStore } from '@/stores/api.store'
+import PoolLink from './LinkToPool'
 
 type PoolLiquidity = {
     base: { amount: number; usd: number }
@@ -27,33 +26,6 @@ type PoolData = {
 type PoolsData = {
     pools: PoolData[]
     totals: PoolLiquidity
-}
-
-type PoolLinkProps = {
-    pool: AmmPool | undefined
-    config?: ReturnType<typeof mapProtocolIdToProtocolConfig>
-}
-
-const PoolLink = ({ pool, config }: PoolLinkProps) => {
-    if (!pool)
-        return (
-            <div className="col-span-3 flex gap-2 items-center group">
-                <pre>{JSON.stringify({ pool, config }, null, 2)}</pre>
-            </div>
-        )
-
-    return (
-        <LinkWrapper target="_blank" href={`https://etherscan.io/address/${pool.address}`} className="col-span-3 flex gap-2 items-center group">
-            <div className="flex justify-center rounded-full p-1 border border-milk-200 bg-milk-200/10">
-                <SvgMapper icon={config?.svgId} className="size-3.5" />
-            </div>
-            <p className="text-milk-600 truncate group-hover:underline">
-                {config?.version ? `${config?.version?.toLowerCase()} - ` : ''}
-                {pool.fee} bps - {pool.address.slice(0, 5)}
-            </p>
-            <IconWrapper icon={IconIds.OPEN_LINK_IN_NEW_TAB} className="size-4 text-milk-200 group-hover:text-milk" />
-        </LinkWrapper>
-    )
 }
 
 const formatAmount = (value: number): string => {
@@ -84,7 +56,7 @@ const calculateLiquidity = (
 }
 
 export default function RoutingSection() {
-    const { showMarketDepthSection, showRoutingSection, showLiquidityBreakdownSection, selectedTrade, showSections } = useAppStore()
+    const { showMarketDepthSection, showRoutingSection, showLiquidityBreakdownSection, selectedTrade, currentChainId, showSections } = useAppStore()
     const { metrics } = useApiStore()
 
     const orderbook = metrics?.orderbook
@@ -210,7 +182,7 @@ export default function RoutingSection() {
                                                                     key={`${percent}-${percentIndex}`}
                                                                     className="grid grid-cols-11 w-full bg-gray-600/10 hover:bg-gray-600/20 rounded-xl py-1.5 px-4 gap-6 items-center text-xs"
                                                                 >
-                                                                    <PoolLink pool={pool} config={config} />
+                                                                    <PoolLink currentChainId={currentChainId} pool={pool} config={config} />
 
                                                                     {/* Input distribution */}
                                                                     <p className="col-span-1 text-milk-600 w-14">

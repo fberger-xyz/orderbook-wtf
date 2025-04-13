@@ -18,4 +18,16 @@ export enum AppUrls {
     RUST_API_LOCALHOST = 'http://localhost:42042/api',
     RUST_API_DOCKER = 'http://stream:42042/api',
     RUST_API_PROD = 'https://tycho.merso.xyz/api',
+
+    // PropellerHeads
+    PROPELLERHEADS_X = 'https://x.com/PropellerSwap',
+    PROPELLERHEADS_TELEGRAM = 'https://t.me/+B4CNQwv7dgIyYTJl',
+
+    // merso
+    MERSO_X = 'https://x.com/0xMerso',
+    MERSO_TELEGRAM = 'https://t.me/xMerso',
+
+    // fberger
+    FBERGER_X = 'https://x.com/fberger_xyz',
+    FBERGER_TELEGRAM = 'https://t.me/fberger_xyz',
 }

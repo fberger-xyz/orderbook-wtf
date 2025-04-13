@@ -3,7 +3,7 @@ import { InterfaceAppLink } from '@/interfaces'
 import { Inter } from 'next/font/google'
 
 export const IS_DEV = process.env.NODE_ENV === 'development'
-export const IS_RUNNING_IN_DOCKER = process.env.NEXT_RUNNING_IN_DOCKER === 'development'
+export const IS_RUNNING_IN_DOCKER = Boolean(process.env.NEXT_PUBLIC_RUNNING_IN_DOCKER)
 export const APP_ROUTE = IS_DEV ? AppUrls.NEXT_API_LOCALHOST : AppUrls.NEXT_API_PROD
 export const APP_METADATA = {
     SITE_NAME: 'Tycho Orderbook',
@@ -33,8 +33,9 @@ export const CHAINS_CONFIG = {
         apiId: 'ethereum',
         oneInchId: 'ethereum',
         supported: true,
-        buyToken: undefined,
-        sellToken: undefined,
+        buyToken: undefined, // todo
+        sellToken: undefined, // todo
+        explorerRoot: '`https://etherscan.io',
     },
     [AppSupportedChains.BASE]: {
         id: AppSupportedChains.BASE,
@@ -42,6 +43,9 @@ export const CHAINS_CONFIG = {
         apiId: 'base',
         oneInchId: 'base',
         supported: true,
+        buyToken: undefined, // todo
+        sellToken: undefined, // todo
+        explorerRoot: 'https://basescan.org',
     },
     [AppSupportedChains.ARBITRUM]: {
         id: AppSupportedChains.ARBITRUM,
@@ -49,5 +53,8 @@ export const CHAINS_CONFIG = {
         apiId: '', // to be added
         oneInchId: 'arbitrum_2',
         supported: false,
+        buyToken: undefined, // todo
+        sellToken: undefined, // todo
+        explorerRoot: '',
     },
 }

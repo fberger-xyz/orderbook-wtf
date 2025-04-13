@@ -9,6 +9,7 @@ dayjs.extend(relativeTime)
 
 import { cn } from '@/utils'
 import LinkWrapper from '../common/LinkWrapper'
+import { AppUrls } from '@/enums'
 
 export default function Footer(props: { className?: string }) {
     const [commitDate, setCommitDate] = useState<null | Date>(null)
@@ -35,15 +36,15 @@ export default function Footer(props: { className?: string }) {
             </div>
             <p className="text-wrap">
                 Made by
-                <LinkWrapper href="https://x.com/PropellerSwap" target="_blank" className="hover:underline hover:text-aquamarine pl-1">
+                <LinkWrapper href={AppUrls.PROPELLERHEADS_X} target="_blank" className="hover:underline hover:text-aquamarine pl-1">
                     PropellerHeads
                 </LinkWrapper>
                 ,
-                <LinkWrapper href="https://x.com/0xMerso" target="_blank" className="hover:underline hover:text-aquamarine px-1">
+                <LinkWrapper href={AppUrls.MERSO_X} target="_blank" className="hover:underline hover:text-aquamarine px-1">
                     @xMerso
                 </LinkWrapper>
                 and
-                <LinkWrapper href="https://x.com/fberger_xyz" target="_blank" className="hover:underline hover:text-aquamarine px-1">
+                <LinkWrapper href={AppUrls.FBERGER_X} target="_blank" className="hover:underline hover:text-aquamarine px-1">
                     @fberger_xyz
                 </LinkWrapper>
             </p>

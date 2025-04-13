@@ -4,7 +4,7 @@ import PageWrapper from '@/components/common/PageWrapper'
 import { useEffect } from 'react'
 import { extractErrorMessage } from '@/utils'
 import IconWrapper from '@/components/common/IconWrapper'
-import { IconIds } from '@/enums'
+import { AppUrls, IconIds } from '@/enums'
 import CenteredContent from '@/components/common/CenteredContent'
 import LinkWrapper from '@/components/common/LinkWrapper'
 
@@ -34,15 +34,19 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
 
                         <p className="text-sm text-milk-600">
                             Or reach out for help on telegram:
-                            <LinkWrapper href="https://t.me/+B4CNQwv7dgIyYTJl" target="_blank" className="hover:underline hover:text-aquamarine pl-1">
+                            <LinkWrapper
+                                href={AppUrls.PROPELLERHEADS_TELEGRAM}
+                                target="_blank"
+                                className="hover:underline hover:text-aquamarine pl-1"
+                            >
                                 PropellerHeads
                             </LinkWrapper>
                             ,
-                            <LinkWrapper href="https://t.me/xMerso" target="_blank" className="hover:underline hover:text-aquamarine px-1">
+                            <LinkWrapper href={AppUrls.MERSO_TELEGRAM} target="_blank" className="hover:underline hover:text-aquamarine px-1">
                                 @xMerso
                             </LinkWrapper>
                             and
-                            <LinkWrapper href="https://t.me/fberger_xyz" target="_blank" className="hover:underline hover:text-aquamarine px-1">
+                            <LinkWrapper href={AppUrls.FBERGER_TELEGRAM} target="_blank" className="hover:underline hover:text-aquamarine px-1">
                                 @fberger_xyz
                             </LinkWrapper>
                         </p>
