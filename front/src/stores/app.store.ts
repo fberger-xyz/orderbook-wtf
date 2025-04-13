@@ -3,7 +3,7 @@ import { persist, createJSONStorage } from 'zustand/middleware'
 import { APP_METADATA, IS_DEV } from '@/config/app.config'
 import { SelectedTrade, Token } from '@/interfaces'
 import { hardcodedTokensList } from '@/data/back-tokens'
-import { OrderbookOption, OrderbookAxisScale } from '@/enums'
+import { OrderbookOption, OrderbookAxisScale, AppSupportedChains } from '@/enums'
 
 export const useAppStore = create<{
     /**
@@ -26,8 +26,8 @@ export const useAppStore = create<{
     showRoutingSection: boolean
     showLiquidityBreakdownSection: boolean
     showSections: (showMarketDepthSection: boolean, showRoutingSection: boolean, showLiquidityBreakdownSection: boolean) => void
-    currentChainName: string
-    setCurrentChain: (currentChainName: string) => void
+    currentChainId: AppSupportedChains
+    setCurrentChain: (currentChainId: AppSupportedChains) => void
 
     /**
      * orderbook
@@ -107,8 +107,16 @@ export const useAppStore = create<{
             showLiquidityBreakdownSection: true,
             showSections: (showMarketDepthSection, showRoutingSection, showLiquidityBreakdownSection) =>
                 set(() => ({ showMarketDepthSection, showRoutingSection, showLiquidityBreakdownSection })),
-            currentChainName: 'ethereum',
-            setCurrentChain: (currentChainName) => set(() => ({ currentChainName })),
+            currentChainId: AppSupportedChains.ETHEREUM,
+            setCurrentChain: (currentChainId) =>
+                set(() => ({
+                    currentChainId,
+                    sellToken: hardcodedTokensList[currentChainId][1],
+                    buyToken: hardcodedTokensList[currentChainId][0],
+                    sellTokenAmountInput: 0,
+                    sellTokenAmountInputRaw: 0,
+                    buyTokenAmountInput: 0,
+                })),
 
             /**
              * orderbook
@@ -130,17 +138,15 @@ export const useAppStore = create<{
 
             // inputs
 
-            sellToken: hardcodedTokensList[1], // todo put this as null
+            sellToken: hardcodedTokensList[AppSupportedChains.ETHEREUM][1], // todo put this as null
             selectSellToken: (sellToken) =>
                 set((state) => {
                     console.log(`selectsellToken: ${sellToken.symbol} (prev=${state.sellToken.symbol})`)
-                    // reset from
-                    // return { sellToken }
                     return { sellToken, sellTokenAmountInput: 1, sellTokenAmountInputRaw: 1 }
                 }),
             sellTokenAmountInput: 0,
             sellTokenAmountInputRaw: 0,
-            buyToken: hardcodedTokensList[0], // todo put this as null
+            buyToken: hardcodedTokensList[AppSupportedChains.ETHEREUM][0], // todo put this as null
             selectBuyToken: (buyToken) =>
                 set((state) => {
                     console.log(`selectBuyToken: ${buyToken.symbol} (prev=${state.buyToken.symbol})`)
@@ -198,32 +204,7 @@ export const useAppStore = create<{
             storage: createJSONStorage(() => sessionStorage),
             skipHydration: false,
             onRehydrateStorage: () => (state) => {
-                if (state && !state.hasHydrated) {
-                    state.setHasHydrated(true)
-
-                    // console.log({ state })
-                    // reset
-                    // state?.selectOrderbookTrade(undefined)
-                    // state?.setSellTokenAmountInput(0)
-                    // state?.setSellTokenAmountInputRaw(state?.sellTokenAmountInput)
-                    // state?.setBuyTokenAmountInput(0)
-
-                    // pre select default tokens if need be
-                    // if (!state.buyToken)
-                    //     state.selectBuyToken({
-                    //         address: '0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48',
-                    //         decimals: 6,
-                    //         symbol: 'USDC',
-                    //         gas: '40652',
-                    //     })
-                    // if (!state.sellToken)
-                    //     state.selectSellToken({
-                    //         address: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
-                    //         decimals: 18,
-                    //         symbol: 'WETH',
-                    //         gas: '29962',
-                    //     })
-                }
+                if (state && !state.hasHydrated) state.setHasHydrated(true)
             },
         },
     ),

@@ -482,6 +482,7 @@ const getOptions = (
 
 export default function DepthChart() {
     const {
+        currentChainId,
         buyToken,
         sellToken,
         storeRefreshedAt,
@@ -577,7 +578,7 @@ export default function DepthChart() {
         } else {
             setOptions(null)
         }
-    }, [apiStoreRefreshedAt, yAxisType, yAxisLogBase, coloredAreas, symbolsInYAxis, selectedTrade])
+    }, [currentChainId, apiStoreRefreshedAt, yAxisType, yAxisLogBase, coloredAreas, symbolsInYAxis, selectedTrade])
 
     const handlePointClick = (params: undefined | { data: EchartOnClickParamsData; dataIndex: number }) => {
         const debug = false

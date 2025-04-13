@@ -1,12 +1,12 @@
 'use client'
 
-import { OrderbookSide } from '@/enums'
+import { AppSupportedChains, OrderbookSide } from '@/enums'
 import { useAppStore } from '@/stores/app.store'
 import { AmmAsOrderbook, RustApiPair, StructuredOutput, Token } from '@/interfaces'
 import { extractErrorMessage } from '@/utils'
 import { useQueries } from '@tanstack/react-query'
 import { useApiStore } from '@/stores/api.store'
-import { APP_ROUTE } from '@/config/app.config'
+import { APP_ROUTE, CHAINS_CONFIG } from '@/config/app.config'
 import toast from 'react-hot-toast'
 import { toastStyle } from '@/config/toasts.config'
 import PoolsTVLSection from './dashboard-sections/PoolsTVLSection'
@@ -16,7 +16,7 @@ import SwapSection from './dashboard-sections/SwapSection'
 import KPIsSection from './dashboard-sections/KPIsSection'
 
 export default function Dashboard() {
-    const { sellToken, sellTokenAmountInput, buyToken, currentChainName, setIsLoadingSomeTrade, selectOrderbookTrade, getAddressPair } = useAppStore()
+    const { sellToken, sellTokenAmountInput, buyToken, currentChainId, setIsLoadingSomeTrade, selectOrderbookTrade, getAddressPair } = useAppStore()
 
     const { orderBookRefreshIntervalMs, setApiTokens, setApiPairs, setApiOrderbook, setApiStoreRefreshedAt, getOrderbook } = useApiStore()
 
@@ -24,46 +24,61 @@ export default function Dashboard() {
     const [ApiTokensQuery, ApiPairsQuery, ApiOrderbookQuery] = useQueries({
         queries: [
             {
-                queryKey: ['ApiTokensQuery', currentChainName],
+                queryKey: ['ApiTokensQuery', currentChainId],
                 enabled: true,
                 queryFn: async () => {
-                    const tokensEndpoint = `${APP_ROUTE}/api/local/tokens?chain=${currentChainName}`
-                    const tokensResponse = await fetch(tokensEndpoint, {
+                    // mainnet
+                    const mainnetTokensEndpoint = `${APP_ROUTE}/api/local/tokens?chain=${CHAINS_CONFIG[AppSupportedChains.ETHEREUM].apiId}`
+                    const mainnetTokensResponse = await fetch(mainnetTokensEndpoint, {
                         method: 'GET',
                         headers: { 'Content-Type': 'application/json' },
                     })
-                    const tokensResponseJson = (await tokensResponse.json()) as StructuredOutput<Token[]>
-                    setApiTokens(tokensResponseJson.data ?? [])
-                    return tokensResponseJson.data
+                    const mainnetTokensResponseJson = (await mainnetTokensResponse.json()) as StructuredOutput<Token[]>
+                    setApiTokens(AppSupportedChains.ETHEREUM, mainnetTokensResponseJson.data ?? [])
+
+                    // base
+                    const baseTokensEndpoint = `${APP_ROUTE}/api/local/tokens?chain=${CHAINS_CONFIG[AppSupportedChains.BASE].apiId}`
+                    const baseTokensResponse = await fetch(baseTokensEndpoint, { method: 'GET', headers: { 'Content-Type': 'application/json' } })
+                    const baseTokensResponseJson = (await baseTokensResponse.json()) as StructuredOutput<RustApiPair[]>
+                    setApiTokens(AppSupportedChains.BASE, mainnetTokensResponseJson.data ?? [])
+
+                    // all
+                    return [mainnetTokensResponseJson.data, baseTokensResponseJson.data]
                 },
                 refetchOnWindowFocus: false,
                 refetchInterval: 1000 * 60 * 5,
             },
             {
-                queryKey: ['ApiPairsQuery', currentChainName],
+                queryKey: ['ApiPairsQuery'],
                 enabled: true,
                 queryFn: async () => {
-                    const pairsEndpoint = `${APP_ROUTE}/api/local/pairs?chain=${currentChainName}`
-                    const pairsResponse = await fetch(pairsEndpoint, {
-                        method: 'GET',
-                        headers: { 'Content-Type': 'application/json' },
-                    })
-                    const pairsResponseJson = (await pairsResponse.json()) as StructuredOutput<RustApiPair[]>
-                    setApiPairs(pairsResponseJson.data ?? [])
-                    return pairsResponseJson.data
+                    // mainnet
+                    const mainnetPairsEndpoint = `${APP_ROUTE}/api/local/pairs?chain=${CHAINS_CONFIG[AppSupportedChains.ETHEREUM].apiId}`
+                    const mainnetPairsResponse = await fetch(mainnetPairsEndpoint, { method: 'GET', headers: { 'Content-Type': 'application/json' } })
+                    const mainnetPairsResponseJson = (await mainnetPairsResponse.json()) as StructuredOutput<RustApiPair[]>
+                    setApiPairs(AppSupportedChains.ETHEREUM, mainnetPairsResponseJson.data ?? [])
+
+                    // base
+                    const basePairsEndpoint = `${APP_ROUTE}/api/local/pairs?chain=${CHAINS_CONFIG[AppSupportedChains.BASE].apiId}`
+                    const basePairsResponse = await fetch(basePairsEndpoint, { method: 'GET', headers: { 'Content-Type': 'application/json' } })
+                    const basePairsResponseJson = (await basePairsResponse.json()) as StructuredOutput<RustApiPair[]>
+                    setApiPairs(AppSupportedChains.BASE, basePairsResponseJson.data ?? [])
+
+                    // all
+                    return [mainnetPairsResponseJson.data, basePairsResponseJson.data]
                 },
                 refetchOnWindowFocus: false,
                 refetchInterval: 1000 * 60 * 5,
             },
             {
-                queryKey: ['ApiOrderbookQuery', currentChainName, sellToken.address, buyToken.address],
+                queryKey: ['ApiOrderbookQuery', currentChainId, sellToken.address, buyToken.address],
                 enabled: true,
                 queryFn: async () => {
                     // -
                     const debug = false
 
                     // fetch all orderbook
-                    const url = `${APP_ROUTE}/api/local/orderbook?chain=${currentChainName}&token0=${sellToken.address}&token1=${buyToken.address}`
+                    const url = `${APP_ROUTE}/api/local/orderbook?chain=${CHAINS_CONFIG[currentChainId].apiId}&token0=${sellToken.address}&token1=${buyToken.address}`
                     const orderbookResponse = await fetch(url, {
                         method: 'GET',
                         headers: { 'Content-Type': 'application/json' },
@@ -92,7 +107,7 @@ export default function Dashboard() {
                         const mustRefreshSelectingTradeToo = sellTokenAmountInput !== undefined && sellTokenAmountInput > 0
                         if (debug) console.log(`ApiOrderbookQuery: mustRefreshSelectingTradeToo =`, mustRefreshSelectingTradeToo)
                         if (mustRefreshSelectingTradeToo) await simulateTradeAndMergeOrderbook(sellTokenAmountInput)
-                        toast.success(`${sellToken.symbol}-${buyToken.symbol} orderbook data updated just now`, { style: toastStyle })
+                        toast.success(`${sellToken.symbol}-${buyToken.symbol} orderbook updated just now`, { style: toastStyle })
                         setApiStoreRefreshedAt(Date.now())
                     }
 
@@ -118,7 +133,7 @@ export default function Dashboard() {
             // toast(`Refreshing selected trade ...`, { style: toastStyle })
 
             // fetch trade data
-            const url = `${APP_ROUTE}/api/local/orderbook?chain=${currentChainName}&token0=${sellToken.address}&token1=${buyToken.address}&pointAmount=${amountIn}&pointToken=${sellToken.address}`
+            const url = `${APP_ROUTE}/api/local/orderbook?chain=${currentChainId}&token0=${sellToken.address}&token1=${buyToken.address}&pointAmount=${amountIn}&pointToken=${sellToken.address}`
             const tradeResponse = await fetch(url, {
                 method: 'GET',
                 headers: { 'Content-Type': 'application/json' },

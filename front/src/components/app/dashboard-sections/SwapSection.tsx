@@ -1,6 +1,6 @@
 'use client'
 
-import { IconIds, OrderbookSide } from '@/enums'
+import { AppSupportedChains, IconIds, OrderbookSide } from '@/enums'
 import numeral from 'numeral'
 import { useAppStore } from '@/stores/app.store'
 import { ChangeEvent, useEffect, useState, useRef } from 'react'
@@ -13,7 +13,7 @@ import { useModal } from 'connectkit'
 import { useAccount } from 'wagmi'
 import { cn, extractErrorMessage, fetchBalance, formatAmount, getBaseValueInUsd, getQuoteValueInUsd, safeNumeral } from '@/utils'
 import { useApiStore } from '@/stores/api.store'
-import { APP_ROUTE } from '@/config/app.config'
+import { APP_ROUTE, CHAINS_CONFIG } from '@/config/app.config'
 import toast from 'react-hot-toast'
 import { toastStyle } from '@/config/toasts.config'
 
@@ -114,7 +114,7 @@ export default function SwapSection() {
         setShowSelectTokenModal,
         setSelectTokenModalFor,
         getAddressPair,
-        currentChainName,
+        currentChainId,
     } = useAppStore()
 
     const { metrics, setApiOrderbook, getOrderbook } = useApiStore()
@@ -149,7 +149,7 @@ export default function SwapSection() {
             if (!orderbook) return
 
             // fetch data
-            const url = `${APP_ROUTE}/api/local/orderbook?chain=${currentChainName}&token0=${sellToken.address}&token1=${buyToken.address}&pointAmount=${amountIn}&pointToken=${sellToken.address}`
+            const url = `${APP_ROUTE}/api/local/orderbook?chain=${currentChainId}&token0=${sellToken.address}&token1=${buyToken.address}&pointAmount=${amountIn}&pointToken=${sellToken.address}`
             const tradeResponse = await fetch(url, { method: 'GET', headers: { 'Content-Type': 'application/json' } })
             const tradeResponseJson = (await tradeResponse.json()) as StructuredOutput<AmmAsOrderbook>
             if (!tradeResponseJson.data || !orderbook) return
@@ -400,7 +400,7 @@ export default function SwapSection() {
                             className="flex gap-1.5 items-center hover:bg-milk-100/5 px-2 py-1 rounded-xl"
                         >
                             <IconWrapper icon={IconIds.GAS} className="size-4 text-milk-600" />
-                            <ChainImage networkName="ethereum" className="size-4" />
+                            <ChainImage oneInchId={CHAINS_CONFIG[AppSupportedChains.ETHEREUM].oneInchId} className="size-4" />
                             <p className="text-milk-600">
                                 ${' '}
                                 {metrics.highestBid?.gas_costs_usd

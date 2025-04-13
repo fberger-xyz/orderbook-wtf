@@ -1,19 +1,18 @@
-import { AppPagePaths } from '@/enums'
+import { AppUrls, AppPagePaths, AppSupportedChains } from '@/enums'
 import { InterfaceAppLink } from '@/interfaces'
 import { Inter } from 'next/font/google'
 
 export const IS_DEV = process.env.NODE_ENV === 'development'
-export const APP_ROUTE = IS_DEV ? 'http://localhost:3000' : 'https://www.orderbook.wtf'
+export const APP_ROUTE = IS_DEV ? AppUrls.NEXT_API_LOCALHOST : AppUrls.NEXT_API_PROD
 export const APP_METADATA = {
     SITE_NAME: 'Tycho Orderbook',
-    SITE_DOMAIN: 'https://orderbook.wtf',
+    SITE_DOMAIN: AppUrls.NEXT_API_PROD_SHORTER,
     SITE_DESCRIPTION:
         'On-chain liquidity in a familiar limit orderbook interface to read (ticks and depth per tick) and write (execute, confirmation) to',
-    SITE_URL: 'https://orderbook.wtf',
+    SITE_URL: AppUrls.NEXT_API_PROD_SHORTER,
 }
-
-export const PUBLIC_STREAM_API_URL = IS_DEV ? 'http://localhost:42042/api' : String(process.env.NEXT_PUBLIC_STREAM_API_URL)
-export const DEBUG = false
+// export const PUBLIC_STREAM_API_URL = IS_DEV ? AppUrls.RUST_API_LOCALHOST : String(process.env.NEXT_PUBLIC_STREAM_API_URL)
+export const PUBLIC_STREAM_API_URL = IS_DEV ? AppUrls.RUST_API_LOCALHOST : AppUrls.RUST_API_PROD
 export const DATE_FORMAT = 'ddd. D MMM. YYYY'
 export const TIME_FORMAT = 'hh:mm A'
 export const APP_PAGES: InterfaceAppLink[] = [
@@ -26,5 +25,29 @@ export const APP_PAGES: InterfaceAppLink[] = [
         sublinks: [],
     },
 ]
-
 export const APP_FONT = Inter({ weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900'], subsets: ['latin'] })
+export const CHAINS_CONFIG = {
+    [AppSupportedChains.ETHEREUM]: {
+        id: AppSupportedChains.ETHEREUM,
+        name: 'Ethereum',
+        apiId: 'ethereum',
+        oneInchId: 'ethereum',
+        supported: true,
+        buyToken: undefined,
+        sellToken: undefined,
+    },
+    [AppSupportedChains.BASE]: {
+        id: AppSupportedChains.BASE,
+        name: 'Base',
+        apiId: 'base',
+        oneInchId: 'base',
+        supported: true,
+    },
+    [AppSupportedChains.ARBITRUM]: {
+        id: AppSupportedChains.ARBITRUM,
+        name: 'Arbitrum',
+        apiId: '', // to be added
+        oneInchId: 'arbitrum_2',
+        supported: false,
+    },
+}

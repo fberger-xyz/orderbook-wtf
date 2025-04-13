@@ -14,6 +14,7 @@ import { hardcodedTokensList } from '@/data/back-tokens'
 import { useAccount } from 'wagmi'
 import { useApiStore } from '@/stores/api.store'
 import { Tooltip } from '@nextui-org/tooltip'
+import { Token } from '@/interfaces'
 
 export default function SelectTokenModal() {
     const {
@@ -22,6 +23,7 @@ export default function SelectTokenModal() {
         showSelectTokenModal,
         selectTokenModalFor,
         selectTokenModalSearch,
+        currentChainId,
         selectSellToken,
         selectBuyToken,
         setShowSelectTokenModal,
@@ -43,12 +45,19 @@ export default function SelectTokenModal() {
         setShowSelectTokenModal(false)
         setSelectTokenModalSearch('')
     })
-    const existingPairs = apiPairs.filter((pair) =>
+
+    // -
+    const existingPairs = apiPairs[currentChainId]?.filter((pair) =>
         [pair.addrbase, pair.addrquote].includes((selectTokenModalFor === 'buy' ? sellToken : buyToken).address),
     )
-    const tokensList = apiTokens.length
-        ? apiTokens.filter((token) => existingPairs.some((pair) => [pair.addrbase, pair.addrquote].includes(token.address)))
-        : hardcodedTokensList // prevent edge cases for now
+
+    // -
+    let tokensList: Token[] = []
+    if (existingPairs)
+        tokensList = apiTokens[currentChainId].length
+            ? apiTokens[currentChainId].filter((token) => existingPairs.some((pair) => [pair.addrbase, pair.addrquote].includes(token.address)))
+            : hardcodedTokensList[currentChainId] // prevent edge cases for now
+
     if (!showSelectTokenModal) return null
     return (
         <Backdrop>
