@@ -5,6 +5,7 @@ export enum AppPagePaths {
 export enum AppSupportedChains {
     ETHEREUM = 'ethereum',
     BASE = 'base',
+    UNICHAIN = 'unichain',
     ARBITRUM = 'arbitrum',
 }
 

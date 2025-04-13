@@ -21,11 +21,13 @@ export const useApiStore = create<{
     apiTokens: {
         [AppSupportedChains.ETHEREUM]: [],
         [AppSupportedChains.BASE]: [],
+        [AppSupportedChains.UNICHAIN]: [],
         [AppSupportedChains.ARBITRUM]: [],
     },
     apiPairs: {
         [AppSupportedChains.ETHEREUM]: [],
         [AppSupportedChains.BASE]: [],
+        [AppSupportedChains.UNICHAIN]: [],
         [AppSupportedChains.ARBITRUM]: [],
     },
     apiOrderbooks: {},

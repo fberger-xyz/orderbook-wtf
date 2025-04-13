@@ -137,7 +137,7 @@ export default function PoolsTVLSection() {
                                     </div>
                                     <div className="grid grid-cols-3 w-full pr-2">
                                         <p className="col-span-1 text-right">Balance</p>
-                                        <p className="col-span-1 text-right">m$</p>
+                                        <p className="col-span-1 text-right">k$</p>
                                         <p className="col-span-1 text-right">Total %</p>
                                     </div>
                                 </div>
@@ -150,7 +150,7 @@ export default function PoolsTVLSection() {
                                     </div>
                                     <div className="grid grid-cols-3 w-full pr-2">
                                         <p className="col-span-1 text-right">Balance</p>
-                                        <p className="col-span-1 text-right">m$</p>
+                                        <p className="col-span-1 text-right">k$</p>
                                         <p className="col-span-1 text-right">Total %</p>
                                     </div>
                                 </div>
@@ -164,7 +164,7 @@ export default function PoolsTVLSection() {
                                         <p className="font-semibold text-milk">Pool TVL</p>
                                     </div>
                                     <div className="grid grid-cols-2 w-full pr-2">
-                                        <p className="col-span-1 text-right">m$</p>
+                                        <p className="col-span-1 text-right">k$</p>
                                         <p className="col-span-1 text-right">Total %</p>
                                     </div>
                                 </div>
@@ -186,26 +186,26 @@ export default function PoolsTVLSection() {
                                         {/* Base token */}
                                         <div className="col-span-3 grid grid-cols-3 w-full">
                                             <p className="col-span-1 text-milk-600 text-right">
-                                                {cleanOutput(numeral(pool.liquidity.base.amount).format('0,0a'))}
+                                                {cleanOutput(numeral(pool.liquidity.base.amount).format('0,0'))}
                                             </p>
                                             <p className="col-span-1 text-milk-600 text-right">
-                                                {cleanOutput(`${numeral(pool.liquidity.base.usd).divide(1000000).format('0,0')} m$`)}
+                                                {cleanOutput(`${numeral(pool.liquidity.base.usd).divide(1000).format('0,0')} k$`)}
                                             </p>
                                             <p className="col-span-1 text-milk-600 text-right">
-                                                {cleanOutput(numeral(pool.liquidity.base.amount).divide(totals.base.amount).format('0,0%'))}
+                                                {cleanOutput(numeral(pool.liquidity.base.amount).divide(totals.base.amount).format('0,0.0%'))}
                                             </p>
                                         </div>
 
                                         {/* Quote token */}
                                         <div className="col-span-3 grid grid-cols-3 w-full">
                                             <p className="col-span-1 text-milk-600 text-right">
-                                                {cleanOutput(numeral(pool.liquidity.quote.amount).format('0,0a'))}
+                                                {cleanOutput(numeral(pool.liquidity.quote.amount).format('0,0'))}
                                             </p>
                                             <p className="col-span-1 text-milk-600 text-right">
-                                                {cleanOutput(`${numeral(pool.liquidity.quote.usd).divide(1000000).format('0,0')} m$`)}
+                                                {cleanOutput(`${numeral(pool.liquidity.quote.usd).divide(1000).format('0,0')} k$`)}
                                             </p>
                                             <p className="col-span-1 text-milk-600 text-right">
-                                                {cleanOutput(numeral(pool.liquidity.quote.amount).divide(totals.quote.amount).format('0,0%'))}
+                                                {cleanOutput(numeral(pool.liquidity.quote.amount).divide(totals.quote.amount).format('0,0.0%'))}
                                             </p>
                                         </div>
 
@@ -213,14 +213,14 @@ export default function PoolsTVLSection() {
                                         <div className="col-span-2 grid grid-cols-2 w-full">
                                             <p className="col-span-1 text-milk-600 text-right">
                                                 {cleanOutput(
-                                                    `${numeral(pool.liquidity.base.usd).add(pool.liquidity.quote.usd).divide(1000000).format('0,0')} m$`,
+                                                    `${numeral(pool.liquidity.base.usd).add(pool.liquidity.quote.usd).divide(1000).format('0,0')} k$`,
                                                 )}
                                             </p>
                                             <p className="col-span-1 text-milk-600 text-right">
                                                 {cleanOutput(
                                                     numeral(pool.liquidity.base.usd + pool.liquidity.quote.usd)
                                                         .divide(totals.base.usd + totals.quote.usd)
-                                                        .format('0,0%'),
+                                                        .format('0,0.0%'),
                                                 )}
                                             </p>
                                         </div>
@@ -234,14 +234,14 @@ export default function PoolsTVLSection() {
                                 {/* Base token */}
                                 <div className="col-span-3 grid grid-cols-3 w-full">
                                     <p className="col-span-1 text-right">{cleanOutput(numeral(totals.base.amount).divide(1000).format('0,0'))} k</p>
-                                    <p className="col-span-1 text-right">{cleanOutput(numeral(totals.base.usd).divide(1000000).format('0,0'))} m$</p>
+                                    <p className="col-span-1 text-right">{cleanOutput(numeral(totals.base.usd).divide(1000).format('0,0'))} k$</p>
                                     <p className="col-span-1 text-right">100%</p>
                                 </div>
 
                                 {/* Quote token */}
                                 <div className="col-span-3 grid grid-cols-3 w-full">
                                     <p className="col-span-1 text-right">{cleanOutput(numeral(totals.quote.amount).divide(1000).format('0,0'))} k</p>
-                                    <p className="col-span-1 text-right">{cleanOutput(numeral(totals.quote.usd).divide(1000000).format('0,0'))} m$</p>
+                                    <p className="col-span-1 text-right">{cleanOutput(numeral(totals.quote.usd).divide(1000).format('0,0'))} k$</p>
                                     <p className="col-span-1 text-right">100%</p>
                                 </div>
 
@@ -250,10 +250,10 @@ export default function PoolsTVLSection() {
                                     <p className="col-span-1 text-right">
                                         {cleanOutput(
                                             numeral(totals.base.usd + totals.quote.usd)
-                                                .divide(1000000)
+                                                .divide(1000)
                                                 .format('0,0'),
                                         )}{' '}
-                                        m$
+                                        k$
                                     </p>
                                     <p className="col-span-1 text-right">100%</p>
                                 </div>

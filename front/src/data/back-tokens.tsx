@@ -30,5 +30,6 @@ export const hardcodedTokensList: Record<AppSupportedChains, Token[]> = {
             gas: '29701',
         },
     ],
+    [AppSupportedChains.UNICHAIN]: [],
     [AppSupportedChains.ARBITRUM]: [],
 }

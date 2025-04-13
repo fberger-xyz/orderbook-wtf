@@ -47,6 +47,16 @@ export const CHAINS_CONFIG = {
         sellToken: undefined, // todo
         explorerRoot: 'https://basescan.org',
     },
+    [AppSupportedChains.UNICHAIN]: {
+        id: AppSupportedChains.UNICHAIN,
+        name: 'Unichain',
+        apiId: '', // to be added
+        oneInchId: 'Unichain',
+        supported: false,
+        buyToken: undefined, // todo
+        sellToken: undefined, // todo
+        explorerRoot: '',
+    },
     [AppSupportedChains.ARBITRUM]: {
         id: AppSupportedChains.ARBITRUM,
         name: 'Arbitrum',
