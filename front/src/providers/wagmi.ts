@@ -1,7 +1,8 @@
 import { APP_METADATA, APP_ROUTE } from '@/config/app.config'
 import { getDefaultConfig } from 'connectkit'
 import { createConfig, http } from 'wagmi'
-import { arbitrum, gnosis, mainnet } from 'wagmi/chains'
+// import { base, unichain, mainnet } from 'wagmi/chains'
+import { base, mainnet } from 'wagmi/chains'
 import { safe } from 'wagmi/connectors'
 
 export const projectId = process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID ?? ''
@@ -10,12 +11,13 @@ if (!projectId) throw new Error('WALLET_CONNECT_PROJECT_ID is not defined')
 const configParams = getDefaultConfig({
     walletConnectProjectId: projectId,
     appUrl: APP_ROUTE,
-    chains: [mainnet, arbitrum, gnosis],
+    chains: [mainnet, base],
     connectors: [safe({ allowedDomains: [/app.safe.global$/], debug: true })],
     transports: {
         [mainnet.id]: http(`https://eth.llamarpc.com`),
-        [arbitrum.id]: http(), // default is fine for these
-        [gnosis.id]: http(),
+        [base.id]: http(`https://base.llamarpc.com`),
+        // [unichain.id]: http(`https://unichain.drpc.org`), // supported here https://github.com/wevm/viem/blob/main/src/chains/index.ts but not here https://wagmi.sh/core/api/chains
+        // [arbitrum.id]: http(), // default is fine
     },
     appName: APP_METADATA.SITE_NAME,
     ssr: true,
