@@ -500,14 +500,13 @@ export default function DepthChart() {
         selectedTrade,
         selectOrderbookTrade,
         getAddressPair,
-        // viewMode,
-        // setViewMode,
     } = useAppStore()
     const { apiStoreRefreshedAt, metrics, getOrderbook } = useApiStore()
     const [options, setOptions] = useState<null | echarts.EChartsOption>(null)
 
     useEffect(() => {
-        const debug = true
+        // debug
+        const debug = false
 
         // get possibly undefined orderbook
         const orderbook = getOrderbook(getAddressPair())

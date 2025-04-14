@@ -19,24 +19,14 @@ import { toastStyle } from '@/config/toasts.config'
 
 const rawAmountFormat = '0,0.[00000000000]'
 
-type TokenBalanceProps = {
-    balance: number
-    isConnected: boolean
-}
-
-const TokenBalance = ({ balance, isConnected }: TokenBalanceProps) => (
+const TokenBalance = ({ balance, isConnected }: { balance: number; isConnected: boolean }) => (
     <div className="flex justify-between gap-1 items-center">
         <IconWrapper icon={IconIds.WALLET} className="size-4 text-milk-400" />
         <p className="text-milk-400 text-xs">{isConnected && balance >= 0 ? formatAmount(balance) : 0}</p>
     </div>
 )
 
-type TokenSelectorProps = {
-    token: Token | undefined
-    onClick: () => void
-}
-
-const TokenSelector = ({ token, onClick }: TokenSelectorProps) => (
+const TokenSelector = ({ token, onClick }: { token: Token | undefined; onClick: () => void }) => (
     <button
         onClick={onClick}
         className="flex rounded-full bg-gray-600/30 transition-colors duration-300 hover:bg-gray-600/50 items-center gap-1.5 pl-1.5 pr-2 py-1.5 min-w-fit"
@@ -51,13 +41,15 @@ const TokenSelector = ({ token, onClick }: TokenSelectorProps) => (
     </button>
 )
 
-type TradeDetailsProps = {
+const TradeDetails = ({
+    isLoading,
+    selectedTrade,
+    sellToken,
+}: {
     isLoading: boolean
     selectedTrade: SelectedTrade | null
     sellToken: Token | undefined
-}
-
-const TradeDetails = ({ isLoading, selectedTrade, sellToken }: TradeDetailsProps) => (
+}) => (
     <div className="flex flex-col gap-2 text-xs px-2">
         <div className="flex justify-between w-full text-milk-400">
             <p>Expected output</p>
@@ -247,9 +239,9 @@ export default function SwapSection() {
                     <div className="flex justify-between">
                         <p className="text-milk-600 text-xs">Sell</p>
                         <div className="flex items-center">
-                            {account.isConnected && sellTokenBalance && sellTokenAmountInput && sellTokenBalance < sellTokenAmountInput && (
-                                <p className="text-folly font-semibold text-xs pr-2">Exceeds Balance</p>
-                            )}
+                            {account.isConnected && sellTokenBalance >= 0 && sellTokenAmountInput && sellTokenBalance < sellTokenAmountInput ? (
+                                <p className="text-folly text-xs pr-2">Exceeds Balance</p>
+                            ) : null}
                             {/* {viewMode === OrderbookSide.BID ? ( */}
                             <p className="text-aquamarine text-xs">Best bid</p>
                             {/* ) : viewMode === OrderbookSide.ASK ? (

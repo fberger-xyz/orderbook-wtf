@@ -1,6 +1,7 @@
 import { AppUrls, AppPagePaths, AppSupportedChains, SvgIds } from '@/enums'
 import { InterfaceAppLink } from '@/interfaces'
 import { Inter } from 'next/font/google'
+import { mainnet, base } from 'wagmi/chains'
 
 export const IS_DEV = process.env.NODE_ENV === 'development'
 export const IS_RUNNING_IN_DOCKER = Boolean(process.env.NEXT_PUBLIC_RUNNING_IN_DOCKER)
@@ -35,9 +36,8 @@ export const CHAINS_CONFIG = {
         apiId: 'ethereum',
         oneInchId: 'ethereum',
         supported: true,
-        defaultSellToken: undefined, // todo
-        defaultBuyToken: undefined, // todo
         explorerRoot: 'https://etherscan.io',
+        wagmi: mainnet,
     },
     [AppSupportedChains.BASE]: {
         id: AppSupportedChains.BASE,
@@ -46,9 +46,8 @@ export const CHAINS_CONFIG = {
         apiId: 'base',
         oneInchId: 'base',
         supported: true,
-        defaultSellToken: undefined, // todo
-        defaultBuyToken: undefined, // todo
         explorerRoot: 'https://basescan.org',
+        wagmi: base,
     },
     [AppSupportedChains.UNICHAIN]: {
         id: AppSupportedChains.UNICHAIN,
@@ -56,10 +55,9 @@ export const CHAINS_CONFIG = {
         name: 'Unichain',
         apiId: 'unichain', // to be confirmed
         oneInchId: 'Unichain',
-        supported: true,
-        defaultSellToken: undefined, // todo
-        defaultBuyToken: undefined, // todo
+        supported: false,
         explorerRoot: 'https://unichain.blockscout.com',
+        wagmi: undefined,
     },
     [AppSupportedChains.ARBITRUM]: {
         id: AppSupportedChains.ARBITRUM,
@@ -68,8 +66,7 @@ export const CHAINS_CONFIG = {
         apiId: '', // to be added
         oneInchId: 'arbitrum_2',
         supported: false,
-        defaultSellToken: undefined, // todo
-        defaultBuyToken: undefined, // todo
         explorerRoot: '',
+        wagmi: undefined,
     },
 }

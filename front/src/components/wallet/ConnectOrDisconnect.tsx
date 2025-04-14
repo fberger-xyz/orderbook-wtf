@@ -13,6 +13,7 @@ import numeral from 'numeral'
 export function ConnectOrDisconnect() {
     const [gasTokenBalance, setGasTokenBalance] = useState(-1)
     const [isClient, setIsClient] = useState(false)
+    const [isFetchingGasBalance, setIsFetchingGasBalance] = useState(false)
     useEffect(() => {
         setIsClient(true)
     }, [])
@@ -24,7 +25,15 @@ export function ConnectOrDisconnect() {
     useEffect(() => {
         if (account.status === 'connected' && account.address) {
             toast.success(`Connected wallet ${shortenAddress(account.address)}`, { style: toastStyle })
-            fetchBalance(account.address, account.chainId).then((balance) => setGasTokenBalance(balance ? balance : -1))
+            try {
+                setIsFetchingGasBalance(true)
+                fetchBalance(account.address, account.chainId).then((balance) => {
+                    setGasTokenBalance(typeof balance === 'number' ? balance : -1)
+                    setIsFetchingGasBalance(false)
+                })
+            } catch (error) {
+                setIsFetchingGasBalance(false)
+            }
         }
     }, [account.address, account.chainId, account.status])
 
@@ -40,8 +49,8 @@ export function ConnectOrDisconnect() {
     return account.isConnected ? (
         <div className="flex items-center gap-2 bg-milk-100/5 rounded-xl h-10 pl-2.5 pr-1 text-milk">
             <IconWrapper icon={IconIds.WALLET} className="size-5 text-milk-600" />
-            {gasTokenBalance > 0 ? (
-                <p className="text-sm">{numeral(gasTokenBalance).format('0,0.[0000]')} ETH</p>
+            {!isFetchingGasBalance && gasTokenBalance >= 0 ? (
+                <p className="text-sm">{numeral(gasTokenBalance).format('0,0.[00000]')} ETH</p>
             ) : (
                 <div className="skeleton-loading flex w-16 h-6 items-center justify-center rounded-full" />
             )}

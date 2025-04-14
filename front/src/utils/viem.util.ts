@@ -9,45 +9,43 @@ import { erc20Abi } from 'viem'
 import { shortenAddress } from './format.util'
 
 export async function fetchBalance(
-    accountAddress: `0x${string}`,
+    accountAddress: string | `0x${string}`,
     accountChainId: number,
-    tokenAddress?: `0x${string}`, // optional ERC-20 address
+    tokenAddress?: string | `0x${string}`, // optional ERC-20 address
 ): Promise<number> {
+    const debug = false
     try {
         if (!tokenAddress) {
             // native token
-            console.log('Fetching gas token balance...')
-            // toast('Fetching gas token balance...', { style: toastStyle })
-            const result = await getBalance(config, {
-                address: accountAddress,
-                chainId: accountChainId,
-            })
+            if (debug) console.log('Fetching gas token balance...')
+            if (debug) toast('Fetching gas token balance...', { style: toastStyle })
+            const result = await getBalance(config, { address: accountAddress as `0x${string}`, chainId: accountChainId })
             const formatted = Number(formatUnits(result.value, result.decimals))
-            console.log(`Gas token balance = ${formatted}`)
-            // toast.success(`Gas token balance = ${formatted}`, { style: toastStyle })
+            if (debug) console.log(`Gas token balance = ${formatted}`)
+            if (debug) toast.success(`Gas token balance = ${formatted}`, { style: toastStyle })
             return formatted
         } else {
             // erc20 token
-            console.log(`Fetching ${shortenAddress(tokenAddress)} balance...`)
-            // toast(`Fetching ${shortenAddress(tokenAddress)} balance...`, { style: toastStyle })
+            if (debug) console.log(`Fetching ${shortenAddress(tokenAddress)} balance...`)
+            if (debug) toast(`Fetching ${shortenAddress(tokenAddress)} balance...`, { style: toastStyle })
             const [decimals, balance] = await Promise.all([
                 readContract(config, {
-                    address: tokenAddress,
+                    address: tokenAddress as `0x${string}`,
                     abi: erc20Abi,
                     functionName: 'decimals',
                     chainId: accountChainId,
                 }) as Promise<number>,
                 readContract(config, {
-                    address: tokenAddress,
+                    address: tokenAddress as `0x${string}`,
                     abi: erc20Abi,
                     functionName: 'balanceOf',
-                    args: [accountAddress],
+                    args: [accountAddress as `0x${string}`],
                     chainId: accountChainId,
                 }) as Promise<bigint>,
             ])
             const formatted = Number(formatUnits(balance, decimals))
-            console.log(`${shortenAddress(tokenAddress)} balance = ${formatted}`)
-            // toast.success(`${shortenAddress(tokenAddress)} balance = ${formatted}`, { style: toastStyle })
+            if (debug) console.log(`${shortenAddress(tokenAddress)} balance = ${formatted}`)
+            if (debug) toast.success(`${shortenAddress(tokenAddress)} balance = ${formatted}`, { style: toastStyle })
             return formatted
         }
     } catch (err) {

@@ -1,7 +1,6 @@
 import { APP_METADATA, APP_ROUTE } from '@/config/app.config'
 import { getDefaultConfig } from 'connectkit'
 import { createConfig, http } from 'wagmi'
-// import { base, unichain, mainnet } from 'wagmi/chains'
 import { base, mainnet } from 'wagmi/chains'
 import { safe } from 'wagmi/connectors'
 
