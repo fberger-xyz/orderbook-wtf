@@ -90,7 +90,7 @@ const getOptions = (
         tooltip: {
             trigger: 'axis',
             triggerOn: 'mousemove|click',
-            backgroundColor: AppColors.jagger[500],
+            backgroundColor: AppColors.jagger[400],
             borderRadius: 6,
             axisPointer: {
                 type: 'line',
@@ -234,7 +234,7 @@ const getOptions = (
                             `1 ${orderbook.quote.symbol} = ${formatAmount(1 / value)} ${orderbook.base.symbol}`,
                         ].join('\n')
                     },
-                    backgroundColor: AppColors.jagger[800],
+                    backgroundColor: AppColors.jagger[400],
                     color: AppColors.milk.DEFAULT,
                     borderColor: 'transparent',
                 },
@@ -546,7 +546,7 @@ export default function DepthChart() {
                         point.symbolSize = 20
                         point.itemStyle = {
                             borderWidth: 1,
-                            borderColor: AppColors.jagger[500],
+                            borderColor: AppColors.jagger[400],
                             color: AppColors.aquamarine,
                             shadowBlur: 15,
                             shadowColor: 'rgba(144, 238, 144, 1)',
@@ -572,7 +572,7 @@ export default function DepthChart() {
                         point.symbolSize = 20
                         point.itemStyle = {
                             borderWidth: 1,
-                            borderColor: AppColors.jagger[500],
+                            borderColor: AppColors.jagger[400],
                             color: AppColors.folly,
                             shadowBlur: 15,
                             shadowColor: 'rgba(255, 0, 128, 1)',

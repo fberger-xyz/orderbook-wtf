@@ -13,6 +13,9 @@ const config: Config = {
                     DEFAULT: '#380a53ff',
                     800: '#380a53cc',
                     500: '#380a538f',
+                    400: '#380a5366',
+                    300: '#380a5344',
+                    200: '#380a531a',
                 },
                 folly: '#ff3366ff', // button with focus and asks
                 aquamarine: '#00ffbbff', // bids
