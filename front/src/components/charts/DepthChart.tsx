@@ -90,7 +90,7 @@ const getOptions = (
         tooltip: {
             trigger: 'axis',
             triggerOn: 'mousemove|click',
-            backgroundColor: AppColors.jagger[800],
+            backgroundColor: AppColors.jagger[500],
             borderRadius: 6,
             axisPointer: {
                 type: 'line',

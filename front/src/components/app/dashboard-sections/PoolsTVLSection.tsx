@@ -10,6 +10,7 @@ import IconWrapper from '@/components/common/IconWrapper'
 import TokenImage from '../TokenImage'
 import { useApiStore } from '@/stores/api.store'
 import PoolLink from './LinkToPool'
+import PoolUpdate from './PoolUpdate'
 
 type PoolLiquidity = {
     base: { amount: number; usd: number }
@@ -127,8 +128,9 @@ export default function PoolsTVLSection() {
                         <div className="w-full overflow-x-scroll">
                             <div className="flex w-full justify-center items-center rounded-xl gap-1 border border-milk-150 flex-col px-3 py-2 min-w-[700px]">
                                 {/* Headers */}
-                                <div className="grid grid-cols-10 w-full rounded-xl py-1 px-4 gap-5 items-end text-xs text-milk-200">
+                                <div className="grid grid-cols-11 w-full rounded-xl py-1 px-4 gap-5 items-end text-xs text-milk-200">
                                     <p className="col-span-2">Pools</p>
+                                    <p className="col-span-1">Last update</p>
 
                                     {/* Base token */}
                                     <div className="flex flex-col col-span-3 gap-2">
@@ -180,7 +182,7 @@ export default function PoolsTVLSection() {
                                     .map((pool) => (
                                         <div
                                             key={`${pool.poolIndex}`}
-                                            className="grid grid-cols-10 w-full bg-gray-600/10 hover:bg-gray-600/20 rounded-xl py-1.5 px-4 gap-5 items-center text-xs"
+                                            className="grid grid-cols-11 w-full bg-gray-600/10 hover:bg-gray-600/20 rounded-xl py-1.5 px-4 gap-5 items-center text-xs"
                                         >
                                             <PoolLink
                                                 currentChainId={currentChainId}
@@ -188,6 +190,8 @@ export default function PoolsTVLSection() {
                                                 config={pool.config}
                                                 className="col-span-2"
                                             />
+
+                                            <PoolUpdate lastUpdatedAt={pool.details.last_updated_at} />
 
                                             {/* Base token */}
                                             <div className="col-span-3 grid grid-cols-3 w-full">
@@ -236,6 +240,7 @@ export default function PoolsTVLSection() {
                                 {/* Totals */}
                                 <div className="grid grid-cols-10 w-full rounded-xl py-1 px-4 gap-5 items-center text-xs text-milk-200">
                                     <p className="col-span-2">Total</p>
+                                    <p className="col-span-1"></p>
 
                                     {/* Base token */}
                                     <div className="col-span-3 grid grid-cols-3 w-full">
