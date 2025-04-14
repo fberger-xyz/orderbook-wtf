@@ -32,10 +32,6 @@ export async function GET(req: NextRequest) {
         const body: { tag: string; point?: { input: string; amount: number } } = { tag: `${token0}-${token1}` }
         if (pointToken && !isNaN(Number(pointAmount))) body.point = { input: pointToken, amount: Number(pointAmount) }
 
-        // debug
-        // console.log('-------')
-        // console.log({ url, body })
-
         // run req
         const fetchResponse = await fetch(url, {
             method: 'POST',

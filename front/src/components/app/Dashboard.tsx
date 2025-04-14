@@ -91,7 +91,7 @@ export default function Dashboard() {
 
                     // fetch all orderbook
                     const url = `${APP_ROUTE}/api/orderbook?chain=${CHAINS_CONFIG[currentChainId].apiId}&token0=${sellToken.address}&token1=${buyToken.address}`
-                    const orderbookResponse = await fetch(url, { method: 'GET', headers })
+                    const orderbookResponse = await fetchWithTimeout(url, { method: 'GET', headers })
 
                     // parse
                     const orderbookJson = (await orderbookResponse.json()) as StructuredOutput<AmmAsOrderbook>
@@ -110,9 +110,17 @@ export default function Dashboard() {
                         return orderbookJson
                     }
 
+                    // debug
+                    toast(`TODO: Block ${orderbookJson.data.block} | Timestamp ${orderbookJson.data.timestamp}`, { style: toastStyle })
+
                     // handle store update
                     const orderbook = getOrderbook(getAddressPair())
-                    if (orderbookJson.data && orderbook && orderbook.block !== orderbookJson.data.block) {
+                    if (orderbook && orderbook.block === orderbookJson.data.block) {
+                        setApiStoreRefreshedAt(Date.now())
+                        return null
+                    }
+
+                    if (orderbookJson.data) {
                         setApiOrderbook(getAddressPair(), orderbookJson.data)
                         const mustRefreshSelectingTradeToo = sellTokenAmountInput !== undefined && sellTokenAmountInput > 0
                         if (debug) console.log(`ApiOrderbookQuery: mustRefreshSelectingTradeToo =`, mustRefreshSelectingTradeToo)
@@ -144,7 +152,7 @@ export default function Dashboard() {
 
             // fetch trade data
             const url = `${APP_ROUTE}/api/orderbook?chain=${currentChainId}&token0=${sellToken.address}&token1=${buyToken.address}&pointAmount=${amountIn}&pointToken=${sellToken.address}`
-            const tradeResponse = await fetch(url, { method: 'GET', headers })
+            const tradeResponse = await fetchWithTimeout(url, { method: 'GET', headers })
             const tradeResponseJson = (await tradeResponse.json()) as StructuredOutput<AmmAsOrderbook>
             if (!tradeResponseJson.data) return
 
