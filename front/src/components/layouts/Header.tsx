@@ -54,11 +54,10 @@ export default function Header(props: { className?: string }) {
                             },
                         )}
                     >
-                        {/* Ethereum */}
                         {Object.values(CHAINS_CONFIG).map((chainConfig) => {
                             if (chainConfig.supported)
                                 return (
-                                    <button
+                                    <div
                                         key={chainConfig.name}
                                         onClick={async () => {
                                             if (chainConfig.wagmi?.id) {
@@ -68,14 +67,14 @@ export default function Header(props: { className?: string }) {
                                                 setMetrics(undefined)
                                             }
                                         }}
-                                        className={cn('flex items-center gap-2 w-full px-4 py-2 text-white rounded-lg transition', {
+                                        className={cn('flex items-center gap-2 w-full px-4 py-2 text-white rounded-lg transition cursor-pointer', {
                                             'hover:bg-gray-600/20': currentChainId === chainConfig.id,
                                             'opacity-50 hover:opacity-100 hover:bg-gray-600/10': currentChainId !== chainConfig.id,
                                         })}
                                     >
                                         <SvgMapper icon={chainConfig.svgId} className="size-6" />
                                         <p className="text-milk-600 capitalize">{chainConfig.name}</p>
-                                    </button>
+                                    </div>
                                 )
                             else
                                 return (

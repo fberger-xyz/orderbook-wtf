@@ -1,6 +1,5 @@
 import { create } from 'zustand'
 import { AmmAsOrderbook, DashboardMetrics, RustApiPair, Token } from '@/interfaces'
-import { IS_DEV } from '@/config/app.config'
 import { getDashboardMetrics } from '@/utils'
 import { AppSupportedChains } from '@/enums'
 
@@ -9,7 +8,7 @@ export const useApiStore = create<{
     apiPairs: Record<AppSupportedChains, RustApiPair[]>
     apiOrderbooks: Record<string, undefined | AmmAsOrderbook>
     metrics?: DashboardMetrics
-    orderBookRefreshIntervalMs: number
+    orderBookRefreshIntervalMs: Record<AppSupportedChains, number>
     apiStoreRefreshedAt: number
     setApiTokens: (key: string, pairs: Token[]) => void
     setApiPairs: (key: string, pairs: RustApiPair[]) => void
@@ -32,7 +31,12 @@ export const useApiStore = create<{
     },
     apiOrderbooks: {},
     metrics: getDashboardMetrics(undefined),
-    orderBookRefreshIntervalMs: (IS_DEV ? 12 : 30) * 1000,
+    orderBookRefreshIntervalMs: {
+        [AppSupportedChains.ETHEREUM]: 12000,
+        [AppSupportedChains.BASE]: 5000,
+        [AppSupportedChains.ARBITRUM]: 5000,
+        [AppSupportedChains.UNICHAIN]: 5000,
+    },
     apiStoreRefreshedAt: -1,
     setApiTokens: (key, tokens) =>
         set((state) => ({

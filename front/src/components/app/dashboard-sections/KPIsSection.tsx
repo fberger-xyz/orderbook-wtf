@@ -121,11 +121,11 @@ export default function KPIsSection() {
                             <CountdownCircleTimer
                                 key={timerKey}
                                 isPlaying
-                                duration={orderBookRefreshIntervalMs / 1000}
+                                duration={orderBookRefreshIntervalMs[currentChainId] / 1000}
                                 initialRemainingTime={
                                     apiStoreRefreshedAt > 0
-                                        ? Math.max((orderBookRefreshIntervalMs - (Date.now() - apiStoreRefreshedAt)) / 1000, 0)
-                                        : orderBookRefreshIntervalMs / 1000
+                                        ? Math.max((orderBookRefreshIntervalMs[currentChainId] - (Date.now() - apiStoreRefreshedAt)) / 1000, 0)
+                                        : orderBookRefreshIntervalMs[currentChainId] / 1000
                                 }
                                 colors={AppColors.folly}
                                 trailColor={AppColors.background}

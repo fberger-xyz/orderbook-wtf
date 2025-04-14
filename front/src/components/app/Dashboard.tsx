@@ -3,7 +3,7 @@
 import { AppSupportedChains, OrderbookSide } from '@/enums'
 import { useAppStore } from '@/stores/app.store'
 import { AmmAsOrderbook, RustApiPair, StructuredOutput, Token } from '@/interfaces'
-import { extractErrorMessage } from '@/utils'
+import { extractErrorMessage, fetchWithTimeout } from '@/utils'
 import { useQueries } from '@tanstack/react-query'
 import { useApiStore } from '@/stores/api.store'
 import { APP_ROUTE, CHAINS_CONFIG } from '@/config/app.config'
@@ -32,19 +32,19 @@ export default function Dashboard() {
                 queryFn: async () => {
                     // mainnet
                     const mainnetTokensEndpoint = `${APP_ROUTE}/api/tokens?chain=${CHAINS_CONFIG[AppSupportedChains.ETHEREUM].apiId}`
-                    const mainnetTokensResponse = await fetch(mainnetTokensEndpoint, { method: 'GET', headers })
+                    const mainnetTokensResponse = await fetchWithTimeout(mainnetTokensEndpoint, { method: 'GET', headers })
                     const mainnetTokensResponseJson = (await mainnetTokensResponse.json()) as StructuredOutput<Token[]>
                     setApiTokens(AppSupportedChains.ETHEREUM, mainnetTokensResponseJson.data ?? [])
 
                     // base
                     const baseTokensEndpoint = `${APP_ROUTE}/api/tokens?chain=${CHAINS_CONFIG[AppSupportedChains.BASE].apiId}`
-                    const baseTokensResponse = await fetch(baseTokensEndpoint, { method: 'GET', headers })
+                    const baseTokensResponse = await fetchWithTimeout(baseTokensEndpoint, { method: 'GET', headers })
                     const baseTokensResponseJson = (await baseTokensResponse.json()) as StructuredOutput<Token[]>
                     setApiTokens(AppSupportedChains.BASE, baseTokensResponseJson.data ?? [])
 
                     // unichain
                     const unichainTokensEndpoint = `${APP_ROUTE}/api/tokens?chain=${CHAINS_CONFIG[AppSupportedChains.UNICHAIN].apiId}`
-                    const unichainTokensResponse = await fetch(unichainTokensEndpoint, { method: 'GET', headers })
+                    const unichainTokensResponse = await fetchWithTimeout(unichainTokensEndpoint, { method: 'GET', headers })
                     const unichainTokensResponseJson = (await unichainTokensResponse.json()) as StructuredOutput<Token[]>
                     setApiTokens(AppSupportedChains.UNICHAIN, unichainTokensResponseJson.data ?? [])
 
@@ -60,19 +60,19 @@ export default function Dashboard() {
                 queryFn: async () => {
                     // mainnet
                     const mainnetPairsUrl = `${APP_ROUTE}/api/pairs?chain=${CHAINS_CONFIG[AppSupportedChains.ETHEREUM].apiId}`
-                    const mainnetPairsResponse = await fetch(mainnetPairsUrl, { method: 'GET', headers })
+                    const mainnetPairsResponse = await fetchWithTimeout(mainnetPairsUrl, { method: 'GET', headers })
                     const mainnetPairsResponseJson = (await mainnetPairsResponse.json()) as StructuredOutput<RustApiPair[]>
                     setApiPairs(AppSupportedChains.ETHEREUM, mainnetPairsResponseJson.data ?? [])
 
                     // base
                     const basePairsUrl = `${APP_ROUTE}/api/pairs?chain=${CHAINS_CONFIG[AppSupportedChains.BASE].apiId}`
-                    const basePairsResponse = await fetch(basePairsUrl, { method: 'GET', headers })
+                    const basePairsResponse = await fetchWithTimeout(basePairsUrl, { method: 'GET', headers })
                     const basePairsResponseJson = (await basePairsResponse.json()) as StructuredOutput<RustApiPair[]>
                     setApiPairs(AppSupportedChains.BASE, basePairsResponseJson.data ?? [])
 
                     // unichain
                     const unichainPairsUrl = `${APP_ROUTE}/api/pairs?chain=${CHAINS_CONFIG[AppSupportedChains.UNICHAIN].apiId}`
-                    const unichainPairsResponse = await fetch(unichainPairsUrl, { method: 'GET', headers })
+                    const unichainPairsResponse = await fetchWithTimeout(unichainPairsUrl, { method: 'GET', headers })
                     const unichainPairsResponseJson = (await unichainPairsResponse.json()) as StructuredOutput<RustApiPair[]>
                     setApiPairs(AppSupportedChains.UNICHAIN, unichainPairsResponseJson.data ?? [])
 
@@ -111,7 +111,8 @@ export default function Dashboard() {
                     }
 
                     // handle store update
-                    if (orderbookJson.data) {
+                    const orderbook = getOrderbook(getAddressPair())
+                    if (orderbookJson.data && orderbook && orderbook.block !== orderbookJson.data.block) {
                         setApiOrderbook(getAddressPair(), orderbookJson.data)
                         const mustRefreshSelectingTradeToo = sellTokenAmountInput !== undefined && sellTokenAmountInput > 0
                         if (debug) console.log(`ApiOrderbookQuery: mustRefreshSelectingTradeToo =`, mustRefreshSelectingTradeToo)
@@ -123,7 +124,7 @@ export default function Dashboard() {
                     return orderbookJson
                 },
                 refetchOnWindowFocus: false,
-                refetchInterval: orderBookRefreshIntervalMs - 2000,
+                refetchInterval: orderBookRefreshIntervalMs[currentChainId],
             },
         ],
     })

@@ -242,11 +242,7 @@ export default function SwapSection() {
                             {account.isConnected && sellTokenBalance >= 0 && sellTokenAmountInput && sellTokenBalance < sellTokenAmountInput ? (
                                 <p className="text-folly text-xs pr-2">Exceeds Balance</p>
                             ) : null}
-                            {/* {viewMode === OrderbookSide.BID ? ( */}
                             <p className="text-aquamarine text-xs">Best bid</p>
-                            {/* ) : viewMode === OrderbookSide.ASK ? (
-                                <p className="text-folly text-xs">Best ask</p>
-                            ) : null} */}
                         </div>
                     </div>
                     <div className="flex justify-between gap-3">
