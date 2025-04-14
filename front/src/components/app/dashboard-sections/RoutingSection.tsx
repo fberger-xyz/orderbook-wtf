@@ -154,7 +154,7 @@ export default function RoutingSection() {
                                                 </div>
 
                                                 {/* Distribution table */}
-                                                <div className="min-w-[700px] flex justify-center items-center rounded-xl gap-1 border border-milk-150 flex-col px-3 py-2">
+                                                <div className="min-w-[800px] flex justify-center items-center rounded-xl gap-1 border border-milk-150 flex-col px-3 py-2">
                                                     {/* Headers */}
                                                     <div className="w-full grid grid-cols-11 rounded-xl py-1 px-4 gap-6 items-center text-xs text-milk-200">
                                                         <p className="col-span-3">Pool</p>

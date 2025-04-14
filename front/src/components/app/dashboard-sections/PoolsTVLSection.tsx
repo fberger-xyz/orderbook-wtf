@@ -126,7 +126,7 @@ export default function PoolsTVLSection() {
                     <div className="flex flex-col gap-2">
                         <p className="text-milk-400 text-xs">Breakdown by token</p>
                         <div className="w-full overflow-x-scroll">
-                            <div className="flex w-full justify-center items-center rounded-xl gap-1 border border-milk-150 flex-col px-3 py-2 min-w-[700px]">
+                            <div className="flex w-full justify-center items-center rounded-xl gap-1 border border-milk-150 flex-col px-3 py-2 min-w-[800px]">
                                 {/* Headers */}
                                 <div className="grid grid-cols-11 w-full rounded-xl py-1 px-4 gap-5 items-end text-xs text-milk-200">
                                     <p className="col-span-2">Pools</p>
