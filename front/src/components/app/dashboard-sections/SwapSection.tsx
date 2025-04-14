@@ -150,7 +150,7 @@ export default function SwapSection() {
             if (!orderbook) return
 
             // fetch data
-            const url = `${APP_ROUTE}/api/local/orderbook?chain=${currentChainId}&token0=${sellToken.address}&token1=${buyToken.address}&pointAmount=${amountIn}&pointToken=${sellToken.address}`
+            const url = `${APP_ROUTE}/api/orderbook?chain=${currentChainId}&token0=${sellToken.address}&token1=${buyToken.address}&pointAmount=${amountIn}&pointToken=${sellToken.address}`
             const tradeResponse = await fetch(url, { method: 'GET', headers: { 'Content-Type': 'application/json' } })
             const tradeResponseJson = (await tradeResponse.json()) as StructuredOutput<AmmAsOrderbook>
             if (!tradeResponseJson.data || !orderbook) return

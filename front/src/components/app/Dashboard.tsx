@@ -15,6 +15,8 @@ import MarketDepthSection from './dashboard-sections/MarketDepthSection'
 import SwapSection from './dashboard-sections/SwapSection'
 import KPIsSection from './dashboard-sections/KPIsSection'
 
+const headers = { 'Content-Type': 'application/json' }
+
 export default function Dashboard() {
     const { sellToken, sellTokenAmountInput, buyToken, currentChainId, setIsLoadingSomeTrade, selectOrderbookTrade, getAddressPair } = useAppStore()
 
@@ -29,31 +31,25 @@ export default function Dashboard() {
                 // todo promise.all
                 queryFn: async () => {
                     // mainnet
-                    const mainnetTokensEndpoint = `${APP_ROUTE}/api/local/tokens?chain=${CHAINS_CONFIG[AppSupportedChains.ETHEREUM].apiId}`
-                    const mainnetTokensResponse = await fetch(mainnetTokensEndpoint, {
-                        method: 'GET',
-                        headers: { 'Content-Type': 'application/json' },
-                    })
+                    const mainnetTokensEndpoint = `${APP_ROUTE}/api/tokens?chain=${CHAINS_CONFIG[AppSupportedChains.ETHEREUM].apiId}`
+                    const mainnetTokensResponse = await fetch(mainnetTokensEndpoint, { method: 'GET', headers })
                     const mainnetTokensResponseJson = (await mainnetTokensResponse.json()) as StructuredOutput<Token[]>
                     setApiTokens(AppSupportedChains.ETHEREUM, mainnetTokensResponseJson.data ?? [])
 
                     // base
-                    const baseTokensEndpoint = `${APP_ROUTE}/api/local/tokens?chain=${CHAINS_CONFIG[AppSupportedChains.BASE].apiId}`
-                    const baseTokensResponse = await fetch(baseTokensEndpoint, { method: 'GET', headers: { 'Content-Type': 'application/json' } })
+                    const baseTokensEndpoint = `${APP_ROUTE}/api/tokens?chain=${CHAINS_CONFIG[AppSupportedChains.BASE].apiId}`
+                    const baseTokensResponse = await fetch(baseTokensEndpoint, { method: 'GET', headers })
                     const baseTokensResponseJson = (await baseTokensResponse.json()) as StructuredOutput<Token[]>
                     setApiTokens(AppSupportedChains.BASE, baseTokensResponseJson.data ?? [])
 
                     // unichain
-                    const unichainTokensEndpoint = `${APP_ROUTE}/api/local/tokens?chain=${CHAINS_CONFIG[AppSupportedChains.UNICHAIN].apiId}`
-                    const unichainTokensResponse = await fetch(unichainTokensEndpoint, {
-                        method: 'GET',
-                        headers: { 'Content-Type': 'application/json' },
-                    })
+                    const unichainTokensEndpoint = `${APP_ROUTE}/api/tokens?chain=${CHAINS_CONFIG[AppSupportedChains.UNICHAIN].apiId}`
+                    const unichainTokensResponse = await fetch(unichainTokensEndpoint, { method: 'GET', headers })
                     const unichainTokensResponseJson = (await unichainTokensResponse.json()) as StructuredOutput<Token[]>
                     setApiTokens(AppSupportedChains.UNICHAIN, unichainTokensResponseJson.data ?? [])
 
                     // all
-                    return [mainnetTokensResponseJson.data, unichainTokensResponseJson.data, unichainTokensResponseJson.data]
+                    return [mainnetTokensResponseJson.data, baseTokensResponseJson.data, unichainTokensResponseJson.data]
                 },
                 refetchOnWindowFocus: false,
                 refetchInterval: 1000 * 60 * 5,
@@ -63,19 +59,25 @@ export default function Dashboard() {
                 enabled: true,
                 queryFn: async () => {
                     // mainnet
-                    const mainnetPairsEndpoint = `${APP_ROUTE}/api/local/pairs?chain=${CHAINS_CONFIG[AppSupportedChains.ETHEREUM].apiId}`
-                    const mainnetPairsResponse = await fetch(mainnetPairsEndpoint, { method: 'GET', headers: { 'Content-Type': 'application/json' } })
+                    const mainnetPairsUrl = `${APP_ROUTE}/api/pairs?chain=${CHAINS_CONFIG[AppSupportedChains.ETHEREUM].apiId}`
+                    const mainnetPairsResponse = await fetch(mainnetPairsUrl, { method: 'GET', headers })
                     const mainnetPairsResponseJson = (await mainnetPairsResponse.json()) as StructuredOutput<RustApiPair[]>
                     setApiPairs(AppSupportedChains.ETHEREUM, mainnetPairsResponseJson.data ?? [])
 
                     // base
-                    const basePairsEndpoint = `${APP_ROUTE}/api/local/pairs?chain=${CHAINS_CONFIG[AppSupportedChains.BASE].apiId}`
-                    const basePairsResponse = await fetch(basePairsEndpoint, { method: 'GET', headers: { 'Content-Type': 'application/json' } })
+                    const basePairsUrl = `${APP_ROUTE}/api/pairs?chain=${CHAINS_CONFIG[AppSupportedChains.BASE].apiId}`
+                    const basePairsResponse = await fetch(basePairsUrl, { method: 'GET', headers })
                     const basePairsResponseJson = (await basePairsResponse.json()) as StructuredOutput<RustApiPair[]>
                     setApiPairs(AppSupportedChains.BASE, basePairsResponseJson.data ?? [])
 
+                    // unichain
+                    const unichainPairsUrl = `${APP_ROUTE}/api/pairs?chain=${CHAINS_CONFIG[AppSupportedChains.UNICHAIN].apiId}`
+                    const unichainPairsResponse = await fetch(unichainPairsUrl, { method: 'GET', headers })
+                    const unichainPairsResponseJson = (await unichainPairsResponse.json()) as StructuredOutput<RustApiPair[]>
+                    setApiPairs(AppSupportedChains.UNICHAIN, unichainPairsResponseJson.data ?? [])
+
                     // all
-                    return [mainnetPairsResponseJson.data, basePairsResponseJson.data]
+                    return [mainnetPairsResponseJson.data, basePairsResponseJson.data, unichainPairsResponseJson.data]
                 },
                 refetchOnWindowFocus: false,
                 refetchInterval: 1000 * 60 * 5,
@@ -88,11 +90,8 @@ export default function Dashboard() {
                     const debug = false
 
                     // fetch all orderbook
-                    const url = `${APP_ROUTE}/api/local/orderbook?chain=${CHAINS_CONFIG[currentChainId].apiId}&token0=${sellToken.address}&token1=${buyToken.address}`
-                    const orderbookResponse = await fetch(url, {
-                        method: 'GET',
-                        headers: { 'Content-Type': 'application/json' },
-                    })
+                    const url = `${APP_ROUTE}/api/orderbook?chain=${CHAINS_CONFIG[currentChainId].apiId}&token0=${sellToken.address}&token1=${buyToken.address}`
+                    const orderbookResponse = await fetch(url, { method: 'GET', headers })
 
                     // parse
                     const orderbookJson = (await orderbookResponse.json()) as StructuredOutput<AmmAsOrderbook>
@@ -143,11 +142,8 @@ export default function Dashboard() {
             // toast(`Refreshing selected trade ...`, { style: toastStyle })
 
             // fetch trade data
-            const url = `${APP_ROUTE}/api/local/orderbook?chain=${currentChainId}&token0=${sellToken.address}&token1=${buyToken.address}&pointAmount=${amountIn}&pointToken=${sellToken.address}`
-            const tradeResponse = await fetch(url, {
-                method: 'GET',
-                headers: { 'Content-Type': 'application/json' },
-            })
+            const url = `${APP_ROUTE}/api/orderbook?chain=${currentChainId}&token0=${sellToken.address}&token1=${buyToken.address}&pointAmount=${amountIn}&pointToken=${sellToken.address}`
+            const tradeResponse = await fetch(url, { method: 'GET', headers })
             const tradeResponseJson = (await tradeResponse.json()) as StructuredOutput<AmmAsOrderbook>
             if (!tradeResponseJson.data) return
 
