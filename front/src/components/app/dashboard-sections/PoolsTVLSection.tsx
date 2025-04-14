@@ -238,7 +238,7 @@ export default function PoolsTVLSection() {
                                     ))}
 
                                 {/* Totals */}
-                                <div className="grid grid-cols-10 w-full rounded-xl py-1 px-4 gap-5 items-center text-xs text-milk-200">
+                                <div className="grid grid-cols-11 w-full rounded-xl py-1 px-4 gap-5 items-center text-xs text-milk-200">
                                     <p className="col-span-2">Total</p>
                                     <p className="col-span-1"></p>
 
