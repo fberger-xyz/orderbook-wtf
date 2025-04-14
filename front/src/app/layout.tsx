@@ -29,24 +29,26 @@ export const metadata: Metadata = {
         url: APP_METADATA.SITE_URL,
         images: [
             {
-                url: 'https://raw.githubusercontent.com/propeller-heads/tycho-x/19c454303ad279419c9eae38f2c818d20220a0c5/assets/orderbook-header.png',
+                url: '/hero-img.png',
                 width: 1100,
                 height: 400,
-                alt: 'Tycho X ORDERBOOK visual header — abstract dark background with teal and purple liquidity chart textures and bold orderbook title.',
+                alt: 'Tycho Orderbook — abstract dark background with teal and purple liquidity chart textures and bold orderbook title.',
+                type: 'image/png',
             },
         ],
     },
     twitter: {
         card: 'summary_large_image',
-        site: 'fberger_xyz',
+        site: '@fberger_xyz',
         title: APP_METADATA.SITE_NAME,
         description: APP_METADATA.SITE_DESCRIPTION,
         images: [
             {
-                url: 'https://raw.githubusercontent.com/propeller-heads/tycho-x/19c454303ad279419c9eae38f2c818d20220a0c5/assets/orderbook-header.png',
+                url: '/hero-img.png',
                 width: 1100,
                 height: 400,
-                alt: 'Tycho X ORDERBOOK visual header — abstract dark background with teal and purple liquidity chart textures and bold orderbook title.',
+                alt: 'Tycho Orderbook — abstract dark background with teal and purple liquidity chart textures and bold orderbook title.',
+                type: 'image/png',
             },
         ],
         // label1: 'Coded by',
