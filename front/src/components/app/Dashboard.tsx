@@ -26,6 +26,7 @@ export default function Dashboard() {
             {
                 queryKey: ['ApiTokensQuery', currentChainId],
                 enabled: true,
+                // todo promise.all
                 queryFn: async () => {
                     // mainnet
                     const mainnetTokensEndpoint = `${APP_ROUTE}/api/local/tokens?chain=${CHAINS_CONFIG[AppSupportedChains.ETHEREUM].apiId}`
@@ -39,11 +40,20 @@ export default function Dashboard() {
                     // base
                     const baseTokensEndpoint = `${APP_ROUTE}/api/local/tokens?chain=${CHAINS_CONFIG[AppSupportedChains.BASE].apiId}`
                     const baseTokensResponse = await fetch(baseTokensEndpoint, { method: 'GET', headers: { 'Content-Type': 'application/json' } })
-                    const baseTokensResponseJson = (await baseTokensResponse.json()) as StructuredOutput<RustApiPair[]>
-                    setApiTokens(AppSupportedChains.BASE, mainnetTokensResponseJson.data ?? [])
+                    const baseTokensResponseJson = (await baseTokensResponse.json()) as StructuredOutput<Token[]>
+                    setApiTokens(AppSupportedChains.BASE, baseTokensResponseJson.data ?? [])
+
+                    // unichain
+                    const unichainTokensEndpoint = `${APP_ROUTE}/api/local/tokens?chain=${CHAINS_CONFIG[AppSupportedChains.UNICHAIN].apiId}`
+                    const unichainTokensResponse = await fetch(unichainTokensEndpoint, {
+                        method: 'GET',
+                        headers: { 'Content-Type': 'application/json' },
+                    })
+                    const unichainTokensResponseJson = (await unichainTokensResponse.json()) as StructuredOutput<Token[]>
+                    setApiTokens(AppSupportedChains.UNICHAIN, unichainTokensResponseJson.data ?? [])
 
                     // all
-                    return [mainnetTokensResponseJson.data, baseTokensResponseJson.data]
+                    return [mainnetTokensResponseJson.data, unichainTokensResponseJson.data, unichainTokensResponseJson.data]
                 },
                 refetchOnWindowFocus: false,
                 refetchInterval: 1000 * 60 * 5,
@@ -107,7 +117,7 @@ export default function Dashboard() {
                         const mustRefreshSelectingTradeToo = sellTokenAmountInput !== undefined && sellTokenAmountInput > 0
                         if (debug) console.log(`ApiOrderbookQuery: mustRefreshSelectingTradeToo =`, mustRefreshSelectingTradeToo)
                         if (mustRefreshSelectingTradeToo) await simulateTradeAndMergeOrderbook(sellTokenAmountInput)
-                        toast.success(`${sellToken.symbol}-${buyToken.symbol} market depth updated just now`, { style: toastStyle })
+                        toast.success(`Market depth for ${sellToken.symbol}-${buyToken.symbol} updated just now`, { style: toastStyle })
                         setApiStoreRefreshedAt(Date.now())
                     }
 

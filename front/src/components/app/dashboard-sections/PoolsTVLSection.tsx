@@ -233,15 +233,23 @@ export default function PoolsTVLSection() {
 
                                 {/* Base token */}
                                 <div className="col-span-3 grid grid-cols-3 w-full">
-                                    <p className="col-span-1 text-right">{cleanOutput(numeral(totals.base.amount).divide(1000).format('0,0'))} k</p>
-                                    <p className="col-span-1 text-right">{cleanOutput(numeral(totals.base.usd).divide(1000).format('0,0'))} k$</p>
+                                    <p className="col-span-1 text-right">
+                                        {cleanOutput(`${numeral(totals.base.amount).divide(1000).format('0,0')} k`)}
+                                    </p>
+                                    <p className="col-span-1 text-right">
+                                        {cleanOutput(`${numeral(totals.base.usd).divide(1000).format('0,0')} k$`)}
+                                    </p>
                                     <p className="col-span-1 text-right">100%</p>
                                 </div>
 
                                 {/* Quote token */}
                                 <div className="col-span-3 grid grid-cols-3 w-full">
-                                    <p className="col-span-1 text-right">{cleanOutput(numeral(totals.quote.amount).divide(1000).format('0,0'))} k</p>
-                                    <p className="col-span-1 text-right">{cleanOutput(numeral(totals.quote.usd).divide(1000).format('0,0'))} k$</p>
+                                    <p className="col-span-1 text-right">
+                                        {cleanOutput(`${numeral(totals.quote.amount).divide(1000).format('0,0')} k`)}
+                                    </p>
+                                    <p className="col-span-1 text-right">
+                                        {cleanOutput(`${numeral(totals.quote.usd).divide(1000).format('0,0')} k$`)}
+                                    </p>
                                     <p className="col-span-1 text-right">100%</p>
                                 </div>
 

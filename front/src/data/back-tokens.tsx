@@ -30,6 +30,19 @@ export const hardcodedTokensList: Record<AppSupportedChains, Token[]> = {
             gas: '29701',
         },
     ],
-    [AppSupportedChains.UNICHAIN]: [],
+    [AppSupportedChains.UNICHAIN]: [
+        {
+            address: '0x078D782b760474a361dDA0AF3839290b0EF57AD6',
+            decimals: 6,
+            symbol: 'USDC',
+            gas: '40563', // todo: find correct values or remove if useless
+        },
+        {
+            address: '0x4200000000000000000000000000000000000006',
+            decimals: 18,
+            symbol: 'WETH',
+            gas: '29701', // todo: find correct values or remove if useless
+        },
+    ],
     [AppSupportedChains.ARBITRUM]: [],
 }

@@ -12,6 +12,7 @@ export interface Token {
 }
 
 export interface AmmAsOrderbook {
+    tag: string // ?
     block: number
     timestamp: number
 
@@ -37,9 +38,11 @@ export interface AmmAsOrderbook {
     mpd_base_to_quote: OrderbookKeyMetrics
     mpd_quote_to_base: OrderbookKeyMetrics
 
-    // ?
+    // ? usage to find
     base_worth_eth: number
     quote_worth_eth: number
+    aggregated_balance_base_worth_usd: number
+    aggregated_balance_quote_worth_usd: number
 }
 
 export interface AmmPool {
@@ -52,6 +55,7 @@ export interface AmmPool {
     static_attributes: string[][]
     creation_tx: string
     fee: number
+    last_updated_at: number
 }
 
 export interface AmmTrade {
@@ -71,6 +75,10 @@ export interface OrderbookKeyMetrics {
     mid: number
     spread: number
     spread_pct: number
+
+    // ?
+    received: number // ?
+    distribution: number[] // ?
 }
 
 /**

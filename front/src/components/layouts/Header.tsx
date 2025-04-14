@@ -12,6 +12,8 @@ import { useAppStore } from '@/stores/app.store'
 import { CHAINS_CONFIG } from '@/config/app.config'
 import { useApiStore } from '@/stores/api.store'
 import SvgMapper from '../icons/SvgMapper'
+import toast from 'react-hot-toast'
+import { toastStyle } from '@/config/toasts.config'
 
 export default function Header(props: { className?: string }) {
     const { currentChainId, setCurrentChain } = useAppStore()
@@ -58,6 +60,7 @@ export default function Header(props: { className?: string }) {
                                         key={chainConfig.name}
                                         onClick={() => {
                                             setCurrentChain(chainConfig.id)
+                                            toast.success(`Chain selected: ${chainConfig.name}`, { style: toastStyle })
                                             setMetrics(undefined)
                                         }}
                                         className={cn('flex items-center gap-2 w-full px-4 py-2 text-white rounded-lg transition', {

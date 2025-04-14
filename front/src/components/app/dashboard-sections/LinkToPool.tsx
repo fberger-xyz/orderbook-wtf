@@ -19,7 +19,12 @@ export default function PoolLink({
     config?: ReturnType<typeof mapProtocolIdToProtocolConfig>
     className?: string
 }) {
-    if (!pool) return null
+    if (!pool)
+        return (
+            <div className={cn('flex gap-2 items-center group cursor-alias', className)}>
+                <p className="text-milk-600 truncate">{config?.id}</p>
+            </div>
+        )
 
     return (
         <LinkWrapper
