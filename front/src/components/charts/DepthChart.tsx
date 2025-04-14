@@ -500,7 +500,8 @@ export default function DepthChart() {
         selectedTrade,
         selectOrderbookTrade,
         getAddressPair,
-        // switchSelectedTokens,
+        // viewMode,
+        // setViewMode,
     } = useAppStore()
     const { apiStoreRefreshedAt, metrics, getOrderbook } = useApiStore()
     const [options, setOptions] = useState<null | echarts.EChartsOption>(null)
@@ -601,7 +602,7 @@ export default function DepthChart() {
         const fnName = 'handlePointClick'
         if (params?.data) {
             // debug
-            if (debug) console.log('---------')
+            if (debug) console.log('-----------------')
             if (debug) console.log(fnName, 'ok data', params?.data)
 
             const key = `${sellToken.address}-${buyToken.address}`
@@ -620,8 +621,11 @@ export default function DepthChart() {
                     return
                 }
 
+                // -
+                // if (viewMode !== side) setViewMode(side)
+
                 // debug
-                if (debug) console.log(fnName, 'ok side', side)
+                if (debug) console.log(fnName, 'side', side)
 
                 const trade =
                     side === OrderbookSide.BID
@@ -632,10 +636,10 @@ export default function DepthChart() {
                 if (!trade) return
 
                 // notify
-                toast.success(`New trade selected`, { style: toastStyle })
+                toast.success(`New ${side} trade selected`, { style: toastStyle })
 
                 // debug
-                if (debug) console.log(fnName, 'ok trade', trade)
+                if (debug) console.log(fnName, `${side} trade`, trade)
 
                 // update markline
                 selectOrderbookTrade({

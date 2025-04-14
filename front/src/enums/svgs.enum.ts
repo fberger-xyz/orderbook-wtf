@@ -1,9 +1,13 @@
 // https://icones.js.org/
 
 export enum SvgIds {
+    // chains
     MAINNET = 'mainnet',
     ARBITRUM = 'arbitrum',
     BASE = 'base',
+    UNICHAIN = 'unichain',
+
+    // dexes
     BALANCERV2 = 'BalancerV2',
     CURVE = 'Curve',
     PANCAKESWAPV2 = 'PancakeSwapV2',

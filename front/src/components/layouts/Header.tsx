@@ -6,12 +6,12 @@ import { ConnectOrDisconnect } from '../wallet/ConnectOrDisconnect'
 import LinkWrapper from '../common/LinkWrapper'
 import { IconIds } from '@/enums'
 import TychoSVG from '../icons/tycho-svg.icon'
-import ChainImage from '../app/ChainImage'
 import { useRef, useState } from 'react'
 import { useClickOutside } from '@/hooks/useClickOutside'
 import { useAppStore } from '@/stores/app.store'
 import { CHAINS_CONFIG } from '@/config/app.config'
 import { useApiStore } from '@/stores/api.store'
+import SvgMapper from '../icons/SvgMapper'
 
 export default function Header(props: { className?: string }) {
     const { currentChainId, setCurrentChain } = useAppStore()
@@ -35,7 +35,7 @@ export default function Header(props: { className?: string }) {
                 {/* networks */}
                 <button onClick={() => setOpenNetworkDropown(!openNetworkDropown)} className="relative">
                     <div className="flex items-center gap-1 bg-milk-100/5 transition-colors duration-300 hover:bg-milk-100/10 rounded-xl h-10 px-3">
-                        <ChainImage oneInchId={CHAINS_CONFIG[currentChainId].oneInchId} className="size-5" />
+                        <SvgMapper icon={CHAINS_CONFIG[currentChainId].svgId} className="size-5" />
                         <IconWrapper icon={IconIds.TRIANGLE_DOWN} className="size-5" />
                     </div>
 
@@ -61,11 +61,11 @@ export default function Header(props: { className?: string }) {
                                             setMetrics(undefined)
                                         }}
                                         className={cn('flex items-center gap-2 w-full px-4 py-2 text-white rounded-lg transition', {
-                                            'bg-gray-600/20': currentChainId === chainConfig.id,
-                                            'hover:bg-gray-600/10': currentChainId !== chainConfig.id,
+                                            'hover:bg-gray-600/20': currentChainId === chainConfig.id,
+                                            'opacity-50 hover:opacity-100 hover:bg-gray-600/10': currentChainId !== chainConfig.id,
                                         })}
                                     >
-                                        <ChainImage oneInchId={chainConfig.oneInchId} className="size-6" />
+                                        <SvgMapper icon={chainConfig.svgId} className="size-6" />
                                         <p className="text-milk-600 capitalize">{chainConfig.name}</p>
                                     </button>
                                 )
@@ -76,8 +76,8 @@ export default function Header(props: { className?: string }) {
                                         className="flex items-center gap-2 px-4 py-2 text-gray-500 cursor-not-allowed mt-1 rounded-lg"
                                     >
                                         <div className="flex items-center gap-2">
-                                            <ChainImage oneInchId={chainConfig.oneInchId} className="size-6 opacity-50" />
-                                            <p className="capitalize">{chainConfig.name.replace('_2', '')}</p>
+                                            <SvgMapper icon={chainConfig.svgId} className="size-6 opacity-50" />
+                                            <p className="capitalize">{chainConfig.name}</p>
                                         </div>
                                         <p className="bg-white/20 px-1 font-semibold rounded-sm text-xs text-background">SOON</p>
                                     </div>

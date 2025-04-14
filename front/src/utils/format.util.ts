@@ -200,3 +200,7 @@ export const cleanOutput = (output: string | number, defaultOutput = '-'): strin
     if (strOutput === 'NaN') return defaultOutput
     return String(output)
 }
+
+export const formatOrDisplayRaw = (rawInput: string | number, format: string): string => {
+    return typeof numeral(rawInput).value() === 'number' ? numeral(rawInput).format(format) : String(rawInput)
+}

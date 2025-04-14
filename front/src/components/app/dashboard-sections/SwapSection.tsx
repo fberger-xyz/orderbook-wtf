@@ -11,13 +11,13 @@ import { AmmAsOrderbook, SelectedTrade, StructuredOutput, Token } from '@/interf
 import SelectTokenModal from '../SelectTokenModal'
 import { useModal } from 'connectkit'
 import { useAccount } from 'wagmi'
-import { cn, extractErrorMessage, fetchBalance, formatAmount, getBaseValueInUsd, getQuoteValueInUsd, safeNumeral } from '@/utils'
+import { cn, extractErrorMessage, fetchBalance, formatAmount, formatOrDisplayRaw, getBaseValueInUsd, getQuoteValueInUsd, safeNumeral } from '@/utils'
 import { useApiStore } from '@/stores/api.store'
 import { APP_ROUTE, CHAINS_CONFIG } from '@/config/app.config'
 import toast from 'react-hot-toast'
 import { toastStyle } from '@/config/toasts.config'
 
-const rawAmountFormat = '0,0.[0000000000000]'
+const rawAmountFormat = '0,0.[00000000000]'
 
 type TokenBalanceProps = {
     balance: number
@@ -115,6 +115,7 @@ export default function SwapSection() {
         setSelectTokenModalFor,
         getAddressPair,
         currentChainId,
+        // viewMode,
     } = useAppStore()
 
     const { metrics, setApiOrderbook, getOrderbook } = useApiStore()
@@ -249,12 +250,13 @@ export default function SwapSection() {
                             {account.isConnected && sellTokenBalance && sellTokenAmountInput && sellTokenBalance < sellTokenAmountInput && (
                                 <p className="text-folly font-semibold text-xs pr-2">Exceeds Balance</p>
                             )}
+                            {/* {viewMode === OrderbookSide.BID ? ( */}
                             <p className="text-aquamarine text-xs">Best bid</p>
+                            {/* ) : viewMode === OrderbookSide.ASK ? (
+                                <p className="text-folly text-xs">Best ask</p>
+                            ) : null} */}
                         </div>
                     </div>
-                    {/* <pre>={sellTokenAmountInput}</pre>
-                    <pre>raw={sellTokenAmountInputRaw}</pre>
-                    <pre>typeof {typeof numeral(sellTokenAmountInputRaw).value()}</pre> */}
                     <div className="flex justify-between gap-3">
                         <TokenSelector
                             token={sellToken}
@@ -266,14 +268,7 @@ export default function SwapSection() {
                         <input
                             type="text"
                             className="text-xl font-semibold text-right border-none outline-none ring-0 focus:ring-0 focus:outline-none focus:border-none bg-transparent w-full"
-                            value={
-                                // if number
-                                typeof numeral(sellTokenAmountInputRaw).value() === 'number'
-                                    ? // display it
-                                      numeral(sellTokenAmountInputRaw).format(rawAmountFormat)
-                                    : // else display it raw
-                                      sellTokenAmountInputRaw
-                            }
+                            value={formatOrDisplayRaw(sellTokenAmountInputRaw, rawAmountFormat)}
                             onChange={handleChangeOfAmountIn}
                         />
                     </div>

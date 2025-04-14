@@ -3,7 +3,7 @@ import { persist, createJSONStorage } from 'zustand/middleware'
 import { APP_METADATA, IS_DEV } from '@/config/app.config'
 import { SelectedTrade, Token } from '@/interfaces'
 import { hardcodedTokensList } from '@/data/back-tokens'
-import { OrderbookOption, OrderbookAxisScale, AppSupportedChains } from '@/enums'
+import { OrderbookOption, OrderbookAxisScale, AppSupportedChains, OrderbookSide } from '@/enums'
 
 export const useAppStore = create<{
     /**
@@ -48,6 +48,8 @@ export const useAppStore = create<{
      */
 
     // inputs
+    viewMode: OrderbookSide
+    setViewMode: (viewMode: OrderbookSide) => void
     sellToken: Token
     selectSellToken: (sellToken: Token) => void
     sellTokenAmountInput: number
@@ -137,7 +139,8 @@ export const useAppStore = create<{
              */
 
             // inputs
-
+            viewMode: OrderbookSide.BID,
+            setViewMode: (viewMode) => set(() => ({ viewMode })),
             sellToken: hardcodedTokensList[AppSupportedChains.ETHEREUM][1], // todo put this as null
             selectSellToken: (sellToken) =>
                 set((state) => {

@@ -1,4 +1,4 @@
-import { AppUrls, AppPagePaths, AppSupportedChains } from '@/enums'
+import { AppUrls, AppPagePaths, AppSupportedChains, SvgIds } from '@/enums'
 import { InterfaceAppLink } from '@/interfaces'
 import { Inter } from 'next/font/google'
 
@@ -29,42 +29,46 @@ export const APP_FONT = Inter({ weight: ['100', '200', '300', '400', '500', '600
 export const CHAINS_CONFIG = {
     [AppSupportedChains.ETHEREUM]: {
         id: AppSupportedChains.ETHEREUM,
+        svgId: SvgIds.MAINNET,
         name: 'Ethereum',
         apiId: 'ethereum',
         oneInchId: 'ethereum',
         supported: true,
-        buyToken: undefined, // todo
-        sellToken: undefined, // todo
+        defaultSellToken: undefined, // todo
+        defaultBuyToken: undefined, // todo
         explorerRoot: 'https://etherscan.io',
     },
     [AppSupportedChains.BASE]: {
         id: AppSupportedChains.BASE,
+        svgId: SvgIds.BASE,
         name: 'Base',
         apiId: 'base',
         oneInchId: 'base',
         supported: true,
-        buyToken: undefined, // todo
-        sellToken: undefined, // todo
+        defaultSellToken: undefined, // todo
+        defaultBuyToken: undefined, // todo
         explorerRoot: 'https://basescan.org',
     },
     [AppSupportedChains.UNICHAIN]: {
         id: AppSupportedChains.UNICHAIN,
+        svgId: SvgIds.UNICHAIN,
         name: 'Unichain',
         apiId: '', // to be added
         oneInchId: 'Unichain',
-        supported: false,
-        buyToken: undefined, // todo
-        sellToken: undefined, // todo
-        explorerRoot: '',
+        supported: true,
+        defaultSellToken: undefined, // todo
+        defaultBuyToken: undefined, // todo
+        explorerRoot: 'https://unichain.blockscout.com',
     },
     [AppSupportedChains.ARBITRUM]: {
         id: AppSupportedChains.ARBITRUM,
+        svgId: SvgIds.ARBITRUM,
         name: 'Arbitrum',
         apiId: '', // to be added
         oneInchId: 'arbitrum_2',
         supported: false,
-        buyToken: undefined, // todo
-        sellToken: undefined, // todo
+        defaultSellToken: undefined, // todo
+        defaultBuyToken: undefined, // todo
         explorerRoot: '',
     },
 }
