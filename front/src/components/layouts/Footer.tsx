@@ -33,6 +33,9 @@ export default function Footer(props: { className?: string }) {
                 <p>
                     Alpha Version Notice <span className="opacity-50">deployed on {dayjs.utc(commitDate).format('D MMM. YYYY HH:mm A')} UTC</span>
                 </p>
+                <LinkWrapper href={AppUrls.VM_UPTIME} target="_blank" className="cursor-alias hover:underline hover:text-aquamarine pl-1">
+                    <p>API status</p>
+                </LinkWrapper>
             </div>
             <p className="text-wrap">
                 Made by

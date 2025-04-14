@@ -31,4 +31,7 @@ export enum AppUrls {
     // fberger
     FBERGER_X = 'https://x.com/fberger_xyz',
     FBERGER_TELEGRAM = 'https://t.me/fberger_xyz',
+
+    // VM
+    VM_UPTIME = 'https://merso.betteruptime.com/',
 }
