@@ -121,12 +121,12 @@ export default function KPIsSection() {
                 <OrderbookComponentLayout
                     title={
                         <Tooltip
-                            placement="top"
+                            placement="bottom"
                             content={
-                                <div className="rounded-2xl backdrop-blur border border-milk-150 shadow-lg p-3 -mb-1 max-w-60">
+                                <div className="rounded-2xl backdrop-blur border border-milk-150 shadow-lg p-3 -mt-1 max-w-60">
                                     <p className="text-milk text-sm">
                                         While our backend updates market depth every new block (~12s on Ethereum or ~2s on Base), we limit frontend
-                                        refreshes (to 12s for Ethereum and 5s for Base) to reduce noise and keep the app fast.
+                                        refreshes to 12s for Ethereum and 5s for Base in order to reduce noise and keep the app fast.
                                     </p>
                                 </div>
                             }
