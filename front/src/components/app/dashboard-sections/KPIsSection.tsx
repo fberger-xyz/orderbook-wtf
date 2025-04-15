@@ -19,7 +19,7 @@ const lastBlockTooltipContent = () => (
     <div className="rounded-2xl backdrop-blur border border-milk-150 shadow-lg p-3 -mt-1 max-w-80 text-milk text-sm flex">
         <p className="text-wrap">
             Using Tycho Indexer, our backend simulates market depth on every new block (~12s on Ethereum, ~2s on Base). On the frontend, we refresh
-            every 12s on Ethereum and 5s on Base to reduce unnecessary requests and and stay responsive.
+            every 12s on Ethereum and 5s on Base to reduce unnecessary requests and stay responsive.
         </p>
     </div>
 )
