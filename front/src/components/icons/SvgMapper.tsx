@@ -4,7 +4,7 @@ import { AppSupportedChains, SvgIds } from '@/enums'
 import Image from 'next/image'
 import { cn } from '@/utils'
 import { ReactNode } from 'react'
-import ChainImage from '../app/ChainImage'
+import ChainImage from '../app/commons/ChainImage'
 import { CHAINS_CONFIG } from '@/config/app.config'
 
 function SvgWrapper(props: { children: ReactNode; className?: string }) {

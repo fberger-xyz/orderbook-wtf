@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { AmmAsOrderbook, StructuredOutput } from '@/interfaces'
 import { isAddress } from 'viem'
 import { PUBLIC_STREAM_API_URL } from '@/config/app.config'
-import { extractErrorMessage, initOutput } from '@/utils'
+import { extractErrorMessage, fetchWithTimeout, initOutput } from '@/utils'
 
 export async function GET(req: NextRequest) {
     const res = initOutput<AmmAsOrderbook>()
@@ -27,22 +27,16 @@ export async function GET(req: NextRequest) {
         }
 
         // prepare request
-        const controller = new AbortController()
-        const timeoutId = setTimeout(() => controller.abort(), 60000) // 60 seconds timeout
         const body: { tag: string; point?: { input: string; amount: number } } = { tag: `${token0}-${token1}` }
         if (pointToken && !isNaN(Number(pointAmount))) body.point = { input: pointToken, amount: Number(pointAmount) }
 
         // run req
-        const fetchResponse = await fetch(url, {
+        const fetchResponse = await fetchWithTimeout(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json', [`${process.env.API_HEADER_KEY}`]: `${process.env.API_HEADER_VALUE}` },
-            signal: controller.signal,
             cache: 'no-store',
             body: JSON.stringify(body),
         })
-
-        // timeout
-        clearTimeout(timeoutId)
 
         // error
         if (!fetchResponse.ok) {
@@ -50,16 +44,14 @@ export async function GET(req: NextRequest) {
             return NextResponse.json(res, { status: fetchResponse.status })
         }
 
-        // read and cast
+        // cast
         const fetchResponseJson = (await fetchResponse.json()) as StructuredOutput<AmmAsOrderbook>
         res.ts = fetchResponseJson.ts
         res.error = fetchResponseJson.error
         res.data = fetchResponseJson.data
 
         // double check errors
-        if (String(res.data).includes('backend error')) {
-            return NextResponse.json({ ...res, error: `Upstream rust API returned an error` }, { status: 502 })
-        }
+        if (String(res.data).includes('error')) return NextResponse.json({ ...res, error: `Upstream rust API returned an error` }, { status: 502 })
 
         // res
         return NextResponse.json(res)

@@ -9,7 +9,7 @@ export default function AppStoreLoader(props: { children: ReactNode }) {
     const loadAppStore = () => useAppStore.persist.rehydrate()?.then(() => console.log('✅ Page rehydrated'))
     useEffect(() => {
         if (!hasHydrated) loadAppStore()
-        // add toast if need be
+        // add some toast if need be
     }, [hasHydrated])
     return <PageWrapper>{props.children}</PageWrapper>
 }

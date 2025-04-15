@@ -1,7 +1,7 @@
 'use client'
 
 import { Token } from '@/interfaces'
-import ImageWrapper from '../common/ImageWrapper'
+import ImageWrapper from '../../common/ImageWrapper'
 
 export default function TokenImage(props: { token?: Token; className?: string; size?: number }) {
     if (!props.token) return <span className="animate-pulse rounded-full bg-milk-150" style={{ width: props.size, height: props.size }} />

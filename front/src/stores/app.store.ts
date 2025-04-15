@@ -5,6 +5,7 @@ import { SelectedTrade, Token } from '@/interfaces'
 import { hardcodedTokensList } from '@/data/back-tokens'
 import { OrderbookOption, OrderbookAxisScale, AppSupportedChains, OrderbookSide } from '@/enums'
 
+// todo remove useless keys
 export const useAppStore = create<{
     /**
      * store

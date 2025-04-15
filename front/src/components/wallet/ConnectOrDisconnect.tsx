@@ -44,7 +44,8 @@ export function ConnectOrDisconnect() {
         }
     }, [error])
 
-    if (!isClient) return null // Avoid rendering during SSR
+    // avoid rendering during SSR
+    if (!isClient) return null
 
     return account.isConnected ? (
         <div className="flex items-center gap-2 bg-milk-100/5 rounded-xl h-10 pl-2.5 pr-1 text-milk">

@@ -32,9 +32,10 @@ function useTimeAgo(date: Date | number): string {
             }
 
             setTimeAgo(result)
-        }, 1000) // update every second
+        }, 1000)
 
-        return () => clearInterval(interval) // cleanup interval on unmount
+        // cleanup interval on unmount
+        return () => clearInterval(interval)
     }, [date])
 
     return timeAgo

@@ -15,8 +15,8 @@ const configParams = getDefaultConfig({
     transports: {
         [mainnet.id]: http(`https://eth.llamarpc.com`),
         [base.id]: http(`https://base.llamarpc.com`),
-        // [unichain.id]: http(`https://unichain.drpc.org`), // supported here https://github.com/wevm/viem/blob/main/src/chains/index.ts but not here https://wagmi.sh/core/api/chains
-        // [arbitrum.id]: http(), // default is fine
+        // todo: unichain is supported here https://github.com/wevm/viem/blob/main/src/chains/index.ts but not here https://wagmi.sh/core/api/chains
+        // [unichain.id]: http(`https://unichain.drpc.org`),
     },
     appName: APP_METADATA.SITE_NAME,
     ssr: true,

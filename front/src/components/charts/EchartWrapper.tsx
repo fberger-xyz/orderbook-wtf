@@ -33,7 +33,6 @@ export default function EchartWrapper(props: InterfaceEchartWrapperProps) {
         if (chartRef?.current) {
             // ensure chart has been initialised
             if (!myChart.current) myChart.current = echarts.init(chartRef.current)
-            // myChart.current = echarts.init(chartRef.current, undefined, { renderer: 'svg' })
             window.addEventListener('resize', handleChartResize, { passive: true })
 
             // handle toolbox
@@ -45,16 +44,17 @@ export default function EchartWrapper(props: InterfaceEchartWrapperProps) {
 
             // @ts-expect-error: poorly typed
             const grid3DOptions = currentOptions?.grid3D ? { grid3D: currentOptions.grid3D } : {}
+
+            // if need be
             // const dataZoomOptions = currentOptions?.dataZoom ? { dataZoom: currentOptions.dataZoom } : {}
 
             // set option
             myChart.current.setOption(
                 // @ts-expect-error: poorly typed
                 { ...props.options, ...grid3DOptions },
-                // { ...props.options, ...grid3DOptions, ...dataZoomOptions },
                 {
                     // notMerge: true, // the new option object replaces the existing one completely.
-                    notMerge: true, // Default - ECharts merges the new options with the existing ones
+                    notMerge: true, // Default - ECharts merges the new options with the existing ones.
 
                     /**
                      * lazyUpdate?: boolean
@@ -77,17 +77,9 @@ export default function EchartWrapper(props: InterfaceEchartWrapperProps) {
             )
 
             // attach click event listener
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             myChart.current.on('click', (params: unknown) => {
                 if (props.onPointClick) props.onPointClick(params)
             })
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            // myChart.current.on('dataZoom', (params: unknown) => {
-            //     const options = myChart.current?.getOption()
-            //     if (options) {
-            //         console.log('dataZoom', 'options?.dataZoom', options?.dataZoom)
-            //     } else console.log('dataZoom', { params })
-            // })
         }
 
         return () => {
@@ -97,6 +89,7 @@ export default function EchartWrapper(props: InterfaceEchartWrapperProps) {
                 myChart.current.off('click')
             }
         }
+
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [props.options])
 

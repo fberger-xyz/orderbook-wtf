@@ -6,8 +6,6 @@ export const toastStyle = {
     borderColor: AppColors.milk[400],
     border: 2,
     color: AppColors.milk.DEFAULT,
-
-    // -
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',

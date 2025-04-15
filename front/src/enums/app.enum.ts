@@ -34,4 +34,7 @@ export enum AppUrls {
 
     // VM
     VM_UPTIME = 'https://merso.betteruptime.com/',
+
+    // doc
+    DOCUMENTATION = 'https://tycho-orderbook.gitbook.io/docs',
 }

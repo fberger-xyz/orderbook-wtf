@@ -4,7 +4,7 @@ import { cn } from '@/utils'
 import IconWrapper from '../common/IconWrapper'
 import { ConnectOrDisconnect } from '../wallet/ConnectOrDisconnect'
 import LinkWrapper from '../common/LinkWrapper'
-import { IconIds } from '@/enums'
+import { AppUrls, IconIds } from '@/enums'
 import TychoSVG from '../icons/tycho-svg.icon'
 import { useRef, useState } from 'react'
 import { useClickOutside } from '@/hooks/useClickOutside'
@@ -31,7 +31,7 @@ export default function Header(props: { className?: string }) {
             </div>
             <div className="flex flex-wrap justify-end items-center gap-2 z-20">
                 {/* docs */}
-                <LinkWrapper href="https://tycho-orderbook.gitbook.io/docs" target="_blank" className="flex items-center gap-1 px-2.5 cursor-alias">
+                <LinkWrapper href={AppUrls.DOCUMENTATION} target="_blank" className="flex items-center gap-1 px-2.5 cursor-alias">
                     <p className="text-milk text-sm">Docs</p>
                     <IconWrapper icon={IconIds.OPEN_LINK_IN_NEW_TAB} className="size-4" />
                 </LinkWrapper>

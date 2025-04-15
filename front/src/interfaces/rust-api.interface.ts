@@ -1,5 +1,3 @@
-// component endpoint
-
 export interface RustApiLiquidityPool {
     address: string
     id: string
@@ -18,9 +16,6 @@ export interface RustApiLiquidityPoolToken {
     symbol: string
     gas: string
 }
-
-// pools endpoint
-// todo
 
 // pairs endpoint
 export interface RustApiPair {

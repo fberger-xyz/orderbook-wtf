@@ -147,9 +147,6 @@ export default function Dashboard() {
             const orderbook = getOrderbook(pair)
             if (!orderbook) return
 
-            // notify
-            // toast(`Refreshing selected trade ...`, { style: toastStyle })
-
             // fetch trade data
             const url = `${APP_ROUTE}/api/orderbook?chain=${currentChainId}&token0=${sellToken.address}&token1=${buyToken.address}&pointAmount=${amountIn}&pointToken=${sellToken.address}`
             const tradeResponse = await fetchWithTimeout(url, { method: 'GET', headers })
@@ -172,7 +169,7 @@ export default function Dashboard() {
             if (!newTradeEntry) return
 
             // new orderbook
-            // nb: make sure we have the same amount of pools
+            // todo: make sure we have the same amount of pools
             const newOrderbook = {
                 ...tradeResponseJson.data,
 
@@ -195,9 +192,6 @@ export default function Dashboard() {
                 xAxis: newTradeEntry.average_sell_price,
             }
             selectOrderbookTrade(newSelectedTrade)
-
-            // notify
-            // toast.success(`Simulation`, { style: toastStyle })
         } catch (error) {
             toast.error(`Unexpected error while fetching price: ${extractErrorMessage(error)}`, { style: toastStyle })
         } finally {

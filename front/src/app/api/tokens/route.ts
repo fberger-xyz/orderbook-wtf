@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { StructuredOutput, Token } from '@/interfaces'
 import { PUBLIC_STREAM_API_URL } from '@/config/app.config'
-import { initOutput } from '@/utils'
+import { fetchWithTimeout, initOutput } from '@/utils'
 
 export async function GET(req: NextRequest) {
     const res = initOutput<Token[]>()
@@ -10,20 +10,12 @@ export async function GET(req: NextRequest) {
         const chainName = searchParams.get('chain')
         const url = `${PUBLIC_STREAM_API_URL}/${chainName}/tokens`
 
-        // prepare request
-        const controller = new AbortController()
-        const timeoutId = setTimeout(() => controller.abort(), 60000) // 60 seconds timeout
-
         // run req
-        const fetchResponse = await fetch(url, {
+        const fetchResponse = await fetchWithTimeout(url, {
             method: 'GET',
             headers: { 'Content-Type': 'application/json', [`${process.env.API_HEADER_KEY}`]: `${process.env.API_HEADER_VALUE}` },
-            signal: controller.signal,
             cache: 'no-store',
         })
-
-        // timeout
-        clearTimeout(timeoutId)
 
         // error
         if (!fetchResponse.ok) {

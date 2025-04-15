@@ -1,6 +1,6 @@
 'use client'
 
-import ImageWrapper from '../common/ImageWrapper'
+import ImageWrapper from '../../common/ImageWrapper'
 
 export default function ChainImage(props: { oneInchId: string; size?: number; className?: string }) {
     return (

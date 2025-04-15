@@ -51,10 +51,8 @@ export const metadata: Metadata = {
                 type: 'image/png',
             },
         ],
-        // label1: 'Coded by',
-        // data1: 'PropellerHeads',
-        // label2: 'Reading time',
-        // data2: '3 minutes',
+        // label1: 'TAP-2',
+        // data1: '@xMerso, @fberger_xyz',
     },
 }
 

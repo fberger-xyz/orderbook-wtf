@@ -17,8 +17,8 @@ export interface AmmAsOrderbook {
     timestamp: number
 
     // tokens
-    base: Token // token0
-    quote: Token // quote
+    base: Token
+    quote: Token
 
     // prices
     prices_base_to_quote: number[]
@@ -66,7 +66,7 @@ export interface AmmTrade {
     gas_costs: number[]
     gas_costs_usd: number[]
     average_sell_price: number
-    price_impact: number // donné en %
+    price_impact: number // given in %
 }
 
 export interface OrderbookKeyMetrics {

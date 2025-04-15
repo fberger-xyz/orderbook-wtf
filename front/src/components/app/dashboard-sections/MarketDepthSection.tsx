@@ -3,7 +3,7 @@
 import { IconIds, OrderbookAxisScale, OrderbookOption } from '@/enums'
 import { useAppStore } from '@/stores/app.store'
 import { cn } from '@/utils'
-import { OrderbookComponentLayout } from './Layouts'
+import { OrderbookComponentLayout } from '../commons/Commons'
 import IconWrapper from '@/components/common/IconWrapper'
 import DepthChart from '@/components/charts/DepthChart'
 import { useRef, useState } from 'react'

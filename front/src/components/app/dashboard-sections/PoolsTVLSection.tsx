@@ -5,12 +5,12 @@ import numeral from 'numeral'
 import { useAppStore } from '@/stores/app.store'
 import { AmmPool } from '@/interfaces'
 import { cleanOutput, mapProtocolIdToProtocolConfig } from '@/utils'
-import { OrderbookComponentLayout } from './Layouts'
+import { OrderbookComponentLayout } from '../commons/Commons'
 import IconWrapper from '@/components/common/IconWrapper'
-import TokenImage from '../TokenImage'
+import TokenImage from '../commons/TokenImage'
 import { useApiStore } from '@/stores/api.store'
-import PoolLink from './LinkToPool'
-import PoolUpdate from './PoolUpdate'
+import PoolLink from '../commons/LinkToPool'
+import PoolUpdate from '../commons/PoolUpdate'
 
 type PoolLiquidity = {
     base: { amount: number; usd: number }
