@@ -409,10 +409,10 @@ export default function SwapSection() {
                 {/* Swap button */}
                 {account.isConnected ? (
                     <button
-                        onClick={() => {}}
+                        disabled={true}
                         className="bg-folly flex justify-center p-4 rounded-xl border-milk-150 transition-all duration-300 hover:opacity-90"
                     >
-                        <p className="font-semibold">Swap</p>
+                        <p className="font-semibold">Swap [to be implemented]</p>
                     </button>
                 ) : (
                     <button
