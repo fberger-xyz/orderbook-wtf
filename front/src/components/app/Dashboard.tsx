@@ -110,17 +110,7 @@ export default function Dashboard() {
                         return orderbookJson
                     }
 
-                    // debug
-                    // toast(`TODO: Block ${orderbookJson.data.block} | Timestamp ${orderbookJson.data.timestamp}`, { style: toastStyle })
-
-                    // handle store update
-
-                    // ? usefull ?
-                    // const orderbook = getOrderbook(getAddressPair())
-                    // if (orderbook && orderbook.block === orderbookJson.data.block) {
-                    //     setApiStoreRefreshedAt(Date.now())
-                    //     return null
-
+                    // -
                     if (orderbookJson.data) {
                         setApiOrderbook(getAddressPair(), orderbookJson.data)
                         const mustRefreshSelectingTradeToo = sellTokenAmountInput !== undefined && sellTokenAmountInput > 0
@@ -133,7 +123,7 @@ export default function Dashboard() {
                     return orderbookJson
                 },
                 refetchOnWindowFocus: false,
-                refetchInterval: orderBookRefreshIntervalMs[currentChainId],
+                refetchInterval: orderBookRefreshIntervalMs[currentChainId] * 0.9, // small hack to avoid counter to stop at 0
             },
         ],
     })
