@@ -36,5 +36,6 @@ export enum AppUrls {
     VM_UPTIME = 'https://merso.betteruptime.com/',
 
     // doc
+    TYCHO_INDEXER = 'https://docs.propellerheads.xyz/tycho/for-solvers/indexer',
     DOCUMENTATION = 'https://tycho-orderbook.gitbook.io/docs',
 }

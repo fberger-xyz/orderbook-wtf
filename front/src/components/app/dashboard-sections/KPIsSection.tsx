@@ -15,6 +15,15 @@ import { useApiStore } from '@/stores/api.store'
 import { CHAINS_CONFIG } from '@/config/app.config'
 import { useState, useRef, useEffect } from 'react'
 
+const lastBlockTooltipContent = () => (
+    <div className="rounded-2xl backdrop-blur border border-milk-150 shadow-lg p-3 -mt-1 max-w-80 text-milk text-sm flex">
+        <p className="text-wrap">
+            Using Tycho Indexer, our backend simulates market depth on every new block (~12s on Ethereum, ~2s on Base). On the frontend, we refresh
+            every 12s on Ethereum and 5s on Base to reduce unnecessary requests and and stay responsive.
+        </p>
+    </div>
+)
+
 export default function KPIsSection() {
     const { sellToken, buyToken, currentChainId } = useAppStore()
     const { orderBookRefreshIntervalMs, apiStoreRefreshedAt, metrics } = useApiStore()
@@ -120,17 +129,7 @@ export default function KPIsSection() {
             {typeof metrics?.block === 'number' && metrics.block > 0 ? (
                 <OrderbookComponentLayout
                     title={
-                        <Tooltip
-                            placement="bottom"
-                            content={
-                                <div className="rounded-2xl backdrop-blur border border-milk-150 shadow-lg p-3 -mt-1 max-w-60">
-                                    <p className="text-milk text-sm">
-                                        While our backend updates market depth every new block (~12s on Ethereum or ~2s on Base), we limit frontend
-                                        refreshes to 12s for Ethereum and 5s for Base in order to reduce noise and keep the app fast.
-                                    </p>
-                                </div>
-                            }
-                        >
+                        <Tooltip placement="bottom" content={lastBlockTooltipContent()}>
                             <div className="w-full flex justify-between">
                                 <div className="flex gap-1">
                                     <p className="text-milk-600 text-xs">Last block</p>
@@ -172,17 +171,7 @@ export default function KPIsSection() {
             ) : (
                 <OrderbookComponentLayout
                     title={
-                        <Tooltip
-                            placement="bottom"
-                            content={
-                                <div className="rounded-2xl backdrop-blur border border-milk-150 shadow-lg p-3 -mt-1 max-w-60">
-                                    <p className="text-milk text-sm">
-                                        Our backend updates market depth every block (~12s on Ethereum, ~2s on Base). This frontend refreshes every
-                                        12s on Ethereum and 5s on Base to reduce noise and stay responsive.
-                                    </p>
-                                </div>
-                            }
-                        >
+                        <Tooltip placement="bottom" content={lastBlockTooltipContent()}>
                             <div className="flex gap-1">
                                 <p className="text-milk-600 text-xs">Last block</p>
                                 <IconWrapper icon={IconIds.INFORMATION} className="size-3.5 text-milk-200 group-hover:text-milk cursor-pointer" />
