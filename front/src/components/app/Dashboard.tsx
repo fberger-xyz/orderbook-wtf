@@ -114,19 +114,20 @@ export default function Dashboard() {
                     // toast(`TODO: Block ${orderbookJson.data.block} | Timestamp ${orderbookJson.data.timestamp}`, { style: toastStyle })
 
                     // handle store update
-                    const orderbook = getOrderbook(getAddressPair())
-                    if (orderbook && orderbook.block === orderbookJson.data.block) {
-                        setApiStoreRefreshedAt(Date.now())
-                        return null
-                    }
+
+                    // ? usefull ?
+                    // const orderbook = getOrderbook(getAddressPair())
+                    // if (orderbook && orderbook.block === orderbookJson.data.block) {
+                    //     setApiStoreRefreshedAt(Date.now())
+                    //     return null
 
                     if (orderbookJson.data) {
                         setApiOrderbook(getAddressPair(), orderbookJson.data)
                         const mustRefreshSelectingTradeToo = sellTokenAmountInput !== undefined && sellTokenAmountInput > 0
                         if (debug) console.log(`ApiOrderbookQuery: mustRefreshSelectingTradeToo =`, mustRefreshSelectingTradeToo)
                         if (mustRefreshSelectingTradeToo) await simulateTradeAndMergeOrderbook(sellTokenAmountInput)
-                        toast.success(`Market depth for ${sellToken.symbol}-${buyToken.symbol} updated just now`, { style: toastStyle })
                         setApiStoreRefreshedAt(Date.now())
+                        toast.success(`Market depth for ${sellToken.symbol}-${buyToken.symbol} updated just now`, { style: toastStyle })
                     }
 
                     return orderbookJson
@@ -177,6 +178,8 @@ export default function Dashboard() {
                 bids: [...orderbook.bids.filter((bid) => newTradeEntry.amount !== bid.amount), ...tradeResponseJson.data.bids],
                 asks: orderbook.asks,
                 pools: orderbook.pools,
+                timestamp: Math.max(tradeResponseJson.data.timestamp, orderbook.timestamp),
+                block: Math.max(tradeResponseJson.data.block, orderbook.block),
             }
 
             // update state

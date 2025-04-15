@@ -11,18 +11,22 @@ import { OrderbookComponentLayout, OrderbookKeyMetric } from '../commons/Commons
 import BestSideIcon from '@/components/icons/bestSide.icon'
 import { Tooltip } from '@nextui-org/tooltip'
 import { CountdownCircleTimer } from 'react-countdown-circle-timer'
-import { useEffect, useState } from 'react'
 import { useApiStore } from '@/stores/api.store'
 import { CHAINS_CONFIG } from '@/config/app.config'
+import { useState, useRef, useEffect } from 'react'
 
 export default function KPIsSection() {
     const { sellToken, buyToken, currentChainId } = useAppStore()
     const { orderBookRefreshIntervalMs, apiStoreRefreshedAt, metrics } = useApiStore()
-    const [timerKey, setTimerKey] = useState(0)
+    const [blockFlash, setBlockFlash] = useState(false)
+    const lastBlockRef = useRef<number | undefined>(undefined)
 
     useEffect(() => {
-        if (apiStoreRefreshedAt > 0) {
-            setTimerKey((prev) => prev + 1)
+        if (metrics?.block !== undefined && metrics.block !== lastBlockRef.current) {
+            setBlockFlash(true)
+            lastBlockRef.current = metrics.block
+            const timeout = setTimeout(() => setBlockFlash(false), 300)
+            return () => clearTimeout(timeout)
         }
     }, [apiStoreRefreshedAt])
 
@@ -113,13 +117,13 @@ export default function KPIsSection() {
                 }
             />
 
-            {metrics?.block !== undefined ? (
+            {typeof metrics?.block === 'number' && metrics.block > 0 ? (
                 <OrderbookComponentLayout
                     title={
                         <div className="w-full flex justify-between">
                             <p className="text-milk-600 text-xs">Last block</p>
                             <CountdownCircleTimer
-                                key={timerKey}
+                                key={apiStoreRefreshedAt}
                                 isPlaying
                                 duration={orderBookRefreshIntervalMs[currentChainId] / 1000}
                                 initialRemainingTime={
@@ -143,7 +147,9 @@ export default function KPIsSection() {
                             href={`${CHAINS_CONFIG[currentChainId].explorerRoot}/block/${metrics?.block}`}
                             className="flex gap-1 items-center group cursor-alias"
                         >
-                            <p className="text-milk font-semibold text-base">{cleanOutput(numeral(metrics?.block).format('0,0'))}</p>
+                            <p className={cn('text-milk font-semibold text-base', { 'animate-flash': blockFlash })}>
+                                {cleanOutput(numeral(metrics?.block).format('0,0'))}
+                            </p>
                             <IconWrapper icon={IconIds.OPEN_LINK_IN_NEW_TAB} className="size-4 text-milk-200 group-hover:text-milk" />
                         </LinkWrapper>
                     }

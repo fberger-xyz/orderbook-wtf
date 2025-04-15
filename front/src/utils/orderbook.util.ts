@@ -77,7 +77,7 @@ export const mapProtocolIdToProtocolConfig = (protocolId: string) => {
     return config
 }
 
-export const getDashboardMetrics = (orderbook: undefined | AmmAsOrderbook) => {
+export const getDashboardMetrics = (orderbook: undefined | AmmAsOrderbook, prevOrderbook?: undefined | AmmAsOrderbook) => {
     const metrics: DashboardMetrics = {
         timestamp: 0,
         block: 0,
@@ -95,8 +95,8 @@ export const getDashboardMetrics = (orderbook: undefined | AmmAsOrderbook) => {
     }
 
     if (!orderbook) return metrics
-    metrics.timestamp = orderbook.timestamp
-    metrics.block = orderbook.block
+    metrics.timestamp = Math.max(orderbook.timestamp, prevOrderbook?.timestamp ?? 0)
+    metrics.block = Math.max(orderbook.block, prevOrderbook?.block ?? 0)
     metrics.orderbook = orderbook
     metrics.highestBid = getHighestBid(orderbook)
     metrics.lowestAsk = getLowestAsk(orderbook)

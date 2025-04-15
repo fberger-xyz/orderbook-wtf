@@ -31,11 +31,17 @@ const config: Config = {
             },
             animation: {
                 'skeleton-move': 'skeleton-move 2s infinite',
+                flash: 'flash 0.6s ease-in-out',
             },
             keyframes: {
                 'skeleton-move': {
                     '0%': { transform: 'translateX(-100%)' },
                     '100%': { transform: 'translateX(100%)' },
+                },
+                flash: {
+                    '0%': { opacity: '1' },
+                    '50%': { opacity: '0.3' },
+                    '100%': { opacity: '1' },
                 },
             },
         },

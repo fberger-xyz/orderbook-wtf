@@ -24,16 +24,16 @@ export default function Footer(props: { className?: string }) {
     return (
         <div
             className={cn(
-                'w-full flex flex-col md:flex-row md:justify-between md:items-end py-6 px-8 text-milk-600/50 font-light text-sm',
+                'w-full flex flex-col md:flex-row md:justify-between md:items-end py-6 px-8 text-milk-600/50 font-light text-sm gap-4 md:gap-0',
                 props.className,
             )}
         >
-            <div className="flex md:gap-10 flex-col md:flex-row">
+            <div className="flex md:gap-10 flex-col gap-4 md:flex-row">
                 <p>2024 © PropellerHeads</p>
                 <p>
                     Alpha Version Notice <span className="opacity-50">deployed on {dayjs.utc(commitDate).format('D MMM. YYYY HH:mm A')} UTC</span>
                 </p>
-                <LinkWrapper href={AppUrls.VM_UPTIME} target="_blank" className="cursor-alias hover:underline hover:text-aquamarine pl-1">
+                <LinkWrapper href={AppUrls.VM_UPTIME} target="_blank" className="cursor-alias hover:underline hover:text-aquamarine">
                     <p>API status</p>
                 </LinkWrapper>
             </div>

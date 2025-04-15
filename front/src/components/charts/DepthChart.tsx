@@ -12,6 +12,7 @@ import { ErrorBoundaryFallback } from '../common/ErrorBoundaryFallback'
 import {
     AppColors,
     bestSideSymbol,
+    cleanOutput,
     formatAmount,
     formatAmountDependingOnPrice,
     getHighestBid,
@@ -23,6 +24,7 @@ import numeral from 'numeral'
 import toast from 'react-hot-toast'
 import { toastStyle } from '@/config/toasts.config'
 import { useApiStore } from '@/stores/api.store'
+import dayjs from 'dayjs'
 
 type LineDataPoint = {
     value: [number, number]
@@ -172,8 +174,9 @@ const getOptions = (
                     `<span style="color:${AppColors.milk[600]}">1 ${orderbook.quote.symbol} = ${numeral(1 / price).format('0,0.[00000]')} ${orderbook.base.symbol}</span>`,
                     `<br/><strong>You buy</strong>`,
                     `<span style="color:${AppColors.milk[600]}">${formatAmountDependingOnPrice(output, price)} ${buyTokenSymbol}</span>`,
-                    `<span style="color:${AppColors.milk[400]}">Price impact: ${numeral(custom?.priceImpact).format('0,0.[00]%')}</span>`,
+                    `<span style="color:${AppColors.milk[400]}">Price impact: ${cleanOutput(numeral(custom?.priceImpact).format('0,0.[00]%'), 'none')}</span>`,
                     distributionSection,
+                    `<span style="color:${AppColors.milk[400]}">Simulated at ${dayjs.utc(orderbook.timestamp * 1000).format('HH:mm:ss A')} UTC</span>`,
                 ].join('<br/>')
             },
         },
@@ -246,7 +249,7 @@ const getOptions = (
                 show: true,
                 type: 'slider',
                 height: 25,
-                bottom: '3%',
+                bottom: 30,
                 backgroundColor: AppColors.milk[50],
                 fillerColor: 'transparent',
                 borderColor: AppColors.milk[200],
@@ -348,7 +351,7 @@ const getOptions = (
             left: '7%',
             right: '7%',
             top: selectedTrade ? '40' : '20',
-            bottom: '100',
+            bottom: 110,
         },
         series: [
             {
@@ -450,38 +453,6 @@ const getOptions = (
                                   ],
                               },
                           },
-                // markLine:
-                //     selectedTrade?.trade && selectedTrade.side === OrderbookSide.ASK
-                //         ? {
-                //               symbol: ['circle', 'none'],
-                //               animation: false,
-                //               data: [
-                //                   {
-                //                       symbolSize: 6,
-                //                       lineStyle: {
-                //                           color: AppColors.folly,
-                //                           opacity: 1,
-                //                       },
-                //                       xAxis: selectedTrade.xAxis,
-                //                       // xAxis: selectedTrade.trade?.average_sell_price,
-                //                       label: {
-                //                           formatter: (askMarlineParams) => {
-                //                               return [
-                //                                   `${numeral(selectedTrade.amountIn).format('0.0,[000]')} ${orderbook.quote.symbol}`,
-                //                                   `at ${askMarlineParams.value} ${orderbook.base.symbol}/${orderbook.quote.symbol}`,
-                //                                   `= ${selectedTrade.trade?.output ? `${numeral(selectedTrade.trade?.output).format('0,0.[000]')} ${orderbook.base.symbol}` : '...computing'}`,
-                //                               ].join('\n')
-                //                           },
-                //                           color: AppColors.folly,
-                //                           show: true,
-                //                           position: 'end',
-                //                           fontSize: 10,
-                //                           opacity: 0.8,
-                //                       },
-                //                   },
-                //               ],
-                //           }
-                //         : undefined,
             },
         ],
     }
@@ -658,7 +629,7 @@ export default function DepthChart() {
     return (
         <Suspense fallback={<CustomFallback />}>
             <ErrorBoundary FallbackComponent={ErrorBoundaryFallback}>
-                <ChartBackground className="relative h-[400px]">
+                <ChartBackground className="relative h-[420px]">
                     {!storeRefreshedAt ? (
                         <LoadingArea />
                     ) : options && Array.isArray(options.series) && options.series?.length > 0 && options.series[0].data ? (

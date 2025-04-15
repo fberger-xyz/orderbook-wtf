@@ -9,11 +9,11 @@ export const APP_ROUTE = IS_DEV ? AppUrls.NEXT_API_LOCALHOST : AppUrls.NEXT_API_
 export const APP_METADATA = {
     SITE_NAME: 'Tycho Orderbook',
     SITE_DOMAIN: AppUrls.NEXT_API_PROD_SHORTER,
-    SITE_DESCRIPTION:
-        'On-chain liquidity in a familiar limit orderbook interface to read (ticks and depth per tick) and write (execute, confirmation) to',
+    SITE_DESCRIPTION: 'On-chain liquidity in a familiar orderbook interface',
     SITE_URL: AppUrls.NEXT_API_PROD_SHORTER,
 }
-export const PUBLIC_STREAM_API_URL = IS_RUNNING_IN_DOCKER ? AppUrls.RUST_API_DOCKER : IS_DEV ? AppUrls.RUST_API_LOCALHOST : AppUrls.RUST_API_PROD
+// export const PUBLIC_STREAM_API_URL = IS_RUNNING_IN_DOCKER ? AppUrls.RUST_API_DOCKER : IS_DEV ? AppUrls.RUST_API_LOCALHOST : AppUrls.RUST_API_PROD
+export const PUBLIC_STREAM_API_URL = IS_RUNNING_IN_DOCKER ? AppUrls.RUST_API_DOCKER : AppUrls.RUST_API_PROD
 export const DATE_FORMAT = 'ddd. D MMM. YYYY'
 export const TIME_FORMAT = 'hh:mm A'
 export const APP_PAGES: InterfaceAppLink[] = [

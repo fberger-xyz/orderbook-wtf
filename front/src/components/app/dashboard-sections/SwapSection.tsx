@@ -107,10 +107,9 @@ export default function SwapSection() {
         setSelectTokenModalFor,
         getAddressPair,
         currentChainId,
-        // viewMode,
     } = useAppStore()
 
-    const { metrics, setApiOrderbook, getOrderbook } = useApiStore()
+    const { metrics, setApiOrderbook, getOrderbook, setApiStoreRefreshedAt } = useApiStore()
     const account = useAccount()
     const [openTradeDetails, showTradeDetails] = useState(false)
     const [buyTokenBalance, setBuyTokenBalance] = useState(-1)
@@ -168,10 +167,13 @@ export default function SwapSection() {
                 bids: [...orderbook.bids.filter((bid) => newTradeEntry.amount !== bid.amount), ...tradeResponseJson.data.bids],
                 asks: orderbook.asks,
                 pools: orderbook.pools,
+                timestamp: Math.max(tradeResponseJson.data.timestamp, orderbook.timestamp),
+                block: Math.max(tradeResponseJson.data.block, orderbook.block),
             }
 
             /// update state
             setApiOrderbook(pair, newOrderbook)
+            setApiStoreRefreshedAt(Date.now())
 
             const newSelectedTrade = {
                 side: OrderbookSide.BID,
