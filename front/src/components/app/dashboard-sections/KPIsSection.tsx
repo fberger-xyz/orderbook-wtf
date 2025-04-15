@@ -120,26 +120,41 @@ export default function KPIsSection() {
             {typeof metrics?.block === 'number' && metrics.block > 0 ? (
                 <OrderbookComponentLayout
                     title={
-                        <div className="w-full flex justify-between">
-                            <p className="text-milk-600 text-xs">Last block</p>
-                            <CountdownCircleTimer
-                                key={apiStoreRefreshedAt}
-                                isPlaying
-                                duration={orderBookRefreshIntervalMs[currentChainId] / 1000}
-                                initialRemainingTime={
-                                    apiStoreRefreshedAt > 0
-                                        ? Math.max((orderBookRefreshIntervalMs[currentChainId] - (Date.now() - apiStoreRefreshedAt)) / 1000, 0)
-                                        : orderBookRefreshIntervalMs[currentChainId] / 1000
-                                }
-                                colors={AppColors.folly}
-                                trailColor={AppColors.background}
-                                size={16}
-                                strokeWidth={1.5}
-                                trailStrokeWidth={1.5}
-                            >
-                                {({ remainingTime }) => <p className="text-[7px] text-milk-200">{remainingTime}</p>}
-                            </CountdownCircleTimer>
-                        </div>
+                        <Tooltip
+                            placement="top"
+                            content={
+                                <div className="rounded-2xl backdrop-blur border border-milk-150 shadow-lg p-3 -mb-1 max-w-60">
+                                    <p className="text-milk text-sm">
+                                        While our backend updates market depth every new block (~12s on Ethereum or ~2s on Base), we limit frontend
+                                        refreshes (to 12s for Ethereum and 5s for Base) to reduce noise and keep the app fast.
+                                    </p>
+                                </div>
+                            }
+                        >
+                            <div className="w-full flex justify-between">
+                                <div className="flex gap-1">
+                                    <p className="text-milk-600 text-xs">Last block</p>
+                                    <IconWrapper icon={IconIds.INFORMATION} className="size-3.5 text-milk-200 group-hover:text-milk cursor-pointer" />
+                                </div>
+                                <CountdownCircleTimer
+                                    key={apiStoreRefreshedAt}
+                                    isPlaying
+                                    duration={orderBookRefreshIntervalMs[currentChainId] / 1000}
+                                    initialRemainingTime={
+                                        apiStoreRefreshedAt > 0
+                                            ? Math.max((orderBookRefreshIntervalMs[currentChainId] - (Date.now() - apiStoreRefreshedAt)) / 1000, 0)
+                                            : orderBookRefreshIntervalMs[currentChainId] / 1000
+                                    }
+                                    colors={AppColors.folly}
+                                    trailColor={AppColors.background}
+                                    size={16}
+                                    strokeWidth={1.5}
+                                    trailStrokeWidth={1.5}
+                                >
+                                    {({ remainingTime }) => <p className="text-[7px] text-milk-200">{remainingTime}</p>}
+                                </CountdownCircleTimer>
+                            </div>
+                        </Tooltip>
                     }
                     content={
                         <LinkWrapper

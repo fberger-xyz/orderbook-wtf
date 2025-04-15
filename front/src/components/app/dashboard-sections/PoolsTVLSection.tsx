@@ -126,11 +126,14 @@ export default function PoolsTVLSection() {
                     <div className="flex flex-col gap-2">
                         <p className="text-milk-400 text-xs">Breakdown by token</p>
                         <div className="w-full overflow-x-scroll">
-                            <div className="flex w-full justify-center items-center rounded-xl gap-1 border border-milk-150 flex-col px-3 py-2 min-w-[800px]">
+                            <div className="flex w-full justify-center items-center rounded-xl gap-1 border border-milk-150 flex-col px-3 py-2 min-w-[900px]">
                                 {/* Headers */}
                                 <div className="grid grid-cols-11 w-full rounded-xl py-1 px-4 gap-5 items-end text-xs text-milk-200">
                                     <p className="col-span-2">Pools</p>
-                                    <p className="col-span-1">Last update</p>
+                                    <div className="col-span-1 flex gap-0.5 text-start truncate">
+                                        <p>Updated</p>
+                                        <p className="text-xs">(1)</p>
+                                    </div>
 
                                     {/* Base token */}
                                     <div className="flex flex-col col-span-3 gap-2">
