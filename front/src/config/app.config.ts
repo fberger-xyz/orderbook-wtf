@@ -14,7 +14,6 @@ export const APP_METADATA = {
     SITE_URL: AppUrls.NEXT_API_PROD_SHORTER,
 }
 export const PUBLIC_STREAM_API_URL = IS_RUNNING_IN_DOCKER ? AppUrls.RUST_API_DOCKER : IS_DEV ? AppUrls.RUST_API_LOCALHOST : AppUrls.RUST_API_PROD
-// export const PUBLIC_STREAM_API_URL = IS_RUNNING_IN_DOCKER ? AppUrls.RUST_API_DOCKER : AppUrls.RUST_API_PROD
 export const DATE_FORMAT = 'ddd. D MMM. YYYY'
 export const TIME_FORMAT = 'hh:mm A'
 export const APP_PAGES: InterfaceAppLink[] = [

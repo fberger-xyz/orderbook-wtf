@@ -111,7 +111,7 @@ export default function Dashboard() {
                     }
 
                     // debug
-                    toast(`TODO: Block ${orderbookJson.data.block} | Timestamp ${orderbookJson.data.timestamp}`, { style: toastStyle })
+                    // toast(`TODO: Block ${orderbookJson.data.block} | Timestamp ${orderbookJson.data.timestamp}`, { style: toastStyle })
 
                     // handle store update
                     const orderbook = getOrderbook(getAddressPair())
