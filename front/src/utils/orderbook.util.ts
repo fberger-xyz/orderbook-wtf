@@ -79,7 +79,8 @@ export const mapProtocolIdToProtocolConfig = (protocolId: string) => {
 
 export const getDashboardMetrics = (orderbook: undefined | AmmAsOrderbook) => {
     const metrics: DashboardMetrics = {
-        orderbook: undefined,
+        timestamp: 0,
+        block: 0,
         highestBid: undefined,
         midPrice: undefined,
         lowestAsk: undefined,
@@ -88,23 +89,29 @@ export const getDashboardMetrics = (orderbook: undefined | AmmAsOrderbook) => {
         totalQuoteAmountInPools: 0,
         totalBaseTvlUsd: 0,
         totalQuoteTvlUsd: 0,
+
+        // all
+        orderbook: undefined,
     }
 
     if (!orderbook) return metrics
+    metrics.timestamp = orderbook.timestamp
+    metrics.block = orderbook.block
     metrics.orderbook = orderbook
     metrics.highestBid = getHighestBid(orderbook)
     metrics.lowestAsk = getLowestAsk(orderbook)
 
     if (metrics.highestBid && metrics.lowestAsk) {
+        // mid
         metrics.midPrice = (metrics.highestBid.average_sell_price + 1 / metrics.lowestAsk.average_sell_price) / 2
+
+        // spread
         metrics.spreadPercent = (1 / metrics.lowestAsk.average_sell_price - metrics.highestBid.average_sell_price) / metrics.midPrice
 
+        // quote TVL and base TVL
         if (orderbook?.base_lqdty && orderbook?.quote_lqdty) {
-            metrics.totalBaseAmountInPools = orderbook.base_lqdty.reduce((total: number, baseAmountInPool: number) => (total += baseAmountInPool), 0)
-            metrics.totalQuoteAmountInPools = orderbook.quote_lqdty.reduce(
-                (total: number, quoteAmountInPool: number) => (total += quoteAmountInPool),
-                0,
-            )
+            metrics.totalBaseAmountInPools = orderbook.base_lqdty.reduce((total, baseAmountInPool) => (total += baseAmountInPool), 0)
+            metrics.totalQuoteAmountInPools = orderbook.quote_lqdty.reduce((total, quoteAmountInPool) => (total += quoteAmountInPool), 0)
             metrics.totalBaseTvlUsd = metrics.totalBaseAmountInPools * orderbook.base_worth_eth * orderbook.eth_usd
             metrics.totalQuoteTvlUsd = metrics.totalQuoteAmountInPools * orderbook.quote_worth_eth * orderbook.eth_usd
         }

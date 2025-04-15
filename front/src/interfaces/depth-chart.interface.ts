@@ -115,6 +115,8 @@ export interface SelectedTrade {
  */
 
 export interface DashboardMetrics {
+    timestamp: number
+    block: number
     highestBid?: AmmTrade
     midPrice?: number
     lowestAsk?: AmmTrade

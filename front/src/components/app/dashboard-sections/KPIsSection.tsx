@@ -113,7 +113,7 @@ export default function KPIsSection() {
                 }
             />
 
-            {metrics?.orderbook?.block !== undefined ? (
+            {metrics?.block !== undefined ? (
                 <OrderbookComponentLayout
                     title={
                         <div className="w-full flex justify-between">
@@ -140,10 +140,10 @@ export default function KPIsSection() {
                     content={
                         <LinkWrapper
                             target="_blank"
-                            href={`${CHAINS_CONFIG[currentChainId].explorerRoot}/block/${metrics?.orderbook.block}`}
+                            href={`${CHAINS_CONFIG[currentChainId].explorerRoot}/block/${metrics?.block}`}
                             className="flex gap-1 items-center group cursor-alias"
                         >
-                            <p className="text-milk font-semibold text-base">{cleanOutput(numeral(metrics?.orderbook.block).format('0,0'))}</p>
+                            <p className="text-milk font-semibold text-base">{cleanOutput(numeral(metrics?.block).format('0,0'))}</p>
                             <IconWrapper icon={IconIds.OPEN_LINK_IN_NEW_TAB} className="size-4 text-milk-200 group-hover:text-milk" />
                         </LinkWrapper>
                     }
@@ -197,7 +197,7 @@ export default function KPIsSection() {
                     </Tooltip>
                 }
                 content={
-                    !metrics || metrics.totalBaseTvlUsd === 0 || metrics.totalQuoteTvlUsd === 0 ? (
+                    !metrics || (metrics?.totalBaseTvlUsd === 0 && metrics?.totalQuoteTvlUsd === 0) ? (
                         <div className="flex gap-1.5 items-center flex-wrap skeleton-loading p-1 w-full">
                             <p className="text-milk-100 font-semibold text-sm">$ --- m</p>
                         </div>

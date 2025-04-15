@@ -662,10 +662,15 @@ export default function DepthChart() {
                     {!storeRefreshedAt ? (
                         <LoadingArea />
                     ) : options && Array.isArray(options.series) && options.series?.length > 0 && options.series[0].data ? (
-                        <EchartWrapper
-                            options={options}
-                            onPointClick={(params) => handlePointClick(params as undefined | { data: EchartOnClickParamsData; dataIndex: number })}
-                        />
+                        <>
+                            <p className="text-milk-400 text-xs">Click any green bid dot to autofill the swap panel</p>
+                            <EchartWrapper
+                                options={options}
+                                onPointClick={(params) =>
+                                    handlePointClick(params as undefined | { data: EchartOnClickParamsData; dataIndex: number })
+                                }
+                            />
+                        </>
                     ) : (
                         <LoadingArea />
                     )}
