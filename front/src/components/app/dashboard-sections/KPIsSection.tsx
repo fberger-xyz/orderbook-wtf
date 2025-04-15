@@ -170,8 +170,25 @@ export default function KPIsSection() {
                     }
                 />
             ) : (
-                <OrderbookKeyMetric
-                    title="Last block"
+                <OrderbookComponentLayout
+                    title={
+                        <Tooltip
+                            placement="bottom"
+                            content={
+                                <div className="rounded-2xl backdrop-blur border border-milk-150 shadow-lg p-3 -mt-1 max-w-60">
+                                    <p className="text-milk text-sm">
+                                        Our backend updates market depth every block (~12s on Ethereum, ~2s on Base). This frontend refreshes every
+                                        12s on Ethereum and 5s on Base to reduce noise and stay responsive.
+                                    </p>
+                                </div>
+                            }
+                        >
+                            <div className="flex gap-1">
+                                <p className="text-milk-600 text-xs">Last block</p>
+                                <IconWrapper icon={IconIds.INFORMATION} className="size-3.5 text-milk-200 group-hover:text-milk cursor-pointer" />
+                            </div>
+                        </Tooltip>
+                    }
                     content={
                         <div className="flex gap-1.5 items-center flex-wrap skeleton-loading p-1">
                             <p className="text-milk-100 font-semibold text-sm">123456789</p>
