@@ -31,7 +31,7 @@ const config: Config = {
             },
             animation: {
                 'skeleton-move': 'skeleton-move 2s infinite',
-                flash: 'flash 0.6s ease-in-out',
+                flash: 'flash 0.8s ease-in-out',
             },
             keyframes: {
                 'skeleton-move': {
@@ -39,9 +39,11 @@ const config: Config = {
                     '100%': { transform: 'translateX(100%)' },
                 },
                 flash: {
-                    '0%': { opacity: '1' },
-                    '50%': { opacity: '0.3' },
-                    '100%': { opacity: '1' },
+                    '0%': { opacity: '1', transform: 'scale(1)', color: '#fff4e0ff', textShadow: '0 0 0 transparent' },
+                    '25%': { opacity: '0.7', transform: 'scale(1.1)', color: '#FFD11B', textShadow: '0 0 8px #FFD11B' },
+                    '50%': { opacity: '1', transform: 'scale(1)', color: '#fff4e0ff', textShadow: '0 0 0 transparent' },
+                    '75%': { opacity: '0.7', transform: 'scale(1.1)', color: '#FFD11B', textShadow: '0 0 8px #FFD11B' },
+                    '100%': { opacity: '1', transform: 'scale(1)', color: '#fff4e0ff', textShadow: '0 0 0 transparent' },
                 },
             },
         },
