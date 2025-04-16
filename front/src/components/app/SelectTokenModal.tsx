@@ -191,10 +191,10 @@ export default function SelectTokenModal() {
                                                 <p className="text-xs text-milk-400">{shortenAddress(token.address)}</p>
                                             </div>
                                         </div>
-                                        <div className="flex flex-col items-end">
+                                        {/* <div className="flex flex-col items-end">
                                             <p className="text-sm text-milk">0.000000</p>
                                             <p className="text-xs text-milk-400">$0.00</p>
-                                        </div>
+                                        </div> */}
                                     </button>
                                 ))}
                         </>
@@ -236,14 +236,14 @@ export default function SelectTokenModal() {
                                         <p className="text-xs text-milk-400">{shortenAddress(token.address)}</p>
                                     </div>
                                 </div>
-                                {[selectTokenModalFor === 'buy' ? buyToken.symbol.toLowerCase() : sellToken.symbol.toLowerCase()].includes(
+                                {/* {[selectTokenModalFor === 'buy' ? buyToken.symbol.toLowerCase() : sellToken.symbol.toLowerCase()].includes(
                                     token.symbol.toLowerCase(),
                                 ) && (
                                     <div className="flex flex-col items-end">
                                         <p className="text-sm text-milk-600">0.000000</p>
                                         <p className="text-xs text-milk-400">$0.00</p>
                                     </div>
-                                )}
+                                )} */}
                             </button>
                         ))}
                     <span className="h-2" />
