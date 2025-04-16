@@ -3,15 +3,15 @@
 import { AppSupportedChains, IconIds, OrderbookSide } from '@/enums'
 import numeral from 'numeral'
 import { useAppStore } from '@/stores/app.store'
-import { ChangeEvent, useEffect, useState, useRef } from 'react'
+import { ChangeEvent, useState, useRef } from 'react'
 import IconWrapper from '../../common/IconWrapper'
 import TokenImage from '../commons/TokenImage'
 import ChainImage from '../commons/ChainImage'
 import { AmmAsOrderbook, SelectedTrade, StructuredOutput, Token } from '@/interfaces'
 import SelectTokenModal from '../SelectTokenModal'
-import { useModal } from 'connectkit'
+// import { useModal } from 'connectkit'
 import { useAccount } from 'wagmi'
-import { cn, extractErrorMessage, fetchBalance, formatAmount, formatOrDisplayRaw, getBaseValueInUsd, getQuoteValueInUsd, safeNumeral } from '@/utils'
+import { cleanOutput, cn, extractErrorMessage, formatAmount, formatOrDisplayRaw, getBaseValueInUsd, getQuoteValueInUsd, safeNumeral } from '@/utils'
 import { useApiStore } from '@/stores/api.store'
 import { APP_ROUTE, CHAINS_CONFIG } from '@/config/app.config'
 import toast from 'react-hot-toast'
@@ -19,12 +19,12 @@ import { toastStyle } from '@/config/toasts.config'
 
 const rawAmountFormat = '0,0.[00000000000]'
 
-const TokenBalance = ({ balance, isConnected }: { balance: number; isConnected: boolean }) => (
-    <div className="flex justify-between gap-1 items-center">
-        <IconWrapper icon={IconIds.WALLET} className="size-4 text-milk-400" />
-        <p className="text-milk-400 text-xs">{isConnected && balance >= 0 ? formatAmount(balance) : 0}</p>
-    </div>
-)
+// const TokenBalance = ({ balance, isConnected }: { balance: number; isConnected: boolean }) => (
+//     <div className="flex justify-between gap-1 items-center">
+//         <IconWrapper icon={IconIds.WALLET} className="size-4 text-milk-400" />
+//         <p className="text-milk-400 text-xs">{isConnected && balance >= 0 ? formatAmount(balance) : 0}</p>
+//     </div>
+// )
 
 const TokenSelector = ({ token, onClick }: { token: Token | undefined; onClick: () => void }) => (
     <button
@@ -53,18 +53,26 @@ const TradeDetails = ({
     <div className="flex flex-col gap-2 text-xs px-2">
         <div className="flex justify-between w-full text-milk-400">
             <p>Expected output</p>
-            <div className="skeleton-loading w-16 h-4 rounded-full" />
+            {isLoading ? (
+                <div className="skeleton-loading w-16 h-4 rounded-full" />
+            ) : (
+                <p>{selectedTrade?.trade?.output ? numeral(selectedTrade?.trade?.output).format('0,0.[000000]') : 0}</p>
+            )}
         </div>
         <div className="flex justify-between w-full text-milk-400">
             <p>Minimum received after slippage (0.2%)</p>
-            <div className="skeleton-loading w-16 h-4 rounded-full" />
+            {isLoading ? (
+                <div className="skeleton-loading w-16 h-4 rounded-full" />
+            ) : (
+                <p>{selectedTrade?.trade?.output ? numeral(selectedTrade?.trade?.output * 0.998).format('0,0.[000000]') : 0}</p>
+            )}
         </div>
         <div className="flex justify-between w-full text-milk-400">
             <p>Price Impact</p>
             {isLoading ? (
                 <div className="skeleton-loading w-16 h-4 rounded-full" />
             ) : (
-                <p>{selectedTrade?.trade?.price_impact ? numeral(selectedTrade?.trade?.price_impact).format('0,0.[000]%') : '-'}</p>
+                <p>{selectedTrade?.trade?.price_impact ? `~${numeral(selectedTrade?.trade?.price_impact).format('0,0.[00]%')}` : '-'}</p>
             )}
         </div>
         <div className="flex justify-between w-full text-milk-400">
@@ -84,7 +92,15 @@ const TradeDetails = ({
         </div>
         <div className="flex justify-between w-full text-milk-400">
             <p>Network Fee</p>
-            <div className="skeleton-loading w-16 h-4 rounded-full" />
+            {isLoading ? (
+                <div className="skeleton-loading w-16 h-4 rounded-full" />
+            ) : (
+                <p>
+                    {selectedTrade?.trade?.gas_costs_usd
+                        ? `~${cleanOutput(numeral(selectedTrade?.trade?.gas_costs_usd.reduce((acc, curr) => (acc += curr), 0)).format('0,0.[00]'))} $`
+                        : 0}
+                </p>
+            )}
         </div>
     </div>
 )
@@ -111,25 +127,25 @@ export default function SwapSection() {
 
     const { metrics, setApiOrderbook, getOrderbook, setApiStoreRefreshedAt } = useApiStore()
     const account = useAccount()
-    const [openTradeDetails, showTradeDetails] = useState(false)
-    const [buyTokenBalance, setBuyTokenBalance] = useState(-1)
-    const [sellTokenBalance, setSellTokenBalance] = useState(-1)
-    const { setOpen } = useModal()
+    const [openTradeDetails, showTradeDetails] = useState(true)
+    // const [buyTokenBalance, setBuyTokenBalance] = useState(-1)
+    const [sellTokenBalance] = useState(-1)
+    // const { setOpen } = useModal()
     const debounceTimeout = useRef<NodeJS.Timeout | null>(null)
 
     // todo: improve this
     if (sellTokenAmountInputRaw === 0 && sellTokenAmountInput !== 0) setSellTokenAmountInputRaw(sellTokenAmountInput)
 
-    useEffect(() => {
-        if (account.status === 'connected' && account.address && account.chainId) {
-            fetchBalance(account.address, account.chainId, buyToken.address as `0x${string}`).then((balance) =>
-                setBuyTokenBalance(isNaN(balance) ? -1 : balance),
-            )
-            fetchBalance(account.address, account.chainId, sellToken.address as `0x${string}`).then((balance) =>
-                setSellTokenBalance(isNaN(balance) ? -1 : balance),
-            )
-        }
-    }, [account.address, account.chainId, account.status, buyToken.address, sellToken.address])
+    // useEffect(() => {
+    //     if (account.status === 'connected' && account.address && account.chainId) {
+    //         fetchBalance(account.address, account.chainId, buyToken.address as `0x${string}`).then((balance) =>
+    //             setBuyTokenBalance(isNaN(balance) ? -1 : balance),
+    //         )
+    //         fetchBalance(account.address, account.chainId, sellToken.address as `0x${string}`).then((balance) =>
+    //             setSellTokenBalance(isNaN(balance) ? -1 : balance),
+    //         )
+    //     }
+    // }, [account.address, account.chainId, account.status, buyToken.address, sellToken.address])
 
     const simulateTradeAndMergeOrderbook = async (amountIn: number) => {
         try {
@@ -234,16 +250,17 @@ export default function SwapSection() {
                 {/* Sell section */}
                 <div
                     className={cn('flex flex-col gap-4 p-4 rounded-xl border-milk-150 w-full', {
-                        'bg-folly/20': account.isConnected && sellToken.address && sellTokenAmountInput && sellTokenBalance < sellTokenAmountInput,
-                        'bg-milk-600/5': !(account.isConnected && sellTokenAmountInput && sellTokenBalance < sellTokenAmountInput),
+                        // 'bg-folly/20': account.isConnected && sellToken.address && sellTokenAmountInput && sellTokenBalance < sellTokenAmountInput,
+                        // 'bg-milk-600/5': !(account.isConnected && sellTokenAmountInput && sellTokenBalance < sellTokenAmountInput),
+                        'bg-milk-600/5': true,
                     })}
                 >
                     <div className="flex justify-between">
                         <p className="text-milk-600 text-xs">Sell</p>
                         <div className="flex items-center">
-                            {account.isConnected && sellTokenBalance >= 0 && sellTokenAmountInput && sellTokenBalance < sellTokenAmountInput ? (
+                            {/* {account.isConnected && sellTokenBalance >= 0 && sellTokenAmountInput && sellTokenBalance < sellTokenAmountInput ? (
                                 <p className="text-folly text-xs pr-2">Exceeds Balance</p>
-                            ) : null}
+                            ) : null} */}
                             <p className="text-aquamarine text-xs">Best bid</p>
                         </div>
                     </div>
@@ -267,7 +284,8 @@ export default function SwapSection() {
                     {selectedTrade ? (
                         <div className="mt-2 flex justify-between items-center">
                             <div className="flex items-center gap-1">
-                                <TokenBalance balance={sellTokenBalance} isConnected={account.isConnected} />
+                                {/* <TokenBalance balance={sellTokenBalance} isConnected={account.isConnected} /> */}
+                                <span />
                                 {account.isConnected && sellToken.address && (
                                     <button
                                         onClick={() => {
@@ -289,7 +307,8 @@ export default function SwapSection() {
                         </div>
                     ) : (
                         <div className="flex justify-between items-center">
-                            <TokenBalance balance={buyTokenBalance} isConnected={account.isConnected} />
+                            {/* <TokenBalance balance={buyTokenBalance} isConnected={account.isConnected} /> */}
+                            <span />
                             <p className="text-milk-600 text-xs">$ 0</p>
                         </div>
                     )}
@@ -338,7 +357,8 @@ export default function SwapSection() {
                     {/* Last row  */}
                     {selectedTrade ? (
                         <div className="flex justify-between items-center">
-                            <TokenBalance balance={sellTokenBalance} isConnected={account.isConnected} />
+                            {/* <TokenBalance balance={sellTokenBalance} isConnected={account.isConnected} /> */}
+                            <span />
                             {isLoadingSomeTrade ? (
                                 <div className="skeleton-loading w-16 h-4 rounded-full" />
                             ) : (
@@ -352,7 +372,8 @@ export default function SwapSection() {
                         </div>
                     ) : (
                         <div className="flex justify-between items-center">
-                            <TokenBalance balance={sellTokenBalance} isConnected={account.isConnected} />
+                            {/* <TokenBalance balance={sellTokenBalance} isConnected={account.isConnected} /> */}
+                            <span />
                             <p className="text-milk-600 text-xs">$ 0</p>
                         </div>
                     )}
@@ -407,7 +428,7 @@ export default function SwapSection() {
                 <div className="h-0 w-full" />
 
                 {/* Swap button */}
-                {account.isConnected ? (
+                {/* {account.isConnected ? (
                     <button
                         disabled={true}
                         className="bg-folly flex justify-center p-4 rounded-xl border-milk-150 transition-all duration-300 hover:opacity-90"
@@ -421,7 +442,7 @@ export default function SwapSection() {
                     >
                         <p className="font-semibold">Connect wallet</p>
                     </button>
-                )}
+                )} */}
 
                 {/* Debug */}
                 {/* {IS_DEV && <pre className="text-xs p-2">{JSON.stringify({ ...selectedTrade, pools: 'hidden' }, null, 2)}</pre>} */}

@@ -2,7 +2,7 @@
 
 import { cn } from '@/utils'
 import IconWrapper from '../common/IconWrapper'
-import { ConnectOrDisconnect } from '../wallet/ConnectOrDisconnect'
+// import { ConnectOrDisconnect } from '../wallet/ConnectOrDisconnect'
 import LinkWrapper from '../common/LinkWrapper'
 import { AppUrls, IconIds } from '@/enums'
 import TychoSVG from '../icons/tycho-svg.icon'
@@ -16,9 +16,10 @@ import toast from 'react-hot-toast'
 import { toastStyle } from '@/config/toasts.config'
 import { switchChain } from '@wagmi/core'
 import { config } from '@/providers/wagmi'
+import WatIsTisModal from '../app/WatIsTisModal'
 
 export default function Header(props: { className?: string }) {
-    const { currentChainId, setCurrentChain } = useAppStore()
+    const { currentChainId, setCurrentChain, setShowWasIsTisModal } = useAppStore()
     const { setMetrics } = useApiStore()
     const [openNetworkDropown, setOpenNetworkDropown] = useState(false)
     const networkDropown = useRef<HTMLDivElement>(null)
@@ -30,6 +31,11 @@ export default function Header(props: { className?: string }) {
                 <p className="text-milk-600 font-light opacity-50">Orderbook</p>
             </div>
             <div className="flex flex-wrap justify-end items-center gap-2 z-20">
+                {/* docs */}
+                <button onClick={() => setShowWasIsTisModal(true)} className="flex items-center gap-1 px-2.5">
+                    <p className="text-milk text-sm">wat is tis</p>
+                </button>
+
                 {/* docs */}
                 <LinkWrapper href={AppUrls.DOCUMENTATION} target="_blank" className="flex items-center gap-1 px-2.5 cursor-alias">
                     <p className="text-milk text-sm">Docs</p>
@@ -94,7 +100,8 @@ export default function Header(props: { className?: string }) {
                 </button>
 
                 {/* connect */}
-                <ConnectOrDisconnect />
+                {/* <ConnectOrDisconnect /> */}
+                <WatIsTisModal />
             </div>
         </div>
     )

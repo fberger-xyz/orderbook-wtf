@@ -79,6 +79,8 @@ export const useAppStore = create<{
     setSelectTokenModalFor: (selectTokenModalFor: 'buy' | 'sell') => void
     selectTokenModalSearch: string
     setSelectTokenModalSearch: (selectTokenModalSearch: string) => void
+    showWasIsTisModal: boolean
+    setShowWasIsTisModal: (showWasIsTisModal: boolean) => void
 
     /**
      * computeds
@@ -192,6 +194,8 @@ export const useAppStore = create<{
             setShowSelectTokenModal: (showSelectTokenModal) => set(() => ({ showSelectTokenModal })),
             setSelectTokenModalFor: (selectTokenModalFor) => set(() => ({ selectTokenModalFor })),
             setSelectTokenModalSearch: (selectTokenModalSearch) => set(() => ({ selectTokenModalSearch })),
+            showWasIsTisModal: false,
+            setShowWasIsTisModal: (showWasIsTisModal) => set(() => ({ showWasIsTisModal })),
 
             /**
              * computeds
