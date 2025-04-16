@@ -220,8 +220,10 @@ const getOptions = (
             axisTick: {
                 show: false,
             },
-            min: 'dataMin',
-            max: 'dataMax',
+            // min: 'dataMin',
+            // max: 'dataMax',
+            min: (value) => Math.min(value.min, Number(selectedTrade?.xAxis ?? Infinity)) * 0.95,
+            max: (value) => Math.max(value.max, Number(selectedTrade?.xAxis ?? -Infinity)) * 1.05,
             axisPointer: {
                 show: true,
                 label: {
@@ -388,36 +390,39 @@ const getOptions = (
                                   ],
                               },
                           },
-                markLine: selectedTrade?.trade
-                    ? {
-                          symbol: ['circle', 'none'],
-                          animation: false,
-                          data: [
-                              {
-                                  symbolSize: 6,
-                                  lineStyle: {
-                                      color: AppColors.aquamarine,
-                                      opacity: 1,
-                                  },
-                                  xAxis: Number(selectedTrade.xAxis),
-                                  label: {
-                                      formatter: (bidMarlineParams) => {
-                                          return [
-                                              `${numeral(selectedTrade.amountIn).format('0.0,[000]')} ${orderbook.base.symbol}`,
-                                              `at ${bidMarlineParams.value} ${orderbook.base.symbol}/${orderbook.quote.symbol}`,
-                                              `= ${selectedTrade.trade?.output ? `${numeral(selectedTrade.trade.output).format('0,0.[000]')} ${orderbook.quote.symbol}` : '...computing'}`,
-                                          ].join('\n')
+                markLine:
+                    selectedTrade?.trade && selectedTrade.trade?.output && Number(selectedTrade.xAxis) > 0
+                        ? {
+                              symbol: ['circle', 'none'],
+                              animation: false,
+                              data: [
+                                  {
+                                      name: 'Best bid',
+                                      symbolSize: 6,
+                                      lineStyle: {
+                                          color: AppColors.aquamarine,
+                                          opacity: 1,
                                       },
-                                      color: AppColors.aquamarine,
-                                      show: true,
-                                      position: 'end',
-                                      fontSize: 10,
-                                      opacity: 0.8,
+                                      xAxis: Math.max(0, Number(selectedTrade.xAxis)),
+                                      label: {
+                                          formatter: (bidMarlineParams) => {
+                                              console.log({ bidMarlineParams })
+                                              return [
+                                                  `${numeral(selectedTrade.amountIn).format('0.0,[000]')} ${orderbook.base.symbol}`,
+                                                  `at ${bidMarlineParams.value} ${orderbook.base.symbol}/${orderbook.quote.symbol}`,
+                                                  `= ${selectedTrade.trade?.output ? `${numeral(selectedTrade.trade.output).format('0,0.[000]')} ${orderbook.quote.symbol}` : '...computing'}`,
+                                              ].join('\n')
+                                          },
+                                          color: AppColors.aquamarine,
+                                          show: true,
+                                          position: 'end',
+                                          fontSize: 10,
+                                          opacity: 0.8,
+                                      },
                                   },
-                              },
-                          ],
-                      }
-                    : undefined,
+                              ],
+                          }
+                        : undefined,
             },
             {
                 yAxisIndex: 1,
@@ -485,9 +490,9 @@ export default function DepthChart() {
         // debug
         if (debug) console.log('useEffect: orderbook', orderbook)
 
-        // logic
+        // ?
         if (!metrics) setOptions(null)
-        if (orderbook?.bids && orderbook?.asks) {
+        else if (orderbook?.bids && orderbook?.asks) {
             const highestBid = getHighestBid(orderbook)
             const lowestAsk = getLowestAsk(orderbook)
             const bids: LineDataPoint[] = orderbook?.bids
@@ -560,11 +565,8 @@ export default function DepthChart() {
                 })
 
             const newOptions = getOptions(orderbook, bids, asks, yAxisType, yAxisLogBase, coloredAreas, symbolsInYAxis, selectedTrade)
-
             setOptions(newOptions)
-        } else {
-            setOptions(null)
-        }
+        } else setOptions(null)
     }, [currentChainId, metrics, apiStoreRefreshedAt, yAxisType, yAxisLogBase, coloredAreas, symbolsInYAxis, selectedTrade])
 
     const handlePointClick = (params: undefined | { data: EchartOnClickParamsData; dataIndex: number }) => {

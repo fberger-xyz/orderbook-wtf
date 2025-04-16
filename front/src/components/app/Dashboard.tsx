@@ -3,7 +3,7 @@
 import { AppSupportedChains, OrderbookSide } from '@/enums'
 import { useAppStore } from '@/stores/app.store'
 import { AmmAsOrderbook, RustApiPair, StructuredOutput, Token } from '@/interfaces'
-import { extractErrorMessage, fetchWithTimeout } from '@/utils'
+import { extractErrorMessage, fetchWithTimeout, getHighestBid } from '@/utils'
 import { useQueries } from '@tanstack/react-query'
 import { useApiStore } from '@/stores/api.store'
 import { APP_ROUTE, CHAINS_CONFIG } from '@/config/app.config'
@@ -18,7 +18,8 @@ import KPIsSection from './dashboard-sections/KPIsSection'
 const headers = { 'Content-Type': 'application/json' }
 
 export default function Dashboard() {
-    const { sellToken, sellTokenAmountInput, buyToken, currentChainId, setIsLoadingSomeTrade, selectOrderbookTrade, getAddressPair } = useAppStore()
+    const { sellToken, sellTokenAmountInput, buyToken, currentChainId, selectedTrade, setIsLoadingSomeTrade, selectOrderbookTrade, getAddressPair } =
+        useAppStore()
 
     const { orderBookRefreshIntervalMs, setApiTokens, setApiPairs, setApiOrderbook, setApiStoreRefreshedAt, getOrderbook } = useApiStore()
 
@@ -116,6 +117,18 @@ export default function Dashboard() {
                         const mustRefreshSelectingTradeToo = sellTokenAmountInput !== undefined && sellTokenAmountInput > 0
                         if (debug) console.log(`ApiOrderbookQuery: mustRefreshSelectingTradeToo =`, mustRefreshSelectingTradeToo)
                         if (mustRefreshSelectingTradeToo) await simulateTradeAndMergeOrderbook(sellTokenAmountInput)
+                        else if (!selectedTrade) {
+                            const highestBid = getHighestBid(orderbookJson.data)
+                            if (highestBid)
+                                selectOrderbookTrade({
+                                    side: OrderbookSide.BID,
+                                    amountIn: highestBid.amount,
+                                    selectedAt: Date.now(),
+                                    trade: highestBid,
+                                    pools: orderbookJson.data.pools,
+                                    xAxis: highestBid.average_sell_price,
+                                })
+                        }
                         setApiStoreRefreshedAt(Date.now())
                         toast.success(`Market depth for ${sellToken.symbol}-${buyToken.symbol} updated just now`, { style: toastStyle })
                     }
