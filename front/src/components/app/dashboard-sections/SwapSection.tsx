@@ -56,7 +56,7 @@ const TradeDetails = ({
             {isLoading ? (
                 <div className="skeleton-loading w-16 h-4 rounded-full" />
             ) : (
-                <p>{selectedTrade?.trade?.output ? numeral(selectedTrade?.trade?.output).format('0,0.[000000]') : 0}</p>
+                <p>{selectedTrade?.trade?.output ? cleanOutput(numeral(selectedTrade?.trade?.output).format('0,0.[000000]')) : 0}</p>
             )}
         </div>
         <div className="flex justify-between w-full text-milk-400">
@@ -64,7 +64,7 @@ const TradeDetails = ({
             {isLoading ? (
                 <div className="skeleton-loading w-16 h-4 rounded-full" />
             ) : (
-                <p>{selectedTrade?.trade?.output ? numeral(selectedTrade?.trade?.output * 0.998).format('0,0.[000000]') : 0}</p>
+                <p>{selectedTrade?.trade?.output ? cleanOutput(numeral(selectedTrade?.trade?.output * 0.998).format('0,0.[000000]')) : 0}</p>
             )}
         </div>
         <div className="flex justify-between w-full text-milk-400">
@@ -72,7 +72,7 @@ const TradeDetails = ({
             {isLoading ? (
                 <div className="skeleton-loading w-16 h-4 rounded-full" />
             ) : (
-                <p>{selectedTrade?.trade?.price_impact ? `~${numeral(selectedTrade?.trade?.price_impact).format('0,0.[00]%')}` : '-'}</p>
+                <p>{selectedTrade?.trade?.price_impact ? cleanOutput(`~${numeral(selectedTrade?.trade?.price_impact).format('0,0.[00]%')}`) : '-'}</p>
             )}
         </div>
         <div className="flex justify-between w-full text-milk-400">
@@ -97,7 +97,7 @@ const TradeDetails = ({
             ) : (
                 <p>
                     {selectedTrade?.trade?.gas_costs_usd
-                        ? `~${cleanOutput(numeral(selectedTrade?.trade?.gas_costs_usd.reduce((acc, curr) => (acc += curr), 0)).format('0,0.[00]'))} $`
+                        ? cleanOutput(`~${numeral(selectedTrade?.trade?.gas_costs_usd.reduce((acc, curr) => (acc += curr), 0)).format('0,0.[00]')} $`)
                         : 0}
                 </p>
             )}

@@ -19,7 +19,8 @@ import { config } from '@/providers/wagmi'
 import WatIsTisModal from '../app/WatIsTisModal'
 
 export default function Header(props: { className?: string }) {
-    const { currentChainId, setCurrentChain, setShowWasIsTisModal } = useAppStore()
+    // const { currentChainId, setCurrentChain, setShowWasIsTisModal } = useAppStore()
+    const { currentChainId, setCurrentChain } = useAppStore()
     const { setMetrics } = useApiStore()
     const [openNetworkDropown, setOpenNetworkDropown] = useState(false)
     const networkDropown = useRef<HTMLDivElement>(null)
@@ -32,9 +33,9 @@ export default function Header(props: { className?: string }) {
             </div>
             <div className="flex flex-wrap justify-end items-center gap-2 z-20">
                 {/* docs */}
-                <button onClick={() => setShowWasIsTisModal(true)} className="flex items-center gap-1 px-2.5">
+                {/* <button onClick={() => setShowWasIsTisModal(true)} className="flex items-center gap-1 px-2.5">
                     <p className="text-milk text-sm">wat is tis</p>
-                </button>
+                </button> */}
 
                 {/* docs */}
                 <LinkWrapper href={AppUrls.DOCUMENTATION} target="_blank" className="flex items-center gap-1 px-2.5 cursor-alias">

@@ -193,7 +193,7 @@ export const safeNumeral = (value: number, format: string): string => {
 }
 
 export const cleanOutput = (output: string | number, defaultOutput = '-'): string => {
-    const strOutput = String(output).replaceAll(' ', '')
+    const strOutput = String(output).replaceAll('~', '').replaceAll(' ', '')
     if (strOutput === '0') return defaultOutput
     if (strOutput === '0%') return defaultOutput
     if (strOutput === '0m$') return defaultOutput
