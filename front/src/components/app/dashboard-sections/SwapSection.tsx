@@ -11,7 +11,17 @@ import { AmmAsOrderbook, SelectedTrade, StructuredOutput, Token } from '@/interf
 import SelectTokenModal from '../SelectTokenModal'
 // import { useModal } from 'connectkit'
 import { useAccount } from 'wagmi'
-import { cleanOutput, cn, extractErrorMessage, formatAmount, formatOrDisplayRaw, getBaseValueInUsd, getQuoteValueInUsd, safeNumeral } from '@/utils'
+import {
+    cleanOutput,
+    cn,
+    extractErrorMessage,
+    formatAmount,
+    formatOrDisplayRaw,
+    getBaseValueInUsd,
+    getHighestBid,
+    getQuoteValueInUsd,
+    safeNumeral,
+} from '@/utils'
 import { useApiStore } from '@/stores/api.store'
 import { APP_ROUTE, CHAINS_CONFIG } from '@/config/app.config'
 import toast from 'react-hot-toast'
@@ -255,14 +265,35 @@ export default function SwapSection() {
                         'bg-milk-600/5': true,
                     })}
                 >
-                    <div className="flex justify-between">
+                    <div className="flex justify-between items-end">
                         <p className="text-milk-600 text-xs">Sell</p>
-                        <div className="flex items-center">
+                        <button
+                            onClick={() => {
+                                // retrieve best bid
+                                const highestBid = getHighestBid(metrics?.orderbook)
+
+                                // select it
+                                if (metrics?.orderbook && highestBid) {
+                                    selectOrderbookTrade({
+                                        side: OrderbookSide.BID,
+                                        amountIn: highestBid.amount,
+                                        selectedAt: Date.now(),
+                                        trade: highestBid,
+                                        pools: metrics.orderbook.pools,
+                                        xAxis: highestBid.average_sell_price,
+                                    })
+
+                                    // notify
+                                    toast.success(`Best bid trade selected`, { style: toastStyle })
+                                }
+                            }}
+                            className="flex items-center hover:bg-milk-600/5 px-2 py-1 rounded-lg -mb-1"
+                        >
                             {/* {account.isConnected && sellTokenBalance >= 0 && sellTokenAmountInput && sellTokenBalance < sellTokenAmountInput ? (
                                 <p className="text-folly text-xs pr-2">Exceeds Balance</p>
                             ) : null} */}
                             <p className="text-aquamarine text-xs">Best bid</p>
-                        </div>
+                        </button>
                     </div>
                     <div className="flex justify-between gap-3">
                         <TokenSelector
