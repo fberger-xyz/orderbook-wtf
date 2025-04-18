@@ -3,7 +3,7 @@ import { persist, createJSONStorage } from 'zustand/middleware'
 import { APP_METADATA, IS_DEV } from '@/config/app.config'
 import { SelectedTrade, Token } from '@/interfaces'
 import { hardcodedTokensList } from '@/data/back-tokens'
-import { OrderbookOption, OrderbookAxisScale, AppSupportedChains, OrderbookSide } from '@/enums'
+import { OrderbookOption, OrderbookAxisScale, AppSupportedChains } from '@/enums'
 
 // todo remove useless keys
 export const useAppStore = create<{
@@ -18,11 +18,8 @@ export const useAppStore = create<{
      * ui
      */
 
-    showMobileMenu: boolean
-    setShowMobileMenu: (showMobileMenu: boolean) => void
     storeRefreshedAt: number
     setStoreRefreshedAt: (storeRefreshedAt: number) => void
-    refetchInterval: number
     showMarketDepthSection: boolean
     showRoutingSection: boolean
     showLiquidityBreakdownSection: boolean
@@ -36,8 +33,8 @@ export const useAppStore = create<{
 
     // chart
     yAxisType: OrderbookAxisScale
-    yAxisLogBase: number
     setYAxisType: (yAxisType: OrderbookAxisScale) => void
+    yAxisLogBase: number
     setYAxisLogBase: (yAxisLogBase: number) => void
     coloredAreas: OrderbookOption
     setColoredAreas: (coloredAreas: OrderbookOption) => void
@@ -49,23 +46,21 @@ export const useAppStore = create<{
      */
 
     // inputs
-    viewMode: OrderbookSide
-    setViewMode: (viewMode: OrderbookSide) => void
     sellToken: Token
     selectSellToken: (sellToken: Token) => void
     sellTokenAmountInput: number
-    sellTokenAmountInputRaw: string | number
     setSellTokenAmountInput: (sellTokenAmountInput: number) => void
+    sellTokenAmountInputRaw: string | number
     setSellTokenAmountInputRaw: (sellTokenAmountInputRaw: string | number) => void
     buyToken: Token
     selectBuyToken: (buyToken: Token) => void
     buyTokenAmountInput?: number
     setBuyTokenAmountInput: (buyTokenAmountInput: number) => void
     switchSelectedTokens: () => void
-    isLoadingSomeTrade: boolean
-    setIsLoadingSomeTrade: (isLoadingSomeTrade: boolean) => void
 
     // trade
+    isRefreshingMarketDepth: boolean
+    setIsRefreshingMarketDepth: (isRefreshingMarketDepth: boolean) => void
     selectedTrade?: SelectedTrade
     selectOrderbookTrade: (selectedTrade?: SelectedTrade) => void
 
@@ -87,7 +82,6 @@ export const useAppStore = create<{
      */
 
     getAddressPair: () => string
-    getSymbolPair: () => string
 }>()(
     persist(
         (set, get) => ({
@@ -102,11 +96,8 @@ export const useAppStore = create<{
              * ui
              */
 
-            showMobileMenu: false,
-            setShowMobileMenu: (showMobileMenu) => set(() => ({ showMobileMenu })),
             storeRefreshedAt: -1,
             setStoreRefreshedAt: (storeRefreshedAt) => set(() => ({ storeRefreshedAt })),
-            refetchInterval: 60 * 1000,
             showMarketDepthSection: true,
             showRoutingSection: true,
             showLiquidityBreakdownSection: true,
@@ -141,9 +132,6 @@ export const useAppStore = create<{
              * swap
              */
 
-            // inputs
-            viewMode: OrderbookSide.BID,
-            setViewMode: (viewMode) => set(() => ({ viewMode })),
             sellToken: hardcodedTokensList[AppSupportedChains.ETHEREUM][1], // todo put this as null
             selectSellToken: (sellToken) =>
                 set((state) => {
@@ -164,16 +152,21 @@ export const useAppStore = create<{
             setBuyTokenAmountInput: (buyTokenAmountInput) => set(() => ({ buyTokenAmountInput })),
             switchSelectedTokens: () =>
                 set((state) => ({
+                    selectedTrade: undefined,
                     sellToken: state.buyToken,
                     buyToken: state.sellToken,
                     sellTokenAmountInput: state.buyTokenAmountInput,
                     sellTokenAmountInputRaw: state.buyTokenAmountInput,
                     buyTokenAmountInput: state.sellTokenAmountInput,
                 })),
-            isLoadingSomeTrade: false,
-            setIsLoadingSomeTrade: (isLoadingSomeTrade) => set(() => ({ isLoadingSomeTrade })),
 
             // trade
+            isRefreshingMarketDepth: false,
+            setIsRefreshingMarketDepth: (isRefreshingMarketDepth) =>
+                set((state) => {
+                    if (state.isRefreshingMarketDepth !== isRefreshingMarketDepth) set(() => ({ isRefreshingMarketDepth }))
+                    return state
+                }),
             selectedTrade: undefined,
             selectOrderbookTrade: (selectedTrade) =>
                 set(() => ({
@@ -203,7 +196,6 @@ export const useAppStore = create<{
 
             // -
             getAddressPair: () => `${get().sellToken.address}-${get().buyToken.address}`,
-            getSymbolPair: () => `${get().sellToken.symbol}-${get().buyToken.symbol}`,
         }),
         {
             name: IS_DEV

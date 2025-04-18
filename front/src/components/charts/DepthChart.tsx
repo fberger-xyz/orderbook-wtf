@@ -103,7 +103,7 @@ const getOptions = (
                     type: 'dotted',
                 },
             },
-            borderColor: 'transparent',
+            borderColor: AppColors.milk[200],
             textStyle: {
                 fontSize: 12,
                 color: AppColors.milk.DEFAULT,
@@ -220,10 +220,10 @@ const getOptions = (
             axisTick: {
                 show: false,
             },
-            // min: 'dataMin',
-            // max: 'dataMax',
-            min: (value) => Math.min(value.min, Number(selectedTrade?.xAxis ?? Infinity)) * 0.95,
-            max: (value) => Math.max(value.max, Number(selectedTrade?.xAxis ?? -Infinity)) * 1.05,
+            min: 'dataMin',
+            max: 'dataMax',
+            // min: (value) => Math.min(value.min, Number(selectedTrade?.xAxis ?? Infinity)) * 0.98,
+            // max: (value) => Math.max(value.max, Number(selectedTrade?.xAxis ?? -Infinity)) * 1.02,
             axisPointer: {
                 show: true,
                 label: {
@@ -405,11 +405,11 @@ const getOptions = (
                                       },
                                       xAxis: Math.max(0, Number(selectedTrade.xAxis)),
                                       label: {
-                                          formatter: (bidMarlineParams) => {
-                                              console.log({ bidMarlineParams })
+                                          formatter: (bidMarklineParams) => {
+                                              //   console.log({ bidMarklineParams })
                                               return [
                                                   `${numeral(selectedTrade.amountIn).format('0.0,[000]')} ${orderbook.base.symbol}`,
-                                                  `at ${bidMarlineParams.value} ${orderbook.base.symbol}/${orderbook.quote.symbol}`,
+                                                  `at ${bidMarklineParams.value} ${orderbook.base.symbol}/${orderbook.quote.symbol}`,
                                                   `= ${selectedTrade.trade?.output ? `${numeral(selectedTrade.trade.output).format('0,0.[000]')} ${orderbook.quote.symbol}` : '...computing'}`,
                                               ].join('\n')
                                           },
@@ -592,9 +592,6 @@ export default function DepthChart() {
                     toast(`Can't select asks, only bids.`, { style: toastStyle })
                     return
                 }
-
-                // -
-                // if (viewMode !== side) setViewMode(side)
 
                 // debug
                 if (debug) console.log(fnName, 'side', side)

@@ -49,7 +49,7 @@ export const useApiStore = create<{
     setApiOrderbook: (key, orderbook) =>
         set((state) => ({
             apiOrderbooks: { ...state.apiOrderbooks, [key]: orderbook },
-            metrics: getDashboardMetrics(orderbook, state.apiOrderbooks[key]),
+            metrics: getDashboardMetrics(orderbook),
         })),
     setApiStoreRefreshedAt: (apiStoreRefreshedAt) => set(() => ({ apiStoreRefreshedAt })),
     setMetrics: (metrics) => set(() => ({ metrics })),

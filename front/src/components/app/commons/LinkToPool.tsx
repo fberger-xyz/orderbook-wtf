@@ -30,10 +30,15 @@ export default function PoolLink({
         <LinkWrapper
             target="_blank"
             href={`${CHAINS_CONFIG[currentChainId].explorerRoot}/address/${pool.address}`}
-            className={cn('flex gap-2 items-center group cursor-alias', className)}
+            className={cn('flex gap-2 items-center group cursor-alias transition-all duration-300 ease-in-out', className)}
         >
-            <div className="flex justify-center rounded-full p-1 border border-milk-200 bg-milk-200/10">
-                <SvgMapper icon={config?.svgId} className="size-3.5" />
+            <div className="relative">
+                <div className="flex justify-center rounded-full p-1 border border-milk-200 bg-milk-200/10">
+                    <SvgMapper icon={config?.svgId} className="size-3.5" />
+                </div>
+                <div className="flex items-center gap-2 absolute -bottom-0 -left-1.5">
+                    <SvgMapper icon={CHAINS_CONFIG[currentChainId].svgId} className="size-2.5 opacity-80 group-hover:opacity-100" />
+                </div>
             </div>
             <p className="text-milk-600 truncate group-hover:underline">
                 {config?.version ? `${config?.version.toLowerCase()} - ` : ''}

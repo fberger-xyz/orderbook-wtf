@@ -2,7 +2,6 @@
 
 import { cn } from '@/utils'
 import IconWrapper from '../common/IconWrapper'
-// import { ConnectOrDisconnect } from '../wallet/ConnectOrDisconnect'
 import LinkWrapper from '../common/LinkWrapper'
 import { AppUrls, IconIds } from '@/enums'
 import TychoSVG from '../icons/tycho-svg.icon'
@@ -14,9 +13,7 @@ import { useApiStore } from '@/stores/api.store'
 import SvgMapper from '../icons/SvgMapper'
 import toast from 'react-hot-toast'
 import { toastStyle } from '@/config/toasts.config'
-import { switchChain } from '@wagmi/core'
-import { config } from '@/providers/wagmi'
-import WatIsTisModal from '../app/WatIsTisModal'
+// import WatIsTisModal from '../app/WatIsTisModal'
 
 export default function Header(props: { className?: string }) {
     // const { currentChainId, setCurrentChain, setShowWasIsTisModal } = useAppStore()
@@ -68,7 +65,6 @@ export default function Header(props: { className?: string }) {
                                         key={chainConfig.name}
                                         onClick={async () => {
                                             if (chainConfig.wagmi?.id) {
-                                                await switchChain(config, { chainId: chainConfig.wagmi?.id })
                                                 setCurrentChain(chainConfig.id)
                                                 toast.success(`Chain selected: ${chainConfig.name}`, { style: toastStyle })
                                                 setMetrics(undefined)
@@ -102,7 +98,7 @@ export default function Header(props: { className?: string }) {
 
                 {/* connect */}
                 {/* <ConnectOrDisconnect /> */}
-                <WatIsTisModal />
+                {/* <WatIsTisModal /> */}
             </div>
         </div>
     )

@@ -7,9 +7,8 @@ import { ChangeEvent, useState, useRef } from 'react'
 import IconWrapper from '../../common/IconWrapper'
 import TokenImage from '../commons/TokenImage'
 import ChainImage from '../commons/ChainImage'
-import { AmmAsOrderbook, SelectedTrade, StructuredOutput, Token } from '@/interfaces'
+import { SelectedTrade, Token } from '@/interfaces'
 import SelectTokenModal from '../SelectTokenModal'
-// import { useModal } from 'connectkit'
 import { useAccount } from 'wagmi'
 import {
     cleanOutput,
@@ -20,21 +19,16 @@ import {
     getBaseValueInUsd,
     getHighestBid,
     getQuoteValueInUsd,
+    mergeOrderbooks,
     safeNumeral,
+    simulateTradeForAmountIn,
 } from '@/utils'
 import { useApiStore } from '@/stores/api.store'
-import { APP_ROUTE, CHAINS_CONFIG } from '@/config/app.config'
+import { CHAINS_CONFIG } from '@/config/app.config'
 import toast from 'react-hot-toast'
 import { toastStyle } from '@/config/toasts.config'
 
 const rawAmountFormat = '0,0.[00000000000]'
-
-// const TokenBalance = ({ balance, isConnected }: { balance: number; isConnected: boolean }) => (
-//     <div className="flex justify-between gap-1 items-center">
-//         <IconWrapper icon={IconIds.WALLET} className="size-4 text-milk-400" />
-//         <p className="text-milk-400 text-xs">{isConnected && balance >= 0 ? formatAmount(balance) : 0}</p>
-//     </div>
-// )
 
 const TokenSelector = ({ token, onClick }: { token: Token | undefined; onClick: () => void }) => (
     <button
@@ -125,8 +119,8 @@ export default function SwapSection() {
         buyToken,
         buyTokenAmountInput,
         switchSelectedTokens,
-        isLoadingSomeTrade,
-        setIsLoadingSomeTrade,
+        isRefreshingMarketDepth,
+        setIsRefreshingMarketDepth,
         selectedTrade,
         selectOrderbookTrade,
         setShowSelectTokenModal,
@@ -138,85 +132,42 @@ export default function SwapSection() {
     const { metrics, setApiOrderbook, getOrderbook, setApiStoreRefreshedAt } = useApiStore()
     const account = useAccount()
     const [openTradeDetails, showTradeDetails] = useState(true)
-    // const [buyTokenBalance, setBuyTokenBalance] = useState(-1)
     const [sellTokenBalance] = useState(-1)
-    // const { setOpen } = useModal()
     const debounceTimeout = useRef<NodeJS.Timeout | null>(null)
 
     // todo: improve this
     if (sellTokenAmountInputRaw === 0 && sellTokenAmountInput !== 0) setSellTokenAmountInputRaw(sellTokenAmountInput)
 
-    // useEffect(() => {
-    //     if (account.status === 'connected' && account.address && account.chainId) {
-    //         fetchBalance(account.address, account.chainId, buyToken.address as `0x${string}`).then((balance) =>
-    //             setBuyTokenBalance(isNaN(balance) ? -1 : balance),
-    //         )
-    //         fetchBalance(account.address, account.chainId, sellToken.address as `0x${string}`).then((balance) =>
-    //             setSellTokenBalance(isNaN(balance) ? -1 : balance),
-    //         )
-    //     }
-    // }, [account.address, account.chainId, account.status, buyToken.address, sellToken.address])
-
     const simulateTradeAndMergeOrderbook = async (amountIn: number) => {
         try {
-            setIsLoadingSomeTrade(true)
+            // state
+            setIsRefreshingMarketDepth(true)
 
-            // prevent errors
-            const pair = getAddressPair()
-            const orderbook = getOrderbook(pair)
-            if (!orderbook) return
+            // prevent further processing
+            const currentOrderbook = getOrderbook(getAddressPair())
+            if (!currentOrderbook) return
 
-            // fetch data
-            const url = `${APP_ROUTE}/api/orderbook?chain=${currentChainId}&token0=${sellToken.address}&token1=${buyToken.address}&pointAmount=${amountIn}&pointToken=${sellToken.address}`
-            const tradeResponse = await fetch(url, { method: 'GET', headers: { 'Content-Type': 'application/json' } })
-            const tradeResponseJson = (await tradeResponse.json()) as StructuredOutput<AmmAsOrderbook>
-            if (!tradeResponseJson.data || !orderbook) return
-
-            // nb: can only be a bid for now
-            const side = OrderbookSide.BID
-
-            // prevent errors
-            if (!side) return
-
-            // ease access
-            const newTradeEntry = tradeResponseJson.data?.bids.length > 0 ? tradeResponseJson.data.bids[0] : null
-
-            // prevent errors
-            if (!newTradeEntry) return
-
-            // new orderbook
-            // nb: make sure we have the same amount of pools
-            const newOrderbook = {
-                ...tradeResponseJson.data,
-
-                // filter out previous entry for same trade
-                bids: [...orderbook.bids.filter((bid) => newTradeEntry.amount !== bid.amount), ...tradeResponseJson.data.bids],
-                asks: orderbook.asks,
-                pools: orderbook.pools,
-                timestamp: Math.max(tradeResponseJson.data.timestamp, orderbook.timestamp),
-                block: Math.max(tradeResponseJson.data.block, orderbook.block),
+            // simulate trade and update state (orderbook then selected trade)
+            const orderbookWithTrade = await simulateTradeForAmountIn(currentChainId, sellToken, buyToken, amountIn)
+            const mergedOrderbook = mergeOrderbooks(currentOrderbook, orderbookWithTrade)
+            setApiOrderbook(getAddressPair(), mergedOrderbook)
+            if (orderbookWithTrade?.bids.length) {
+                const newSelectedTrade = orderbookWithTrade.bids.find((bid) => bid.amount === amountIn)
+                if (newSelectedTrade)
+                    selectOrderbookTrade({
+                        side: OrderbookSide.BID,
+                        amountIn: amountIn,
+                        selectedAt: Date.now(),
+                        trade: newSelectedTrade,
+                        pools: orderbookWithTrade.pools,
+                        xAxis: newSelectedTrade.average_sell_price,
+                    })
             }
-
-            /// update state
-            setApiOrderbook(pair, newOrderbook)
-            setApiStoreRefreshedAt(Date.now())
-
-            const newSelectedTrade = {
-                side: OrderbookSide.BID,
-                amountIn,
-                selectedAt: Date.now(),
-                trade: newTradeEntry,
-                pools: newOrderbook.pools,
-                xAxis: newTradeEntry.average_sell_price,
-            }
-
-            selectOrderbookTrade(newSelectedTrade)
         } catch (error) {
-            toast.error(`Unexepected error while fetching price: ${extractErrorMessage(error)}`, {
-                style: toastStyle,
-            })
         } finally {
-            setIsLoadingSomeTrade(false)
+            // trigger an ui refresh
+            setApiStoreRefreshedAt(Date.now())
+            setIsRefreshingMarketDepth(false)
         }
     }
 
@@ -231,6 +182,7 @@ export default function SwapSection() {
             const amountIn = typeof parsed === 'number' ? parsed : NaN
             if (isNaN(amountIn)) return
 
+            // update ui
             const newSelectedTrade: SelectedTrade = {
                 side: OrderbookSide.BID,
                 amountIn,
@@ -239,10 +191,10 @@ export default function SwapSection() {
                 pools: [],
                 xAxis: -1,
             }
-
-            selectOrderbookTrade(newSelectedTrade)
             setSellTokenAmountInput(amountIn)
+            selectOrderbookTrade(newSelectedTrade)
 
+            // debounced
             if (debounceTimeout.current) clearTimeout(debounceTimeout.current)
             debounceTimeout.current = setTimeout(() => {
                 simulateTradeAndMergeOrderbook(amountIn)
@@ -289,7 +241,7 @@ export default function SwapSection() {
                             }}
                             className="flex items-center hover:bg-milk-600/5 px-2 py-1 rounded-lg -mb-1"
                         >
-                            {/* {account.isConnected && sellTokenBalance >= 0 && sellTokenAmountInput && sellTokenBalance < sellTokenAmountInput ? (
+                            {/* {account.isconnected && selltokenbalance >= 0 && selltokenamountinput && selltokenbalance < selltokenamountinput ? (
                                 <p className="text-folly text-xs pr-2">Exceeds Balance</p>
                             ) : null} */}
                             <p className="text-aquamarine text-xs">Best bid</p>
@@ -311,11 +263,11 @@ export default function SwapSection() {
                         />
                     </div>
 
-                    {/* Last row  */}
+                    {/* last row  */}
                     {selectedTrade ? (
                         <div className="mt-2 flex justify-between items-center">
                             <div className="flex items-center gap-1">
-                                {/* <TokenBalance balance={sellTokenBalance} isConnected={account.isConnected} /> */}
+                                {/* <tokenbalance balance={selltokenbalance} isconnected={account.isconnected} /> */}
                                 <span />
                                 {account.isConnected && sellToken.address && (
                                     <button
@@ -338,7 +290,7 @@ export default function SwapSection() {
                         </div>
                     ) : (
                         <div className="flex justify-between items-center">
-                            {/* <TokenBalance balance={buyTokenBalance} isConnected={account.isConnected} /> */}
+                            {/* <tokenbalance balance={buytokenbalance} isconnected={account.isconnected} /> */}
                             <span />
                             <p className="text-milk-600 text-xs">$ 0</p>
                         </div>
@@ -352,7 +304,6 @@ export default function SwapSection() {
                             onClick={async () => {
                                 setApiOrderbook(getAddressPair(), undefined)
                                 switchSelectedTokens()
-                                if (sellTokenAmountInput) await simulateTradeAndMergeOrderbook(sellTokenAmountInput)
                             }}
                             className="size-full rounded-lg bg-milk-600/5 flex items-center justify-center group"
                         >
@@ -385,12 +336,12 @@ export default function SwapSection() {
                         />
                     </div>
 
-                    {/* Last row  */}
+                    {/* last row  */}
                     {selectedTrade ? (
                         <div className="flex justify-between items-center">
-                            {/* <TokenBalance balance={sellTokenBalance} isConnected={account.isConnected} /> */}
+                            {/* <tokenbalance balance={selltokenbalance} isconnected={account.isconnected} /> */}
                             <span />
-                            {isLoadingSomeTrade ? (
+                            {isRefreshingMarketDepth ? (
                                 <div className="skeleton-loading w-16 h-4 rounded-full" />
                             ) : (
                                 <p className="text-milk-600 text-xs">
@@ -403,7 +354,7 @@ export default function SwapSection() {
                         </div>
                     ) : (
                         <div className="flex justify-between items-center">
-                            {/* <TokenBalance balance={sellTokenBalance} isConnected={account.isConnected} /> */}
+                            {/* <tokenbalance balance={selltokenbalance} isconnected={account.isconnected} /> */}
                             <span />
                             <p className="text-milk-600 text-xs">$ 0</p>
                         </div>
@@ -415,7 +366,7 @@ export default function SwapSection() {
 
                 {/* Trade details section */}
                 <div className="bg-milk-600/5 flex flex-col gap-6 px-2 py-4 rounded-xl border-milk-150 text-xs">
-                    {/* Summary */}
+                    {/* summary */}
                     <div className="flex w-full justify-between items-center">
                         {sellToken && buyToken && metrics?.highestBid && metrics.orderbook ? (
                             <p className="text-milk-600 truncate pl-2">
@@ -451,35 +402,14 @@ export default function SwapSection() {
                         </button>
                     </div>
 
-                    {/* Trade details */}
-                    {openTradeDetails && <TradeDetails isLoading={isLoadingSomeTrade} selectedTrade={selectedTrade ?? null} sellToken={sellToken} />}
+                    {/* trade details */}
+                    {openTradeDetails && (
+                        <TradeDetails isLoading={isRefreshingMarketDepth} selectedTrade={selectedTrade ?? null} sellToken={sellToken} />
+                    )}
                 </div>
-
-                {/* Separator */}
-                <div className="h-0 w-full" />
-
-                {/* Swap button */}
-                {/* {account.isConnected ? (
-                    <button
-                        disabled={true}
-                        className="bg-folly flex justify-center p-4 rounded-xl border-milk-150 transition-all duration-300 hover:opacity-90"
-                    >
-                        <p className="font-semibold">Swap [to be implemented]</p>
-                    </button>
-                ) : (
-                    <button
-                        onClick={() => setOpen(true)}
-                        className="bg-folly flex justify-center p-4 rounded-xl border-milk-150 transition-all duration-300 hover:opacity-90"
-                    >
-                        <p className="font-semibold">Connect wallet</p>
-                    </button>
-                )} */}
-
-                {/* Debug */}
-                {/* {IS_DEV && <pre className="text-xs p-2">{JSON.stringify({ ...selectedTrade, pools: 'hidden' }, null, 2)}</pre>} */}
             </div>
 
-            {/* Token selection modal */}
+            {/* select token modal */}
             <SelectTokenModal />
         </>
     )

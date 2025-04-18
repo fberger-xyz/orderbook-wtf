@@ -3,7 +3,7 @@
 import { AppSupportedChains, OrderbookSide } from '@/enums'
 import { useAppStore } from '@/stores/app.store'
 import { AmmAsOrderbook, RustApiPair, StructuredOutput, Token } from '@/interfaces'
-import { extractErrorMessage, fetchWithTimeout, getHighestBid } from '@/utils'
+import { defaultHeaders, fetchWithTimeout, getHighestBid, mergeOrderbooks, simulateTradeForAmountIn } from '@/utils'
 import { useQueries } from '@tanstack/react-query'
 import { useApiStore } from '@/stores/api.store'
 import { APP_ROUTE, CHAINS_CONFIG } from '@/config/app.config'
@@ -15,13 +15,11 @@ import MarketDepthSection from './dashboard-sections/MarketDepthSection'
 import SwapSection from './dashboard-sections/SwapSection'
 import KPIsSection from './dashboard-sections/KPIsSection'
 
-const headers = { 'Content-Type': 'application/json' }
-
 export default function Dashboard() {
-    const { sellToken, sellTokenAmountInput, buyToken, currentChainId, selectedTrade, setIsLoadingSomeTrade, selectOrderbookTrade, getAddressPair } =
+    const { sellToken, sellTokenAmountInput, buyToken, currentChainId, setIsRefreshingMarketDepth, selectOrderbookTrade, getAddressPair } =
         useAppStore()
 
-    const { orderBookRefreshIntervalMs, setApiTokens, setApiPairs, setApiOrderbook, setApiStoreRefreshedAt, getOrderbook } = useApiStore()
+    const { orderBookRefreshIntervalMs, setApiTokens, setApiPairs, setApiOrderbook, setApiStoreRefreshedAt } = useApiStore()
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [ApiTokensQuery, ApiPairsQuery, ApiOrderbookQuery] = useQueries({
@@ -33,24 +31,24 @@ export default function Dashboard() {
                 queryFn: async () => {
                     // mainnet
                     const mainnetTokensEndpoint = `${APP_ROUTE}/api/tokens?chain=${CHAINS_CONFIG[AppSupportedChains.ETHEREUM].apiId}`
-                    const mainnetTokensResponse = await fetchWithTimeout(mainnetTokensEndpoint, { method: 'GET', headers })
+                    const mainnetTokensResponse = await fetchWithTimeout(mainnetTokensEndpoint, { method: 'GET', headers: defaultHeaders })
                     const mainnetTokensResponseJson = (await mainnetTokensResponse.json()) as StructuredOutput<Token[]>
                     setApiTokens(AppSupportedChains.ETHEREUM, mainnetTokensResponseJson.data ?? [])
 
                     // base
-                    const baseTokensEndpoint = `${APP_ROUTE}/api/tokens?chain=${CHAINS_CONFIG[AppSupportedChains.BASE].apiId}`
-                    const baseTokensResponse = await fetchWithTimeout(baseTokensEndpoint, { method: 'GET', headers })
-                    const baseTokensResponseJson = (await baseTokensResponse.json()) as StructuredOutput<Token[]>
-                    setApiTokens(AppSupportedChains.BASE, baseTokensResponseJson.data ?? [])
+                    // const baseTokensEndpoint = `${APP_ROUTE}/api/tokens?chain=${CHAINS_CONFIG[AppSupportedChains.BASE].apiId}`
+                    // const baseTokensResponse = await fetchWithTimeout(baseTokensEndpoint, { method: 'GET', headers: defaultHeaders })
+                    // const baseTokensResponseJson = (await baseTokensResponse.json()) as StructuredOutput<Token[]>
+                    // setApiTokens(AppSupportedChains.BASE, baseTokensResponseJson.data ?? [])
 
                     // unichain
                     const unichainTokensEndpoint = `${APP_ROUTE}/api/tokens?chain=${CHAINS_CONFIG[AppSupportedChains.UNICHAIN].apiId}`
-                    const unichainTokensResponse = await fetchWithTimeout(unichainTokensEndpoint, { method: 'GET', headers })
+                    const unichainTokensResponse = await fetchWithTimeout(unichainTokensEndpoint, { method: 'GET', headers: defaultHeaders })
                     const unichainTokensResponseJson = (await unichainTokensResponse.json()) as StructuredOutput<Token[]>
                     setApiTokens(AppSupportedChains.UNICHAIN, unichainTokensResponseJson.data ?? [])
 
                     // all
-                    return [mainnetTokensResponseJson.data, baseTokensResponseJson.data, unichainTokensResponseJson.data]
+                    return [mainnetTokensResponseJson.data, unichainTokensResponseJson.data]
                 },
                 refetchOnWindowFocus: false,
                 refetchInterval: 1000 * 60 * 5,
@@ -58,27 +56,28 @@ export default function Dashboard() {
             {
                 queryKey: ['ApiPairsQuery'],
                 enabled: true,
+                // todo promise.all
                 queryFn: async () => {
                     // mainnet
                     const mainnetPairsUrl = `${APP_ROUTE}/api/pairs?chain=${CHAINS_CONFIG[AppSupportedChains.ETHEREUM].apiId}`
-                    const mainnetPairsResponse = await fetchWithTimeout(mainnetPairsUrl, { method: 'GET', headers })
+                    const mainnetPairsResponse = await fetchWithTimeout(mainnetPairsUrl, { method: 'GET', headers: defaultHeaders })
                     const mainnetPairsResponseJson = (await mainnetPairsResponse.json()) as StructuredOutput<RustApiPair[]>
                     setApiPairs(AppSupportedChains.ETHEREUM, mainnetPairsResponseJson.data ?? [])
 
                     // base
-                    const basePairsUrl = `${APP_ROUTE}/api/pairs?chain=${CHAINS_CONFIG[AppSupportedChains.BASE].apiId}`
-                    const basePairsResponse = await fetchWithTimeout(basePairsUrl, { method: 'GET', headers })
-                    const basePairsResponseJson = (await basePairsResponse.json()) as StructuredOutput<RustApiPair[]>
-                    setApiPairs(AppSupportedChains.BASE, basePairsResponseJson.data ?? [])
+                    // const basePairsUrl = `${APP_ROUTE}/api/pairs?chain=${CHAINS_CONFIG[AppSupportedChains.BASE].apiId}`
+                    // const basePairsResponse = await fetchWithTimeout(basePairsUrl, { method: 'GET', headers: defaultHeaders })
+                    // const basePairsResponseJson = (await basePairsResponse.json()) as StructuredOutput<RustApiPair[]>
+                    // setApiPairs(AppSupportedChains.BASE, basePairsResponseJson.data ?? [])
 
                     // unichain
                     const unichainPairsUrl = `${APP_ROUTE}/api/pairs?chain=${CHAINS_CONFIG[AppSupportedChains.UNICHAIN].apiId}`
-                    const unichainPairsResponse = await fetchWithTimeout(unichainPairsUrl, { method: 'GET', headers })
+                    const unichainPairsResponse = await fetchWithTimeout(unichainPairsUrl, { method: 'GET', headers: defaultHeaders })
                     const unichainPairsResponseJson = (await unichainPairsResponse.json()) as StructuredOutput<RustApiPair[]>
                     setApiPairs(AppSupportedChains.UNICHAIN, unichainPairsResponseJson.data ?? [])
 
                     // all
-                    return [mainnetPairsResponseJson.data, basePairsResponseJson.data, unichainPairsResponseJson.data]
+                    return [mainnetPairsResponseJson.data, unichainPairsResponseJson.data]
                 },
                 refetchOnWindowFocus: false,
                 refetchInterval: 1000 * 60 * 5,
@@ -87,12 +86,9 @@ export default function Dashboard() {
                 queryKey: ['ApiOrderbookQuery', currentChainId, sellToken.address, buyToken.address],
                 enabled: true,
                 queryFn: async () => {
-                    // -
-                    const debug = false
-
                     // fetch all orderbook
                     const url = `${APP_ROUTE}/api/orderbook?chain=${CHAINS_CONFIG[currentChainId].apiId}&token0=${sellToken.address}&token1=${buyToken.address}`
-                    const orderbookResponse = await fetchWithTimeout(url, { method: 'GET', headers })
+                    const orderbookResponse = await fetchWithTimeout(url, { method: 'GET', headers: defaultHeaders })
 
                     // parse
                     const orderbookJson = (await orderbookResponse.json()) as StructuredOutput<AmmAsOrderbook>
@@ -106,104 +102,69 @@ export default function Dashboard() {
                     }
 
                     // prevent format errors
-                    if (!orderbookJson.data?.bids || !orderbookJson.data?.asks) {
+                    const newOrderbook = orderbookJson.data
+                    if (!newOrderbook || !newOrderbook?.bids.length || !newOrderbook?.asks.length || !newOrderbook?.pools.length) {
                         toast.error(`Bad orderbook format`, { style: toastStyle })
                         return orderbookJson
                     }
 
-                    // -
-                    if (orderbookJson.data) {
-                        setApiOrderbook(getAddressPair(), orderbookJson.data)
-                        const mustRefreshSelectingTradeToo = sellTokenAmountInput !== undefined && sellTokenAmountInput > 0
-                        if (debug) console.log(`ApiOrderbookQuery: mustRefreshSelectingTradeToo =`, mustRefreshSelectingTradeToo)
-                        if (mustRefreshSelectingTradeToo) await simulateTradeAndMergeOrderbook(sellTokenAmountInput)
-                        else if (!selectedTrade) {
-                            const highestBid = getHighestBid(orderbookJson.data)
-                            if (highestBid)
+                    try {
+                        // state
+                        setIsRefreshingMarketDepth(true)
+
+                        // simulate current trade if need be
+                        const orderbookWithTrade = await simulateTradeForAmountIn(currentChainId, sellToken, buyToken, sellTokenAmountInput)
+
+                        // merge
+                        const nextOrderbook = orderbookJson.data
+                        const mergedOrderbook = mergeOrderbooks(nextOrderbook, orderbookWithTrade)
+
+                        // state
+                        setApiOrderbook(getAddressPair(), mergedOrderbook)
+
+                        // set current trade as the one we just refreshed
+                        const newTradeEntry = orderbookWithTrade && orderbookWithTrade?.bids?.length > 0 ? orderbookWithTrade?.bids[0] : undefined
+                        if (newTradeEntry)
+                            selectOrderbookTrade({
+                                side: OrderbookSide.BID,
+                                amountIn: newTradeEntry.amount,
+                                selectedAt: Date.now(),
+                                trade: newTradeEntry,
+                                pools: newOrderbook.pools,
+                                xAxis: newTradeEntry.average_sell_price,
+                            })
+                        else {
+                            // or set current trade as the highest bid
+                            const highestBid = getHighestBid(newOrderbook)
+                            if (highestBid) {
                                 selectOrderbookTrade({
                                     side: OrderbookSide.BID,
                                     amountIn: highestBid.amount,
                                     selectedAt: Date.now(),
                                     trade: highestBid,
-                                    pools: orderbookJson.data.pools,
+                                    pools: newOrderbook.pools,
                                     xAxis: highestBid.average_sell_price,
                                 })
+                            }
                         }
+                    } catch (error) {
+                    } finally {
+                        // trigger an ui refresh
                         setApiStoreRefreshedAt(Date.now())
-                        toast.success(`Market depth for ${sellToken.symbol}-${buyToken.symbol} updated just now`, { style: toastStyle })
+                        setIsRefreshingMarketDepth(false)
                     }
+
+                    // refresh
+                    // setApiStoreRefreshedAt(Date.now())
+                    toast.success(`Market depth for ${sellToken.symbol}-${buyToken.symbol} updated just now`, { style: toastStyle })
 
                     return orderbookJson
                 },
                 refetchOnWindowFocus: false,
-                refetchInterval: orderBookRefreshIntervalMs[currentChainId] * 0.9, // small hack to avoid counter to stop at 0
+                refetchInterval: orderBookRefreshIntervalMs[currentChainId] * 0.85, // small hack to avoid counter to stop at 0
             },
         ],
     })
-
-    const simulateTradeAndMergeOrderbook = async (amountIn: number) => {
-        const debug = false
-        try {
-            setIsLoadingSomeTrade(true)
-
-            // prevent errors
-            const pair = getAddressPair()
-            const orderbook = getOrderbook(pair)
-            if (!orderbook) return
-
-            // fetch trade data
-            const url = `${APP_ROUTE}/api/orderbook?chain=${currentChainId}&token0=${sellToken.address}&token1=${buyToken.address}&pointAmount=${amountIn}&pointToken=${sellToken.address}`
-            const tradeResponse = await fetchWithTimeout(url, { method: 'GET', headers })
-            const tradeResponseJson = (await tradeResponse.json()) as StructuredOutput<AmmAsOrderbook>
-            if (!tradeResponseJson.data) return
-
-            // nb: can only be a bid for now
-            const side = OrderbookSide.BID
-
-            // prevent errors
-            if (!side) return
-
-            // ease access
-            const newTradeEntry = tradeResponseJson.data?.bids.length > 0 ? tradeResponseJson.data.bids[0] : null
-
-            // -
-            if (debug) console.log(`Dashboard/simulateTradeAndMergeOrderbook`, { newTradeEntry })
-
-            // prevent errors
-            if (!newTradeEntry) return
-
-            // new orderbook
-            // todo: make sure we have the same amount of pools
-            const newOrderbook = {
-                ...tradeResponseJson.data,
-
-                // filter out previous entry for same trade
-                bids: [...orderbook.bids.filter((bid) => newTradeEntry.amount !== bid.amount), ...tradeResponseJson.data.bids],
-                asks: orderbook.asks,
-                pools: orderbook.pools,
-                timestamp: Math.max(tradeResponseJson.data.timestamp, orderbook.timestamp),
-                block: Math.max(tradeResponseJson.data.block, orderbook.block),
-            }
-
-            // update state
-            setApiOrderbook(pair, newOrderbook)
-
-            // -
-            const newSelectedTrade = {
-                side: OrderbookSide.BID,
-                amountIn,
-                selectedAt: Date.now(),
-                trade: newTradeEntry,
-                pools: newOrderbook.pools,
-                xAxis: newTradeEntry.average_sell_price,
-            }
-            selectOrderbookTrade(newSelectedTrade)
-        } catch (error) {
-            toast.error(`Unexpected error while fetching price: ${extractErrorMessage(error)}`, { style: toastStyle })
-        } finally {
-            setIsLoadingSomeTrade(false)
-        }
-    }
 
     return (
         <div className="w-full grid grid-cols-1 md:grid-cols-10 gap-4">
@@ -214,7 +175,6 @@ export default function Dashboard() {
                 <PoolsTVLSection />
             </div>
             <SwapSection />
-            {/* {IS_DEV && <pre>{JSON.stringify(metrics, null, 2)}</pre>} */}
         </div>
     )
 }

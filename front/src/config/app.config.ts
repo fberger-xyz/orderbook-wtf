@@ -12,7 +12,6 @@ export const APP_METADATA = {
     SITE_DESCRIPTION: 'On-chain liquidity in a familiar orderbook interface',
     SITE_URL: AppUrls.NEXT_API_PROD_SHORTER,
 }
-// export const PUBLIC_STREAM_API_URL = IS_RUNNING_IN_DOCKER ? AppUrls.RUST_API_DOCKER : IS_DEV ? AppUrls.RUST_API_LOCALHOST : AppUrls.RUST_API_PROD
 export const PUBLIC_STREAM_API_URL = IS_RUNNING_IN_DOCKER ? AppUrls.RUST_API_DOCKER : AppUrls.RUST_API_PROD
 export const DATE_FORMAT = 'ddd. D MMM. YYYY'
 export const TIME_FORMAT = 'hh:mm A'
@@ -38,25 +37,25 @@ export const CHAINS_CONFIG = {
         explorerRoot: 'https://etherscan.io',
         wagmi: mainnet,
     },
+    [AppSupportedChains.UNICHAIN]: {
+        id: AppSupportedChains.UNICHAIN,
+        svgId: SvgIds.UNICHAIN,
+        name: 'Unichain',
+        apiId: 'unichain',
+        oneInchId: 'unichain',
+        supported: true,
+        explorerRoot: 'https://unichain.blockscout.com',
+        wagmi: { id: 130 },
+    },
     [AppSupportedChains.BASE]: {
         id: AppSupportedChains.BASE,
         svgId: SvgIds.BASE,
         name: 'Base',
         apiId: 'base',
         oneInchId: 'base',
-        supported: true,
+        supported: false,
         explorerRoot: 'https://basescan.org',
         wagmi: base,
-    },
-    [AppSupportedChains.UNICHAIN]: {
-        id: AppSupportedChains.UNICHAIN,
-        svgId: SvgIds.UNICHAIN,
-        name: 'Unichain',
-        apiId: 'unichain', // to be confirmed
-        oneInchId: 'Unichain',
-        supported: false,
-        explorerRoot: 'https://unichain.blockscout.com',
-        wagmi: undefined,
     },
     [AppSupportedChains.ARBITRUM]: {
         id: AppSupportedChains.ARBITRUM,
