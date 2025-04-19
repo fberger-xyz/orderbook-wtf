@@ -131,8 +131,8 @@ export default function PoolsTVLSection() {
                                 <div className="grid grid-cols-11 w-full rounded-xl py-1 px-4 gap-5 items-end text-xs text-milk-200">
                                     <p className="col-span-2">Pools</p>
                                     <div className="col-span-1 flex gap-0.5 text-start truncate">
-                                        <p>Updated</p>
-                                        <p className="text-xs">(1)</p>
+                                        <p>Last updated</p>
+                                        {/* <p className="text-xs">(1)</p> */}
                                     </div>
 
                                     {/* Base token */}
