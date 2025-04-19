@@ -45,15 +45,7 @@ const TokenSelector = ({ token, onClick }: { token: Token | undefined; onClick: 
     </button>
 )
 
-const TradeDetails = ({
-    isLoading,
-    selectedTrade,
-    sellToken,
-}: {
-    isLoading: boolean
-    selectedTrade: SelectedTrade | null
-    sellToken: Token | undefined
-}) => (
+const TradeDetails = ({ isLoading, selectedTrade, sellToken }: { isLoading: boolean; selectedTrade?: SelectedTrade; sellToken?: Token }) => (
     <div className="flex flex-col gap-2 text-xs px-2">
         <div className="flex justify-between w-full text-milk-400">
             <p>Expected output</p>
@@ -134,9 +126,6 @@ export default function SwapSection() {
     const [openTradeDetails, showTradeDetails] = useState(true)
     const [sellTokenBalance] = useState(-1)
     const debounceTimeout = useRef<NodeJS.Timeout | null>(null)
-
-    // todo: improve this
-    if (sellTokenAmountInputRaw === 0 && sellTokenAmountInput !== 0) setSellTokenAmountInputRaw(sellTokenAmountInput)
 
     const simulateTradeAndMergeOrderbook = async (amountIn: number) => {
         try {
@@ -271,11 +260,13 @@ export default function SwapSection() {
                                     </button>
                                 )}
                             </div>
-                            <p className="text-milk-600 text-xs">
-                                {getBaseValueInUsd(metrics?.orderbook)
-                                    ? `$ ${safeNumeral(selectedTrade.amountIn * (getBaseValueInUsd(metrics?.orderbook) as number), '0,0.[00]')}`
-                                    : '-'}
-                            </p>
+                            {getBaseValueInUsd(metrics?.orderbook) ? (
+                                <p className="text-milk-600 text-xs">
+                                    $ {safeNumeral(selectedTrade.amountIn * (getBaseValueInUsd(metrics?.orderbook) as number), '0,0.[00]')}
+                                </p>
+                            ) : (
+                                <div className="skeleton-loading flex w-20 h-4 items-center justify-center rounded-full" />
+                            )}
                         </div>
                     ) : (
                         <p className="ml-auto text-milk-600 text-xs">$ 0</p>
@@ -322,21 +313,22 @@ export default function SwapSection() {
                     </div>
 
                     {/* last row  */}
-                    {selectedTrade ? (
+                    {selectedTrade?.trade ? (
                         <div className="flex justify-end items-center">
                             {isRefreshingMarketDepth ? (
                                 <div className="skeleton-loading w-16 h-4 rounded-full" />
                             ) : (
                                 <p className="text-milk-600 text-xs">
-                                    ${' '}
                                     {sellTokenAmountInput !== 0 && buyTokenAmountInput && getQuoteValueInUsd(metrics?.orderbook)
-                                        ? numeral(buyTokenAmountInput).multiply(getQuoteValueInUsd(metrics?.orderbook)).format('0,0.[00]')
-                                        : '0'}
+                                        ? `$ ${numeral(buyTokenAmountInput).multiply(getQuoteValueInUsd(metrics?.orderbook)).format('0,0.[00]')}`
+                                        : '$ 0'}
                                 </p>
                             )}
                         </div>
-                    ) : (
+                    ) : sellTokenAmountInput === 0 ? (
                         <p className="ml-auto text-milk-600 text-xs">$ 0</p>
+                    ) : (
+                        <div className="ml-auto skeleton-loading flex w-20 h-4 items-center justify-center rounded-full" />
                     )}
                 </div>
 
@@ -383,7 +375,11 @@ export default function SwapSection() {
 
                     {/* trade details */}
                     {openTradeDetails && (
-                        <TradeDetails isLoading={isRefreshingMarketDepth} selectedTrade={selectedTrade ?? null} sellToken={sellToken} />
+                        <TradeDetails
+                            isLoading={isRefreshingMarketDepth || (!selectedTrade?.trade && sellTokenAmountInput !== 0)}
+                            selectedTrade={selectedTrade}
+                            sellToken={sellToken}
+                        />
                     )}
                 </div>
             </div>
