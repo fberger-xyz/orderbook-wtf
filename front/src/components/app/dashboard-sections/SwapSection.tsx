@@ -127,7 +127,7 @@ export default function SwapSection() {
     const [sellTokenBalance] = useState(-1)
     const debounceTimeout = useRef<NodeJS.Timeout | null>(null)
 
-    const simulateTradeAndMergeOrderbook = async (amountIn: number) => {
+    const simulateTradeAndMergeOrderbook = async (amountIn: number, start: number) => {
         try {
             // state
             setIsRefreshingMarketDepth(true)
@@ -141,29 +141,42 @@ export default function SwapSection() {
             const orderbookWithTrade = await simulateTradeForAmountIn(currentChainId, sellToken, buyToken, amountIn)
             const mergedOrderbook = mergeOrderbooks(currentOrderbook, orderbookWithTrade)
             setApiOrderbook(getAddressPair(), mergedOrderbook)
-            if (orderbookWithTrade?.bids.length) {
-                const newSelectedTrade = orderbookWithTrade.bids.find((bid) => bid.amount === amountIn)
+            const newSelectedTrade = orderbookWithTrade?.bids.find((bid) => bid.amount === amountIn)
+            if (orderbookWithTrade && newSelectedTrade) {
                 // if trade found AND trade amount equals what the input set by user
-                if (newSelectedTrade && newSelectedTrade.amount === sellTokenAmountInput)
+                if (newSelectedTrade && newSelectedTrade.amount === sellTokenAmountInput) {
                     selectOrderbookTrade({
                         side: OrderbookSide.BID,
-                        amountIn: amountIn,
+                        amountIn: sellTokenAmountInput,
                         selectedAt: Date.now(),
                         trade: newSelectedTrade,
                         pools: orderbookWithTrade.pools,
                         xAxis: newSelectedTrade.average_sell_price,
                     })
+
+                    // end
+                    toast(
+                        `Trade simulated (~${numeral(Date.now() - start)
+                            .divide(1000)
+                            .format('0,0.0')}s)`,
+                        { style: toastStyle },
+                    )
+
+                    // trigger an ui refresh
+                    setApiStoreRefreshedAt(Date.now())
+                }
             }
         } catch (error) {
         } finally {
-            // trigger an ui refresh
-            setApiStoreRefreshedAt(Date.now())
             setIsRefreshingMarketDepth(false)
         }
     }
 
     const handleChangeOfAmountIn = async (event: ChangeEvent<HTMLInputElement>) => {
         try {
+            // start
+            const start = Date.now()
+
             // prepare
             const raw = event.target.value
             setSellTokenAmountInputRaw(raw)
@@ -187,7 +200,7 @@ export default function SwapSection() {
             // debounced
             if (debounceTimeout.current) clearTimeout(debounceTimeout.current)
             debounceTimeout.current = setTimeout(() => {
-                simulateTradeAndMergeOrderbook(amountIn)
+                simulateTradeAndMergeOrderbook(amountIn, start)
             }, 600) // 1000ms debounce delay
         } catch (error) {
             toast.error(`Unexepected error while fetching price: ${extractErrorMessage(error)}`, {
@@ -220,7 +233,7 @@ export default function SwapSection() {
                                     })
 
                                     // notify
-                                    toast.success(`Best bid trade selected`, { style: toastStyle })
+                                    toast(`Best bid trade selected`, { style: toastStyle })
                                 }
                             }}
                             className="flex items-center hover:bg-milk-600/5 px-2 py-1 rounded-lg -mb-1"
