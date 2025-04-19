@@ -1,8 +1,8 @@
 'use client'
 
-import { AppSupportedChains, OrderbookSide } from '@/enums'
+import { OrderbookSide } from '@/enums'
 import { useAppStore } from '@/stores/app.store'
-import { AmmAsOrderbook, RustApiPair, StructuredOutput, Token } from '@/interfaces'
+import { AmmAsOrderbook, StructuredOutput } from '@/interfaces'
 import { defaultHeaders, fetchWithTimeout, getHighestBid, mergeOrderbooks, simulateTradeForAmountIn } from '@/utils'
 import { useQueries } from '@tanstack/react-query'
 import { useApiStore } from '@/stores/api.store'
@@ -21,28 +21,23 @@ export default function Dashboard() {
 
     const { orderBookRefreshIntervalMs, setApiTokens, setApiPairs, setApiOrderbook, setApiStoreRefreshedAt } = useApiStore()
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const [ApiTokensQuery, ApiPairsQuery, ApiOrderbookQuery] = useQueries({
+    useQueries({
         queries: [
             {
                 queryKey: ['ApiTokensQuery', currentChainId],
                 enabled: true,
-                // todo promise.all
                 queryFn: async () => {
-                    // mainnet
-                    const mainnetTokensEndpoint = `${APP_ROUTE}/api/tokens?chain=${CHAINS_CONFIG[AppSupportedChains.ETHEREUM].apiId}`
-                    const mainnetTokensResponse = await fetchWithTimeout(mainnetTokensEndpoint, { method: 'GET', headers: defaultHeaders })
-                    const mainnetTokensResponseJson = (await mainnetTokensResponse.json()) as StructuredOutput<Token[]>
-                    setApiTokens(AppSupportedChains.ETHEREUM, mainnetTokensResponseJson.data ?? [])
-
-                    // unichain
-                    const unichainTokensEndpoint = `${APP_ROUTE}/api/tokens?chain=${CHAINS_CONFIG[AppSupportedChains.UNICHAIN].apiId}`
-                    const unichainTokensResponse = await fetchWithTimeout(unichainTokensEndpoint, { method: 'GET', headers: defaultHeaders })
-                    const unichainTokensResponseJson = (await unichainTokensResponse.json()) as StructuredOutput<Token[]>
-                    setApiTokens(AppSupportedChains.UNICHAIN, unichainTokensResponseJson.data ?? [])
-
-                    // all
-                    return [mainnetTokensResponseJson.data, unichainTokensResponseJson.data]
+                    const supportedChains = Object.values(CHAINS_CONFIG).filter((chain) => chain.supported)
+                    const fetchPromises = supportedChains.map((chain) => {
+                        const url = `${APP_ROUTE}/api/tokens?chain=${chain.id}`
+                        return fetchWithTimeout(url, { method: 'GET', headers: defaultHeaders })
+                    })
+                    const fetchResponses = await Promise.all(fetchPromises)
+                    const jsonPromises = fetchResponses.map((promise) => promise.json())
+                    const tokensPerChain = await Promise.all(jsonPromises)
+                    for (let chainIndex = 0; chainIndex < tokensPerChain.length; chainIndex++)
+                        if (supportedChains[chainIndex]) setApiTokens(supportedChains[chainIndex].id, tokensPerChain[chainIndex].data ?? [])
+                    return tokensPerChain
                 },
                 refetchOnWindowFocus: false,
                 refetchInterval: 1000 * 60 * 5,
@@ -50,22 +45,18 @@ export default function Dashboard() {
             {
                 queryKey: ['ApiPairsQuery'],
                 enabled: true,
-                // todo promise.all
                 queryFn: async () => {
-                    // mainnet
-                    const mainnetPairsUrl = `${APP_ROUTE}/api/pairs?chain=${CHAINS_CONFIG[AppSupportedChains.ETHEREUM].apiId}`
-                    const mainnetPairsResponse = await fetchWithTimeout(mainnetPairsUrl, { method: 'GET', headers: defaultHeaders })
-                    const mainnetPairsResponseJson = (await mainnetPairsResponse.json()) as StructuredOutput<RustApiPair[]>
-                    setApiPairs(AppSupportedChains.ETHEREUM, mainnetPairsResponseJson.data ?? [])
-
-                    // unichain
-                    const unichainPairsUrl = `${APP_ROUTE}/api/pairs?chain=${CHAINS_CONFIG[AppSupportedChains.UNICHAIN].apiId}`
-                    const unichainPairsResponse = await fetchWithTimeout(unichainPairsUrl, { method: 'GET', headers: defaultHeaders })
-                    const unichainPairsResponseJson = (await unichainPairsResponse.json()) as StructuredOutput<RustApiPair[]>
-                    setApiPairs(AppSupportedChains.UNICHAIN, unichainPairsResponseJson.data ?? [])
-
-                    // all
-                    return [mainnetPairsResponseJson.data, unichainPairsResponseJson.data]
+                    const supportedChains = Object.values(CHAINS_CONFIG).filter((chain) => chain.supported)
+                    const fetchPromises = supportedChains.map((chain) => {
+                        const url = `${APP_ROUTE}/api/pairs?chain=${chain.id}`
+                        return fetchWithTimeout(url, { method: 'GET', headers: defaultHeaders })
+                    })
+                    const fetchResponses = await Promise.all(fetchPromises)
+                    const jsonPromises = fetchResponses.map((promise) => promise.json())
+                    const pairsPerChain = await Promise.all(jsonPromises)
+                    for (let chainIndex = 0; chainIndex < pairsPerChain.length; chainIndex++)
+                        if (supportedChains[chainIndex]) setApiPairs(supportedChains[chainIndex].id, pairsPerChain[chainIndex].data ?? [])
+                    return pairsPerChain
                 },
                 refetchOnWindowFocus: false,
                 refetchInterval: 1000 * 60 * 5,
@@ -142,14 +133,14 @@ export default function Dashboard() {
                         setIsRefreshingMarketDepth(false)
                     }
 
-                    // refresh
-                    // setApiStoreRefreshedAt(Date.now())
+                    // notify
                     toast.success(`Market depth for ${sellToken.symbol}-${buyToken.symbol} updated just now`, { style: toastStyle })
 
+                    // -
                     return orderbookJson
                 },
                 refetchOnWindowFocus: false,
-                refetchInterval: orderBookRefreshIntervalMs[currentChainId] * 0.85, // small hack to avoid counter to stop at 0
+                refetchInterval: orderBookRefreshIntervalMs[currentChainId] * 0.85, // small hack to avoid counter to freeze a few secs at 0
             },
         ],
     })
