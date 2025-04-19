@@ -35,12 +35,6 @@ export default function Dashboard() {
                     const mainnetTokensResponseJson = (await mainnetTokensResponse.json()) as StructuredOutput<Token[]>
                     setApiTokens(AppSupportedChains.ETHEREUM, mainnetTokensResponseJson.data ?? [])
 
-                    // base
-                    // const baseTokensEndpoint = `${APP_ROUTE}/api/tokens?chain=${CHAINS_CONFIG[AppSupportedChains.BASE].apiId}`
-                    // const baseTokensResponse = await fetchWithTimeout(baseTokensEndpoint, { method: 'GET', headers: defaultHeaders })
-                    // const baseTokensResponseJson = (await baseTokensResponse.json()) as StructuredOutput<Token[]>
-                    // setApiTokens(AppSupportedChains.BASE, baseTokensResponseJson.data ?? [])
-
                     // unichain
                     const unichainTokensEndpoint = `${APP_ROUTE}/api/tokens?chain=${CHAINS_CONFIG[AppSupportedChains.UNICHAIN].apiId}`
                     const unichainTokensResponse = await fetchWithTimeout(unichainTokensEndpoint, { method: 'GET', headers: defaultHeaders })
@@ -63,12 +57,6 @@ export default function Dashboard() {
                     const mainnetPairsResponse = await fetchWithTimeout(mainnetPairsUrl, { method: 'GET', headers: defaultHeaders })
                     const mainnetPairsResponseJson = (await mainnetPairsResponse.json()) as StructuredOutput<RustApiPair[]>
                     setApiPairs(AppSupportedChains.ETHEREUM, mainnetPairsResponseJson.data ?? [])
-
-                    // base
-                    // const basePairsUrl = `${APP_ROUTE}/api/pairs?chain=${CHAINS_CONFIG[AppSupportedChains.BASE].apiId}`
-                    // const basePairsResponse = await fetchWithTimeout(basePairsUrl, { method: 'GET', headers: defaultHeaders })
-                    // const basePairsResponseJson = (await basePairsResponse.json()) as StructuredOutput<RustApiPair[]>
-                    // setApiPairs(AppSupportedChains.BASE, basePairsResponseJson.data ?? [])
 
                     // unichain
                     const unichainPairsUrl = `${APP_ROUTE}/api/pairs?chain=${CHAINS_CONFIG[AppSupportedChains.UNICHAIN].apiId}`

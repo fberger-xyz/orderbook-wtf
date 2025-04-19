@@ -143,7 +143,8 @@ export default function SwapSection() {
             // state
             setIsRefreshingMarketDepth(true)
 
-            // prevent further processing
+            // prevent useless processing
+            if (amountIn !== sellTokenAmountInput) return
             const currentOrderbook = getOrderbook(getAddressPair())
             if (!currentOrderbook) return
 
@@ -153,7 +154,8 @@ export default function SwapSection() {
             setApiOrderbook(getAddressPair(), mergedOrderbook)
             if (orderbookWithTrade?.bids.length) {
                 const newSelectedTrade = orderbookWithTrade.bids.find((bid) => bid.amount === amountIn)
-                if (newSelectedTrade)
+                // if trade found AND trade amount equals what the input set by user
+                if (newSelectedTrade && newSelectedTrade.amount === sellTokenAmountInput)
                     selectOrderbookTrade({
                         side: OrderbookSide.BID,
                         amountIn: amountIn,
@@ -183,22 +185,21 @@ export default function SwapSection() {
             if (isNaN(amountIn)) return
 
             // update ui
-            const newSelectedTrade: SelectedTrade = {
+            setSellTokenAmountInput(amountIn)
+            selectOrderbookTrade({
                 side: OrderbookSide.BID,
                 amountIn,
                 selectedAt: Date.now(),
                 trade: undefined,
                 pools: [],
                 xAxis: -1,
-            }
-            setSellTokenAmountInput(amountIn)
-            selectOrderbookTrade(newSelectedTrade)
+            })
 
             // debounced
             if (debounceTimeout.current) clearTimeout(debounceTimeout.current)
             debounceTimeout.current = setTimeout(() => {
                 simulateTradeAndMergeOrderbook(amountIn)
-            }, 1000) // 1000ms debounce delay
+            }, 600) // 1000ms debounce delay
         } catch (error) {
             toast.error(`Unexepected error while fetching price: ${extractErrorMessage(error)}`, {
                 style: toastStyle,
@@ -210,13 +211,7 @@ export default function SwapSection() {
         <>
             <div className="col-span-1 md:col-span-4 flex flex-col gap-0.5 xl:col-span-3">
                 {/* Sell section */}
-                <div
-                    className={cn('flex flex-col gap-4 p-4 rounded-xl border-milk-150 w-full', {
-                        // 'bg-folly/20': account.isConnected && sellToken.address && sellTokenAmountInput && sellTokenBalance < sellTokenAmountInput,
-                        // 'bg-milk-600/5': !(account.isConnected && sellTokenAmountInput && sellTokenBalance < sellTokenAmountInput),
-                        'bg-milk-600/5': true,
-                    })}
-                >
+                <div className="flex flex-col gap-4 p-4 rounded-xl border-milk-150 w-full bg-milk-600/5">
                     <div className="flex justify-between items-end">
                         <p className="text-milk-600 text-xs">Sell</p>
                         <button
@@ -241,9 +236,6 @@ export default function SwapSection() {
                             }}
                             className="flex items-center hover:bg-milk-600/5 px-2 py-1 rounded-lg -mb-1"
                         >
-                            {/* {account.isconnected && selltokenbalance >= 0 && selltokenamountinput && selltokenbalance < selltokenamountinput ? (
-                                <p className="text-folly text-xs pr-2">Exceeds Balance</p>
-                            ) : null} */}
                             <p className="text-aquamarine text-xs">Best bid</p>
                         </button>
                     </div>
@@ -267,8 +259,6 @@ export default function SwapSection() {
                     {selectedTrade ? (
                         <div className="mt-2 flex justify-between items-center">
                             <div className="flex items-center gap-1">
-                                {/* <tokenbalance balance={selltokenbalance} isconnected={account.isconnected} /> */}
-                                <span />
                                 {account.isConnected && sellToken.address && (
                                     <button
                                         onClick={() => {
@@ -282,18 +272,13 @@ export default function SwapSection() {
                                 )}
                             </div>
                             <p className="text-milk-600 text-xs">
-                                ${' '}
                                 {getBaseValueInUsd(metrics?.orderbook)
-                                    ? safeNumeral(selectedTrade.amountIn * (getBaseValueInUsd(metrics?.orderbook) as number), '0,0.[00]')
+                                    ? `$ ${safeNumeral(selectedTrade.amountIn * (getBaseValueInUsd(metrics?.orderbook) as number), '0,0.[00]')}`
                                     : '-'}
                             </p>
                         </div>
                     ) : (
-                        <div className="flex justify-between items-center">
-                            {/* <tokenbalance balance={buytokenbalance} isconnected={account.isconnected} /> */}
-                            <span />
-                            <p className="text-milk-600 text-xs">$ 0</p>
-                        </div>
+                        <p className="ml-auto text-milk-600 text-xs">$ 0</p>
                     )}
                 </div>
 
@@ -338,9 +323,7 @@ export default function SwapSection() {
 
                     {/* last row  */}
                     {selectedTrade ? (
-                        <div className="flex justify-between items-center">
-                            {/* <tokenbalance balance={selltokenbalance} isconnected={account.isconnected} /> */}
-                            <span />
+                        <div className="flex justify-end items-center">
                             {isRefreshingMarketDepth ? (
                                 <div className="skeleton-loading w-16 h-4 rounded-full" />
                             ) : (
@@ -353,11 +336,7 @@ export default function SwapSection() {
                             )}
                         </div>
                     ) : (
-                        <div className="flex justify-between items-center">
-                            {/* <tokenbalance balance={selltokenbalance} isconnected={account.isconnected} /> */}
-                            <span />
-                            <p className="text-milk-600 text-xs">$ 0</p>
-                        </div>
+                        <p className="ml-auto text-milk-600 text-xs">$ 0</p>
                     )}
                 </div>
 
