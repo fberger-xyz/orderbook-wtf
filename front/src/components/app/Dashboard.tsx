@@ -82,8 +82,20 @@ export default function Dashboard() {
 
                     // prevent format errors
                     const newOrderbook = orderbookJson.data
-                    if (!newOrderbook || !newOrderbook?.bids.length || !newOrderbook?.asks.length || !newOrderbook?.pools.length) {
-                        toast.error(`Bad orderbook format`, { style: toastStyle })
+                    if (!newOrderbook) {
+                        toast.error(`Empty orderbook`, { style: toastStyle })
+                        return orderbookJson
+                    }
+                    if (!newOrderbook.bids.length) {
+                        toast.error(`Bad orderbook format: no bids`, { style: toastStyle })
+                        return orderbookJson
+                    }
+                    if (!newOrderbook.asks.length) {
+                        toast.error(`Bad orderbook format: missing asks`, { style: toastStyle })
+                        return orderbookJson
+                    }
+                    if (!newOrderbook.pools.length) {
+                        toast.error(`Bad orderbook format: missing pools`, { style: toastStyle })
                         return orderbookJson
                     }
 
