@@ -171,8 +171,8 @@ export const useAppStore = create<{
             selectOrderbookTrade: (selectedTrade) =>
                 set(() => ({
                     selectedTrade,
-                    sellTokenAmountInput: selectedTrade?.amountIn ?? 0,
-                    sellTokenAmountInputRaw: selectedTrade?.amountIn ?? 0,
+                    // sellTokenAmountInput: selectedTrade?.amountIn ?? 0,
+                    // sellTokenAmountInputRaw: selectedTrade?.amountIn ?? 0,
                     buyTokenAmountInput: selectedTrade?.trade?.output ?? 0,
                 })),
 

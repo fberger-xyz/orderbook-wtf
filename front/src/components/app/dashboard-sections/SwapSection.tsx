@@ -15,12 +15,13 @@ import {
     cn,
     extractErrorMessage,
     formatAmount,
-    formatOrDisplayRaw,
+    formatInputWithCommas,
     getBaseValueInUsd,
     getHighestBid,
     getQuoteValueInUsd,
     mergeOrderbooks,
     safeNumeral,
+    sanitizeSwapInput,
     simulateTradeForAmountIn,
 } from '@/utils'
 import { useApiStore } from '@/stores/api.store'
@@ -174,38 +175,40 @@ export default function SwapSection() {
 
     const handleChangeOfAmountIn = async (event: ChangeEvent<HTMLInputElement>) => {
         try {
-            // start
-            const start = Date.now()
+            const raw = event.target.value.replace(/,/g, '') // remove commas first
+            if (!/^[\d.]*$/.test(raw)) return // skip if invalid char
 
-            // prepare
-            const raw = event.target.value
-            setSellTokenAmountInputRaw(raw)
+            // allow input like '12.', '0.', etc.
+            const dotCount = (raw.match(/\./g) || []).length
+            if (dotCount > 1) return
 
-            // parse
-            const parsed = numeral(raw).value()
-            const amountIn = typeof parsed === 'number' ? parsed : NaN
-            if (isNaN(amountIn)) return
+            // format and set state
+            const formatted = formatInputWithCommas(raw)
+            setSellTokenAmountInputRaw(formatted)
 
-            // update ui
-            setSellTokenAmountInput(amountIn)
+            // parse numeric part for logic
+            const numeric = sanitizeSwapInput(raw)
+            if (isNaN(Number(numeric))) return
+
+            setSellTokenAmountInput(Number(numeric))
+
             selectOrderbookTrade({
                 side: OrderbookSide.BID,
-                amountIn,
+                amountIn: Number(numeric),
                 selectedAt: Date.now(),
                 trade: undefined,
                 pools: [],
                 xAxis: -1,
             })
 
-            // debounced
+            // debounce
+            const start = Date.now()
             if (debounceTimeout.current) clearTimeout(debounceTimeout.current)
             debounceTimeout.current = setTimeout(() => {
-                simulateTradeAndMergeOrderbook(amountIn, start)
-            }, 600) // 1000ms debounce delay
+                simulateTradeAndMergeOrderbook(Number(numeric), start)
+            }, 600)
         } catch (error) {
-            toast.error(`Unexepected error while fetching price: ${extractErrorMessage(error)}`, {
-                style: toastStyle,
-            })
+            toast.error(`Unexpected error while fetching price: ${extractErrorMessage(error)}`, { style: toastStyle })
         }
     }
 
@@ -252,7 +255,7 @@ export default function SwapSection() {
                         <input
                             type="text"
                             className="text-xl font-semibold text-right border-none outline-none ring-0 focus:ring-0 focus:outline-none focus:border-none bg-transparent w-full"
-                            value={formatOrDisplayRaw(sellTokenAmountInputRaw, rawAmountFormat)}
+                            value={sellTokenAmountInputRaw}
                             onChange={handleChangeOfAmountIn}
                         />
                     </div>
