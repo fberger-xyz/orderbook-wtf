@@ -16,11 +16,18 @@ import SwapSection from './dashboard-sections/SwapSection'
 import KPIsSection from './dashboard-sections/KPIsSection'
 
 export default function Dashboard() {
-    const { sellToken, sellTokenAmountInput, buyToken, currentChainId, setIsRefreshingMarketDepth, selectOrderbookTrade, getAddressPair } =
-        useAppStore()
-
+    const {
+        sellToken,
+        sellTokenAmountInput,
+        buyToken,
+        currentChainId,
+        setIsRefreshingMarketDepth,
+        selectTrade,
+        getAddressPair,
+        setSellTokenAmountInput,
+        setSellTokenAmountInputRaw,
+    } = useAppStore()
     const { orderBookRefreshIntervalMs, setApiTokens, setApiPairs, setApiOrderbook, setApiStoreRefreshedAt } = useApiStore()
-
     useQueries({
         queries: [
             {
@@ -115,8 +122,8 @@ export default function Dashboard() {
 
                         // set current trade as the one we just refreshed
                         const newTradeEntry = orderbookWithTrade && orderbookWithTrade?.bids?.length > 0 ? orderbookWithTrade?.bids[0] : undefined
-                        if (newTradeEntry)
-                            selectOrderbookTrade({
+                        if (newTradeEntry) {
+                            selectTrade({
                                 side: OrderbookSide.BID,
                                 amountIn: newTradeEntry.amount,
                                 selectedAt: Date.now(),
@@ -124,11 +131,13 @@ export default function Dashboard() {
                                 pools: newOrderbook.pools,
                                 xAxis: newTradeEntry.average_sell_price,
                             })
-                        else {
+                            setSellTokenAmountInputRaw(newTradeEntry.amount)
+                            setSellTokenAmountInput(newTradeEntry.amount)
+                        } else {
                             // or set current trade as the highest bid
                             const highestBid = getHighestBid(newOrderbook)
                             if (highestBid) {
-                                selectOrderbookTrade({
+                                selectTrade({
                                     side: OrderbookSide.BID,
                                     amountIn: highestBid.amount,
                                     selectedAt: Date.now(),
@@ -136,6 +145,8 @@ export default function Dashboard() {
                                     pools: newOrderbook.pools,
                                     xAxis: highestBid.average_sell_price,
                                 })
+                                setSellTokenAmountInputRaw(highestBid.amount)
+                                setSellTokenAmountInput(highestBid.amount)
                             }
                         }
                     } catch (error) {

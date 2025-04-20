@@ -474,8 +474,10 @@ export default function DepthChart() {
         coloredAreas,
         symbolsInYAxis,
         selectedTrade,
-        selectOrderbookTrade,
+        selectTrade,
         getAddressPair,
+        setSellTokenAmountInputRaw,
+        setSellTokenAmountInput,
     } = useAppStore()
     const { apiStoreRefreshedAt, metrics, getOrderbook } = useApiStore()
     const [options, setOptions] = useState<null | echarts.EChartsOption>(null)
@@ -611,7 +613,7 @@ export default function DepthChart() {
                 if (debug) console.log(fnName, `${side} trade`, trade)
 
                 // update markline
-                selectOrderbookTrade({
+                selectTrade({
                     selectedAt: Date.now(),
                     side: params.data?.customData.side,
                     amountIn: params.data.value[1],
@@ -619,6 +621,8 @@ export default function DepthChart() {
                     trade,
                     xAxis: trade.average_sell_price,
                 })
+                setSellTokenAmountInputRaw(params.data.value[1])
+                setSellTokenAmountInput(params.data.value[1])
             }
         } else {
             if (debug) console.log(fnName, 'missing data in params')

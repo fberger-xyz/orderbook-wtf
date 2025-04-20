@@ -62,7 +62,7 @@ export const useAppStore = create<{
     isRefreshingMarketDepth: boolean
     setIsRefreshingMarketDepth: (isRefreshingMarketDepth: boolean) => void
     selectedTrade?: SelectedTrade
-    selectOrderbookTrade: (selectedTrade?: SelectedTrade) => void
+    selectTrade: (selectedTrade?: SelectedTrade) => void
 
     /**
      * modal
@@ -168,11 +168,9 @@ export const useAppStore = create<{
                     return state
                 }),
             selectedTrade: undefined,
-            selectOrderbookTrade: (selectedTrade) =>
+            selectTrade: (selectedTrade) =>
                 set(() => ({
                     selectedTrade,
-                    // sellTokenAmountInput: selectedTrade?.amountIn ?? 0,
-                    // sellTokenAmountInputRaw: selectedTrade?.amountIn ?? 0,
                     buyTokenAmountInput: selectedTrade?.trade?.output ?? 0,
                 })),
 

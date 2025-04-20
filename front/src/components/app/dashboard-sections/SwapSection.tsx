@@ -115,7 +115,7 @@ export default function SwapSection() {
         isRefreshingMarketDepth,
         setIsRefreshingMarketDepth,
         selectedTrade,
-        selectOrderbookTrade,
+        selectTrade,
         setShowSelectTokenModal,
         setSelectTokenModalFor,
         getAddressPair,
@@ -146,7 +146,7 @@ export default function SwapSection() {
             if (orderbookWithTrade && newSelectedTrade) {
                 // if trade found AND trade amount equals what the input set by user
                 if (newSelectedTrade && newSelectedTrade.amount === sellTokenAmountInput) {
-                    selectOrderbookTrade({
+                    selectTrade({
                         side: OrderbookSide.BID,
                         amountIn: sellTokenAmountInput,
                         selectedAt: Date.now(),
@@ -191,8 +191,7 @@ export default function SwapSection() {
             if (isNaN(Number(numeric))) return
 
             setSellTokenAmountInput(Number(numeric))
-
-            selectOrderbookTrade({
+            selectTrade({
                 side: OrderbookSide.BID,
                 amountIn: Number(numeric),
                 selectedAt: Date.now(),
@@ -226,7 +225,7 @@ export default function SwapSection() {
 
                                 // select it
                                 if (metrics?.orderbook && highestBid) {
-                                    selectOrderbookTrade({
+                                    selectTrade({
                                         side: OrderbookSide.BID,
                                         amountIn: highestBid.amount,
                                         selectedAt: Date.now(),
@@ -234,6 +233,8 @@ export default function SwapSection() {
                                         pools: metrics.orderbook.pools,
                                         xAxis: highestBid.average_sell_price,
                                     })
+                                    setSellTokenAmountInputRaw(highestBid.amount)
+                                    setSellTokenAmountInput(highestBid.amount)
 
                                     // notify
                                     toast(`Best bid trade selected`, { style: toastStyle })
