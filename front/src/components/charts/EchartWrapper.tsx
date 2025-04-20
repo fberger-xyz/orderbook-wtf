@@ -46,15 +46,15 @@ export default function EchartWrapper(props: InterfaceEchartWrapperProps) {
             const grid3DOptions = currentOptions?.grid3D ? { grid3D: currentOptions.grid3D } : {}
 
             // if need be
-            // const dataZoomOptions = currentOptions?.dataZoom ? { dataZoom: currentOptions.dataZoom } : {}
+            const dataZoomOptions = currentOptions?.dataZoom ? { dataZoom: currentOptions.dataZoom } : {}
 
             // set option
             myChart.current.setOption(
                 // @ts-expect-error: poorly typed
-                { ...props.options, ...grid3DOptions },
+                { ...props.options, ...grid3DOptions, ...dataZoomOptions },
                 {
-                    // notMerge: true, // the new option object replaces the existing one completely.
-                    notMerge: true, // Default - ECharts merges the new options with the existing ones.
+                    notMerge: false, // the new option object replaces the existing one completely.
+                    // notMerge: true, // Default - ECharts merges the new options with the existing ones.
 
                     /**
                      * lazyUpdate?: boolean
