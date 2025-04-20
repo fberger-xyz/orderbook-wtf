@@ -83,19 +83,19 @@ export default function Dashboard() {
                     // prevent format errors
                     const newOrderbook = orderbookJson.data
                     if (!newOrderbook) {
-                        toast.error(`Empty orderbook`, { style: toastStyle })
+                        toast.error(`Empty orderbook. Check API status.`, { style: toastStyle })
                         return orderbookJson
                     }
                     if (!newOrderbook.bids.length) {
-                        toast.error(`Bad orderbook format: no bids`, { style: toastStyle })
+                        toast.error(`Bad orderbook format: no bids. Check API status.`, { style: toastStyle })
                         return orderbookJson
                     }
                     if (!newOrderbook.asks.length) {
-                        toast.error(`Bad orderbook format: missing asks`, { style: toastStyle })
+                        toast.error(`Bad orderbook format: missing asks. Check API status.`, { style: toastStyle })
                         return orderbookJson
                     }
                     if (!newOrderbook.pools.length) {
-                        toast.error(`Bad orderbook format: missing pools`, { style: toastStyle })
+                        toast.error(`Bad orderbook format: missing pools. Check API status.`, { style: toastStyle })
                         return orderbookJson
                     }
 
