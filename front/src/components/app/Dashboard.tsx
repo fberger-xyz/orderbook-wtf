@@ -27,7 +27,7 @@ export default function Dashboard() {
         setSellTokenAmountInput,
         setSellTokenAmountInputRaw,
     } = useAppStore()
-    const { orderBookRefreshIntervalMs, setApiTokens, setApiPairs, setApiOrderbook, setApiStoreRefreshedAt } = useApiStore()
+    const { orderBookRefreshIntervalMs, actions } = useApiStore()
     useQueries({
         queries: [
             {
@@ -40,10 +40,10 @@ export default function Dashboard() {
                         return fetchWithTimeout(url, { method: 'GET', headers: defaultHeaders })
                     })
                     const fetchResponses = await Promise.all(fetchPromises)
-                    const jsonPromises = fetchResponses.map((promise) => promise.json())
+                    const jsonPromises = fetchResponses.map((response) => response.json())
                     const tokensPerChain = await Promise.all(jsonPromises)
                     for (let chainIndex = 0; chainIndex < tokensPerChain.length; chainIndex++)
-                        if (supportedChains[chainIndex]) setApiTokens(supportedChains[chainIndex].id, tokensPerChain[chainIndex].data ?? [])
+                        if (supportedChains[chainIndex]) actions.setApiTokens(supportedChains[chainIndex].id, tokensPerChain[chainIndex].data ?? [])
                     return tokensPerChain
                 },
                 refetchOnWindowFocus: false,
@@ -59,10 +59,10 @@ export default function Dashboard() {
                         return fetchWithTimeout(url, { method: 'GET', headers: defaultHeaders })
                     })
                     const fetchResponses = await Promise.all(fetchPromises)
-                    const jsonPromises = fetchResponses.map((promise) => promise.json())
+                    const jsonPromises = fetchResponses.map((response) => response.json())
                     const pairsPerChain = await Promise.all(jsonPromises)
                     for (let chainIndex = 0; chainIndex < pairsPerChain.length; chainIndex++)
-                        if (supportedChains[chainIndex]) setApiPairs(supportedChains[chainIndex].id, pairsPerChain[chainIndex].data ?? [])
+                        if (supportedChains[chainIndex]) actions.setApiPairs(supportedChains[chainIndex].id, pairsPerChain[chainIndex].data ?? [])
                     return pairsPerChain
                 },
                 refetchOnWindowFocus: false,
@@ -118,7 +118,7 @@ export default function Dashboard() {
                         const mergedOrderbook = mergeOrderbooks(nextOrderbook, orderbookWithTrade)
 
                         // state
-                        setApiOrderbook(getAddressPair(), mergedOrderbook)
+                        actions.setApiOrderbook(getAddressPair(), mergedOrderbook)
 
                         // set current trade as the one we just refreshed
                         const newTradeEntry = orderbookWithTrade && orderbookWithTrade?.bids?.length > 0 ? orderbookWithTrade?.bids[0] : undefined
@@ -152,7 +152,7 @@ export default function Dashboard() {
                     } catch (error) {
                     } finally {
                         // trigger an ui refresh
-                        setApiStoreRefreshedAt(Date.now())
+                        actions.setApiStoreRefreshedAt(Date.now())
                         setIsRefreshingMarketDepth(false)
                     }
 

@@ -131,7 +131,7 @@ export default function KPIsSection() {
                     title={
                         <Tooltip placement="bottom" content={lastBlockTooltipContent()}>
                             <div className="w-full flex justify-between">
-                                <div className="flex gap-1">
+                                <div className="flex gap-1 group">
                                     <p className="text-milk-600 text-xs">Last block</p>
                                     <IconWrapper icon={IconIds.INFORMATION} className="size-3.5 text-milk-200 group-hover:text-milk cursor-pointer" />
                                 </div>

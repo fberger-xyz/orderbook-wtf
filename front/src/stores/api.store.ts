@@ -10,12 +10,14 @@ export const useApiStore = create<{
     metrics?: DashboardMetrics
     orderBookRefreshIntervalMs: Record<AppSupportedChains, number>
     apiStoreRefreshedAt: number
-    setApiTokens: (key: string, pairs: Token[]) => void
-    setApiPairs: (key: string, pairs: RustApiPair[]) => void
-    setApiOrderbook: (key: string, orderbook?: AmmAsOrderbook) => void
-    setApiStoreRefreshedAt: (apiStoreRefreshedAt: number) => void
-    setMetrics: (metrics?: DashboardMetrics) => void
-    getOrderbook: (key: string) => undefined | AmmAsOrderbook
+    actions: {
+        setApiTokens: (key: string, pairs: Token[]) => void
+        setApiPairs: (key: string, pairs: RustApiPair[]) => void
+        setApiOrderbook: (key: string, orderbook?: AmmAsOrderbook) => void
+        setApiStoreRefreshedAt: (apiStoreRefreshedAt: number) => void
+        setMetrics: (metrics?: DashboardMetrics) => void
+        getOrderbook: (key: string) => undefined | AmmAsOrderbook
+    }
 }>((set, get) => ({
     apiTokens: {
         [AppSupportedChains.ETHEREUM]: [],
@@ -38,20 +40,23 @@ export const useApiStore = create<{
         [AppSupportedChains.UNICHAIN]: 5000,
     },
     apiStoreRefreshedAt: -1,
-    setApiTokens: (key, tokens) =>
-        set((state) => ({
-            apiTokens: { ...state.apiTokens, [key]: tokens },
-        })),
-    setApiPairs: (key, pairs) =>
-        set((state) => ({
-            apiPairs: { ...state.apiPairs, [key]: pairs },
-        })),
-    setApiOrderbook: (key, orderbook) =>
-        set((state) => ({
-            apiOrderbooks: { ...state.apiOrderbooks, [key]: orderbook },
-            metrics: getDashboardMetrics(orderbook),
-        })),
-    setApiStoreRefreshedAt: (apiStoreRefreshedAt) => set(() => ({ apiStoreRefreshedAt })),
-    setMetrics: (metrics) => set(() => ({ metrics })),
-    getOrderbook: (key) => get().apiOrderbooks[key],
+    actions: {
+        setApiTokens: (key, tokens) =>
+            set((state) => ({
+                // todo try immer middleware for testing. cf. https://www.youtube.com/watch?v=6tEQ1nJZ51w&t=10s
+                apiTokens: { ...state.apiTokens, [key]: tokens },
+            })),
+        setApiPairs: (key, pairs) =>
+            set((state) => ({
+                apiPairs: { ...state.apiPairs, [key]: pairs },
+            })),
+        setApiOrderbook: (key, orderbook) =>
+            set((state) => ({
+                apiOrderbooks: { ...state.apiOrderbooks, [key]: orderbook },
+                metrics: getDashboardMetrics(orderbook),
+            })),
+        setApiStoreRefreshedAt: (apiStoreRefreshedAt) => set(() => ({ apiStoreRefreshedAt })),
+        setMetrics: (metrics) => set(() => ({ metrics })),
+        getOrderbook: (key) => get().apiOrderbooks[key],
+    },
 }))

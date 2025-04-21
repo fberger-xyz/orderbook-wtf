@@ -18,7 +18,7 @@ import { toastStyle } from '@/config/toasts.config'
 export default function Header(props: { className?: string }) {
     // const { currentChainId, setCurrentChain, setShowWasIsTisModal } = useAppStore()
     const { currentChainId, setCurrentChain } = useAppStore()
-    const { setMetrics } = useApiStore()
+    const { actions } = useApiStore()
     const [openNetworkDropown, setOpenNetworkDropown] = useState(false)
     const networkDropown = useRef<HTMLDivElement>(null)
     useClickOutside(networkDropown, () => setOpenNetworkDropown(false))
@@ -67,7 +67,7 @@ export default function Header(props: { className?: string }) {
                                             if (chainConfig.wagmi?.id) {
                                                 setCurrentChain(chainConfig.id)
                                                 toast.success(`Chain selected: ${chainConfig.name}`, { style: toastStyle })
-                                                setMetrics(undefined)
+                                                actions.setMetrics(undefined)
                                             }
                                         }}
                                         className={cn('flex items-center gap-2 w-full px-4 py-2 text-white rounded-lg transition cursor-pointer', {

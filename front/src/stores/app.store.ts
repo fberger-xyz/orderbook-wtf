@@ -5,7 +5,7 @@ import { SelectedTrade, Token } from '@/interfaces'
 import { hardcodedTokensList } from '@/data/back-tokens'
 import { OrderbookOption, OrderbookAxisScale, AppSupportedChains } from '@/enums'
 
-// todo remove useless keys
+// todo: find a way to group static setters into an 'actions' record without compromising the persist feature
 export const useAppStore = create<{
     /**
      * store
@@ -132,7 +132,7 @@ export const useAppStore = create<{
              * swap
              */
 
-            sellToken: hardcodedTokensList[AppSupportedChains.ETHEREUM][1], // todo put this as null
+            sellToken: hardcodedTokensList[AppSupportedChains.ETHEREUM][1],
             selectSellToken: (sellToken) =>
                 set((state) => {
                     console.log(`selectsellToken: ${sellToken.symbol} (prev=${state.sellToken.symbol})`)
@@ -140,7 +140,7 @@ export const useAppStore = create<{
                 }),
             sellTokenAmountInput: 0,
             sellTokenAmountInputRaw: 0,
-            buyToken: hardcodedTokensList[AppSupportedChains.ETHEREUM][0], // todo put this as null
+            buyToken: hardcodedTokensList[AppSupportedChains.ETHEREUM][0],
             selectBuyToken: (buyToken) =>
                 set((state) => {
                     console.log(`selectBuyToken: ${buyToken.symbol} (prev=${state.buyToken.symbol})`)

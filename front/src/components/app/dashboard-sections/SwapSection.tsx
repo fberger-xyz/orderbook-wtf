@@ -122,7 +122,7 @@ export default function SwapSection() {
         currentChainId,
     } = useAppStore()
 
-    const { metrics, setApiOrderbook, getOrderbook, setApiStoreRefreshedAt } = useApiStore()
+    const { metrics, actions } = useApiStore()
     const account = useAccount()
     const [openTradeDetails, showTradeDetails] = useState(true)
     const [sellTokenBalance] = useState(-1)
@@ -135,13 +135,13 @@ export default function SwapSection() {
 
             // prevent useless processing
             if (amountIn !== sellTokenAmountInput) return
-            const currentOrderbook = getOrderbook(getAddressPair())
+            const currentOrderbook = actions.getOrderbook(getAddressPair())
             if (!currentOrderbook) return
 
             // simulate trade and update state (orderbook then selected trade)
             const orderbookWithTrade = await simulateTradeForAmountIn(currentChainId, sellToken, buyToken, amountIn)
             const mergedOrderbook = mergeOrderbooks(currentOrderbook, orderbookWithTrade)
-            setApiOrderbook(getAddressPair(), mergedOrderbook)
+            actions.setApiOrderbook(getAddressPair(), mergedOrderbook)
             const newSelectedTrade = orderbookWithTrade?.bids.find((bid) => bid.amount === amountIn)
             if (orderbookWithTrade && newSelectedTrade) {
                 // if trade found AND trade amount equals what the input set by user
@@ -164,7 +164,7 @@ export default function SwapSection() {
                     )
 
                     // trigger an ui refresh
-                    setApiStoreRefreshedAt(Date.now())
+                    actions.setApiStoreRefreshedAt(Date.now())
                 }
             }
         } catch (error) {
@@ -295,7 +295,7 @@ export default function SwapSection() {
                     <div className="size-[44px] rounded-xl bg-background p-1">
                         <button
                             onClick={async () => {
-                                setApiOrderbook(getAddressPair(), undefined)
+                                actions.setApiOrderbook(getAddressPair(), undefined)
                                 switchSelectedTokens()
                             }}
                             className="size-full rounded-lg bg-milk-600/5 flex items-center justify-center group"

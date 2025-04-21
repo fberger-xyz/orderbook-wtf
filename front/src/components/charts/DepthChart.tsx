@@ -479,7 +479,7 @@ export default function DepthChart() {
         setSellTokenAmountInputRaw,
         setSellTokenAmountInput,
     } = useAppStore()
-    const { apiStoreRefreshedAt, metrics, getOrderbook } = useApiStore()
+    const { apiStoreRefreshedAt, metrics, actions } = useApiStore()
     const [options, setOptions] = useState<null | echarts.EChartsOption>(null)
 
     useEffect(() => {
@@ -487,7 +487,7 @@ export default function DepthChart() {
         const debug = false
 
         // get possibly undefined orderbook
-        const orderbook = getOrderbook(getAddressPair())
+        const orderbook = actions.getOrderbook(getAddressPair())
 
         // debug
         if (debug) console.log('useEffect: orderbook', orderbook)
@@ -580,7 +580,7 @@ export default function DepthChart() {
             if (debug) console.log(fnName, 'ok data', params?.data)
 
             const key = `${sellToken.address}-${buyToken.address}`
-            const orderbook = getOrderbook(key)
+            const orderbook = actions.getOrderbook(key)
             if (orderbook) {
                 // debug
                 if (debug) console.log(fnName, 'orderbook found', orderbook)
