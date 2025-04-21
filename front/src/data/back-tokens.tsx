@@ -38,9 +38,11 @@ export const hardcodedTokensList: Record<AppSupportedChains, Token[]> = {
             gas: '40563', // todo: find correct values or remove if useless
         },
         {
-            address: '0x4200000000000000000000000000000000000006',
+            // address: '0x4200000000000000000000000000000000000006',
+            address: '0x0000000000000000000000000000000000000000',
             decimals: 18,
-            symbol: 'WETH',
+            // symbol: 'WETH',
+            symbol: 'ETH',
             gas: '29701', // todo: find correct values or remove if useless
         },
     ],
