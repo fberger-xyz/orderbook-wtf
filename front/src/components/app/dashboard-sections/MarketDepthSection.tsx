@@ -8,14 +8,9 @@ import IconWrapper from '@/components/common/IconWrapper'
 import DepthChart from '@/components/charts/DepthChart'
 import { useRef, useState } from 'react'
 import { useClickOutside } from '@/hooks/useClickOutside'
+import { Tooltip } from '@nextui-org/tooltip'
 
-type OptionButtonProps = {
-    isSelected: boolean
-    onClick: () => void
-    children: React.ReactNode
-}
-
-const OptionButton = ({ isSelected, onClick, children }: OptionButtonProps) => (
+const OptionButton = ({ isSelected, onClick, children }: { isSelected: boolean; onClick: () => void; children: React.ReactNode }) => (
     <div
         className={cn('flex items-center gap-2 w-full px-4 py-1.5 rounded-lg transition', {
             'text-white bg-gray-600/20': isSelected,
@@ -57,9 +52,9 @@ const ChartOption = <T extends OrderbookAxisScale | OrderbookOption>({
 export default function MarketDepthSection() {
     const {
         showMarketDepthSection,
-        showRoutingSection,
-        showLiquidityBreakdownSection,
-        showSections,
+        // showRoutingSection,
+        // showLiquidityBreakdownSection,
+        // showSections,
         yAxisType,
         yAxisLogBase,
         setYAxisType,
@@ -80,55 +75,68 @@ export default function MarketDepthSection() {
             title={
                 <div className="w-full flex justify-between">
                     <button
-                        onClick={() => showSections(!showMarketDepthSection, showRoutingSection, showLiquidityBreakdownSection)}
-                        className="flex gap-1 items-center rounded-lg px-2.5 py-1.5 hover:bg-milk-100/5 transition-colors duration-300 -ml-1"
+                        // onClick={() => showSections(!showMarketDepthSection, showRoutingSection, showLiquidityBreakdownSection)}
+                        // className="flex gap-1 items-center rounded-lg px-2.5 py-1.5 hover:bg-milk-100/5 transition-colors duration-300 -ml-1"
+                        className="flex gap-1 items-center rounded-lg px-2.5 py-1.5 -ml-1"
                     >
                         <p className="text-milk text-base font-semibold">Market depth</p>
-                        <IconWrapper icon={showMarketDepthSection ? IconIds.TRIANGLE_UP : IconIds.TRIANGLE_DOWN} className="size-4" />
+                        <Tooltip
+                            placement="bottom"
+                            content={
+                                <div className="rounded-2xl backdrop-blur border border-milk-150 shadow-lg p-3 -mt-1 max-w-80 text-milk text-sm flex">
+                                    <p className="text-wrap">
+                                        [TODO: explains what the user is seeing and why sometimes the chart has not straight lines which bend inwards
+                                        - the gas fees, pool fees, and routing logic, causing these]
+                                    </p>
+                                </div>
+                            }
+                        >
+                            <div className="group mx-0.5">
+                                <IconWrapper icon={IconIds.INFORMATION} className="size-4 text-milk-200 group-hover:text-milk cursor-pointer" />
+                            </div>
+                        </Tooltip>
+                        {/* <IconWrapper icon={showMarketDepthSection ? IconIds.TRIANGLE_UP : IconIds.TRIANGLE_DOWN} className="size-4" /> */}
                     </button>
-                    {showMarketDepthSection && (
-                        <button onClick={() => showChartOptions(!openChartOptions)} className="relative">
-                            <div className="flex items-center gap-1 hover:bg-milk-100/5 transition-colors duration-300 rounded-lg px-2.5 py-1.5">
-                                <p className="text-milk text-sm">Settings</p>
-                                <IconWrapper icon={IconIds.TRIANGLE_DOWN} className="size-4" />
-                            </div>
+                    {/* {showMarketDepthSection && ( */}
+                    <button onClick={() => showChartOptions(!openChartOptions)} className="relative">
+                        <div className="flex items-center gap-1 hover:bg-milk-100/5 transition-colors duration-300 rounded-lg px-2.5 py-1.5">
+                            <IconWrapper icon={IconIds.SETTINGS} className="size-4" />
+                        </div>
 
-                            <div
-                                ref={chartOptionsDropdown}
-                                className={cn(
-                                    'z-20 absolute right-0 mt-2 w-52 rounded-2xl backdrop-blur-lg border border-milk-150 shadow-lg p-3 transition-all origin-top-right flex flex-col gap-5',
-                                    {
-                                        'scale-100 opacity-100': openChartOptions,
-                                        'scale-95 opacity-0 pointer-events-none': !openChartOptions,
-                                    },
-                                )}
-                            >
-                                <ChartOption<OrderbookAxisScale>
-                                    title="Y Axis scale"
-                                    options={[OrderbookAxisScale.VALUE, OrderbookAxisScale.LOG]}
-                                    selectedOption={yAxisType}
-                                    onSelect={setYAxisType}
-                                    renderOptionLabel={renderYAxisLabel}
-                                />
+                        <div
+                            ref={chartOptionsDropdown}
+                            className={cn(
+                                'z-20 absolute right-0 mt-2 w-52 rounded-2xl backdrop-blur-lg border border-milk-150 shadow-lg p-3 transition-all origin-top-right flex flex-col gap-5',
+                                {
+                                    'scale-100 opacity-100': openChartOptions,
+                                    'scale-95 opacity-0 pointer-events-none': !openChartOptions,
+                                },
+                            )}
+                        >
+                            <ChartOption<OrderbookAxisScale>
+                                title="Y Axis scale"
+                                options={[OrderbookAxisScale.VALUE, OrderbookAxisScale.LOG]}
+                                selectedOption={yAxisType}
+                                onSelect={setYAxisType}
+                                renderOptionLabel={renderYAxisLabel}
+                            />
 
-                                <ChartOption<OrderbookOption>
-                                    title="Colored areas"
-                                    options={[OrderbookOption.YES, OrderbookOption.NO]}
-                                    selectedOption={coloredAreas}
-                                    onSelect={() => setColoredAreas(coloredAreas === OrderbookOption.YES ? OrderbookOption.NO : OrderbookOption.YES)}
-                                />
+                            <ChartOption<OrderbookOption>
+                                title="Colored areas"
+                                options={[OrderbookOption.YES, OrderbookOption.NO]}
+                                selectedOption={coloredAreas}
+                                onSelect={() => setColoredAreas(coloredAreas === OrderbookOption.YES ? OrderbookOption.NO : OrderbookOption.YES)}
+                            />
 
-                                <ChartOption<OrderbookOption>
-                                    title="Symbols in Y axis labels"
-                                    options={[OrderbookOption.YES, OrderbookOption.NO]}
-                                    selectedOption={symbolsInYAxis}
-                                    onSelect={() =>
-                                        setSymbolsInYAxis(symbolsInYAxis === OrderbookOption.YES ? OrderbookOption.NO : OrderbookOption.YES)
-                                    }
-                                />
-                            </div>
-                        </button>
-                    )}
+                            <ChartOption<OrderbookOption>
+                                title="Symbols in Y axis labels"
+                                options={[OrderbookOption.YES, OrderbookOption.NO]}
+                                selectedOption={symbolsInYAxis}
+                                onSelect={() => setSymbolsInYAxis(symbolsInYAxis === OrderbookOption.YES ? OrderbookOption.NO : OrderbookOption.YES)}
+                            />
+                        </div>
+                    </button>
+                    {/* )} */}
                 </div>
             }
             content={showMarketDepthSection ? <DepthChart /> : null}

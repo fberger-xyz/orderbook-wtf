@@ -77,4 +77,5 @@ export enum IconIds {
     TRIANGLE_DOWN = 'ic:round-arrow-drop-down',
     TRIANGLE_UP = 'ic:round-arrow-drop-up',
     INFORMATION = 'iconamoon:information-circle',
+    SETTINGS = 'ic:baseline-settings',
 }

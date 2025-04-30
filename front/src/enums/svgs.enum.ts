@@ -1,6 +1,9 @@
 // https://icones.js.org/
 
 export enum SvgIds {
+    // app
+    TYCHO_ORDERBOOK = 'Tycho orderbook',
+
     // chains
     MAINNET = 'mainnet',
     ARBITRUM = 'arbitrum',

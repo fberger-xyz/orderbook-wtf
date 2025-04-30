@@ -14,6 +14,7 @@ import RoutingSection from './dashboard-sections/RoutingSection'
 import MarketDepthSection from './dashboard-sections/MarketDepthSection'
 import SwapSection from './dashboard-sections/SwapSection'
 import KPIsSection from './dashboard-sections/KPIsSection'
+// import OrderbookSection from './dashboard-sections/OrderbookSection'
 
 export default function Dashboard() {
     const {
@@ -176,7 +177,10 @@ export default function Dashboard() {
                 <RoutingSection />
                 <PoolsTVLSection />
             </div>
-            <SwapSection />
+            <div className="col-span-1 md:col-span-4 flex flex-col gap-4 xl:col-span-3">
+                {/* <OrderbookSection /> */}
+                <SwapSection />
+            </div>
         </div>
     )
 }

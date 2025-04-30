@@ -3,8 +3,8 @@
 import { cn } from '@/utils'
 import IconWrapper from '../common/IconWrapper'
 import LinkWrapper from '../common/LinkWrapper'
-import { AppUrls, IconIds } from '@/enums'
-import TychoSVG from '../icons/tycho-svg.icon'
+import { AppUrls, IconIds, SvgIds } from '@/enums'
+import Image from 'next/image'
 import { useRef, useState } from 'react'
 import { useClickOutside } from '@/hooks/useClickOutside'
 import { useAppStore } from '@/stores/app.store'
@@ -13,30 +13,22 @@ import { useApiStore } from '@/stores/api.store'
 import SvgMapper from '../icons/SvgMapper'
 import toast from 'react-hot-toast'
 import { toastStyle } from '@/config/toasts.config'
-// import WatIsTisModal from '../app/WatIsTisModal'
 
 export default function Header(props: { className?: string }) {
-    // const { currentChainId, setCurrentChain, setShowWasIsTisModal } = useAppStore()
     const { currentChainId, setCurrentChain } = useAppStore()
     const { actions } = useApiStore()
     const [openNetworkDropown, setOpenNetworkDropown] = useState(false)
     const networkDropown = useRef<HTMLDivElement>(null)
     useClickOutside(networkDropown, () => setOpenNetworkDropown(false))
     return (
-        <div className={cn('flex justify-between items-start w-full px-7 py-4', props.className)}>
+        <div className={cn('flex justify-between items-center w-full px-7 py-4', props.className)}>
             <div className="flex gap-2 items-center flex-col md:flex-row">
-                <TychoSVG className="h-6" />
-                <p className="text-milk-600 font-light opacity-50">Orderbook</p>
+                <Image src={'/Tycho-orderbook.svg'} alt={SvgIds.TYCHO_ORDERBOOK} width={212} height={24} />
             </div>
             <div className="flex flex-wrap justify-end items-center gap-2 z-20">
                 {/* docs */}
-                {/* <button onClick={() => setShowWasIsTisModal(true)} className="flex items-center gap-1 px-2.5">
-                    <p className="text-milk text-sm">wat is tis</p>
-                </button> */}
-
-                {/* docs */}
                 <LinkWrapper href={AppUrls.DOCUMENTATION} target="_blank" className="flex items-center gap-1 px-2.5 cursor-alias">
-                    <p className="text-milk text-sm">Docs</p>
+                    <p className="text-milk text-sm">Docs (Run locally)</p>
                     <IconWrapper icon={IconIds.OPEN_LINK_IN_NEW_TAB} className="size-4" />
                 </LinkWrapper>
 
@@ -72,7 +64,7 @@ export default function Header(props: { className?: string }) {
                                         }}
                                         className={cn('flex items-center gap-2 w-full px-4 py-2 text-white rounded-lg transition cursor-pointer', {
                                             'hover:bg-gray-600/20': currentChainId === chainConfig.id,
-                                            'opacity-50 hover:opacity-100 hover:bg-gray-600/10': currentChainId !== chainConfig.id,
+                                            'hover:opacity-100 hover:bg-gray-600/10': currentChainId !== chainConfig.id,
                                         })}
                                     >
                                         <SvgMapper icon={chainConfig.svgId} className="size-6" />
@@ -95,10 +87,6 @@ export default function Header(props: { className?: string }) {
                         })}
                     </div>
                 </button>
-
-                {/* connect */}
-                {/* <ConnectOrDisconnect /> */}
-                {/* <WatIsTisModal /> */}
             </div>
         </div>
     )

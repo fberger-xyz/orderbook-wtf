@@ -463,7 +463,7 @@ const getOptions = (
     }
 }
 
-export default function DepthChart() {
+export default function OrderbookChart() {
     const {
         currentChainId,
         buyToken,

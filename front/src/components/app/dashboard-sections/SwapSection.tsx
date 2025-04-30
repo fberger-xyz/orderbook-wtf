@@ -213,7 +213,7 @@ export default function SwapSection() {
 
     return (
         <>
-            <div className="col-span-1 md:col-span-4 flex flex-col gap-0.5 xl:col-span-3">
+            <div className="w-full flex flex-col gap-0.5">
                 {/* Sell section */}
                 <div className="flex flex-col gap-4 p-4 rounded-xl border-milk-150 w-full bg-milk-600/5">
                     <div className="flex justify-between items-end">

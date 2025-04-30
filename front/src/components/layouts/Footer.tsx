@@ -47,7 +47,7 @@ export default function Footer(props: { className?: string }) {
                     @xMerso
                 </LinkWrapper>
                 and
-                <LinkWrapper href={AppUrls.FBERGER_X} target="_blank" className="cursor-alias hover:underline hover:text-aquamarine px-1">
+                <LinkWrapper href={AppUrls.FBERGER_WEBSITE} target="_blank" className="cursor-alias hover:underline hover:text-aquamarine px-1">
                     @fberger_xyz
                 </LinkWrapper>
             </p>

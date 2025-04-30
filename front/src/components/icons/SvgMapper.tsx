@@ -7,7 +7,7 @@ import { ReactNode } from 'react'
 import ChainImage from '../app/commons/ChainImage'
 import { CHAINS_CONFIG } from '@/config/app.config'
 
-function SvgWrapper(props: { children: ReactNode; className?: string }) {
+export function SvgWrapper(props: { children: ReactNode; className?: string }) {
     return <div className={cn('flex items-center justify-center relative', props.className)}>{props.children}</div>
 }
 

@@ -37,6 +37,7 @@ export default function KPIsSection() {
             const timeout = setTimeout(() => setBlockFlash(false), 300)
             return () => clearTimeout(timeout)
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [apiStoreRefreshedAt])
 
     return (
@@ -129,31 +130,31 @@ export default function KPIsSection() {
             {typeof metrics?.block === 'number' && metrics.block > 0 ? (
                 <OrderbookComponentLayout
                     title={
-                        <Tooltip placement="bottom" content={lastBlockTooltipContent()}>
-                            <div className="w-full flex justify-between">
-                                <div className="flex gap-1 group">
+                        <div className="w-full flex justify-between">
+                            <Tooltip placement="bottom" content={lastBlockTooltipContent()}>
+                                <div className="flex gap-1 group items-center">
                                     <p className="text-milk-600 text-xs">Last block</p>
-                                    <IconWrapper icon={IconIds.INFORMATION} className="size-3.5 text-milk-200 group-hover:text-milk cursor-pointer" />
+                                    <IconWrapper icon={IconIds.INFORMATION} className="size-4 text-milk-200 group-hover:text-milk cursor-pointer" />
                                 </div>
-                                <CountdownCircleTimer
-                                    key={apiStoreRefreshedAt}
-                                    isPlaying
-                                    duration={orderBookRefreshIntervalMs[currentChainId] / 1000}
-                                    initialRemainingTime={
-                                        apiStoreRefreshedAt > 0
-                                            ? Math.max((orderBookRefreshIntervalMs[currentChainId] - (Date.now() - apiStoreRefreshedAt)) / 1000, 0)
-                                            : orderBookRefreshIntervalMs[currentChainId] / 1000
-                                    }
-                                    colors={AppColors.folly}
-                                    trailColor={AppColors.background}
-                                    size={16}
-                                    strokeWidth={1.5}
-                                    trailStrokeWidth={1.5}
-                                >
-                                    {({ remainingTime }) => <p className="text-[7px] text-milk-200">{remainingTime}</p>}
-                                </CountdownCircleTimer>
-                            </div>
-                        </Tooltip>
+                            </Tooltip>
+                            <CountdownCircleTimer
+                                key={apiStoreRefreshedAt}
+                                isPlaying
+                                duration={orderBookRefreshIntervalMs[currentChainId] / 1000}
+                                initialRemainingTime={
+                                    apiStoreRefreshedAt > 0
+                                        ? Math.max((orderBookRefreshIntervalMs[currentChainId] - (Date.now() - apiStoreRefreshedAt)) / 1000, 0)
+                                        : orderBookRefreshIntervalMs[currentChainId] / 1000
+                                }
+                                colors={AppColors.folly}
+                                trailColor={AppColors.background}
+                                size={16}
+                                strokeWidth={1.5}
+                                trailStrokeWidth={1.5}
+                            >
+                                {({ remainingTime }) => <p className="text-[7px] text-milk-200">{remainingTime}</p>}
+                            </CountdownCircleTimer>
+                        </div>
                     }
                     content={
                         <LinkWrapper
@@ -161,9 +162,7 @@ export default function KPIsSection() {
                             href={`${CHAINS_CONFIG[currentChainId].explorerRoot}/block/${metrics?.block}`}
                             className="flex gap-1 items-center group cursor-alias"
                         >
-                            <p className={cn('text-milk font-semibold text-base', { 'animate-flash': blockFlash })}>
-                                {cleanOutput(numeral(metrics?.block).format('0,0'))}
-                            </p>
+                            <p className={cn('text-milk font-semibold text-base', { 'animate-flash': blockFlash })}>{metrics?.block}</p>
                             <IconWrapper icon={IconIds.OPEN_LINK_IN_NEW_TAB} className="size-4 text-milk-200 group-hover:text-milk" />
                         </LinkWrapper>
                     }
@@ -172,9 +171,9 @@ export default function KPIsSection() {
                 <OrderbookComponentLayout
                     title={
                         <Tooltip placement="bottom" content={lastBlockTooltipContent()}>
-                            <div className="flex gap-1">
+                            <div className="flex gap-1 items-center">
                                 <p className="text-milk-600 text-xs">Last block</p>
-                                <IconWrapper icon={IconIds.INFORMATION} className="size-3.5 text-milk-200 group-hover:text-milk cursor-pointer" />
+                                <IconWrapper icon={IconIds.INFORMATION} className="size-4 text-milk-200 group-hover:text-milk cursor-pointer" />
                             </div>
                         </Tooltip>
                     }
