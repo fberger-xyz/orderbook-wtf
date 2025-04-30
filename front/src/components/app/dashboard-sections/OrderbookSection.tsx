@@ -8,6 +8,7 @@ import numeral from 'numeral'
 import { cleanOutput } from '@/utils'
 import { OrderbookSide } from '@/enums'
 
+// todo: make it dynamic
 const ROWS_TO_SHOW = 10
 
 function EmptyBook(side: OrderbookSide) {

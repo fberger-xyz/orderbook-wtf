@@ -85,15 +85,15 @@ export default function MarketDepthSection() {
                             content={
                                 <div className="rounded-2xl backdrop-blur border border-milk-150 shadow-lg p-3 -mt-1 max-w-80 text-milk text-sm flex flex-col gap-2">
                                     <p className="text-wrap">
-                                        This chart is a tentative to visualize onchain liquidity depth. We simulate AMM swaps across increasing trade
-                                        sizes, with slippage and price impact.
+                                        This chart shows the onchain liquidity depth by simulating increasingly large swaps, to obtain prices,
+                                        slippage and price impact.
                                     </p>
                                     <p className="text-wrap">
                                         Pool logic, gas fees, and liquidity depth influence the final price and vary by swap path and network.
                                     </p>
                                     <p className="text-wrap">
-                                        Why not straight lines / inwards ? Orderbook curves aren’t straight, the default solver optimizes paths with
-                                        dynamic criteria. Small trades suffer more from gas overhead.
+                                        Why not straight lines or perfectly inwards ? The lines in this orderbook aren’t straight, the default solver
+                                        optimizes paths with dynamic criteria. Small trades suffer more from gas overhead.
                                     </p>
                                     <p className="text-wrap">
                                         The default Rust solver uses simple routing, but a custom solver can be used and visualized via the Tycho SDK.
