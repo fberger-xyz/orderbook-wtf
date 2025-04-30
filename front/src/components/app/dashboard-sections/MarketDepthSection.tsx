@@ -77,16 +77,26 @@ export default function MarketDepthSection() {
                     <button
                         // onClick={() => showSections(!showMarketDepthSection, showRoutingSection, showLiquidityBreakdownSection)}
                         // className="flex gap-1 items-center rounded-lg px-2.5 py-1.5 hover:bg-milk-100/5 transition-colors duration-300 -ml-1"
-                        className="flex gap-1 items-center rounded-lg px-2.5 py-1.5 -ml-1"
+                        className="flex gap-1 items-center rounded-lg py-1.5 -ml-1"
                     >
                         <p className="text-milk text-base font-semibold">Market depth</p>
                         <Tooltip
                             placement="bottom"
                             content={
-                                <div className="rounded-2xl backdrop-blur border border-milk-150 shadow-lg p-3 -mt-1 max-w-80 text-milk text-sm flex">
+                                <div className="rounded-2xl backdrop-blur border border-milk-150 shadow-lg p-3 -mt-1 max-w-80 text-milk text-sm flex flex-col gap-2">
                                     <p className="text-wrap">
-                                        [TODO: explains what the user is seeing and why sometimes the chart has not straight lines which bend inwards
-                                        - the gas fees, pool fees, and routing logic, causing these]
+                                        This chart is a tentative to visualize onchain liquidity depth. We simulate AMM swaps across increasing trade
+                                        sizes, with slippage and price impact.
+                                    </p>
+                                    <p className="text-wrap">
+                                        Pool logic, gas fees, and liquidity depth influence the final price and vary by swap path and network.
+                                    </p>
+                                    <p className="text-wrap">
+                                        Why not straight lines / inwards ? Orderbook curves aren’t straight, the default solver optimizes paths with
+                                        dynamic criteria. Small trades suffer more from gas overhead.
+                                    </p>
+                                    <p className="text-wrap">
+                                        The default Rust solver uses simple routing, but a custom solver can be used and visualized via the Tycho SDK.
                                     </p>
                                 </div>
                             }

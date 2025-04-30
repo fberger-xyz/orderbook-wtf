@@ -124,7 +124,7 @@ export default function SwapSection() {
 
     const { metrics, actions } = useApiStore()
     const account = useAccount()
-    const [openTradeDetails, showTradeDetails] = useState(true)
+    const [openTradeDetails, setOpenTradeDetails] = useState(false)
     const [sellTokenBalance] = useState(-1)
     const debounceTimeout = useRef<NodeJS.Timeout | null>(null)
 
@@ -215,7 +215,7 @@ export default function SwapSection() {
         <>
             <div className="w-full flex flex-col gap-0.5">
                 {/* Sell section */}
-                <div className="flex flex-col gap-4 p-4 rounded-xl border-milk-150 w-full bg-milk-600/5">
+                <div className="flex flex-col gap-3 p-4 rounded-xl border-milk-150 w-full bg-milk-600/5">
                     <div className="flex justify-between items-end">
                         <p className="text-milk-600 text-xs">Sell</p>
                         <button
@@ -306,7 +306,7 @@ export default function SwapSection() {
                 </div>
 
                 {/* Buy section */}
-                <div className="bg-milk-600/5 flex flex-col gap-4 p-4 rounded-xl border-milk-150 w-full">
+                <div className="bg-milk-600/5 flex flex-col gap-3 p-4 rounded-xl border-milk-150 w-full">
                     <p className="text-milk-600 text-xs">Buy</p>
                     <div className="flex justify-between gap-3 w-full">
                         <TokenSelector
@@ -372,7 +372,7 @@ export default function SwapSection() {
                         )}
 
                         <button
-                            onClick={() => showTradeDetails(!openTradeDetails)}
+                            onClick={() => setOpenTradeDetails(!openTradeDetails)}
                             className="flex gap-1.5 items-center hover:bg-milk-100/5 px-2 py-1 rounded-xl"
                         >
                             <IconWrapper icon={IconIds.GAS} className="size-4 text-milk-600" />

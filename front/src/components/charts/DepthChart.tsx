@@ -490,7 +490,7 @@ export default function DepthChart() {
         const orderbook = actions.getOrderbook(getAddressPair())
 
         // debug
-        if (debug) console.log('useEffect: orderbook', orderbook)
+        if (debug) console.log('useEffect: depth chart', orderbook)
 
         // ?
         if (!metrics) setOptions(null)

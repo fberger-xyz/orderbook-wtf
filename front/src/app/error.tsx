@@ -46,7 +46,7 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
                                 @xMerso
                             </LinkWrapper>
                             and
-                            <LinkWrapper href={AppUrls.FBERGER_TELEGRAM} target="_blank" className="hover:underline hover:text-aquamarine px-1">
+                            <LinkWrapper href={AppUrls.FBERGER_WEBSITE} target="_blank" className="hover:underline hover:text-aquamarine px-1">
                                 @fberger_xyz
                             </LinkWrapper>
                         </p>
