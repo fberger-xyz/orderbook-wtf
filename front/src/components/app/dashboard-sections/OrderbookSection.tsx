@@ -79,7 +79,7 @@ export default function OrderbookSection() {
                               return (
                                   <div
                                       key={`${askIndex}-${ask.amount}`}
-                                      className="relative group w-full cursor-pointer hover:bg-milk-150"
+                                      className="relative group w-full hover:bg-milk-150"
                                       onMouseEnter={() => setHoveredOrderbookTrade(ask)}
                                       onMouseLeave={() => {
                                           if (debounceTimeout.current) clearTimeout(debounceTimeout.current)
@@ -133,7 +133,7 @@ export default function OrderbookSection() {
                           return (
                               <div
                                   key={`${bidIndex}-${bid.amount}`}
-                                  className="relative group w-full cursor-pointer hover:bg-milk-150"
+                                  className="relative group w-full hover:bg-milk-150"
                                   onMouseEnter={() => setHoveredOrderbookTrade(bid)}
                                   onMouseLeave={() => {
                                       if (debounceTimeout.current) clearTimeout(debounceTimeout.current)
