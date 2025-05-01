@@ -19,7 +19,7 @@ import {
     getLowestAsk,
     mapProtocolIdToProtocolConfig,
 } from '@/utils'
-import { AmmAsOrderbook, EchartOnClickParamsData, SelectedTrade } from '@/interfaces'
+import { AmmAsOrderbook, AmmTrade, EchartOnClickParamsData, SelectedTrade } from '@/interfaces'
 import numeral from 'numeral'
 import toast from 'react-hot-toast'
 import { toastStyle } from '@/config/toasts.config'
@@ -87,6 +87,7 @@ const getOptions = (
     coloredAreas: OrderbookOption,
     symbolsInYAxis: OrderbookOption,
     selectedTrade?: SelectedTrade,
+    hoveredOrderbookTrade?: AmmTrade,
 ): echarts.EChartsOption => {
     return {
         tooltip: {
@@ -390,39 +391,68 @@ const getOptions = (
                                   ],
                               },
                           },
-                markLine:
-                    selectedTrade?.trade && selectedTrade.trade?.output && Number(selectedTrade.xAxis) > 0
-                        ? {
-                              symbol: ['circle', 'none'],
-                              animation: false,
-                              data: [
-                                  {
-                                      name: 'Best bid',
-                                      symbolSize: 6,
-                                      lineStyle: {
-                                          color: AppColors.aquamarine,
-                                          opacity: 1,
-                                      },
-                                      xAxis: Math.max(0, Number(selectedTrade.xAxis)),
-                                      label: {
-                                          formatter: (bidMarklineParams) => {
-                                              //   console.log({ bidMarklineParams })
-                                              return [
-                                                  `${numeral(selectedTrade.amountIn).format('0.0,[000]')} ${orderbook.base.symbol}`,
-                                                  `at ${bidMarklineParams.value} ${orderbook.base.symbol}/${orderbook.quote.symbol}`,
-                                                  `= ${selectedTrade.trade?.output ? `${numeral(selectedTrade.trade.output).format('0,0.[000]')} ${orderbook.quote.symbol}` : '...computing'}`,
-                                              ].join('\n')
-                                          },
-                                          color: AppColors.aquamarine,
-                                          show: true,
-                                          position: 'end',
-                                          fontSize: 10,
-                                          opacity: 0.8,
-                                      },
+                markLine: hoveredOrderbookTrade
+                    ? {
+                          symbol: ['circle', 'none'],
+                          animation: false,
+                          data: [
+                              {
+                                  name: 'Hovered orderbook trade',
+                                  symbolSize: 6,
+                                  lineStyle: {
+                                      color: AppColors.aquamarine,
+                                      opacity: 1,
                                   },
-                              ],
-                          }
-                        : undefined,
+                                  xAxis: Math.max(0, Number(hoveredOrderbookTrade.average_sell_price)),
+                                  label: {
+                                      formatter: (bidMarklineParams) => {
+                                          return [
+                                              `${numeral(hoveredOrderbookTrade.amount).format('0.0,[000]')} ${orderbook.base.symbol}`,
+                                              `at ${bidMarklineParams.value} ${orderbook.base.symbol}/${orderbook.quote.symbol}`,
+                                              `= ${hoveredOrderbookTrade.output ? `${numeral(hoveredOrderbookTrade.output).format('0,0.[000]')} ${orderbook.quote.symbol}` : '...computing'}`,
+                                          ].join('\n')
+                                      },
+                                      color: AppColors.aquamarine,
+                                      show: true,
+                                      position: 'end',
+                                      fontSize: 10,
+                                      opacity: 0.8,
+                                  },
+                              },
+                          ],
+                      }
+                    : selectedTrade?.trade && selectedTrade.trade?.output && Number(selectedTrade.xAxis) > 0
+                      ? {
+                            symbol: ['circle', 'none'],
+                            animation: false,
+                            data: [
+                                {
+                                    name: 'Best bid',
+                                    symbolSize: 6,
+                                    lineStyle: {
+                                        color: AppColors.aquamarine,
+                                        opacity: 1,
+                                    },
+                                    xAxis: Math.max(0, Number(selectedTrade.xAxis)),
+                                    label: {
+                                        formatter: (bidMarklineParams) => {
+                                            //   console.log({ bidMarklineParams })
+                                            return [
+                                                `${numeral(selectedTrade.amountIn).format('0.0,[000]')} ${orderbook.base.symbol}`,
+                                                `at ${bidMarklineParams.value} ${orderbook.base.symbol}/${orderbook.quote.symbol}`,
+                                                `= ${selectedTrade.trade?.output ? `${numeral(selectedTrade.trade.output).format('0,0.[000]')} ${orderbook.quote.symbol}` : '...computing'}`,
+                                            ].join('\n')
+                                        },
+                                        color: AppColors.aquamarine,
+                                        show: true,
+                                        position: 'end',
+                                        fontSize: 10,
+                                        opacity: 0.8,
+                                    },
+                                },
+                            ],
+                        }
+                      : undefined,
             },
             {
                 yAxisIndex: 1,
@@ -458,6 +488,37 @@ const getOptions = (
                                   ],
                               },
                           },
+                markLine: hoveredOrderbookTrade
+                    ? {
+                          symbol: ['circle', 'none'],
+                          animation: false,
+                          data: [
+                              {
+                                  name: 'Hovered orderbook trade',
+                                  symbolSize: 6,
+                                  lineStyle: {
+                                      color: AppColors.folly,
+                                      opacity: 1,
+                                  },
+                                  xAxis: Math.max(0, Number(1 / hoveredOrderbookTrade.average_sell_price)),
+                                  label: {
+                                      formatter: (askMarklineParams) => {
+                                          return [
+                                              `${numeral(hoveredOrderbookTrade.amount).format('0.0,[000]')} ${orderbook.quote.symbol}`,
+                                              `at ${askMarklineParams.value} ${orderbook.quote.symbol}/${orderbook.quote.symbol}`,
+                                              `= ${hoveredOrderbookTrade.output ? `${numeral(hoveredOrderbookTrade.output).format('0,0.[000]')} ${orderbook.base.symbol}` : '...computing'}`,
+                                          ].join('\n')
+                                      },
+                                      color: AppColors.folly,
+                                      show: true,
+                                      position: 'end',
+                                      fontSize: 10,
+                                      opacity: 0.8,
+                                  },
+                              },
+                          ],
+                      }
+                    : undefined,
             },
         ],
     }
@@ -474,6 +535,7 @@ export default function DepthChart() {
         coloredAreas,
         symbolsInYAxis,
         selectedTrade,
+        hoveredOrderbookTrade,
         selectTrade,
         getAddressPair,
         setSellTokenAmountInputRaw,
@@ -566,11 +628,21 @@ export default function DepthChart() {
                     return point
                 })
 
-            const newOptions = getOptions(orderbook, bids, asks, yAxisType, yAxisLogBase, coloredAreas, symbolsInYAxis, selectedTrade)
+            const newOptions = getOptions(
+                orderbook,
+                bids,
+                asks,
+                yAxisType,
+                yAxisLogBase,
+                coloredAreas,
+                symbolsInYAxis,
+                selectedTrade,
+                hoveredOrderbookTrade,
+            )
             setOptions(newOptions)
         } else setOptions(null)
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [currentChainId, metrics, apiStoreRefreshedAt, yAxisType, yAxisLogBase, coloredAreas, symbolsInYAxis, selectedTrade])
+    }, [currentChainId, metrics, apiStoreRefreshedAt, yAxisType, yAxisLogBase, coloredAreas, symbolsInYAxis, selectedTrade, hoveredOrderbookTrade])
 
     const handlePointClick = (params: undefined | { data: EchartOnClickParamsData; dataIndex: number }) => {
         const debug = false

@@ -53,8 +53,8 @@ export default function EchartWrapper(props: InterfaceEchartWrapperProps) {
                 // @ts-expect-error: poorly typed
                 { ...props.options, ...grid3DOptions, ...dataZoomOptions },
                 {
-                    notMerge: false, // the new option object replaces the existing one completely.
-                    // notMerge: true, // Default - ECharts merges the new options with the existing ones.
+                    notMerge: false, // false = the new option object replaces the existing one completely.
+                    // notMerge: true, // true, default = ECharts merges the new options with the existing ones.
 
                     /**
                      * lazyUpdate?: boolean
@@ -64,7 +64,7 @@ export default function EchartWrapper(props: InterfaceEchartWrapperProps) {
                         - Instead, it waits until the next frame, allowing multiple setOption calls to be batched for better performance.
                         Use case: Useful when you're calling setOption multiple times in a row and want to avoid unnecessary renders.
                      */
-                    lazyUpdate: false,
+                    lazyUpdate: true,
 
                     /**
                      * Default: false

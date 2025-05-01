@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
 import { APP_METADATA, IS_DEV } from '@/config/app.config'
-import { SelectedTrade, Token } from '@/interfaces'
+import { AmmTrade, SelectedTrade, Token } from '@/interfaces'
 import { hardcodedTokensList } from '@/data/back-tokens'
 import { OrderbookOption, OrderbookAxisScale, AppSupportedChains } from '@/enums'
 
@@ -28,7 +28,7 @@ export const useAppStore = create<{
     setCurrentChain: (currentChainId: AppSupportedChains) => void
 
     /**
-     * orderbook
+     * market depth
      */
 
     // chart
@@ -78,6 +78,13 @@ export const useAppStore = create<{
     setShowWasIsTisModal: (showWasIsTisModal: boolean) => void
 
     /**
+     * orderbook
+     */
+
+    hoveredOrderbookTrade?: AmmTrade
+    setHoveredOrderbookTrade: (hoveredOrderbookTrade?: AmmTrade) => void
+
+    /**
      * computeds
      */
 
@@ -115,7 +122,7 @@ export const useAppStore = create<{
                 })),
 
             /**
-             * orderbook
+             * market depth
              */
 
             // chart
@@ -173,6 +180,13 @@ export const useAppStore = create<{
                     selectedTrade,
                     buyTokenAmountInput: selectedTrade?.trade?.output ?? 0,
                 })),
+
+            /**
+             * orderbook
+             */
+
+            hoveredOrderbookTrade: undefined,
+            setHoveredOrderbookTrade: (hoveredOrderbookTrade) => set(() => ({ hoveredOrderbookTrade })),
 
             /**
              * modal
