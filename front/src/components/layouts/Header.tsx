@@ -45,9 +45,10 @@ export default function Header(props: { className?: string }) {
                         <LinkWrapper
                             target="_blank"
                             href={AppUrls.PROPELLERHEADS_EXPLORER}
-                            className="cursor-alias hover:bg-gray-600/20 p-2.5 w-full rounded-xl"
+                            className="cursor-alias p-2.5 w-full rounded-xl flex justify-between items-center"
                         >
-                            <p className="text-sm text-milk text-left">Explorer</p>
+                            <p className="text-sm text-gray-500 text-left">Explorer</p>
+                            <p className="bg-white/20 px-1 font-semibold rounded-sm text-xs text-background">SOON</p>
                         </LinkWrapper>
                         <LinkWrapper href="/" className="cursor-alias bg-gray-600/20 p-2.5 w-full rounded-xl">
                             <p className="text-sm text-milk text-left">Orderbook</p>
