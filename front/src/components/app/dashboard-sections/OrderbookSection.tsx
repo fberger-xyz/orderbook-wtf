@@ -79,7 +79,7 @@ export default function OrderbookSection() {
                               return (
                                   <div
                                       key={`${askIndex}-${ask.amount}`}
-                                      className="relative group w-full hover:bg-milk-150"
+                                      className="relative group w-full hover:bg-milk-150 hover:font-semibold"
                                       onMouseEnter={() => setHoveredOrderbookTrade(ask)}
                                       onMouseLeave={() => {
                                           if (debounceTimeout.current) clearTimeout(debounceTimeout.current)
@@ -88,7 +88,7 @@ export default function OrderbookSection() {
                                           }, 600)
                                       }}
                                   >
-                                      <div className="bg-folly/10 hover:bg-folly/30 absolute h-full" style={{ width: `${percentage}%` }} />
+                                      <div className="bg-folly/10 group-hover:bg-folly/30 absolute h-full" style={{ width: `${percentage}%` }} />
                                       <div className="grid grid-cols-3 px-4 py-0.5">
                                           <p className="text-folly">{cleanOutput(numeral(1 / ask.average_sell_price).format('0,0.[0000]'))}</p>
                                           <p className="ml-auto truncate">{cleanOutput(numeral(ask.output).format('0,0.[0000]'))}</p>
@@ -133,7 +133,7 @@ export default function OrderbookSection() {
                           return (
                               <div
                                   key={`${bidIndex}-${bid.amount}`}
-                                  className="relative group w-full hover:bg-milk-150"
+                                  className="relative group w-full hover:bg-milk-150 hover:font-semibold"
                                   onMouseEnter={() => setHoveredOrderbookTrade(bid)}
                                   onMouseLeave={() => {
                                       if (debounceTimeout.current) clearTimeout(debounceTimeout.current)
@@ -142,7 +142,10 @@ export default function OrderbookSection() {
                                       }, 600)
                                   }}
                               >
-                                  <div className="bg-aquamarine/10 hover:bg-aquamarine/30 absolute h-full" style={{ width: `${percentage}%` }} />
+                                  <div
+                                      className="bg-aquamarine/10 group-hover:bg-aquamarine/30 absolute h-full"
+                                      style={{ width: `${percentage}%` }}
+                                  />
                                   <div className="grid grid-cols-3 px-4 py-0.5">
                                       <p className="text-aquamarine">{cleanOutput(numeral(bid.average_sell_price).format('0,0.[0000]'))}</p>
                                       <p className="ml-auto truncate">{cleanOutput(numeral(bid.amount).format('0,0.[0000]'))}</p>
