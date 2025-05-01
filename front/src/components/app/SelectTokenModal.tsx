@@ -66,7 +66,7 @@ export default function SelectTokenModal() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ ease: 'easeInOut', duration: 0.25 }}
-                className="flex max-w-[430px] w-full flex-col rounded-xl border border-milk-150 bg-jagger/80 shadow-lg"
+                className="flex max-w-[430px] w-full flex-col rounded-xl border border-milk-150 bg-[#FFF4E00A] shadow-lg"
             >
                 {/* 1 header */}
                 <div className="p-4 flex w-full items-center justify-between focus:ring-2 focus:ring-folly focus:ring-offset-2 cursor-pointer">

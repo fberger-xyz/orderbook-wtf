@@ -17,7 +17,6 @@ import {
     formatAmount,
     formatInputWithCommas,
     getBaseValueInUsd,
-    getHighestBid,
     getQuoteValueInUsd,
     mergeOrderbooks,
     safeNumeral,
@@ -29,20 +28,18 @@ import { CHAINS_CONFIG } from '@/config/app.config'
 import toast from 'react-hot-toast'
 import { toastStyle } from '@/config/toasts.config'
 
-const rawAmountFormat = '0,0.[00000000000]'
-
 const TokenSelector = ({ token, onClick }: { token: Token | undefined; onClick: () => void }) => (
     <button
         onClick={onClick}
-        className="flex rounded-full bg-gray-600/30 transition-colors duration-300 hover:bg-gray-600/50 items-center gap-1.5 pl-1.5 pr-2 py-1.5 min-w-fit"
+        className="flex rounded-full bg-gray-600/30 transition-colors duration-300 hover:bg-gray-600/50 items-center pl-1.5 pr-2 py-1.5 min-w-fit"
     >
         <TokenImage size={24} token={token} />
         {token ? (
-            <p className="font-semibold tracking-wide">{token.symbol}</p>
+            <p className="font-semibold tracking-wide pl-1.5">{token.symbol}</p>
         ) : (
-            <div className="skeleton-loading flex w-16 h-6 items-center justify-center rounded-full" />
+            <div className="skeleton-loading flex w-16 h-6 items-center justify-center rounded-full pl-1.5" />
         )}
-        <IconWrapper icon={IconIds.TRIANGLE_DOWN} className="size-4" />
+        <IconWrapper icon={IconIds.TRIANGLE_DOWN} className="size-5" />
     </button>
 )
 
@@ -215,37 +212,9 @@ export default function SwapSection() {
         <>
             <div className="w-full flex flex-col gap-0.5">
                 {/* Sell section */}
-                <div className="flex flex-col gap-3 p-4 rounded-xl border-milk-150 w-full bg-milk-600/5">
-                    <div className="flex justify-between items-end">
+                <div className="flex gap-3 p-4 rounded-xl border-milk-150 w-full bg-milk-600/5 justify-between items-center">
+                    <div className="flex gap-2 items-center">
                         <p className="text-milk-600 text-xs">Sell</p>
-                        <button
-                            onClick={() => {
-                                // retrieve best bid
-                                const highestBid = getHighestBid(metrics?.orderbook)
-
-                                // select it
-                                if (metrics?.orderbook && highestBid) {
-                                    selectTrade({
-                                        side: OrderbookSide.BID,
-                                        amountIn: highestBid.amount,
-                                        selectedAt: Date.now(),
-                                        trade: highestBid,
-                                        pools: metrics.orderbook.pools,
-                                        xAxis: highestBid.average_sell_price,
-                                    })
-                                    setSellTokenAmountInputRaw(highestBid.amount)
-                                    setSellTokenAmountInput(highestBid.amount)
-
-                                    // notify
-                                    toast(`Best bid trade selected`, { style: toastStyle })
-                                }
-                            }}
-                            className="flex items-center hover:bg-milk-600/5 px-2 py-1 rounded-lg -mb-1"
-                        >
-                            <p className="text-aquamarine text-xs">Best bid</p>
-                        </button>
-                    </div>
-                    <div className="flex justify-between gap-3">
                         <TokenSelector
                             token={sellToken}
                             onClick={() => {
@@ -253,46 +222,31 @@ export default function SwapSection() {
                                 setShowSelectTokenModal(true)
                             }}
                         />
+                    </div>
+                    <div className="flex flex-col items-end gap-1">
                         <input
                             type="text"
-                            className="text-xl font-semibold text-right border-none outline-none ring-0 focus:ring-0 focus:outline-none focus:border-none bg-transparent w-full"
+                            className="text-base font-semibold text-right border-none outline-none ring-0 focus:ring-0 focus:outline-none focus:border-none bg-transparent w-full"
                             value={sellTokenAmountInputRaw}
                             onChange={handleChangeOfAmountIn}
                         />
-                    </div>
-
-                    {/* last row  */}
-                    {selectedTrade ? (
-                        <div className="mt-2 flex justify-between items-center">
-                            <div className="flex items-center gap-1">
-                                {account.isConnected && sellToken.address && (
-                                    <button
-                                        onClick={() => {
-                                            setSellTokenAmountInput(sellTokenBalance)
-                                            setSellTokenAmountInputRaw(numeral(sellTokenBalance).format(rawAmountFormat))
-                                        }}
-                                        className="pl-1"
-                                    >
-                                        <p className="text-folly font-semibold text-xs">MAX</p>
-                                    </button>
-                                )}
-                            </div>
-                            {getBaseValueInUsd(metrics?.orderbook) ? (
+                        {selectedTrade ? (
+                            getBaseValueInUsd(metrics?.orderbook) ? (
                                 <p className="text-milk-600 text-xs">
                                     $ {safeNumeral(selectedTrade.amountIn * (getBaseValueInUsd(metrics?.orderbook) as number), '0,0.[00]')}
                                 </p>
                             ) : (
                                 <div className="skeleton-loading flex w-20 h-4 items-center justify-center rounded-full" />
-                            )}
-                        </div>
-                    ) : (
-                        <p className="ml-auto text-milk-600 text-xs">$ 0</p>
-                    )}
+                            )
+                        ) : (
+                            <p className="ml-auto text-milk-600 text-xs">$ 0</p>
+                        )}
+                    </div>
                 </div>
 
                 {/* Token switch button */}
                 <div className="h-0 w-full flex justify-center items-center z-10">
-                    <div className="size-[44px] rounded-xl bg-background p-1">
+                    <div className="size-[32px] rounded-lg bg-background p-0.5">
                         <button
                             onClick={async () => {
                                 actions.setApiOrderbook(getAddressPair(), undefined)
@@ -300,15 +254,15 @@ export default function SwapSection() {
                             }}
                             className="size-full rounded-lg bg-milk-600/5 flex items-center justify-center group"
                         >
-                            <IconWrapper icon={IconIds.ARROW_DOWN} className="size-5 transition-transform duration-300 group-hover:rotate-180" />
+                            <IconWrapper icon={IconIds.ARROW_DOWN} className="size-4 transition-transform duration-300 group-hover:rotate-180" />
                         </button>
                     </div>
                 </div>
 
                 {/* Buy section */}
-                <div className="bg-milk-600/5 flex flex-col gap-3 p-4 rounded-xl border-milk-150 w-full">
-                    <p className="text-milk-600 text-xs">Buy</p>
-                    <div className="flex justify-between gap-3 w-full">
+                <div className="flex gap-3 p-4 rounded-xl border-milk-150 w-full bg-milk-600/5 justify-between items-center">
+                    <div className="flex gap-2 items-center">
+                        <p className="text-milk-600 text-xs">Buy</p>
                         <TokenSelector
                             token={buyToken}
                             onClick={() => {
@@ -316,9 +270,11 @@ export default function SwapSection() {
                                 setShowSelectTokenModal(true)
                             }}
                         />
+                    </div>
+                    <div className="flex flex-col items-end gap-1">
                         <input
                             type="text"
-                            className={cn('text-xl font-semibold text-right border-none outline-none', {
+                            className={cn('text-base font-semibold text-right border-none outline-none', {
                                 'cursor-not-allowed bg-transparent ring-0 focus:ring-0 focus:outline-none focus:border-none w-full':
                                     selectedTrade?.trade || sellTokenAmountInput === 0,
                                 'skeleton-loading ml-auto w-1/2 h-8 rounded-full text-transparent':
@@ -327,26 +283,26 @@ export default function SwapSection() {
                             value={numeral(buyTokenAmountInput).format('0,0.[00000]')}
                             disabled={true}
                         />
-                    </div>
 
-                    {/* last row  */}
-                    {selectedTrade?.trade ? (
-                        <div className="flex justify-end items-center">
-                            {isRefreshingMarketDepth ? (
-                                <div className="skeleton-loading w-16 h-4 rounded-full" />
-                            ) : (
-                                <p className="text-milk-600 text-xs">
-                                    {sellTokenAmountInput !== 0 && buyTokenAmountInput && getQuoteValueInUsd(metrics?.orderbook)
-                                        ? `$ ${numeral(buyTokenAmountInput).multiply(getQuoteValueInUsd(metrics?.orderbook)).format('0,0.[00]')}`
-                                        : '$ 0'}
-                                </p>
-                            )}
-                        </div>
-                    ) : sellTokenAmountInput === 0 ? (
-                        <p className="ml-auto text-milk-600 text-xs">$ 0</p>
-                    ) : (
-                        <div className="ml-auto skeleton-loading flex w-20 h-4 items-center justify-center rounded-full" />
-                    )}
+                        {/* last row  */}
+                        {selectedTrade?.trade ? (
+                            <div className="flex justify-end items-center">
+                                {isRefreshingMarketDepth ? (
+                                    <div className="skeleton-loading w-16 h-4 rounded-full" />
+                                ) : (
+                                    <p className="text-milk-600 text-xs">
+                                        {sellTokenAmountInput !== 0 && buyTokenAmountInput && getQuoteValueInUsd(metrics?.orderbook)
+                                            ? `$ ${numeral(buyTokenAmountInput).multiply(getQuoteValueInUsd(metrics?.orderbook)).format('0,0.[00]')}`
+                                            : '$ 0'}
+                                    </p>
+                                )}
+                            </div>
+                        ) : sellTokenAmountInput === 0 ? (
+                            <p className="ml-auto text-milk-600 text-xs">$ 0</p>
+                        ) : (
+                            <div className="ml-auto skeleton-loading flex w-20 h-4 items-center justify-center rounded-full" />
+                        )}
+                    </div>
                 </div>
 
                 {/* Separator */}
@@ -375,10 +331,10 @@ export default function SwapSection() {
                             onClick={() => setOpenTradeDetails(!openTradeDetails)}
                             className="flex gap-1.5 items-center hover:bg-milk-100/5 px-2 py-1 rounded-xl"
                         >
-                            <IconWrapper icon={IconIds.GAS} className="size-4 text-milk-600" />
-                            <ChainImage oneInchId={CHAINS_CONFIG[AppSupportedChains.ETHEREUM].oneInchId} className="size-4" />
-                            <p className="text-milk-600">
-                                ${' '}
+                            <IconWrapper icon={IconIds.GAS} className="size-4" />
+                            {/* <ChainImage oneInchId={CHAINS_CONFIG[AppSupportedChains.ETHEREUM].oneInchId} className="size-4" /> */}
+                            <p>
+                                $
                                 {metrics?.highestBid?.gas_costs_usd
                                     ? numeral(metrics?.highestBid.gas_costs_usd.reduce((cost, curr) => (cost += curr), 0)).format('0,0.[00]')
                                     : '-'}

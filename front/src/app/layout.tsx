@@ -65,11 +65,7 @@ export default async function RootLayout({
         <html lang="en" suppressHydrationWarning>
             <body className={cn(APP_FONT.className, 'h-screen w-screen overflow-auto text-base text-milk bg-background')}>
                 <WagmiAndReactQueryProviders>
-                    <main className="relative flex min-h-screen w-screen flex-col">
-                        <div
-                            className="absolute w-full -top-[600px] h-[800px] rounded-full bg-gradient-stroke blur-3xl opacity-[0.06]"
-                            style={{ zIndex: -1 }}
-                        />
+                    <main className="relative flex min-h-screen w-screen flex-col" style={{ backgroundImage: "url('/background.svg')" }}>
                         <Header />
                         <Suspense fallback={<DefaultFallback />}>
                             <ErrorBoundary FallbackComponent={ErrorBoundaryFallback}>{children}</ErrorBoundary>
