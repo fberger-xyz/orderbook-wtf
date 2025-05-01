@@ -120,7 +120,7 @@ export default function MarketDepthSection() {
 
                         <div
                             className={cn(
-                                'z-20 absolute right-0 mt-2 w-52 rounded-2xl backdrop-blur-lg border border-milk-150 shadow-lg p-3 transition-all origin-top-right flex flex-col gap-5',
+                                'absolute right-0 mt-1 w-52 rounded-xl border border-milk-150 shadow-lg p-3 transition-all origin-top-right flex flex-col gap-5 bg-milk-200/4 backdrop-blur z-20',
                                 {
                                     'scale-100 opacity-100': openChartOptions,
                                     'scale-95 opacity-0 pointer-events-none': !openChartOptions,

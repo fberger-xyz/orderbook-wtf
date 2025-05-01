@@ -93,8 +93,8 @@ const getOptions = (
         tooltip: {
             trigger: 'axis',
             triggerOn: 'mousemove|click',
-            backgroundColor: AppColors.jagger[400],
-            borderRadius: 6,
+            backgroundColor: '#FFF4E005',
+            borderRadius: 12,
             axisPointer: {
                 type: 'line',
                 snap: true,
@@ -109,7 +109,7 @@ const getOptions = (
                 fontSize: 12,
                 color: AppColors.milk.DEFAULT,
             },
-            extraCssText: 'backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);',
+            extraCssText: 'backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); padding:12px;',
             formatter: (params) => {
                 // cast
                 const [firstSerieDataPoints] = Array.isArray(params) ? params : [params]
@@ -240,7 +240,7 @@ const getOptions = (
                             `1 ${orderbook.quote.symbol} = ${formatAmount(1 / value)} ${orderbook.base.symbol}`,
                         ].join('\n')
                     },
-                    backgroundColor: AppColors.jagger[400],
+                    backgroundColor: '#FFF4E005',
                     color: AppColors.milk.DEFAULT,
                     borderColor: 'transparent',
                 },
@@ -585,7 +585,7 @@ export default function DepthChart() {
                         point.symbolSize = 20
                         point.itemStyle = {
                             borderWidth: 1,
-                            borderColor: AppColors.jagger[400],
+                            borderColor: '#FFF4E005',
                             color: AppColors.aquamarine,
                             shadowBlur: 15,
                             shadowColor: 'rgba(144, 238, 144, 1)',
@@ -611,7 +611,7 @@ export default function DepthChart() {
                         point.symbolSize = 20
                         point.itemStyle = {
                             borderWidth: 1,
-                            borderColor: AppColors.jagger[400],
+                            borderColor: '#FFF4E005',
                             color: AppColors.folly,
                             shadowBlur: 15,
                             shadowColor: 'rgba(255, 0, 128, 1)',
