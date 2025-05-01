@@ -151,7 +151,7 @@ export default function SelectTokenModal() {
                 </div>
 
                 {/* tokens */}
-                <div className="px-3 max-h-[400px] overflow-scroll flex flex-col border-t border-milk-150 mt-4">
+                <div className="px-3 max-h-[360px] overflow-scroll flex flex-col border-t border-milk-150 mt-4">
                     {account.isConnected && (
                         <>
                             <p className="p-4 text-base text-milk-400">Your tokens</p>

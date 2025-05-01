@@ -51,9 +51,9 @@ export default function Header(props: { className?: string }) {
                             <p className="text-sm text-gray-500 text-left">Explorer</p>
                             <p className="bg-white/20 px-1 font-semibold rounded-sm text-xs text-background">SOON</p>
                         </LinkWrapper>
-                        <LinkWrapper href="/" className="cursor-alias bg-gray-600/20 p-2.5 w-full rounded-xl">
+                        <div onClick={() => setOpenGridDropdown(false)} className="bg-gray-600/20 p-2.5 w-full rounded-xl">
                             <p className="text-sm text-milk text-left">Orderbook</p>
-                        </LinkWrapper>
+                        </div>
                     </div>
                 </button>
 
