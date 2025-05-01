@@ -9,7 +9,8 @@ dayjs.extend(relativeTime)
 
 import { cn } from '@/utils'
 import LinkWrapper from '../common/LinkWrapper'
-import { AppUrls } from '@/enums'
+import { AppUrls, IconIds } from '@/enums'
+import IconWrapper from '../common/IconWrapper'
 
 export default function Footer(props: { className?: string }) {
     const [commitDate, setCommitDate] = useState<null | Date>(null)
@@ -29,15 +30,19 @@ export default function Footer(props: { className?: string }) {
             )}
         >
             <div className="flex lg:gap-10 flex-col gap-4 lg:flex-row">
-                <p>2024 © PropellerHeads</p>
-                <p>
+                <p className="truncate">2024 © PropellerHeads</p>
+                <p className="truncate">
                     Alpha Version Notice <span className="opacity-50">deployed on {dayjs.utc(commitDate).format('D MMM. YYYY HH:mm A')} UTC</span>
                 </p>
                 <LinkWrapper href={AppUrls.VM_UPTIME} target="_blank" className="cursor-alias hover:underline hover:text-aquamarine">
                     <p>API status</p>
                 </LinkWrapper>
+                <LinkWrapper href={AppUrls.DOCUMENTATION} target="_blank" className="flex items-center gap-1 cursor-alias sm:hidden">
+                    <p>Docs</p>
+                    <IconWrapper icon={IconIds.OPEN_LINK_IN_NEW_TAB} className="size-4" />
+                </LinkWrapper>
             </div>
-            <p className="text-wrap">
+            <p className="text-wrap truncate">
                 Made by
                 <LinkWrapper href={AppUrls.PROPELLERHEADS_X} target="_blank" className="cursor-alias hover:underline hover:text-aquamarine pl-1">
                     PropellerHeads

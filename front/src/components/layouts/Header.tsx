@@ -23,25 +23,31 @@ export default function Header(props: { className?: string }) {
     return (
         <div className={cn('flex justify-between items-center w-full px-7 py-4', props.className)}>
             <div className="flex gap-2 items-center flex-col md:flex-row">
-                <Image src={'/Tycho-orderbook.svg'} alt={SvgIds.TYCHO_ORDERBOOK} width={212} height={24} />
+                <Image src={'/Tycho-orderbook.svg'} alt={SvgIds.TYCHO_ORDERBOOK} width={180} height={24} className="sm:hidden" />
+                <Image src={'/Tycho-orderbook.svg'} alt={SvgIds.TYCHO_ORDERBOOK} width={212} height={24} className="hidden sm:block" />
             </div>
             <div className="flex flex-wrap justify-end items-center gap-2 z-20">
                 {/* docs */}
-                <LinkWrapper href={AppUrls.DOCUMENTATION} target="_blank" className="flex items-center gap-1 px-2.5 cursor-alias">
-                    <p className="text-milk text-sm">Docs (Run locally)</p>
+                <LinkWrapper href={AppUrls.DOCUMENTATION} target="_blank" className="flex items-center gap-1 px-2.5 cursor-alias w-max">
+                    <p className="text-milk text-sm truncate">
+                        <span className="sm:hidden">Docs</span>
+                        <span className="hidden sm:block">Docs (Run locally)</span>
+                    </p>
                     <IconWrapper icon={IconIds.OPEN_LINK_IN_NEW_TAB} className="size-4" />
                 </LinkWrapper>
 
                 {/* networks */}
                 <button onClick={() => setOpenNetworkDropown(!openNetworkDropown)} className="relative">
-                    <div className="flex items-center gap-1 bg-milk-100/5 transition-colors duration-300 hover:bg-milk-100/10 rounded-xl h-10 px-3">
+                    <div
+                        ref={networkDropown}
+                        className="flex items-center gap-1 bg-milk-100/5 transition-colors duration-300 hover:bg-milk-100/10 rounded-xl h-10 px-3"
+                    >
                         <SvgMapper icon={CHAINS_CONFIG[currentChainId].svgId} className="size-5" />
                         <IconWrapper icon={IconIds.TRIANGLE_DOWN} className="size-5" />
                     </div>
 
                     {/* dropdown */}
                     <div
-                        ref={networkDropown}
                         className={cn(
                             `absolute right-0 mt-2 w-52 rounded-2xl backdrop-blur-lg border-milk-150 border-2 shadow-lg p-2.5 transition-all origin-top-right`,
                             {

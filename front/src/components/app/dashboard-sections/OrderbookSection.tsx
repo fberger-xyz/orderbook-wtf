@@ -90,7 +90,7 @@ export default function OrderbookSection() {
                         <p className="mx-auto truncate">{numeral(metrics?.spreadPercent).multiply(metrics?.midPrice).format('0,0.[0000]')} </p>
                     ) : (
                         <div className="flex gap-1.5 items-center flex-wrap skeleton-loading mx-4">
-                            <p className="text-milk-100 font-semibold">-.--</p>
+                            <p className="text-milk-100 font-semibold mx-auto">-.--</p>
                         </div>
                     )}
                     {metrics && !isNaN(Number(metrics?.spreadPercent)) ? (
@@ -103,7 +103,7 @@ export default function OrderbookSection() {
                         </p>
                     ) : (
                         <div className="flex gap-1.5 items-center flex-wrap skeleton-loading mx-4">
-                            <p className="text-milk-100 font-semibold">-.--%</p>
+                            <p className="text-milk-100 font-semibold mx-auto">-.--%</p>
                         </div>
                     )}
                 </div>
