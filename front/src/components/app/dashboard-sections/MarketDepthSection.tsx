@@ -111,12 +111,14 @@ export default function MarketDepthSection() {
                     </button>
                     {/* {showMarketDepthSection && ( */}
                     <button onClick={() => showChartOptions(!openChartOptions)} className="relative">
-                        <div className="flex items-center gap-1 hover:bg-milk-100/5 transition-colors duration-300 rounded-lg px-2.5 py-1.5">
+                        <div
+                            ref={chartOptionsDropdown}
+                            className="flex items-center gap-1 hover:bg-milk-100/5 transition-colors duration-300 rounded-lg px-2.5 py-1.5"
+                        >
                             <IconWrapper icon={IconIds.SETTINGS} className="size-4" />
                         </div>
 
                         <div
-                            ref={chartOptionsDropdown}
                             className={cn(
                                 'z-20 absolute right-0 mt-2 w-52 rounded-2xl backdrop-blur-lg border border-milk-150 shadow-lg p-3 transition-all origin-top-right flex flex-col gap-5',
                                 {

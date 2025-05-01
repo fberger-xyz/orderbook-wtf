@@ -351,8 +351,8 @@ const getOptions = (
             fontFamily: APP_FONT.style.fontFamily,
         },
         grid: {
-            left: 40,
-            right: 40,
+            left: symbolsInYAxis ? 60 : 40,
+            right: symbolsInYAxis ? 60 : 40,
             top: selectedTrade ? '40' : '20',
             bottom: 110,
         },
