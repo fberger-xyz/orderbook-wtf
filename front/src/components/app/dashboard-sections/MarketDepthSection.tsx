@@ -89,14 +89,16 @@ export default function MarketDepthSection() {
                                         slippage and price impact.
                                     </p>
                                     <p className="text-wrap">
-                                        Pool logic, gas fees, and liquidity depth influence the final price and vary by swap path and network.
+                                        Pool logic, gas fees, and liquidity depth determine the final price and vary by swap path, solver performance,
+                                        and network.
                                     </p>
                                     <p className="text-wrap">
-                                        Why not straight lines or perfectly inwards ? The lines in this orderbook aren’t straight, the default solver
-                                        optimizes paths with dynamic criteria. Small trades suffer more from gas overhead.
+                                        Why not straight lines and inwards ? Our default solver optimises paths with dynamic criteria, sometimes
+                                        causing inconsistent quotes. Also, small swaps suffer more from gas costs.
                                     </p>
                                     <p className="text-wrap">
-                                        The default Rust solver uses simple routing, but a custom solver can be used and visualized via the Tycho SDK.
+                                        The default Rust solver uses simple routing, but a custom solver running locally can be used and visualized
+                                        with the Tycho Orderbook SDK.
                                     </p>
                                 </div>
                             }
