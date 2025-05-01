@@ -17,12 +17,45 @@ import { toastStyle } from '@/config/toasts.config'
 export default function Header(props: { className?: string }) {
     const { currentChainId, setCurrentChain } = useAppStore()
     const { actions } = useApiStore()
+    const [openGridDropdown, setOpenGridDropdown] = useState(false)
+    const gridDropown = useRef<HTMLDivElement>(null)
+    // useClickOutside(gridDropown, () => setOpenGridDropdown(false)) // no need here
     const [openNetworkDropown, setOpenNetworkDropown] = useState(false)
     const networkDropown = useRef<HTMLDivElement>(null)
     useClickOutside(networkDropown, () => setOpenNetworkDropown(false))
     return (
-        <div className={cn('flex justify-between items-center w-full px-7 py-4', props.className)}>
-            <div className="flex gap-2 items-center flex-col md:flex-row">
+        <div className={cn('flex justify-between items-center w-full px-4 py-4', props.className)}>
+            <div className="flex gap-4 items-center">
+                {/* grid */}
+                <button onClick={() => setOpenGridDropdown(!openGridDropdown)} className="relative">
+                    <div ref={gridDropown} className="bg-milk-100 p-2.5 rounded-xl">
+                        <Image src={'/dots-grid.svg'} alt="dots-grid" width={16} height={16} />
+                    </div>
+
+                    {/* grid dropdown */}
+                    <div
+                        className={cn(
+                            `absolute left-0 mt-2 w-52 rounded-2xl backdrop-blur-lg bg-milk-200/4 border-milk-150 border-2 shadow-lg p-2 transition-all origin-top-left flex flex-col items-start z-10 gap-1`,
+                            {
+                                'scale-100 opacity-100': openGridDropdown,
+                                'scale-95 opacity-0 pointer-events-none': !openGridDropdown,
+                            },
+                        )}
+                    >
+                        <LinkWrapper
+                            target="_blank"
+                            href={AppUrls.PROPELLERHEADS_EXPLORER}
+                            className="cursor-alias hover:bg-gray-600/20 p-2.5 w-full rounded-xl"
+                        >
+                            <p className="text-sm text-milk text-left">Explorer</p>
+                        </LinkWrapper>
+                        <LinkWrapper href="/" className="cursor-alias bg-gray-600/20 p-2.5 w-full rounded-xl">
+                            <p className="text-sm text-milk text-left">Orderbook</p>
+                        </LinkWrapper>
+                    </div>
+                </button>
+
+                {/* logo */}
                 <Image src={'/Tycho-orderbook.svg'} alt={SvgIds.TYCHO_ORDERBOOK} width={180} height={24} className="sm:hidden" />
                 <Image src={'/Tycho-orderbook.svg'} alt={SvgIds.TYCHO_ORDERBOOK} width={212} height={24} className="hidden sm:block" />
             </div>
@@ -46,10 +79,10 @@ export default function Header(props: { className?: string }) {
                         <IconWrapper icon={IconIds.TRIANGLE_DOWN} className="size-5" />
                     </div>
 
-                    {/* dropdown */}
+                    {/* networks dropdown */}
                     <div
                         className={cn(
-                            `absolute right-0 mt-2 w-52 rounded-2xl backdrop-blur-lg border-milk-150 border-2 shadow-lg p-2.5 transition-all origin-top-right`,
+                            `absolute right-0 mt-2 w-52 rounded-2xl backdrop-blur-lg bg-milk-200/4 border-milk-150 border-2 shadow-lg p-2.5 transition-all origin-top-right`,
                             {
                                 'scale-100 opacity-100': openNetworkDropown,
                                 'scale-95 opacity-0 pointer-events-none': !openNetworkDropown,
@@ -70,7 +103,7 @@ export default function Header(props: { className?: string }) {
                                         }}
                                         className={cn('flex items-center gap-2 w-full px-4 py-2 text-white rounded-lg transition cursor-pointer', {
                                             'hover:bg-gray-600/20': currentChainId === chainConfig.id,
-                                            'hover:opacity-100 hover:bg-gray-600/10': currentChainId !== chainConfig.id,
+                                            'hover:opacity-100 hover:bg-gray-600/20': currentChainId !== chainConfig.id,
                                         })}
                                     >
                                         <SvgMapper icon={chainConfig.svgId} className="size-6" />

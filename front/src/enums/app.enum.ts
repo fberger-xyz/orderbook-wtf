@@ -23,6 +23,7 @@ export enum AppUrls {
     // PropellerHeads
     PROPELLERHEADS_X = 'https://x.com/PropellerSwap',
     PROPELLERHEADS_TELEGRAM = 'https://t.me/+B4CNQwv7dgIyYTJl',
+    PROPELLERHEADS_EXPLORER = 'https://www.explorer.wtf',
 
     // merso
     MERSO_X = 'https://x.com/0xMerso',

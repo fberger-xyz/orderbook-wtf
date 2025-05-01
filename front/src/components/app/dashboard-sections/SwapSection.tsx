@@ -277,7 +277,7 @@ export default function SwapSection() {
                             className={cn('text-base font-semibold text-right border-none outline-none', {
                                 'cursor-not-allowed bg-transparent ring-0 focus:ring-0 focus:outline-none focus:border-none w-full':
                                     selectedTrade?.trade || sellTokenAmountInput === 0,
-                                'skeleton-loading ml-auto w-1/2 h-8 rounded-full text-transparent':
+                                'skeleton-loading ml-auto w-1/2 h-6 rounded-full text-transparent':
                                     !selectedTrade?.trade && sellTokenAmountInput !== 0,
                             })}
                             value={numeral(buyTokenAmountInput).format('0,0.[00000]')}
