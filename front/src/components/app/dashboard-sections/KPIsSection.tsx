@@ -16,7 +16,7 @@ import { CHAINS_CONFIG } from '@/config/app.config'
 import { useState, useRef, useEffect } from 'react'
 
 const lastBlockTooltipContent = () => (
-    <div className="rounded-2xl backdrop-blur border border-milk-150 shadow-lg p-3 -mt-1 max-w-80 text-milk text-sm flex">
+    <div className="rounded-xl bg-[#FFF4E00A] backdrop-blur border border-milk-200 shadow-lg p-3 -mt-1 max-w-80 text-milk text-sm flex">
         <p className="text-wrap">
             Using Tycho Indexer, our backend simulates market depth on every new block (~12s on Ethereum, ~1s on Unichain). On the frontend, we
             refresh every 12s on Ethereum and 5s on Unichain to reduce unnecessary requests and stay responsive.
@@ -191,7 +191,7 @@ export default function KPIsSection() {
                         placement="top"
                         content={
                             metrics && (
-                                <div className="rounded-2xl backdrop-blur border border-milk-150 shadow-lg p-3 -mb-1">
+                                <div className="rounded-xl bg-[#FFF4E00A] border backdrop-blur border-milk-200 shadow-lg p-3 -mb-1">
                                     <div className="flex gap-1 text-milk text-sm">
                                         <p>
                                             {cleanOutput(

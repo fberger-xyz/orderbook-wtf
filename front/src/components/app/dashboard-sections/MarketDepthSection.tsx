@@ -83,7 +83,7 @@ export default function MarketDepthSection() {
                         <Tooltip
                             placement="bottom"
                             content={
-                                <div className="rounded-2xl backdrop-blur border border-milk-150 shadow-lg p-3 -mt-1 max-w-80 text-milk text-sm flex flex-col gap-2">
+                                <div className="backdrop-blur rounded-xl bg-[#FFF4E00A] border border-milk-200 shadow-lg p-3 -mt-1 max-w-80 text-milk text-sm flex flex-col gap-2">
                                     <p className="text-wrap">
                                         This chart shows the onchain liquidity depth by simulating increasingly large swaps, to obtain prices,
                                         slippage and price impact.

@@ -66,14 +66,14 @@ export default function SelectTokenModal() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ ease: 'easeInOut', duration: 0.25 }}
-                className="flex max-w-[430px] w-full flex-col rounded-xl border border-milk-150 bg-[#FFF4E00A] shadow-lg"
+                className="flex max-w-[430px] w-full flex-col rounded-xl border border-milk-200 bg-[#FFF4E00A] shadow-lg"
             >
                 {/* 1 header */}
                 <div className="p-4 flex w-full items-center justify-between focus:ring-2 focus:ring-folly focus:ring-offset-2 cursor-pointer">
                     <Tooltip
                         placement="top"
                         content={
-                            <div className="rounded-2xl backdrop-blur border border-milk-150 shadow-lg p-3 -mb-1">
+                            <div className="rounded-xl bg-[#FFF4E00A] border border-milk-200 shadow-lg p-3 -mb-1 backdrop-blur">
                                 <p className="flex gap-1 text-milk text-sm">
                                     We only display tokens for which a single-hop exchange path exists, meaning that a liquidity pool contains base
                                     tokens and quote tokens.
