@@ -18,18 +18,18 @@ export default function Header(props: { className?: string }) {
     const { currentChainId, setCurrentChain } = useAppStore()
     const { actions } = useApiStore()
     const [openGridDropdown, setOpenGridDropdown] = useState(false)
-    const gridDropown = useRef<HTMLDivElement>(null)
+    const gridDropown = useRef<HTMLButtonElement>(null)
     // useClickOutside(gridDropown, () => setOpenGridDropdown(false)) // no need here
     const [openNetworkDropown, setOpenNetworkDropown] = useState(false)
-    const networkDropown = useRef<HTMLDivElement>(null)
+    const networkDropown = useRef<HTMLButtonElement>(null)
     useClickOutside(networkDropown, () => setOpenNetworkDropown(false))
     return (
         <div className={cn('flex justify-between items-center w-full px-4 py-4', props.className)}>
             <div className="flex gap-4 items-center">
                 {/* grid */}
-                <button onClick={() => setOpenGridDropdown(!openGridDropdown)} className="relative">
-                    <div ref={gridDropown} className="bg-milk-100 p-2.5 rounded-xl">
-                        <Image src={'/dots-grid.svg'} alt="dots-grid" width={16} height={16} />
+                <button ref={gridDropown} onClick={() => setOpenGridDropdown(!openGridDropdown)} className="relative">
+                    <div className="bg-milk-100 p-2.5 rounded-xl">
+                        <Image src={'/dots-grid.svg'} alt="dots-grid" width={16} height={16} className="min-w-4" />
                     </div>
 
                     {/* grid dropdown */}
@@ -44,8 +44,9 @@ export default function Header(props: { className?: string }) {
                     >
                         <LinkWrapper
                             target="_blank"
-                            href={AppUrls.PROPELLERHEADS_EXPLORER}
-                            className="cursor-alias p-2.5 w-full rounded-xl flex justify-between items-center"
+                            // href={AppUrls.PROPELLERHEADS_EXPLORER}
+                            href="/"
+                            className="cursor-not-allowed p-2.5 w-full rounded-xl flex justify-between items-center"
                         >
                             <p className="text-sm text-gray-500 text-left">Explorer</p>
                             <p className="bg-white/20 px-1 font-semibold rounded-sm text-xs text-background">SOON</p>
@@ -71,11 +72,8 @@ export default function Header(props: { className?: string }) {
                 </LinkWrapper>
 
                 {/* networks */}
-                <button onClick={() => setOpenNetworkDropown(!openNetworkDropown)} className="relative">
-                    <div
-                        ref={networkDropown}
-                        className="flex items-center gap-1 bg-milk-100/5 transition-colors duration-300 hover:bg-milk-100/10 rounded-xl h-10 px-3"
-                    >
+                <button ref={networkDropown} onClick={() => setOpenNetworkDropown(!openNetworkDropown)} className="relative">
+                    <div className="flex items-center gap-1 bg-milk-100/5 transition-colors duration-300 hover:bg-milk-100/10 rounded-xl h-10 px-3">
                         <SvgMapper icon={CHAINS_CONFIG[currentChainId].svgId} className="size-5" />
                         <IconWrapper icon={IconIds.TRIANGLE_DOWN} className="size-5" />
                     </div>

@@ -10,6 +10,7 @@ import { useRef, useState } from 'react'
 import { useClickOutside } from '@/hooks/useClickOutside'
 import { Tooltip } from '@nextui-org/tooltip'
 
+// todo find a better semantic to avoid buttons inside a parent button
 const OptionButton = ({ isSelected, onClick, children }: { isSelected: boolean; onClick: () => void; children: React.ReactNode }) => (
     <div
         className={cn('flex items-center gap-2 w-full px-4 py-1.5 rounded-lg transition', {
@@ -65,7 +66,7 @@ export default function MarketDepthSection() {
     } = useAppStore()
 
     const [openChartOptions, showChartOptions] = useState(false)
-    const chartOptionsDropdown = useRef<HTMLDivElement>(null)
+    const chartOptionsDropdown = useRef<HTMLButtonElement>(null)
     useClickOutside(chartOptionsDropdown, () => showChartOptions(false))
 
     const renderYAxisLabel = (type: OrderbookAxisScale) => (type === OrderbookAxisScale.VALUE ? 'Linear' : `Log ${yAxisLogBase}`)
@@ -110,11 +111,8 @@ export default function MarketDepthSection() {
                         {/* <IconWrapper icon={showMarketDepthSection ? IconIds.TRIANGLE_UP : IconIds.TRIANGLE_DOWN} className="size-4" /> */}
                     </button>
                     {/* {showMarketDepthSection && ( */}
-                    <button onClick={() => showChartOptions(!openChartOptions)} className="relative">
-                        <div
-                            ref={chartOptionsDropdown}
-                            className="flex items-center gap-1 hover:bg-milk-100/5 transition-colors duration-300 rounded-lg px-2.5 py-1.5"
-                        >
+                    <button ref={chartOptionsDropdown} onClick={() => showChartOptions(!openChartOptions)} className="relative">
+                        <div className="flex items-center gap-1 hover:bg-milk-100/5 transition-colors duration-300 rounded-lg px-2.5 py-1.5">
                             <IconWrapper icon={IconIds.SETTINGS} className="size-4" />
                         </div>
 
