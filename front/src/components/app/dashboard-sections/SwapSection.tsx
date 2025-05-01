@@ -9,7 +9,7 @@ import TokenImage from '../commons/TokenImage'
 import ChainImage from '../commons/ChainImage'
 import { SelectedTrade, Token } from '@/interfaces'
 import SelectTokenModal from '../SelectTokenModal'
-import { useAccount } from 'wagmi'
+// import { useAccount } from 'wagmi'
 import {
     cleanOutput,
     cn,
@@ -120,9 +120,9 @@ export default function SwapSection() {
     } = useAppStore()
 
     const { metrics, actions } = useApiStore()
-    const account = useAccount()
+    // const account = useAccount()
     const [openTradeDetails, setOpenTradeDetails] = useState(false)
-    const [sellTokenBalance] = useState(-1)
+    // const [sellTokenBalance] = useState(-1)
     const debounceTimeout = useRef<NodeJS.Timeout | null>(null)
 
     const simulateTradeAndMergeOrderbook = async (amountIn: number, start: number) => {
@@ -309,7 +309,7 @@ export default function SwapSection() {
                 <div className="h-0 w-full" />
 
                 {/* Trade details section */}
-                <div className="bg-milk-600/5 flex flex-col gap-6 px-2 py-4 rounded-xl border-milk-150 text-xs">
+                <div className="border-milk-100 bg-milk-50/2 backdrop-blur-xl flex flex-col gap-6 px-2 py-4 rounded-xl border text-xs">
                     {/* summary */}
                     <div className="flex w-full justify-between items-center">
                         {sellToken && buyToken && metrics?.highestBid && metrics.orderbook ? (
@@ -332,7 +332,7 @@ export default function SwapSection() {
                             className="flex gap-1.5 items-center hover:bg-milk-100/5 px-2 py-1 rounded-xl"
                         >
                             <IconWrapper icon={IconIds.GAS} className="size-4" />
-                            {/* <ChainImage oneInchId={CHAINS_CONFIG[AppSupportedChains.ETHEREUM].oneInchId} className="size-4" /> */}
+                            <ChainImage oneInchId={CHAINS_CONFIG[AppSupportedChains.ETHEREUM].oneInchId} className="size-4" />
                             <p>
                                 $
                                 {metrics?.highestBid?.gas_costs_usd

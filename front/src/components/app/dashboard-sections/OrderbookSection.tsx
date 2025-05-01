@@ -55,7 +55,7 @@ export default function OrderbookSection() {
     }, [currentChainId, metrics, apiStoreRefreshedAt, selectedTrade])
 
     return (
-        <div className="flex flex-col w-full border rounded-xl py-3 border-milk-100 gap-1 bg-gray-500/5">
+        <div className="flex flex-col w-full border rounded-xl py-3 border-milk-100 gap-1 bg-milk-50/2 backdrop-blur-xl">
             <div className="flex gap-1 items-center rounded-lg px-4 py-1.5">
                 <p className="text-milk text-base font-semibold">Orderbook</p>
             </div>
