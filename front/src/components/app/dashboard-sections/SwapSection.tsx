@@ -210,9 +210,9 @@ export default function SwapSection() {
 
     return (
         <>
-            <div className="w-full flex flex-col gap-0.5">
+            <div className="w-full flex flex-col gap-1">
                 {/* Sell section */}
-                <div className="flex gap-3 p-4 rounded-xl border-milk-150 w-full bg-milk-600/5 justify-between items-center">
+                <div className="flex gap-3 p-4 rounded-xl border-milk-150 w-full bg-milk-100 justify-between items-center">
                     <div className="flex gap-2 items-center">
                         <p className="text-milk-600 text-xs">Sell</p>
                         <TokenSelector
@@ -233,13 +233,13 @@ export default function SwapSection() {
                         {selectedTrade ? (
                             getBaseValueInUsd(metrics?.orderbook) ? (
                                 <p className="text-milk-600 text-xs">
-                                    $ {safeNumeral(selectedTrade.amountIn * (getBaseValueInUsd(metrics?.orderbook) as number), '0,0.[00]')}
+                                    ${safeNumeral(selectedTrade.amountIn * (getBaseValueInUsd(metrics?.orderbook) as number), '0,0.[00]')}
                                 </p>
                             ) : (
                                 <div className="skeleton-loading flex w-20 h-4 items-center justify-center rounded-full" />
                             )
                         ) : (
-                            <p className="ml-auto text-milk-600 text-xs">$ 0</p>
+                            <p className="ml-auto text-milk-600 text-xs">$0</p>
                         )}
                     </div>
                 </div>
@@ -260,7 +260,7 @@ export default function SwapSection() {
                 </div>
 
                 {/* Buy section */}
-                <div className="flex gap-3 p-4 rounded-xl border-milk-150 w-full bg-milk-600/5 justify-between items-center">
+                <div className="flex gap-3 p-4 rounded-xl border-milk-150 w-full bg-milk-100 justify-between items-center">
                     <div className="flex gap-2 items-center">
                         <p className="text-milk-600 text-xs">Buy</p>
                         <TokenSelector
@@ -292,13 +292,13 @@ export default function SwapSection() {
                                 ) : (
                                     <p className="text-milk-600 text-xs">
                                         {sellTokenAmountInput !== 0 && buyTokenAmountInput && getQuoteValueInUsd(metrics?.orderbook)
-                                            ? `$ ${numeral(buyTokenAmountInput).multiply(getQuoteValueInUsd(metrics?.orderbook)).format('0,0.[00]')}`
-                                            : '$ 0'}
+                                            ? `$${numeral(buyTokenAmountInput).multiply(getQuoteValueInUsd(metrics?.orderbook)).format('0,0.[00]')}`
+                                            : '$0'}
                                     </p>
                                 )}
                             </div>
                         ) : sellTokenAmountInput === 0 ? (
-                            <p className="ml-auto text-milk-600 text-xs">$ 0</p>
+                            <p className="ml-auto text-milk-600 text-xs">$0</p>
                         ) : (
                             <div className="ml-auto skeleton-loading flex w-20 h-4 items-center justify-center rounded-full" />
                         )}
