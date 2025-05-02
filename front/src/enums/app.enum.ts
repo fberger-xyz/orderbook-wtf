@@ -21,13 +21,15 @@ export enum AppUrls {
     RUST_API_PROD = 'https://tycho.merso.xyz/api',
 
     // PropellerHeads
+    PROPELLERHEADS_WEBSITE = 'https://www.propellerheads.xyz/',
     PROPELLERHEADS_X = 'https://x.com/PropellerSwap',
     PROPELLERHEADS_TELEGRAM = 'https://t.me/+B4CNQwv7dgIyYTJl',
-    PROPELLERHEADS_EXPLORER = 'https://www.explorer.wtf',
+    PROPELLERHEADS_EXPLORER = 'to-be-added',
 
     // merso
     MERSO_X = 'https://x.com/0xMerso',
     MERSO_TELEGRAM = 'https://t.me/xMerso',
+    MERSO_WEBSITE = 'https://www.merso.xyz/',
 
     // fberger
     FBERGER_X = 'https://x.com/fberger_xyz',

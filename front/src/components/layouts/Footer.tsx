@@ -11,6 +11,8 @@ import { cn } from '@/utils'
 import LinkWrapper from '../common/LinkWrapper'
 import { AppUrls, IconIds } from '@/enums'
 import IconWrapper from '../common/IconWrapper'
+import { Tooltip } from '@nextui-org/tooltip'
+import IframeWrapper from '../common/IframeWrapper'
 
 export default function Footer(props: { className?: string }) {
     const [commitDate, setCommitDate] = useState<null | Date>(null)
@@ -44,17 +46,39 @@ export default function Footer(props: { className?: string }) {
             </div>
             <p className="text-wrap truncate">
                 Made by
-                <LinkWrapper href={AppUrls.PROPELLERHEADS_X} target="_blank" className="cursor-alias hover:underline hover:text-aquamarine pl-1">
-                    PropellerHeads
-                </LinkWrapper>
+                <Tooltip
+                    placement="top"
+                    content={
+                        <div className="-mb-1 rounded-xl p-3 shadow-lg backdrop-blur">
+                            <IframeWrapper src={AppUrls.PROPELLERHEADS_WEBSITE} />
+                        </div>
+                    }
+                >
+                    <LinkWrapper
+                        href={AppUrls.PROPELLERHEADS_WEBSITE}
+                        target="_blank"
+                        className="cursor-alias hover:underline hover:text-aquamarine px-1"
+                    >
+                        PropellerHeads
+                    </LinkWrapper>
+                </Tooltip>
                 ,
                 <LinkWrapper href={AppUrls.MERSO_X} target="_blank" className="cursor-alias hover:underline hover:text-aquamarine px-1">
                     @xMerso
                 </LinkWrapper>
                 and
-                <LinkWrapper href={AppUrls.FBERGER_WEBSITE} target="_blank" className="cursor-alias hover:underline hover:text-aquamarine px-1">
-                    @fberger_xyz
-                </LinkWrapper>
+                <Tooltip
+                    placement="top"
+                    content={
+                        <div className="-mb-1 rounded-xl p-3 shadow-lg backdrop-blur">
+                            <IframeWrapper src={AppUrls.FBERGER_WEBSITE} />
+                        </div>
+                    }
+                >
+                    <LinkWrapper href={AppUrls.FBERGER_WEBSITE} target="_blank" className="cursor-alias hover:underline hover:text-aquamarine px-1">
+                        @fberger_xyz
+                    </LinkWrapper>
+                </Tooltip>
             </p>
         </div>
     )

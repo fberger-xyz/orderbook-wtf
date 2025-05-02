@@ -19,7 +19,7 @@ export default function Header(props: { className?: string }) {
     const { actions } = useApiStore()
     const [openGridDropdown, setOpenGridDropdown] = useState(false)
     const gridDropown = useRef<HTMLButtonElement>(null)
-    // useClickOutside(gridDropown, () => setOpenGridDropdown(false)) // no need here
+    useClickOutside(gridDropown, () => setOpenGridDropdown(false))
     const [openNetworkDropown, setOpenNetworkDropown] = useState(false)
     const networkDropown = useRef<HTMLButtonElement>(null)
     useClickOutside(networkDropown, () => setOpenNetworkDropown(false))
