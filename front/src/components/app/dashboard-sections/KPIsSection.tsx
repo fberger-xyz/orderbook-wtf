@@ -162,7 +162,9 @@ export default function KPIsSection() {
                             href={`${CHAINS_CONFIG[currentChainId].explorerRoot}/block/${metrics?.block}`}
                             className="flex gap-1 items-center group cursor-alias"
                         >
-                            <p className={cn('text-milk font-semibold text-base', { 'animate-flash': blockFlash })}>{metrics?.block}</p>
+                            <p className={cn('text-milk font-semibold text-base', { 'animate-flash text-yellow-500': blockFlash })}>
+                                {metrics?.block}
+                            </p>
                             <IconWrapper icon={IconIds.OPEN_LINK_IN_NEW_TAB} className="size-4 text-milk-200 group-hover:text-milk" />
                         </LinkWrapper>
                     }

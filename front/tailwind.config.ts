@@ -26,7 +26,7 @@ const config: Config = {
                     200: '#fff4e033', // datazoom
                     150: '#fff4e01a', // border of routing
                     100: '#fff4e012', // borders, also background of inactive buttons
-                    50: '#fff4e005', // borders too ?
+                    50: '#fff4e005', // borders too
                 },
             },
             animation: {
@@ -39,11 +39,11 @@ const config: Config = {
                     '100%': { transform: 'translateX(100%)' },
                 },
                 flash: {
-                    '0%': { opacity: '1', transform: 'scale(1)', color: '#fff4e0ff', textShadow: '0 0 0 transparent' },
-                    '25%': { opacity: '0.7', transform: 'scale(1.1)', color: '#FFD11B', textShadow: '0 0 8px #FFD11B' },
-                    '50%': { opacity: '1', transform: 'scale(1)', color: '#fff4e0ff', textShadow: '0 0 0 transparent' },
-                    '75%': { opacity: '0.7', transform: 'scale(1.1)', color: '#FFD11B', textShadow: '0 0 8px #FFD11B' },
-                    '100%': { opacity: '1', transform: 'scale(1)', color: '#fff4e0ff', textShadow: '0 0 0 transparent' },
+                    '0%': { opacity: '1', transform: 'scale(1)' },
+                    '25%': { opacity: '0.7', transform: 'scale(1.1)' },
+                    '50%': { opacity: '1', transform: 'scale(1)' },
+                    '75%': { opacity: '0.7', transform: 'scale(1.1)' },
+                    '100%': { opacity: '1', transform: 'scale(1)' },
                 },
             },
         },

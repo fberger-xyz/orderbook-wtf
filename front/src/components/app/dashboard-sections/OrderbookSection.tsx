@@ -5,7 +5,7 @@ import { useApiStore } from '@/stores/api.store'
 import { useEffect, useRef, useState } from 'react'
 import { AmmTrade } from '@/interfaces'
 import numeral from 'numeral'
-import { cleanOutput } from '@/utils'
+import { cleanOutput, cn } from '@/utils'
 import { OrderbookSide } from '@/enums'
 
 // todo: make it dynamic
@@ -31,19 +31,21 @@ function EmptyBook(side: OrderbookSide) {
     )
 }
 
-// todo: improve this v poorly designed code tomorrow
+// todo: improve this v poorly designed code asap
 export default function OrderbookSection() {
     const { currentChainId, selectedTrade, sellToken, getAddressPair, setHoveredOrderbookTrade } = useAppStore()
     const { apiStoreRefreshedAt, metrics, actions } = useApiStore()
     const [asks, setAsks] = useState<AmmTrade[]>([])
     const [bids, setBids] = useState<AmmTrade[]>([])
     const debounceTimeout = useRef<NodeJS.Timeout | null>(null)
+    const [blockFlash, setBlockFlash] = useState(false)
+    const lastBlockRef = useRef<number | undefined>(undefined)
 
     useEffect(() => {
         // get possibly undefined orderbook
         const orderbook = actions.getOrderbook(getAddressPair())
 
-        // debug
+        // state
         if (orderbook?.bids && orderbook?.asks) {
             setAsks(orderbook?.asks.sort((curr, next) => curr.amount - next.average_sell_price * next.amount - curr.average_sell_price))
             setBids(orderbook?.bids.sort((curr, next) => curr.average_sell_price * curr.amount - next.average_sell_price * next.amount))
@@ -51,6 +53,15 @@ export default function OrderbookSection() {
             setBids([])
             setAsks([])
         }
+
+        // flash
+        if (metrics?.block !== undefined && metrics.block !== lastBlockRef.current) {
+            setBlockFlash(true)
+            lastBlockRef.current = metrics.block
+            const timeout = setTimeout(() => setBlockFlash(false), 300)
+            return () => clearTimeout(timeout)
+        }
+
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [currentChainId, metrics, apiStoreRefreshedAt, selectedTrade])
 
@@ -79,7 +90,7 @@ export default function OrderbookSection() {
                               return (
                                   <div
                                       key={`${askIndex}-${ask.amount}`}
-                                      className="relative group w-full hover:bg-milk-150 hover:font-semibold"
+                                      className="relative group w-full hover:bg-milk-150 hover:font-semibold overflow-hidden"
                                       onMouseEnter={() => setHoveredOrderbookTrade(ask)}
                                       onMouseLeave={() => {
                                           if (debounceTimeout.current) clearTimeout(debounceTimeout.current)
@@ -88,7 +99,12 @@ export default function OrderbookSection() {
                                           }, 600)
                                       }}
                                   >
-                                      <div className="bg-folly/10 group-hover:bg-folly/30 absolute h-full" style={{ width: `${percentage}%` }} />
+                                      <div
+                                          className={cn('bg-folly/10 group-hover:bg-folly/30 absolute h-full', {
+                                              'animate-flash bg-folly/50': blockFlash,
+                                          })}
+                                          style={{ width: `${percentage}%` }}
+                                      />
                                       <div className="grid grid-cols-3 px-4 py-0.5">
                                           <p className="text-folly">{cleanOutput(numeral(1 / ask.average_sell_price).format('0,0.[0000]'))}</p>
                                           <p className="ml-auto truncate">{cleanOutput(numeral(ask.output).format('0,0.[0000]'))}</p>
@@ -133,7 +149,7 @@ export default function OrderbookSection() {
                           return (
                               <div
                                   key={`${bidIndex}-${bid.amount}`}
-                                  className="relative group w-full hover:bg-milk-150 hover:font-semibold"
+                                  className="relative group w-full hover:bg-milk-150 hover:font-semibold overflow-hidden"
                                   onMouseEnter={() => setHoveredOrderbookTrade(bid)}
                                   onMouseLeave={() => {
                                       if (debounceTimeout.current) clearTimeout(debounceTimeout.current)
@@ -143,7 +159,9 @@ export default function OrderbookSection() {
                                   }}
                               >
                                   <div
-                                      className="bg-aquamarine/10 group-hover:bg-aquamarine/30 absolute h-full"
+                                      className={cn('bg-aquamarine/10 group-hover:bg-aquamarine/30 absolute h-full', {
+                                          'animate-flash bg-aquamarine/50': blockFlash,
+                                      })}
                                       style={{ width: `${percentage}%` }}
                                   />
                                   <div className="grid grid-cols-3 px-4 py-0.5">

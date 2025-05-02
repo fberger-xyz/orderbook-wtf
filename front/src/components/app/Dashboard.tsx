@@ -159,7 +159,7 @@ export default function Dashboard() {
 
                     // notify
                     // toast.success(`${sellToken.symbol}-${buyToken.symbol} market depth updated just now`, { style: toastStyle })
-                    toast.success(`Market depth updated just now`, { style: toastStyle })
+                    // toast.success(`Market depth updated just now`, { style: toastStyle }) // avoid spam
 
                     // -
                     return orderbookJson

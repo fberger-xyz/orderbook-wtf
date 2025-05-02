@@ -46,6 +46,7 @@ export default function Header(props: { className?: string }) {
                             target="_blank"
                             // href={AppUrls.PROPELLERHEADS_EXPLORER}
                             href="/"
+                            disabled={true}
                             className="cursor-not-allowed p-2.5 w-full rounded-xl flex justify-between items-center"
                         >
                             <p className="text-sm text-gray-500 text-left">Explorer</p>
