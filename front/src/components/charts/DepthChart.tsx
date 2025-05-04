@@ -92,6 +92,7 @@ const getOptions = (
     return {
         tooltip: {
             trigger: 'axis',
+            appendToBody: true,
             triggerOn: 'mousemove|click',
             backgroundColor: '#FFF4E005',
             borderRadius: 12,
