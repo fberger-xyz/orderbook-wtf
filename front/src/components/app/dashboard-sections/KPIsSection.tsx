@@ -201,6 +201,7 @@ export default function KPIsSection() {
                 title={
                     <Tooltip
                         placement="top"
+                        disableAnimation
                         content={
                             metrics && (
                                 <div className="rounded-xl bg-[#FFF4E00A] border backdrop-blur border-milk-200 shadow-lg p-3 -mb-1">
