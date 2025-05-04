@@ -86,7 +86,7 @@ export default function MarketDepthSection() {
                             // force mount: disables lazy load
                             disableAnimation
                             content={
-                                <div className="backdrop-blur-sm rounded-xl bg-[#FFF4E00A] border border-milk-200 shadow-lg p-3 -mt-1 max-w-80 text-milk text-sm flex flex-col gap-2 will-change-transform">
+                                <div className="backdrop-blur-lg rounded-xl bg-[#FFF4E00A] border border-milk-200 shadow-lg p-3 -mt-1 max-w-80 text-milk text-sm flex flex-col gap-2 will-change-transform">
                                     <p className="text-wrap">
                                         This chart shows the onchain liquidity depth by simulating increasingly large swaps, to obtain prices,
                                         slippage and price impact.

@@ -49,7 +49,7 @@ export default function Footer(props: { className?: string }) {
                 <Tooltip
                     placement="top"
                     content={
-                        <div className="-mb-1 rounded-xl p-3 shadow-lg backdrop-blur-sm will-change-transform">
+                        <div className="-mb-1 rounded-xl p-3 shadow-lg backdrop-blur-lg will-change-transform">
                             <IframeWrapper src={AppUrls.PROPELLERHEADS_WEBSITE} />
                         </div>
                     }
@@ -70,7 +70,7 @@ export default function Footer(props: { className?: string }) {
                 <Tooltip
                     placement="top"
                     content={
-                        <div className="-mb-1 rounded-xl p-3 shadow-lg backdrop-blur-sm will-change-transform">
+                        <div className="-mb-1 rounded-xl p-3 shadow-lg backdrop-blur-lg will-change-transform">
                             <IframeWrapper src={AppUrls.FBERGER_WEBSITE} />
                         </div>
                     }

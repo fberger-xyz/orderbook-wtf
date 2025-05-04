@@ -16,7 +16,7 @@ import { CHAINS_CONFIG } from '@/config/app.config'
 import { useState, useRef, useEffect } from 'react'
 
 const lastBlockTooltipContent = () => (
-    <div className="rounded-xl bg-[#FFF4E00A] backdrop-blur-sm border border-milk-200 shadow-lg p-3 -mt-1 max-w-80 text-milk text-sm flex will-change-transform">
+    <div className="rounded-xl bg-[#FFF4E00A] backdrop-blur-lg border border-milk-200 shadow-lg p-3 -mt-1 max-w-80 text-milk text-sm flex will-change-transform">
         <p className="text-wrap">
             Using Tycho Indexer, our backend simulates market depth on every new block (~12s on Ethereum, ~1s on Unichain). On the frontend, we
             refresh every 12s on Ethereum and 5s on Unichain to reduce unnecessary requests and stay responsive.
