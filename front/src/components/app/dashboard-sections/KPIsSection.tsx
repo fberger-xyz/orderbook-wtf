@@ -16,7 +16,7 @@ import { CHAINS_CONFIG } from '@/config/app.config'
 import { useState, useRef, useEffect } from 'react'
 
 const lastBlockTooltipContent = () => (
-    <div className="rounded-xl bg-[#FFF4E00A] backdrop-blur border border-milk-200 shadow-lg p-3 -mt-1 max-w-80 text-milk text-sm flex">
+    <div className="rounded-xl bg-[#FFF4E00A] backdrop-blur-sm border border-milk-200 shadow-lg p-3 -mt-1 max-w-80 text-milk text-sm flex will-change-transform">
         <p className="text-wrap">
             Using Tycho Indexer, our backend simulates market depth on every new block (~12s on Ethereum, ~1s on Unichain). On the frontend, we
             refresh every 12s on Ethereum and 5s on Unichain to reduce unnecessary requests and stay responsive.
@@ -131,7 +131,12 @@ export default function KPIsSection() {
                 <OrderbookComponentLayout
                     title={
                         <div className="w-full flex justify-between">
-                            <Tooltip placement="bottom" content={lastBlockTooltipContent()}>
+                            <Tooltip
+                                placement="bottom"
+                                content={lastBlockTooltipContent()}
+                                // force mount: disables lazy load
+                                disableAnimation
+                            >
                                 <div className="flex gap-1 group items-center">
                                     <p className="text-milk-600 text-xs">Last block</p>
                                     <IconWrapper icon={IconIds.INFORMATION} className="size-4 text-milk-200 group-hover:text-milk cursor-pointer" />
@@ -172,7 +177,12 @@ export default function KPIsSection() {
             ) : (
                 <OrderbookComponentLayout
                     title={
-                        <Tooltip placement="bottom" content={lastBlockTooltipContent()}>
+                        <Tooltip
+                            placement="bottom"
+                            content={lastBlockTooltipContent()}
+                            // force mount: disables lazy load
+                            disableAnimation
+                        >
                             <div className="flex gap-1 items-center">
                                 <p className="text-milk-600 text-xs">Last block</p>
                                 <IconWrapper icon={IconIds.INFORMATION} className="size-4 text-milk-200 group-hover:text-milk cursor-pointer" />

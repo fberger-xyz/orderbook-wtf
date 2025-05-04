@@ -72,8 +72,9 @@ export default function SelectTokenModal() {
                 <div className="p-4 flex w-full items-center justify-between focus:ring-2 focus:ring-folly focus:ring-offset-2 cursor-pointer">
                     <Tooltip
                         placement="top"
+                        disableAnimation
                         content={
-                            <div className="rounded-xl bg-[#FFF4E00A] border border-milk-200 shadow-lg p-3 -mb-1 backdrop-blur">
+                            <div className="rounded-xl bg-[#FFF4E00A] border border-milk-200 shadow-lg p-3 -mb-1 backdrop-blur-sm will-change-transform">
                                 <p className="flex gap-1 text-milk text-sm">
                                     We only display tokens for which a single-hop exchange path exists, meaning that a liquidity pool contains base
                                     tokens and quote tokens.
