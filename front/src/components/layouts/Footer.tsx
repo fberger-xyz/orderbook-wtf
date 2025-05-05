@@ -59,10 +59,9 @@ export default function Footer(props: { className?: string }) {
                         target="_blank"
                         className="cursor-alias hover:underline hover:text-aquamarine px-1"
                     >
-                        PropellerHeads
+                        PropellerHeads,
                     </LinkWrapper>
                 </Tooltip>
-                ,
                 <LinkWrapper href={AppUrls.MERSO_X} target="_blank" className="cursor-alias hover:underline hover:text-aquamarine px-1">
                     @xMerso
                 </LinkWrapper>
