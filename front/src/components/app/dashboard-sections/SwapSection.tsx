@@ -309,7 +309,7 @@ export default function SwapSection() {
                 <div className="h-0 w-full" />
 
                 {/* Trade details section */}
-                <div className="border-milk-100 bg-milk-50/2 backdrop-blur-xl flex flex-col gap-6 px-2 py-4 rounded-xl border text-xs">
+                <div className="border-milk-100 bg-milk-50 backdrop-blur-xl flex flex-col gap-6 px-2 py-4 rounded-xl border text-xs">
                     {/* summary */}
                     <div className="flex w-full justify-between items-center">
                         {sellToken && buyToken && metrics?.highestBid && metrics.orderbook ? (
