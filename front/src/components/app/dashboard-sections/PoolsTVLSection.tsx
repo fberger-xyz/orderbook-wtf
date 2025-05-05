@@ -118,7 +118,7 @@ export default function PoolsTVLSection() {
                     className="flex gap-1 items-center rounded-lg px-2.5 py-1.5 hover:bg-milk-100/5 transition-colors duration-300 -ml-1 w-fit"
                 >
                     <p className="text-milk text-base font-semibold">Pools TVL</p>
-                    <IconWrapper icon={showLiquidityBreakdownSection ? IconIds.TRIANGLE_UP : IconIds.TRIANGLE_DOWN} className="size-4" />
+                    <IconWrapper icon={showLiquidityBreakdownSection ? IconIds.TRIANGLE_UP : IconIds.TRIANGLE_DOWN} className="size-5" />
                 </button>
             }
             content={

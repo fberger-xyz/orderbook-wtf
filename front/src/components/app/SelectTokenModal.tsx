@@ -28,6 +28,7 @@ export default function SelectTokenModal() {
         selectBuyToken,
         setShowSelectTokenModal,
         setSelectTokenModalSearch,
+        setBuyTokenAmountInput,
     } = useAppStore()
     const { apiTokens, apiPairs, actions } = useApiStore()
     const account = useAccount()
@@ -212,6 +213,7 @@ export default function SelectTokenModal() {
                                     if (selectTokenModalFor === 'buy') {
                                         if (buyToken.address === token.address) return
                                         selectBuyToken(token)
+                                        setBuyTokenAmountInput(0)
                                         actions.setMetrics(undefined)
                                     } else {
                                         if (sellToken.address === token.address) return

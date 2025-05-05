@@ -42,10 +42,14 @@ export default function OrderbookSection() {
     const lastBlockRef = useRef<number | undefined>(undefined)
 
     useEffect(() => {
+        if (!metrics) {
+            setBids([])
+            setAsks([])
+            return
+        }
+
         // get possibly undefined orderbook
         const orderbook = actions.getOrderbook(getAddressPair())
-
-        // state
         if (orderbook?.bids && orderbook?.asks) {
             setAsks(orderbook?.asks.sort((curr, next) => curr.amount - next.average_sell_price * next.amount - curr.average_sell_price))
             setBids(orderbook?.bids.sort((curr, next) => curr.average_sell_price * curr.amount - next.average_sell_price * next.amount))

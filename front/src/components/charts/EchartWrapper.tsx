@@ -72,7 +72,7 @@ export default function EchartWrapper(props: InterfaceEchartWrapperProps) {
                         When true, calling setOption won’t trigger any event dispatch (like rendered, finished, etc.).
                         Use case: Good for silent updates where you don’t want side effects like re-triggering chart-related events.
                      */
-                    silent: true,
+                    silent: false,
                 },
             )
 

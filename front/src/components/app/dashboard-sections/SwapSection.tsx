@@ -278,7 +278,7 @@ export default function SwapSection() {
                                 'cursor-not-allowed bg-transparent ring-0 focus:ring-0 focus:outline-none focus:border-none w-full':
                                     selectedTrade?.trade || sellTokenAmountInput === 0,
                                 'skeleton-loading ml-auto w-1/2 h-6 rounded-full text-transparent':
-                                    !selectedTrade?.trade && sellTokenAmountInput !== 0,
+                                    (!selectedTrade?.trade && sellTokenAmountInput !== 0) || (sellTokenAmountInput > 0 && buyTokenAmountInput === 0),
                             })}
                             value={numeral(buyTokenAmountInput).format('0,0.[00000]')}
                             disabled={true}
@@ -287,7 +287,7 @@ export default function SwapSection() {
                         {/* last row  */}
                         {selectedTrade?.trade ? (
                             <div className="flex justify-end items-center">
-                                {isRefreshingMarketDepth ? (
+                                {isRefreshingMarketDepth || (sellTokenAmountInput > 0 && buyTokenAmountInput === 0) ? (
                                     <div className="skeleton-loading w-16 h-4 rounded-full" />
                                 ) : (
                                     <p className="text-milk-600 text-xs">
