@@ -2,7 +2,7 @@
 
 import * as echarts from 'echarts'
 import { ErrorBoundary } from 'react-error-boundary'
-import { Suspense, useEffect, useState } from 'react'
+import { Suspense, useEffect, useRef, useState } from 'react'
 import { OrderbookOption, OrderbookSide, SvgIds } from '@/enums'
 import EchartWrapper from './EchartWrapper'
 import { ChartBackground, CustomFallback, LoadingArea } from './ChartsCommons'
@@ -272,8 +272,8 @@ const getOptions = (
                     moveHandleStyle: { color: AppColors.milk[400] },
                 },
                 rangeMode: ['value', 'value'],
-                left: '10%',
-                right: '10%',
+                left: 90,
+                right: 90,
             },
             {
                 xAxisIndex: 0,
@@ -549,6 +549,7 @@ export default function DepthChart() {
     } = useAppStore()
     const { apiStoreRefreshedAt, metrics, actions } = useApiStore()
     const [options, setOptions] = useState<null | echarts.EChartsOption>(null)
+    const lastDataZoom = useRef<[number, number] | null>(null)
 
     useEffect(() => {
         // prevent further computations
@@ -656,6 +657,14 @@ export default function DepthChart() {
                 selectedTrade,
                 hoveredOrderbookTrade,
             )
+
+            // capture the previous zoom
+            if (lastDataZoom.current && newOptions?.dataZoom && Array.isArray(newOptions.dataZoom)) {
+                newOptions.dataZoom[0].startValue = lastDataZoom.current[0]
+                newOptions.dataZoom[0].endValue = lastDataZoom.current[1]
+            }
+
+            // update
             setOptions(newOptions)
         } else setOptions(null)
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -745,6 +754,9 @@ export default function DepthChart() {
                                 onPointClick={(params) =>
                                     handlePointClick(params as undefined | { data: EchartOnClickParamsData; dataIndex: number })
                                 }
+                                onDataZoomChange={(start, end) => {
+                                    lastDataZoom.current = [start, end]
+                                }}
                             />
                         </>
                     ) : (

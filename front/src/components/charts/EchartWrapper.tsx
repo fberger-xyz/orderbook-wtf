@@ -9,6 +9,7 @@ interface InterfaceEchartWrapperProps {
     options: echarts.EChartsOption
     id?: string
     onPointClick?: (params: unknown) => void
+    onDataZoomChange?: (start: number, end: number) => void
     className?: string
 }
 
@@ -17,13 +18,15 @@ export default function EchartWrapper(props: InterfaceEchartWrapperProps) {
     const myChart = useRef<echarts.ECharts | null>(null)
 
     const handleChartResize = () => myChart.current?.resize()
-    const toggleToolbox = (show: boolean) => {
-        myChart.current?.setOption({
-            toolbox: {
-                show: show,
-            },
-        })
-    }
+
+    // ! causes a rerender that prevents datazoom cache
+    // const toggleToolbox = (show: boolean) => {
+    //     myChart.current?.setOption({
+    //         toolbox: {
+    //             show: show,
+    //         },
+    //     })
+    // }
 
     useEffect(() => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -36,25 +39,17 @@ export default function EchartWrapper(props: InterfaceEchartWrapperProps) {
             window.addEventListener('resize', handleChartResize, { passive: true })
 
             // handle toolbox
-            chartRef.current.addEventListener('mouseenter', () => toggleToolbox(true))
-            chartRef.current.addEventListener('mouseleave', () => toggleToolbox(false))
-
-            // preserve grid3D view settings if they exist
-            const currentOptions = myChart.current.getOption()
-
-            // @ts-expect-error: poorly typed
-            const grid3DOptions = currentOptions?.grid3D ? { grid3D: currentOptions.grid3D } : {}
-
-            // if need be
-            const dataZoomOptions = currentOptions?.dataZoom ? { dataZoom: currentOptions.dataZoom } : {}
+            // ! causes a rerender that prevents datazoom cache
+            // chartRef.current.addEventListener('mouseenter', () => toggleToolbox(true))
+            // chartRef.current.addEventListener('mouseleave', () => toggleToolbox(false))
 
             // set option
             myChart.current.setOption(
                 // @ts-expect-error: poorly typed
-                { ...props.options, ...grid3DOptions, ...dataZoomOptions },
+                props.options,
                 {
-                    notMerge: false, // false = the new option object replaces the existing one completely.
-                    // notMerge: true, // true, default = ECharts merges the new options with the existing ones.
+                    // notMerge: false, // false = the new option object replaces the existing one completely.
+                    notMerge: true, // true, default = ECharts merges the new options with the existing ones.
 
                     /**
                      * lazyUpdate?: boolean
@@ -80,6 +75,31 @@ export default function EchartWrapper(props: InterfaceEchartWrapperProps) {
             myChart.current.on('click', (params: unknown) => {
                 if (props.onPointClick) props.onPointClick(params)
             })
+
+            // attach dataZoom event listener
+            myChart.current.on('dataZoom', () => {
+                const option = myChart.current?.getOption()
+                const zoom = option?.dataZoom?.[0]
+                const xAxisArray = option?.xAxis as echarts.EChartOption.XAxis[] | undefined
+
+                let startValue = zoom?.startValue
+                let endValue = zoom?.endValue
+
+                if ((startValue === undefined || endValue === undefined) && xAxisArray && Array.isArray(xAxisArray)) {
+                    const xAxis = xAxisArray[0]
+                    const min = typeof xAxis.min === 'number' ? xAxis.min : 0
+                    const max = typeof xAxis.max === 'number' ? xAxis.max : 1
+                    const startPercent = zoom?.start ?? 0
+                    const endPercent = zoom?.end ?? 100
+
+                    startValue = min + (max - min) * (startPercent / 100)
+                    endValue = min + (max - min) * (endPercent / 100)
+                }
+
+                if (props.onDataZoomChange && typeof startValue === 'number' && typeof endValue === 'number') {
+                    props.onDataZoomChange(startValue, endValue)
+                }
+            })
         }
 
         return () => {
@@ -87,6 +107,7 @@ export default function EchartWrapper(props: InterfaceEchartWrapperProps) {
                 // cleanup events listeners
                 window.removeEventListener('resize', handleChartResize)
                 myChart.current.off('click')
+                myChart.current.off('dataZoom')
             }
         }
 
