@@ -302,8 +302,11 @@ const getOptions = (
                     fontSize: 11,
                     show: true,
                     color: AppColors.milk[200],
-                    formatter: (value) =>
-                        symbolsInYAxis === OrderbookOption.YES ? `${formatAmount(value)} ${orderbook.base.symbol}` : `${formatAmount(value)}`,
+                    formatter: (value) => {
+                        if (value > 1000) value = Math.round(value)
+                        if (symbolsInYAxis === OrderbookOption.YES) return `${formatAmount(value)} ${orderbook.base.symbol}`
+                        return `${formatAmount(value)}`
+                    },
                 },
                 axisLine: {
                     show: false,
@@ -335,8 +338,11 @@ const getOptions = (
                     fontSize: 11,
                     show: true,
                     color: AppColors.milk[200],
-                    formatter: (value) =>
-                        symbolsInYAxis === OrderbookOption.YES ? `${formatAmount(value)} ${orderbook.quote.symbol}` : `${formatAmount(value)}`,
+                    formatter: (value) => {
+                        if (value > 1000) value = Math.round(value)
+                        if (symbolsInYAxis === OrderbookOption.YES) return `${formatAmount(value)} ${orderbook.base.symbol}`
+                        return `${formatAmount(value)}`
+                    },
                 },
                 axisLine: {
                     show: false,
