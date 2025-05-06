@@ -14,8 +14,8 @@ import { Tooltip } from '@nextui-org/tooltip'
 const OptionButton = ({ isSelected, onClick, children }: { isSelected: boolean; onClick: () => void; children: React.ReactNode }) => (
     <div
         className={cn('flex items-center gap-2 w-full px-4 py-1.5 rounded-lg transition', {
-            'text-white bg-gray-600/20': isSelected,
-            'text-milk-400 hover:bg-gray-600/20': !isSelected,
+            'text-white bg-gray-600/20 backdrop-blur': isSelected,
+            'text-milk-400 hover:bg-gray-600/20 hover:backdrop-blur': !isSelected,
         })}
         onClick={onClick}
     >
@@ -56,9 +56,13 @@ export default function MarketDepthSection() {
         // showRoutingSection,
         // showLiquidityBreakdownSection,
         // showSections,
-        yAxisType,
-        yAxisLogBase,
-        setYAxisType,
+        showSteps,
+        setSteps,
+        filterOutSolverInconsistencies,
+        setFilterOutSolverInconsistencies,
+        // yAxisType,
+        // yAxisLogBase,
+        // setYAxisType,
         coloredAreas,
         setColoredAreas,
         symbolsInYAxis,
@@ -68,8 +72,6 @@ export default function MarketDepthSection() {
     const [openChartOptions, showChartOptions] = useState(false)
     const chartOptionsDropdown = useRef<HTMLButtonElement>(null)
     useClickOutside(chartOptionsDropdown, () => showChartOptions(false))
-
-    const renderYAxisLabel = (type: OrderbookAxisScale) => (type === OrderbookAxisScale.VALUE ? 'Linear' : `Log ${yAxisLogBase}`)
 
     return (
         <OrderbookComponentLayout
@@ -117,33 +119,39 @@ export default function MarketDepthSection() {
                         <div className="flex items-center gap-1 hover:bg-milk-100/5 transition-colors duration-300 rounded-lg px-2.5 py-1.5">
                             <IconWrapper icon={IconIds.SETTINGS} className="size-4" />
                         </div>
-
                         <div
                             className={cn(
-                                'absolute right-0 mt-1 w-52 rounded-xl border border-milk-150 shadow-lg p-3 transition-all origin-top-right flex flex-col gap-5 bg-milk-200/4 backdrop-blur z-20',
+                                'absolute right-0 mt-1 w-52 rounded-xl border border-milk-150 shadow-lg p-3 transition-all origin-top-right flex flex-col gap-5 bg-milk-50 backdrop-blur-lg',
                                 {
-                                    'scale-100 opacity-100': openChartOptions,
-                                    'scale-95 opacity-0 pointer-events-none': !openChartOptions,
+                                    'z-50 opacity-100': openChartOptions,
+                                    'opacity-0 pointer-events-none': !openChartOptions,
                                 },
                             )}
                         >
-                            <ChartOption<OrderbookAxisScale>
-                                title="Y Axis scale"
-                                options={[OrderbookAxisScale.VALUE, OrderbookAxisScale.LOG]}
-                                selectedOption={yAxisType}
-                                onSelect={setYAxisType}
-                                renderOptionLabel={renderYAxisLabel}
-                            />
-
                             <ChartOption<OrderbookOption>
-                                title="Colored areas"
+                                title="Show steps"
+                                options={[OrderbookOption.YES, OrderbookOption.NO]}
+                                selectedOption={showSteps}
+                                onSelect={() => setSteps(showSteps === OrderbookOption.YES ? OrderbookOption.NO : OrderbookOption.YES)}
+                            />
+                            <ChartOption<OrderbookOption>
+                                title="Filter inconsistencies"
+                                options={[OrderbookOption.YES, OrderbookOption.NO]}
+                                selectedOption={filterOutSolverInconsistencies}
+                                onSelect={() =>
+                                    setFilterOutSolverInconsistencies(
+                                        filterOutSolverInconsistencies === OrderbookOption.YES ? OrderbookOption.NO : OrderbookOption.YES,
+                                    )
+                                }
+                            />
+                            <ChartOption<OrderbookOption>
+                                title="Color areas"
                                 options={[OrderbookOption.YES, OrderbookOption.NO]}
                                 selectedOption={coloredAreas}
                                 onSelect={() => setColoredAreas(coloredAreas === OrderbookOption.YES ? OrderbookOption.NO : OrderbookOption.YES)}
                             />
-
                             <ChartOption<OrderbookOption>
-                                title="Symbols in Y axis labels"
+                                title="Show symbols on Y axis"
                                 options={[OrderbookOption.YES, OrderbookOption.NO]}
                                 selectedOption={symbolsInYAxis}
                                 onSelect={() => setSymbolsInYAxis(symbolsInYAxis === OrderbookOption.YES ? OrderbookOption.NO : OrderbookOption.YES)}

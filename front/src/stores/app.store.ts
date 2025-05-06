@@ -32,6 +32,10 @@ export const useAppStore = create<{
      */
 
     // chart
+    showSteps: OrderbookOption
+    setSteps: (steps: OrderbookOption) => void
+    filterOutSolverInconsistencies: OrderbookOption
+    setFilterOutSolverInconsistencies: (filterOutSolverInconsistencies: OrderbookOption) => void
     yAxisType: OrderbookAxisScale
     setYAxisType: (yAxisType: OrderbookAxisScale) => void
     yAxisLogBase: number
@@ -126,8 +130,12 @@ export const useAppStore = create<{
              */
 
             // chart
+            showSteps: OrderbookOption.YES,
+            setSteps: (showSteps) => set(() => ({ showSteps })),
+            filterOutSolverInconsistencies: OrderbookOption.YES,
+            setFilterOutSolverInconsistencies: (filterOutSolverInconsistencies) => set(() => ({ filterOutSolverInconsistencies })),
             yAxisType: OrderbookAxisScale.VALUE,
-            yAxisLogBase: 10,
+            yAxisLogBase: 2,
             setYAxisType: (yAxisType) => set(() => ({ yAxisType })),
             setYAxisLogBase: (yAxisLogBase) => set(() => ({ yAxisLogBase })),
             coloredAreas: OrderbookOption.YES,
@@ -211,7 +219,8 @@ export const useAppStore = create<{
         }),
         {
             name: IS_DEV
-                ? `${APP_METADATA.SITE_DOMAIN}-app-store-dev` // always keep state in dev
+                ? // ? `${APP_METADATA.SITE_DOMAIN}-app-store-dev` // always keep state in dev
+                  `${APP_METADATA.SITE_DOMAIN}-app-store-dev-${process.env.NEXT_PUBLIC_COMMIT_TIMESTAMP}` // change state at each new pnpm dev
                 : `${APP_METADATA.SITE_DOMAIN}-app-store-prod-${process.env.NEXT_PUBLIC_COMMIT_TIMESTAMP}`, // refresh at each new deployment
             storage: createJSONStorage(() => sessionStorage),
             skipHydration: false,

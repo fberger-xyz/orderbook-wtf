@@ -82,6 +82,7 @@ const getOptions = (
     orderbook: AmmAsOrderbook,
     bids: LineDataPoint[],
     asks: LineDataPoint[],
+    showSteps: OrderbookOption,
     yAxisType: 'value' | 'log',
     yAxisLogBase: number,
     coloredAreas: OrderbookOption,
@@ -352,13 +353,14 @@ const getOptions = (
             fontFamily: APP_FONT.style.fontFamily,
         },
         grid: {
-            left: symbolsInYAxis ? 80 : 40,
-            right: symbolsInYAxis ? 80 : 40,
+            left: symbolsInYAxis === OrderbookOption.YES ? 85 : 45,
+            right: symbolsInYAxis === OrderbookOption.YES ? 85 : 45,
             top: selectedTrade ? '40' : '20',
             bottom: 110,
         },
         series: [
             {
+                step: showSteps === OrderbookOption.YES ? 'end' : undefined,
                 yAxisIndex: 0,
                 name: 'Bids',
                 type: 'line',
@@ -456,6 +458,7 @@ const getOptions = (
                       : undefined,
             },
             {
+                step: showSteps === OrderbookOption.YES ? 'end' : undefined,
                 yAxisIndex: 1,
                 name: 'Asks',
                 type: 'line',
@@ -531,6 +534,8 @@ export default function DepthChart() {
         buyToken,
         sellToken,
         storeRefreshedAt,
+        showSteps,
+        filterOutSolverInconsistencies,
         yAxisType,
         yAxisLogBase,
         coloredAreas,
@@ -546,23 +551,25 @@ export default function DepthChart() {
     const [options, setOptions] = useState<null | echarts.EChartsOption>(null)
 
     useEffect(() => {
-        // debug
-        const debug = false
+        // prevent further computations
+        if (!metrics) return setOptions(null)
 
         // get possibly undefined orderbook
         const orderbook = actions.getOrderbook(getAddressPair())
-
-        // debug
-        if (debug) console.log('useEffect: depth chart', orderbook)
-
-        // ?
-        if (!metrics) setOptions(null)
-        else if (orderbook?.bids && orderbook?.asks) {
+        if (orderbook?.bids && orderbook?.asks) {
             const highestBid = getHighestBid(orderbook)
             const lowestAsk = getLowestAsk(orderbook)
             const bids: LineDataPoint[] = orderbook?.bids
                 .filter((trade, tradeIndex, trades) => trades.findIndex((_trade) => _trade.amount === trade.amount) === tradeIndex)
                 .sort((curr, next) => curr.average_sell_price * curr.amount - next.average_sell_price * next.amount)
+                // filter out inconsistencies
+                .filter((curr, currIndex, all) =>
+                    filterOutSolverInconsistencies === OrderbookOption.YES
+                        ? currIndex + 1 < all.length
+                            ? curr.average_sell_price > all[currIndex + 1].average_sell_price
+                            : true
+                        : true,
+                )
                 .map((trade) => {
                     const point: LineDataPoint = {
                         value: [trade.average_sell_price, trade.amount],
@@ -597,6 +604,14 @@ export default function DepthChart() {
             const asks: LineDataPoint[] = orderbook?.asks
                 .filter((trade, tradeIndex, trades) => trades.findIndex((_trade) => _trade.amount === trade.amount) === tradeIndex)
                 .sort((curr, next) => curr.average_sell_price * curr.amount - next.average_sell_price * next.amount)
+                // filter out inconsistencies
+                .filter((curr, currIndex, all) =>
+                    filterOutSolverInconsistencies === OrderbookOption.YES
+                        ? currIndex + 1 < all.length
+                            ? curr.average_sell_price > all[currIndex + 1].average_sell_price
+                            : true
+                        : true,
+                )
                 .map((trade) => {
                     const point: LineDataPoint = {
                         value: [1 / trade.average_sell_price, trade.amount],
@@ -633,6 +648,7 @@ export default function DepthChart() {
                 orderbook,
                 bids,
                 asks,
+                showSteps,
                 yAxisType,
                 yAxisLogBase,
                 coloredAreas,
@@ -643,7 +659,19 @@ export default function DepthChart() {
             setOptions(newOptions)
         } else setOptions(null)
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [currentChainId, metrics, apiStoreRefreshedAt, yAxisType, yAxisLogBase, coloredAreas, symbolsInYAxis, selectedTrade, hoveredOrderbookTrade])
+    }, [
+        currentChainId,
+        metrics,
+        apiStoreRefreshedAt,
+        showSteps,
+        filterOutSolverInconsistencies,
+        yAxisType,
+        yAxisLogBase,
+        coloredAreas,
+        symbolsInYAxis,
+        selectedTrade,
+        hoveredOrderbookTrade,
+    ])
 
     const handlePointClick = (params: undefined | { data: EchartOnClickParamsData; dataIndex: number }) => {
         const debug = false
@@ -706,7 +734,7 @@ export default function DepthChart() {
     return (
         <Suspense fallback={<CustomFallback />}>
             <ErrorBoundary FallbackComponent={ErrorBoundaryFallback}>
-                <ChartBackground className="relative h-[420px]">
+                <ChartBackground className="relative h-[450px]">
                     {!storeRefreshedAt ? (
                         <LoadingArea />
                     ) : options && Array.isArray(options.series) && options.series?.length > 0 && options.series[0].data ? (
