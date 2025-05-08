@@ -39,6 +39,9 @@ export default function Footer(props: { className?: string }) {
                 <LinkWrapper href={AppUrls.VM_UPTIME} target="_blank" className="cursor-alias hover:underline hover:text-aquamarine">
                     <p>API status</p>
                 </LinkWrapper>
+                <LinkWrapper href={AppUrls.TYCHO_STATUS} target="_blank" className="cursor-alias hover:underline hover:text-aquamarine">
+                    <p>Tycho status</p>
+                </LinkWrapper>
                 <LinkWrapper href={AppUrls.DOCUMENTATION} target="_blank" className="flex items-center gap-1 cursor-alias sm:hidden">
                     <p>Docs</p>
                     <IconWrapper icon={IconIds.OPEN_LINK_IN_NEW_TAB} className="size-4" />
@@ -62,7 +65,7 @@ export default function Footer(props: { className?: string }) {
                         PropellerHeads,
                     </LinkWrapper>
                 </Tooltip>
-                <LinkWrapper href={AppUrls.MERSO_X} target="_blank" className="cursor-alias hover:underline hover:text-aquamarine px-1">
+                <LinkWrapper href={AppUrls.MERSO_X} target="_blank" className="cursor-alias hover:underline hover:text-aquamarine pr-1">
                     @xMerso
                 </LinkWrapper>
                 and

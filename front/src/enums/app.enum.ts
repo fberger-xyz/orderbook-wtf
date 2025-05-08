@@ -25,6 +25,7 @@ export enum AppUrls {
     PROPELLERHEADS_X = 'https://x.com/PropellerSwap',
     PROPELLERHEADS_TELEGRAM = 'https://t.me/+B4CNQwv7dgIyYTJl',
     PROPELLERHEADS_EXPLORER = 'to-be-added',
+    TYCHO_STATUS = 'https://grafana.propellerheads.xyz/public-dashboards/518dd877a470434383caf9fc5845652e?orgId=1&refresh=5s',
 
     // merso
     MERSO_X = 'https://x.com/0xMerso',
