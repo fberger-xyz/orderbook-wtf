@@ -9,7 +9,6 @@ import TokenImage from '../commons/TokenImage'
 import ChainImage from '../commons/ChainImage'
 import { SelectedTrade, Token } from '@/interfaces'
 import SelectTokenModal from '../SelectTokenModal'
-// import { useAccount } from 'wagmi'
 import {
     cleanOutput,
     cn,

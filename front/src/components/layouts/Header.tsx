@@ -5,7 +5,7 @@ import IconWrapper from '../common/IconWrapper'
 import LinkWrapper from '../common/LinkWrapper'
 import { AppUrls, IconIds, SvgIds } from '@/enums'
 import Image from 'next/image'
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { useClickOutside } from '@/hooks/useClickOutside'
 import { useAppStore } from '@/stores/app.store'
 import { CHAINS_CONFIG } from '@/config/app.config'
@@ -13,16 +13,45 @@ import { useApiStore } from '@/stores/api.store'
 import SvgMapper from '../icons/SvgMapper'
 import toast from 'react-hot-toast'
 import { toastStyle } from '@/config/toasts.config'
+import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 
 export default function Header(props: { className?: string }) {
     const { currentChainId, setCurrentChain } = useAppStore()
     const { actions } = useApiStore()
+
+    const router = useRouter()
+    const pathname = usePathname()
+    const searchParams = useSearchParams()
+
     const [openGridDropdown, setOpenGridDropdown] = useState(false)
     const gridDropown = useRef<HTMLButtonElement>(null)
     useClickOutside(gridDropown, () => setOpenGridDropdown(false))
+
     const [openNetworkDropown, setOpenNetworkDropown] = useState(false)
     const networkDropown = useRef<HTMLButtonElement>(null)
     useClickOutside(networkDropown, () => setOpenNetworkDropown(false))
+
+    /**
+     * manage url sync with currently selected chain
+     */
+
+    // 1. update the URL when chain changes
+    useEffect(() => {
+        const chainName = CHAINS_CONFIG[currentChainId].name.toLowerCase()
+        const params = new URLSearchParams(searchParams.toString())
+        params.set('chain', chainName)
+        router.push(`${pathname}?${params.toString()}`)
+    }, [currentChainId, pathname, searchParams, router])
+
+    // 2. set the current chain from URL on first load
+    useEffect(() => {
+        const chain = searchParams.get('chain')
+        if (chain) {
+            const chainConfig = Object.values(CHAINS_CONFIG).find((c) => c.name.toLowerCase() === chain)
+            if (chainConfig) setCurrentChain(chainConfig.id)
+        }
+    }, [searchParams, setCurrentChain])
+
     return (
         <div className={cn('flex justify-between items-center w-full px-4 py-4', props.className)}>
             <div className="flex gap-4 items-center">
@@ -82,7 +111,7 @@ export default function Header(props: { className?: string }) {
                     {/* networks dropdown */}
                     <div
                         className={cn(
-                            `absolute right-0 mt-2 w-52 rounded-2xl backdrop-blur-lg bg-milk-200/4 border-milk-150 border-2 shadow-lg p-2.5 transition-all origin-top-right`,
+                            `absolute right-0 mt-2 w-52 rounded-2xl backdrop-blur-lg bg-milk-200/4 border-milk-150 border-2 shadow-lg p-2.5 transition-all origin-top-right flex flex-col gap-1`,
                             {
                                 'scale-100 opacity-100': openNetworkDropown,
                                 'scale-95 opacity-0 pointer-events-none': !openNetworkDropown,
@@ -102,7 +131,7 @@ export default function Header(props: { className?: string }) {
                                             }
                                         }}
                                         className={cn('flex items-center gap-2 w-full px-4 py-2 text-white rounded-lg transition cursor-pointer', {
-                                            'hover:bg-gray-600/20': currentChainId === chainConfig.id,
+                                            'bg-gray-600/30': currentChainId === chainConfig.id,
                                             'hover:opacity-100 hover:bg-gray-600/20': currentChainId !== chainConfig.id,
                                         })}
                                     >

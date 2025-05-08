@@ -9,8 +9,8 @@ import { ErrorBoundary } from 'react-error-boundary'
 import { ErrorBoundaryFallback } from '@/components/common/ErrorBoundaryFallback'
 import Footer from '@/components/layouts/Footer'
 import { WagmiAndReactQueryProviders } from '@/providers/wagmi-and-react-query.providers'
-import Header from '@/components/layouts/Header'
 import { Analytics } from '@/components/app/GoogleAnalytics'
+import Header from '@/components/layouts/Header'
 
 export const metadata: Metadata = {
     title: APP_METADATA.SITE_NAME,
@@ -75,7 +75,10 @@ export default async function RootLayout({
             >
                 <WagmiAndReactQueryProviders>
                     <main className="relative flex min-h-screen w-screen flex-col">
-                        <Header />
+                        {/* suspense for useSearchParams() in Header */}
+                        <Suspense fallback={null}>
+                            <Header />
+                        </Suspense>
                         <Suspense fallback={<DefaultFallback />}>
                             <ErrorBoundary FallbackComponent={ErrorBoundaryFallback}>{children}</ErrorBoundary>
                         </Suspense>
