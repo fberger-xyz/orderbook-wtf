@@ -27,11 +27,11 @@ export default function Footer(props: { className?: string }) {
     return (
         <div
             className={cn(
-                'w-full flex flex-col lg:flex-row lg:justify-between lg:items-end py-6 px-8 text-milk-600/50 font-light text-sm gap-4 lg:gap-0',
+                'w-full flex flex-col xl:flex-row xl:justify-between xl:items-end py-6 px-8 text-milk-600/50 font-light text-sm gap-4 xl:gap-0',
                 props.className,
             )}
         >
-            <div className="flex lg:gap-10 flex-col gap-4 lg:flex-row">
+            <div className="flex xl:gap-10 flex-col gap-4 xl:flex-row">
                 <p className="truncate">2024 © PropellerHeads</p>
                 <p className="truncate">
                     Alpha Version Notice <span className="opacity-50">deployed on {dayjs.utc(commitDate).format('D MMM. YYYY HH:mm A')} UTC</span>
