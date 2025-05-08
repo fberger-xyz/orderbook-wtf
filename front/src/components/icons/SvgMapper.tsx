@@ -15,9 +15,9 @@ export default function SvgMapper(props: { icon?: SvgIds; className?: string }) 
     // chains
     if (props.icon === SvgIds.MAINNET)
         return <ChainImage className={props.className} oneInchId={CHAINS_CONFIG[AppSupportedChains.ETHEREUM].oneInchId} />
-    if (props.icon === SvgIds.ARBITRUM)
-        return <ChainImage className={props.className} oneInchId={CHAINS_CONFIG[AppSupportedChains.ARBITRUM].oneInchId} />
-    if (props.icon === SvgIds.BASE) return <ChainImage className={props.className} oneInchId={CHAINS_CONFIG[AppSupportedChains.BASE].oneInchId} />
+    // if (props.icon === SvgIds.ARBITRUM)
+    //     return <ChainImage className={props.className} oneInchId={CHAINS_CONFIG[AppSupportedChains.ARBITRUM].oneInchId} />
+    // if (props.icon === SvgIds.BASE) return <ChainImage className={props.className} oneInchId={CHAINS_CONFIG[AppSupportedChains.BASE].oneInchId} />
     if (props.icon === SvgIds.UNICHAIN)
         return (
             <SvgWrapper className={props.className}>

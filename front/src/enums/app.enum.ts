@@ -4,9 +4,9 @@ export enum AppPagePaths {
 
 export enum AppSupportedChains {
     ETHEREUM = 'ethereum',
-    BASE = 'base',
     UNICHAIN = 'unichain',
-    ARBITRUM = 'arbitrum',
+    // BASE = 'base',
+    // ARBITRUM = 'arbitrum',
 }
 
 export enum AppUrls {

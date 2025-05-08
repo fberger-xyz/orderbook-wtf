@@ -21,23 +21,23 @@ export const useApiStore = create<{
 }>((set, get) => ({
     apiTokens: {
         [AppSupportedChains.ETHEREUM]: [],
-        [AppSupportedChains.BASE]: [],
         [AppSupportedChains.UNICHAIN]: [],
-        [AppSupportedChains.ARBITRUM]: [],
+        // [AppSupportedChains.BASE]: [],
+        // [AppSupportedChains.ARBITRUM]: [],
     },
     apiPairs: {
         [AppSupportedChains.ETHEREUM]: [],
-        [AppSupportedChains.BASE]: [],
         [AppSupportedChains.UNICHAIN]: [],
-        [AppSupportedChains.ARBITRUM]: [],
+        // [AppSupportedChains.BASE]: [],
+        // [AppSupportedChains.ARBITRUM]: [],
     },
     apiOrderbooks: {},
     metrics: getDashboardMetrics(undefined),
     orderBookRefreshIntervalMs: {
         [AppSupportedChains.ETHEREUM]: 12000,
-        [AppSupportedChains.BASE]: 5000,
-        [AppSupportedChains.ARBITRUM]: 5000,
         [AppSupportedChains.UNICHAIN]: 5000,
+        // [AppSupportedChains.BASE]: 5000,
+        // [AppSupportedChains.ARBITRUM]: 5000,
     },
     apiStoreRefreshedAt: -1,
     actions: {
