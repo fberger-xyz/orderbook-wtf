@@ -1,7 +1,7 @@
 import { AppUrls, AppPagePaths, AppSupportedChains, SvgIds } from '@/enums'
 import { InterfaceAppLink } from '@/interfaces'
 import { Inter } from 'next/font/google'
-import { mainnet, base } from 'wagmi/chains'
+import { mainnet } from 'wagmi/chains'
 
 export const IS_DEV = process.env.NODE_ENV === 'development'
 export const IS_RUNNING_IN_DOCKER = Boolean(process.env.NEXT_PUBLIC_RUNNING_IN_DOCKER)
@@ -47,25 +47,25 @@ export const CHAINS_CONFIG = {
         explorerRoot: 'https://unichain.blockscout.com',
         wagmi: { id: 130 },
     },
-    [AppSupportedChains.BASE]: {
-        id: AppSupportedChains.BASE,
-        svgId: SvgIds.BASE,
-        name: 'Base',
-        apiId: 'base',
-        oneInchId: 'base',
-        supported: false,
-        explorerRoot: 'https://basescan.org',
-        wagmi: base,
-    },
-    [AppSupportedChains.ARBITRUM]: {
-        id: AppSupportedChains.ARBITRUM,
-        svgId: SvgIds.ARBITRUM,
-        name: 'Arbitrum',
-        apiId: '', // to be added
-        oneInchId: 'arbitrum_2',
-        supported: false,
-        explorerRoot: '',
-        wagmi: undefined,
-    },
+    // [AppSupportedChains.BASE]: {
+    //     id: AppSupportedChains.BASE,
+    //     svgId: SvgIds.BASE,
+    //     name: 'Base',
+    //     apiId: 'base',
+    //     oneInchId: 'base',
+    //     supported: false,
+    //     explorerRoot: 'https://basescan.org',
+    //     wagmi: base,
+    // },
+    // [AppSupportedChains.ARBITRUM]: {
+    //     id: AppSupportedChains.ARBITRUM,
+    //     svgId: SvgIds.ARBITRUM,
+    //     name: 'Arbitrum',
+    //     apiId: '', // to be added
+    //     oneInchId: 'arbitrum_2',
+    //     supported: false,
+    //     explorerRoot: '',
+    //     wagmi: undefined,
+    // },
 }
 export const GANALYTICS_ID = 'QQQJ2W90F6'
