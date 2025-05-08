@@ -68,3 +68,4 @@ export const CHAINS_CONFIG = {
         wagmi: undefined,
     },
 }
+export const GANALYTICS_ID = 'QQQJ2W90F6'

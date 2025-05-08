@@ -10,6 +10,7 @@ import { ErrorBoundaryFallback } from '@/components/common/ErrorBoundaryFallback
 import Footer from '@/components/layouts/Footer'
 import { WagmiAndReactQueryProviders } from '@/providers/wagmi-and-react-query.providers'
 import Header from '@/components/layouts/Header'
+import { Analytics } from '@/components/app/GoogleAnalytics'
 
 export const metadata: Metadata = {
     title: APP_METADATA.SITE_NAME,
@@ -82,6 +83,7 @@ export default async function RootLayout({
                         <Toaster position="bottom-right" reverseOrder={true} />
                     </main>
                 </WagmiAndReactQueryProviders>
+                <Analytics />
             </body>
         </html>
     )
