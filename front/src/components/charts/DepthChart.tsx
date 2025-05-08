@@ -340,7 +340,7 @@ const getOptions = (
                     color: AppColors.milk[200],
                     formatter: (value) => {
                         if (value > 1000) value = Math.round(value)
-                        if (symbolsInYAxis === OrderbookOption.YES) return `${formatAmount(value)} ${orderbook.base.symbol}`
+                        if (symbolsInYAxis === OrderbookOption.YES) return `${formatAmount(value)} ${orderbook.quote.symbol}`
                         return `${formatAmount(value)}`
                     },
                 },
@@ -566,17 +566,9 @@ export default function DepthChart() {
         if (orderbook?.bids && orderbook?.asks) {
             const highestBid = getHighestBid(orderbook)
             const lowestAsk = getLowestAsk(orderbook)
-            const bids: LineDataPoint[] = orderbook?.bids
+            let bids: LineDataPoint[] = orderbook?.bids
                 .filter((trade, tradeIndex, trades) => trades.findIndex((_trade) => _trade.amount === trade.amount) === tradeIndex)
                 .sort((curr, next) => curr.average_sell_price * curr.amount - next.average_sell_price * next.amount)
-                // filter out inconsistencies
-                .filter((curr, currIndex, all) =>
-                    filterOutSolverInconsistencies === OrderbookOption.YES
-                        ? currIndex + 1 < all.length
-                            ? curr.average_sell_price > all[currIndex + 1].average_sell_price
-                            : true
-                        : true,
-                )
                 .map((trade) => {
                     const point: LineDataPoint = {
                         value: [trade.average_sell_price, trade.amount],
@@ -608,17 +600,11 @@ export default function DepthChart() {
                     }
                     return point
                 })
-            const asks: LineDataPoint[] = orderbook?.asks
+
+            let asks: LineDataPoint[] = orderbook?.asks
                 .filter((trade, tradeIndex, trades) => trades.findIndex((_trade) => _trade.amount === trade.amount) === tradeIndex)
                 .sort((curr, next) => curr.average_sell_price * curr.amount - next.average_sell_price * next.amount)
-                // filter out inconsistencies
-                .filter((curr, currIndex, all) =>
-                    filterOutSolverInconsistencies === OrderbookOption.YES
-                        ? currIndex + 1 < all.length
-                            ? curr.average_sell_price > all[currIndex + 1].average_sell_price
-                            : true
-                        : true,
-                )
+
                 .map((trade) => {
                     const point: LineDataPoint = {
                         value: [1 / trade.average_sell_price, trade.amount],
@@ -650,6 +636,12 @@ export default function DepthChart() {
                     }
                     return point
                 })
+
+            // filter out inconsistencies
+            if (filterOutSolverInconsistencies === OrderbookOption.YES) {
+                bids = bids.filter((curr, currIndex, all) => (currIndex + 1 < all.length ? curr.value[0] > all[currIndex + 1].value[0] : true))
+                asks = asks.filter((curr, currIndex, all) => (currIndex + 1 < all.length ? curr.value[0] < all[currIndex + 1].value[0] : true))
+            }
 
             const newOptions = getOptions(
                 orderbook,

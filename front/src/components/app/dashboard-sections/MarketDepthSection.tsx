@@ -13,7 +13,7 @@ import { Tooltip } from '@nextui-org/tooltip'
 // todo find a better semantic to avoid buttons inside a parent button
 const OptionButton = ({ isSelected, onClick, children }: { isSelected: boolean; onClick: () => void; children: React.ReactNode }) => (
     <div
-        className={cn('flex items-center gap-2 w-full px-4 py-1.5 rounded-lg transition', {
+        className={cn('flex items-center gap-2 w-full px-4 py-1.5 rounded-lg transition cursor-pointer', {
             'text-white bg-gray-600/20 backdrop-blur': isSelected,
             'text-milk-400 hover:bg-gray-600/20 hover:backdrop-blur': !isSelected,
         })}
@@ -53,16 +53,10 @@ const ChartOption = <T extends OrderbookAxisScale | OrderbookOption>({
 export default function MarketDepthSection() {
     const {
         showMarketDepthSection,
-        // showRoutingSection,
-        // showLiquidityBreakdownSection,
-        // showSections,
         showSteps,
         setSteps,
-        filterOutSolverInconsistencies,
-        setFilterOutSolverInconsistencies,
-        // yAxisType,
-        // yAxisLogBase,
-        // setYAxisType,
+        // filterOutSolverInconsistencies,
+        // setFilterOutSolverInconsistencies,
         coloredAreas,
         setColoredAreas,
         symbolsInYAxis,
@@ -116,7 +110,7 @@ export default function MarketDepthSection() {
                     </button>
                     {/* {showMarketDepthSection && ( */}
                     <button ref={chartOptionsDropdown} onClick={() => showChartOptions(!openChartOptions)} className="relative">
-                        <div className="flex items-center gap-1 hover:bg-milk-100/5 transition-colors duration-300 rounded-lg px-2.5 py-1.5">
+                        <div className="flex items-center gap-1 hover:bg-milk-100/5 transition-colors duration-300 rounded-lg px-2.5 py-1.5 cursor-pointer z-50">
                             <IconWrapper icon={IconIds.SETTINGS} className="size-4" />
                         </div>
                         <div
@@ -134,7 +128,7 @@ export default function MarketDepthSection() {
                                 selectedOption={showSteps}
                                 onSelect={() => setSteps(showSteps === OrderbookOption.YES ? OrderbookOption.NO : OrderbookOption.YES)}
                             />
-                            <ChartOption<OrderbookOption>
+                            {/* <ChartOption<OrderbookOption>
                                 title="Filter inconsistencies"
                                 options={[OrderbookOption.YES, OrderbookOption.NO]}
                                 selectedOption={filterOutSolverInconsistencies}
@@ -143,7 +137,7 @@ export default function MarketDepthSection() {
                                         filterOutSolverInconsistencies === OrderbookOption.YES ? OrderbookOption.NO : OrderbookOption.YES,
                                     )
                                 }
-                            />
+                            /> */}
                             <ChartOption<OrderbookOption>
                                 title="Color areas"
                                 options={[OrderbookOption.YES, OrderbookOption.NO]}

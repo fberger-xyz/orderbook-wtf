@@ -12,7 +12,6 @@ const unknownFormatMap = [
     { limit: 1000, format: '0,0.[000]' },
     { limit: 10000, format: '0,0.[00]' },
     { limit: 1000000, format: '0,0.[0]a' },
-    { limit: 1000000000, format: '0,0a' },
 ]
 export const formatAmount = (amount?: number | string) => {
     try {
