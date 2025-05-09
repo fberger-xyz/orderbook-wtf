@@ -8,7 +8,7 @@ import IconWrapper from '@/components/common/IconWrapper'
 import DepthChart from '@/components/charts/DepthChart'
 import { useRef, useState } from 'react'
 import { useClickOutside } from '@/hooks/useClickOutside'
-import { Tooltip } from '@nextui-org/tooltip'
+import StyledTooltip from '@/components/common/StyledTooltip'
 
 // todo find a better semantic to avoid buttons inside a parent button
 const OptionButton = ({ isSelected, onClick, children }: { isSelected: boolean; onClick: () => void; children: React.ReactNode }) => (
@@ -77,12 +77,11 @@ export default function MarketDepthSection() {
                         className="flex gap-1 items-center rounded-lg py-1.5 -ml-1"
                     >
                         <p className="text-milk text-base font-semibold">Market depth</p>
-                        <Tooltip
+                        <StyledTooltip
                             placement="bottom"
-                            // force mount: disables lazy load
                             disableAnimation
                             content={
-                                <div className="backdrop-blur-lg rounded-xl bg-[#FFF4E00A] border border-milk-200 shadow-lg p-3 -mt-1 max-w-80 text-milk text-sm flex flex-col gap-2 will-change-transform">
+                                <div className="flex flex-col gap-2 max-w-80">
                                     <p className="text-wrap">
                                         This chart shows the onchain liquidity depth by simulating increasingly large swaps, to obtain prices,
                                         slippage and price impact.
@@ -102,10 +101,10 @@ export default function MarketDepthSection() {
                                 </div>
                             }
                         >
-                            <div className="group mx-0.5">
-                                <IconWrapper icon={IconIds.INFORMATION} className="size-4 text-milk-200 group-hover:text-milk cursor-pointer" />
+                            <div className="mx-0.5">
+                                <IconWrapper icon={IconIds.INFORMATION} className="size-4 text-milk-200 hover:text-milk cursor-pointer" />
                             </div>
-                        </Tooltip>
+                        </StyledTooltip>
                         {/* <IconWrapper icon={showMarketDepthSection ? IconIds.TRIANGLE_UP : IconIds.TRIANGLE_DOWN} className="size-4" /> */}
                     </button>
                     {/* {showMarketDepthSection && ( */}

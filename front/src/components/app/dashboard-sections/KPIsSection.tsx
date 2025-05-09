@@ -9,19 +9,17 @@ import LinkWrapper from '@/components/common/LinkWrapper'
 import TokenImage from '../commons/TokenImage'
 import { OrderbookComponentLayout, OrderbookKeyMetric } from '../commons/Commons'
 import BestSideIcon from '@/components/icons/bestSide.icon'
-import { Tooltip } from '@nextui-org/tooltip'
 import { CountdownCircleTimer } from 'react-countdown-circle-timer'
 import { useApiStore } from '@/stores/api.store'
 import { CHAINS_CONFIG } from '@/config/app.config'
 import { useState, useRef, useEffect } from 'react'
+import StyledTooltip from '@/components/common/StyledTooltip'
 
 const lastBlockTooltipContent = () => (
-    <div className="rounded-xl bg-[#FFF4E00A] backdrop-blur-lg border border-milk-200 shadow-lg p-3 -mt-1 max-w-80 text-milk text-sm flex will-change-transform">
-        <p className="text-wrap">
-            Using Tycho Indexer, our backend simulates market depth on every new block (~12s on Ethereum, ~1s on Unichain). On the frontend, we
-            refresh every 12s on Ethereum and 5s on Unichain to reduce unnecessary requests and stay responsive.
-        </p>
-    </div>
+    <p className="text-wrap">
+        Using Tycho Indexer, our backend simulates market depth on every new block (~12s on Ethereum, ~1s on Unichain). On the frontend, we refresh
+        every 12s on Ethereum and 5s on Unichain to reduce unnecessary requests and stay responsive.
+    </p>
 )
 
 export default function KPIsSection() {
@@ -131,17 +129,12 @@ export default function KPIsSection() {
                 <OrderbookComponentLayout
                     title={
                         <div className="w-full flex justify-between">
-                            <Tooltip
-                                placement="bottom"
-                                content={lastBlockTooltipContent()}
-                                // force mount: disables lazy load
-                                disableAnimation
-                            >
+                            <StyledTooltip placement="bottom" content={lastBlockTooltipContent()} className="max-w-80" disableAnimation>
                                 <div className="flex gap-1 group items-center">
                                     <p className="text-milk-600 text-xs">Last block</p>
                                     <IconWrapper icon={IconIds.INFORMATION} className="size-4 text-milk-200 group-hover:text-milk cursor-pointer" />
                                 </div>
-                            </Tooltip>
+                            </StyledTooltip>
                             <CountdownCircleTimer
                                 key={apiStoreRefreshedAt}
                                 isPlaying
@@ -177,17 +170,12 @@ export default function KPIsSection() {
             ) : (
                 <OrderbookComponentLayout
                     title={
-                        <Tooltip
-                            placement="bottom"
-                            content={lastBlockTooltipContent()}
-                            // force mount: disables lazy load
-                            disableAnimation
-                        >
+                        <StyledTooltip placement="bottom" content={lastBlockTooltipContent()} className="max-w-80" disableAnimation>
                             <div className="flex gap-1 items-center">
                                 <p className="text-milk-600 text-xs">Last block</p>
                                 <IconWrapper icon={IconIds.INFORMATION} className="size-4 text-milk-200 group-hover:text-milk cursor-pointer" />
                             </div>
-                        </Tooltip>
+                        </StyledTooltip>
                     }
                     content={
                         <div className="flex gap-1.5 items-center flex-wrap skeleton-loading p-1">
@@ -199,32 +187,30 @@ export default function KPIsSection() {
 
             <OrderbookComponentLayout
                 title={
-                    <Tooltip
-                        placement="top"
+                    <StyledTooltip
                         disableAnimation
+                        placement="bottom"
                         content={
                             metrics && (
-                                <div className="rounded-xl bg-[#FFF4E00A] border backdrop-blur border-milk-200 shadow-lg p-3 -mb-1">
-                                    <div className="flex gap-1 text-milk text-sm">
-                                        <p>
-                                            {cleanOutput(
-                                                numeral(metrics?.totalBaseTvlUsd / (metrics?.totalBaseTvlUsd + metrics?.totalQuoteTvlUsd)).format(
-                                                    '0,0.%',
-                                                ),
-                                            )}
-                                        </p>
-                                        <TokenImage size={20} token={sellToken} />
-                                        <p>
-                                            {sellToken.symbol} and{' '}
-                                            {cleanOutput(
-                                                numeral(metrics?.totalQuoteTvlUsd / (metrics?.totalBaseTvlUsd + metrics?.totalQuoteTvlUsd)).format(
-                                                    '0,0.%',
-                                                ),
-                                            )}
-                                        </p>
-                                        <TokenImage size={20} token={buyToken} />
-                                        <p>{buyToken.symbol}</p>
-                                    </div>
+                                <div className="flex gap-1 text-milk text-sm">
+                                    <p>
+                                        {cleanOutput(
+                                            numeral(metrics?.totalBaseTvlUsd / (metrics?.totalBaseTvlUsd + metrics?.totalQuoteTvlUsd)).format(
+                                                '0,0.%',
+                                            ),
+                                        )}
+                                    </p>
+                                    <TokenImage size={20} token={sellToken} />
+                                    <p>
+                                        {sellToken.symbol} and{' '}
+                                        {cleanOutput(
+                                            numeral(metrics?.totalQuoteTvlUsd / (metrics?.totalBaseTvlUsd + metrics?.totalQuoteTvlUsd)).format(
+                                                '0,0.%',
+                                            ),
+                                        )}
+                                    </p>
+                                    <TokenImage size={20} token={buyToken} />
+                                    <p>{buyToken.symbol}</p>
                                 </div>
                             )
                         }
@@ -233,7 +219,7 @@ export default function KPIsSection() {
                             <p className="text-milk-600 text-xs">Pools TVL</p>
                             <IconWrapper icon={IconIds.INFORMATION} className="size-3.5 text-milk-200 group-hover:text-milk cursor-pointer" />
                         </div>
-                    </Tooltip>
+                    </StyledTooltip>
                 }
                 content={
                     !metrics || (metrics?.totalBaseTvlUsd === 0 && metrics?.totalQuoteTvlUsd === 0) ? (

@@ -13,8 +13,8 @@ import TokenImage from './commons/TokenImage'
 import { hardcodedTokensList } from '@/data/back-tokens'
 import { useAccount } from 'wagmi'
 import { useApiStore } from '@/stores/api.store'
-import { Tooltip } from '@nextui-org/tooltip'
 import { Token } from '@/interfaces'
+import StyledTooltip from '../common/StyledTooltip'
 
 export default function SelectTokenModal() {
     const {
@@ -71,23 +71,20 @@ export default function SelectTokenModal() {
             >
                 {/* 1 header */}
                 <div className="p-4 flex w-full items-center justify-between focus:ring-2 focus:ring-folly focus:ring-offset-2 cursor-pointer">
-                    <Tooltip
-                        placement="top"
-                        disableAnimation
+                    <StyledTooltip
+                        className="max-w-80"
                         content={
-                            <div className="rounded-xl bg-[#FFF4E00A] border border-milk-200 shadow-lg p-3 -mb-1 backdrop-blur-lg will-change-transform">
-                                <p className="flex gap-1 text-milk text-sm">
-                                    We only display tokens for which a single-hop exchange path exists, meaning that a liquidity pool contains base
-                                    tokens and quote tokens.
-                                </p>
-                            </div>
+                            <p className="flex gap-1 text-milk text-sm">
+                                We only display tokens for which a single-hop exchange path exists, meaning that a liquidity pool contains base tokens
+                                and quote tokens.
+                            </p>
                         }
                     >
                         <div className="flex items-center gap-1.5 group">
                             <p className="font-semibold text-xl">Select a token</p>
                             <IconWrapper icon={IconIds.INFORMATION} className="size-4 text-milk-200 group-hover:text-milk cursor-pointer" />
                         </div>
-                    </Tooltip>
+                    </StyledTooltip>
                     <button
                         onClick={() => {
                             setShowSelectTokenModal(false)
