@@ -9,8 +9,7 @@ dayjs.extend(relativeTime)
 
 import { cn } from '@/utils'
 import LinkWrapper from '../common/LinkWrapper'
-import { AppUrls, IconIds } from '@/enums'
-import IconWrapper from '../common/IconWrapper'
+import { AppUrls } from '@/enums'
 import { Tooltip } from '@nextui-org/tooltip'
 import IframeWrapper from '../common/IframeWrapper'
 
@@ -27,26 +26,36 @@ export default function Footer(props: { className?: string }) {
     return (
         <div
             className={cn(
-                'w-full flex flex-col xl:flex-row xl:justify-between xl:items-end py-6 px-8 text-milk-600/50 font-light text-sm gap-4 xl:gap-0',
+                'w-full flex flex-col lg:flex-row lg:justify-between lg:items-end py-6 px-8 text-milk-400 font-light text-sm gap-4 lg:gap-0',
                 props.className,
             )}
         >
-            <div className="flex xl:gap-10 flex-col gap-4 xl:flex-row">
-                <p className="truncate">2024 © PropellerHeads</p>
-                <p className="truncate">
-                    Alpha Version Notice <span className="opacity-50">deployed on {dayjs.utc(commitDate).format('D MMM. YYYY HH:mm A')} UTC</span>
-                </p>
+            {/* left */}
+            <div className="flex lg:gap-8 flex-col gap-4 lg:flex-row">
+                <p className="truncate">2025 © PropellerHeads</p>
+                <Tooltip
+                    placement="top"
+                    content={
+                        <div className="rounded-xl bg-[#FFF4E00A] backdrop-blur-lg border border-milk-200 shadow-lg p-3 -mt-1 max-w-80 text-milk text-sm flex will-change-transform">
+                            <p>Deployed on {dayjs.utc(commitDate).format('D MMM. YYYY HH:mm A')} UTC</p>
+                        </div>
+                    }
+                >
+                    <p className="truncate hover:underline hover:text-aquamarine">Version 1.1</p>
+                </Tooltip>
+            </div>
+
+            {/* center */}
+            <div className="flex lg:gap-8 flex-col gap-4 lg:flex-row">
                 <LinkWrapper href={AppUrls.VM_UPTIME} target="_blank" className="cursor-alias hover:underline hover:text-aquamarine">
                     <p>API status</p>
                 </LinkWrapper>
                 <LinkWrapper href={AppUrls.TYCHO_STATUS} target="_blank" className="cursor-alias hover:underline hover:text-aquamarine">
                     <p>Tycho status</p>
                 </LinkWrapper>
-                <LinkWrapper href={AppUrls.DOCUMENTATION} target="_blank" className="flex items-center gap-1 cursor-alias sm:hidden">
-                    <p>Docs</p>
-                    <IconWrapper icon={IconIds.OPEN_LINK_IN_NEW_TAB} className="size-4" />
-                </LinkWrapper>
             </div>
+
+            {/* right */}
             <p className="text-wrap truncate">
                 Made by
                 <Tooltip
@@ -62,7 +71,7 @@ export default function Footer(props: { className?: string }) {
                         target="_blank"
                         className="cursor-alias hover:underline hover:text-aquamarine px-1"
                     >
-                        PropellerHeads,
+                        Propeller Heads,
                     </LinkWrapper>
                 </Tooltip>
                 <LinkWrapper href={AppUrls.MERSO_X} target="_blank" className="cursor-alias hover:underline hover:text-aquamarine pr-1">
