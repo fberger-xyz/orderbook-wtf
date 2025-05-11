@@ -681,20 +681,10 @@ export default function DepthChart() {
     ])
 
     const handlePointClick = (params: undefined | { data: EchartOnClickParamsData; dataIndex: number }) => {
-        const debug = false
-        const fnName = 'handlePointClick'
         if (params?.data) {
-            // debug
-            if (debug) console.log('-----------------')
-            if (debug) console.log(fnName, 'ok data', params?.data)
-
             const key = `${sellToken.address}-${buyToken.address}`
             const orderbook = actions.getOrderbook(key)
             if (orderbook) {
-                // debug
-                if (debug) console.log(fnName, 'orderbook found', orderbook)
-
-                // find
                 const side = params.data.customData?.side
 
                 // prevent errors
@@ -703,9 +693,6 @@ export default function DepthChart() {
                     toast(`Can't select asks, only bids.`, { style: toastStyle })
                     return
                 }
-
-                // debug
-                if (debug) console.log(fnName, 'side', side)
 
                 const trade =
                     side === OrderbookSide.BID
@@ -717,9 +704,6 @@ export default function DepthChart() {
 
                 // notify
                 toast.success(`New ${side} trade selected`, { style: toastStyle })
-
-                // debug
-                if (debug) console.log(fnName, `${side} trade`, trade)
 
                 // update markline
                 selectTrade({
@@ -733,8 +717,6 @@ export default function DepthChart() {
                 setSellTokenAmountInputRaw(params.data.value[1])
                 setSellTokenAmountInput(params.data.value[1])
             }
-        } else {
-            if (debug) console.log(fnName, 'missing data in params')
         }
     }
 

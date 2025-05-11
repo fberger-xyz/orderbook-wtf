@@ -21,10 +21,10 @@ export default function Button(props: InterfaceButtonProps) {
     const handleClick = async () => {
         setLoading(() => true)
         try {
-            if (props.onClickFn) props.onClickFn()
+            if (props.onClickFn) await props.onClickFn()
             else await new Promise((resolve) => setTimeout(resolve, 2000)) // feint
         } catch (error) {
-            console.log('button', { error })
+            // Silently handle errors to prevent UI disruption
         } finally {
             setLoading(() => false)
         }

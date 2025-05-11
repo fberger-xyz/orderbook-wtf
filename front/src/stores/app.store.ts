@@ -149,18 +149,16 @@ export const useAppStore = create<{
 
             sellToken: hardcodedTokensList[AppSupportedChains.ETHEREUM][1],
             selectSellToken: (sellToken) =>
-                set((state) => {
-                    console.log(`selectsellToken: ${sellToken.symbol} (prev=${state.sellToken.symbol})`)
-                    return { sellToken, sellTokenAmountInput: 1, sellTokenAmountInputRaw: 1 }
-                }),
+                set(() => ({
+                    sellToken,
+                    sellTokenAmountInput: 1,
+                    sellTokenAmountInputRaw: 1
+                })),
             sellTokenAmountInput: 0,
             sellTokenAmountInputRaw: 0,
             buyToken: hardcodedTokensList[AppSupportedChains.ETHEREUM][0],
             selectBuyToken: (buyToken) =>
-                set((state) => {
-                    console.log(`selectBuyToken: ${buyToken.symbol} (prev=${state.buyToken.symbol})`)
-                    return { buyToken }
-                }),
+                set(() => ({ buyToken })),
             buyTokenAmountInput: 0,
             setSellTokenAmountInputRaw: (sellTokenAmountInputRaw) => set(() => ({ sellTokenAmountInputRaw })),
             setSellTokenAmountInput: (sellTokenAmountInput) => set(() => ({ sellTokenAmountInput })),

@@ -1,6 +1,10 @@
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const extractErrorMessage = (error: any): string => {
-    const needToParseError = !(error instanceof Error)
-    if (needToParseError) error = new Error(error)
-    return error.message
+export const extractErrorMessage = (error: unknown): string => {
+    if (error instanceof Error) {
+        return error.message;
+    }
+    if (typeof error === 'string') {
+        return error;
+    }
+    return 'An unknown error occurred';
 }

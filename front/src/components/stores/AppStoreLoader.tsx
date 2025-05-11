@@ -6,10 +6,11 @@ import PageWrapper from '../common/PageWrapper'
 
 export default function AppStoreLoader(props: { children: ReactNode }) {
     const { hasHydrated } = useAppStore()
-    const loadAppStore = () => useAppStore.persist.rehydrate()?.then(() => console.log('✅ Page rehydrated'))
+    const loadAppStore = () => useAppStore.persist.rehydrate()
+    
     useEffect(() => {
         if (!hasHydrated) loadAppStore()
-        // add some toast if need be
     }, [hasHydrated])
+    
     return <PageWrapper>{props.children}</PageWrapper>
 }

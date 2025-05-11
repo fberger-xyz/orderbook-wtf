@@ -39,7 +39,6 @@ export function ConnectOrDisconnect() {
 
     useEffect(() => {
         if (error) {
-            console.log('Connect error', { error })
             toast.error(`Connection error: ${(error as BaseError).shortMessage}`, { style: toastStyle })
         }
     }, [error])
@@ -61,7 +60,7 @@ export function ConnectOrDisconnect() {
                     try {
                         await setOpen(true)
                     } catch (error) {
-                        window.alert({ error })
+                        toast.error(`Failed to open wallet modal: ${(error as Error).message}`, { style: toastStyle })
                     }
                 }}
             >
