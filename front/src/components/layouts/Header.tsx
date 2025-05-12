@@ -18,8 +18,7 @@ import { hardcodedTokensList } from '@/data/back-tokens'
 import WelcomeModal from '../app/WelcomeModal'
 
 export default function Header(props: { className?: string }) {
-    const { currentChainId, setCurrentChain, sellToken, buyToken, selectSellToken, selectBuyToken, showWhatIsThisModal, setShowWhatIsThisModal } =
-        useAppStore()
+    const { currentChainId, setCurrentChain, sellToken, buyToken, selectSellToken, selectBuyToken, setShowWhatIsThisModal } = useAppStore()
     const { actions } = useApiStore()
 
     const router = useRouter()
@@ -158,7 +157,7 @@ export default function Header(props: { className?: string }) {
                 <Image src={'/Tycho-orderbook.svg'} alt={SvgIds.TYCHO_ORDERBOOK} width={180} height={24} className="sm:hidden" />
                 <Image src={'/Tycho-orderbook.svg'} alt={SvgIds.TYCHO_ORDERBOOK} width={212} height={24} className="hidden sm:block" />
             </div>
-            <div className="flex flex-wrap justify-end items-center z-20">
+            <div className="flex flex-col items-end z-20 gap-2 md:gap-0 md:flex-row md:items-center md:justify-end">
                 {/* welcome */}
                 <button
                     onClick={() => setShowWhatIsThisModal(true)}
@@ -171,7 +170,7 @@ export default function Header(props: { className?: string }) {
                 <LinkWrapper
                     href={AppUrls.DOCUMENTATION}
                     target="_blank"
-                    className="flex items-center gap-1 px-2.5 cursor-alias w-max hover:underline ml-4 mr-6"
+                    className="flex items-center gap-1 px-2.5 cursor-alias w-max hover:underline md:ml-4 md:mr-6"
                 >
                     <p className="text-milk text-sm truncate">
                         <span className="sm:hidden">Docs</span>
