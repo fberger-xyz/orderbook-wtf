@@ -114,7 +114,7 @@ export default function KPIsSection() {
                         className="max-w-80"
                         disableAnimation
                     >
-                        <div className="flex gap-1 items-center">
+                        <div className="flex gap-1 items-center group">
                             <p className="text-milk-600 text-xs">Spread</p>
                             <IconWrapper icon={IconIds.INFORMATION} className="size-4 text-milk-200 group-hover:text-milk cursor-pointer" />
                         </div>
