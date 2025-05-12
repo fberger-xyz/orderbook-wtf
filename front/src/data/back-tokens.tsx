@@ -15,21 +15,19 @@ export const hardcodedTokensList: Record<AppSupportedChains, Token[]> = {
             symbol: 'WETH',
             gas: '29962',
         },
+        {
+            address: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
+            decimals: 6,
+            symbol: 'USDT',
+            gas: '0',
+        },
+        {
+            address: '0x6B175474E89094C44Da98b954EedeAC495271d0F',
+            decimals: 18,
+            symbol: 'DAI',
+            gas: '0',
+        },
     ],
-    // [AppSupportedChains.BASE]: [
-    //     {
-    //         address: '0x833589fcd6edb6e08f4c7c32d4f71b54bda02913',
-    //         decimals: 6,
-    //         symbol: 'USDC',
-    //         gas: '40563',
-    //     },
-    //     {
-    //         address: '0x4200000000000000000000000000000000000006',
-    //         decimals: 18,
-    //         symbol: 'WETH',
-    //         gas: '29701',
-    //     },
-    // ],
     [AppSupportedChains.UNICHAIN]: [
         {
             address: '0x078D782b760474a361dDA0AF3839290b0EF57AD6',
@@ -38,13 +36,22 @@ export const hardcodedTokensList: Record<AppSupportedChains, Token[]> = {
             gas: '40563', // todo: find correct values or remove if useless
         },
         {
-            // address: '0x4200000000000000000000000000000000000006',
             address: '0x0000000000000000000000000000000000000000',
             decimals: 18,
-            // symbol: 'WETH',
             symbol: 'ETH',
             gas: '29701', // todo: find correct values or remove if useless
         },
+        {
+            address: '0x20cab320a855b39f724131c69424240519573f81',
+            decimals: 18,
+            symbol: 'DAI',
+            gas: '29880',
+        },
+        {
+            address: '0x8f187aa05619a017077f5308904739877ce9ea21',
+            decimals: 18,
+            symbol: 'UNI',
+            gas: '29880',
+        },
     ],
-    // [AppSupportedChains.ARBITRUM]: [],
 }

@@ -1,8 +1,7 @@
 import { create } from 'zustand'
 import { persist, createJSONStorage } from 'zustand/middleware'
-import { APP_METADATA, IS_DEV } from '@/config/app.config'
+import { APP_METADATA, DEFAULT_BUY_TOKEN, DEFAULT_CHAIN_CONFIG, DEFAULT_SELL_TOKEN, IS_DEV } from '@/config/app.config'
 import { AmmTrade, SelectedTrade, Token } from '@/interfaces'
-import { hardcodedTokensList } from '@/data/back-tokens'
 import { OrderbookOption, OrderbookAxisScale, AppSupportedChains } from '@/enums'
 
 // todo: find a way to group static setters into an 'actions' record without compromising the persist feature
@@ -25,7 +24,7 @@ export const useAppStore = create<{
     showLiquidityBreakdownSection: boolean
     showSections: (showMarketDepthSection: boolean, showRoutingSection: boolean, showLiquidityBreakdownSection: boolean) => void
     currentChainId: AppSupportedChains
-    setCurrentChain: (currentChainId: AppSupportedChains) => void
+    setCurrentChain: (currentChainId: AppSupportedChains, sellToken: Token, buyToken: Token) => void
 
     /**
      * market depth
@@ -114,12 +113,12 @@ export const useAppStore = create<{
             showLiquidityBreakdownSection: true,
             showSections: (showMarketDepthSection, showRoutingSection, showLiquidityBreakdownSection) =>
                 set(() => ({ showMarketDepthSection, showRoutingSection, showLiquidityBreakdownSection })),
-            currentChainId: AppSupportedChains.ETHEREUM,
-            setCurrentChain: (currentChainId) =>
+            currentChainId: DEFAULT_CHAIN_CONFIG.id,
+            setCurrentChain: (currentChainId, sellToken, buyToken) =>
                 set(() => ({
                     currentChainId,
-                    sellToken: hardcodedTokensList[currentChainId][1],
-                    buyToken: hardcodedTokensList[currentChainId][0],
+                    sellToken,
+                    buyToken,
                     sellTokenAmountInput: 0,
                     sellTokenAmountInputRaw: 0,
                     buyTokenAmountInput: 0,
@@ -147,18 +146,17 @@ export const useAppStore = create<{
              * swap
              */
 
-            sellToken: hardcodedTokensList[AppSupportedChains.ETHEREUM][1],
+            sellToken: DEFAULT_SELL_TOKEN,
             selectSellToken: (sellToken) =>
                 set(() => ({
                     sellToken,
                     sellTokenAmountInput: 1,
-                    sellTokenAmountInputRaw: 1
+                    sellTokenAmountInputRaw: 1,
                 })),
             sellTokenAmountInput: 0,
             sellTokenAmountInputRaw: 0,
-            buyToken: hardcodedTokensList[AppSupportedChains.ETHEREUM][0],
-            selectBuyToken: (buyToken) =>
-                set(() => ({ buyToken })),
+            buyToken: DEFAULT_BUY_TOKEN,
+            selectBuyToken: (buyToken) => set(() => ({ buyToken })),
             buyTokenAmountInput: 0,
             setSellTokenAmountInputRaw: (sellTokenAmountInputRaw) => set(() => ({ sellTokenAmountInputRaw })),
             setSellTokenAmountInput: (sellTokenAmountInput) => set(() => ({ sellTokenAmountInput })),

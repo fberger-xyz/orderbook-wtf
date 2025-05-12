@@ -1,6 +1,6 @@
 'use client'
 
-import { cn } from '@/utils'
+import { cn, shortenAddress } from '@/utils'
 import IconWrapper from '../common/IconWrapper'
 import LinkWrapper from '../common/LinkWrapper'
 import { AppUrls, IconIds, SvgIds } from '@/enums'
@@ -14,9 +14,10 @@ import SvgMapper from '../icons/SvgMapper'
 import toast from 'react-hot-toast'
 import { toastStyle } from '@/config/toasts.config'
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
+import { hardcodedTokensList } from '@/data/back-tokens'
 
 export default function Header(props: { className?: string }) {
-    const { currentChainId, setCurrentChain } = useAppStore()
+    const { currentChainId, setCurrentChain, sellToken, buyToken, selectSellToken, selectBuyToken } = useAppStore()
     const { actions } = useApiStore()
 
     const router = useRouter()
@@ -32,25 +33,84 @@ export default function Header(props: { className?: string }) {
     useClickOutside(networkDropown, () => setOpenNetworkDropown(false))
 
     /**
-     * manage url sync with currently selected chain
+     * manage url sync with currently selected chain and tokens
      */
 
-    // 1. update the URL when chain changes
+    // 1. update the URL when user change chain or tokens change
     useEffect(() => {
-        const chainName = CHAINS_CONFIG[currentChainId].name.toLowerCase()
+        // -
         const params = new URLSearchParams(searchParams.toString())
-        params.set('chain', chainName)
-        router.push(`${pathname}?${params.toString()}`)
-    }, [currentChainId, pathname, searchParams, router])
+        const urlChain = String(searchParams.get('chain')).toLowerCase()
+        const urlSell = String(searchParams.get('sell'))
+        const urlBuy = String(searchParams.get('buy'))
 
-    // 2. set the current chain from URL on first load
-    useEffect(() => {
-        const chain = searchParams.get('chain')
-        if (chain) {
-            const chainConfig = Object.values(CHAINS_CONFIG).find((c) => c.name.toLowerCase() === chain)
-            if (chainConfig) setCurrentChain(chainConfig.id)
+        // -
+        const appChain = CHAINS_CONFIG[currentChainId].name.toLowerCase()
+        if (urlChain !== appChain) {
+            params.set('chain', appChain)
+            router.push(`${pathname}?chain=${appChain}&sell=${sellToken.address}&buy=${buyToken.address}`)
         }
-    }, [searchParams, setCurrentChain])
+        if (urlSell !== sellToken.address) {
+            params.set('sell', sellToken.address)
+            router.push(`${pathname}?chain=${appChain}&sell=${sellToken.address}&buy=${buyToken.address}`)
+        }
+        if (urlBuy !== buyToken.address) {
+            params.set('buy', buyToken.address)
+            router.push(`${pathname}?chain=${appChain}&sell=${sellToken.address}&buy=${buyToken.address}`)
+        }
+    }, [currentChainId, sellToken, buyToken])
+
+    // 2. update the state to follow the url
+    useEffect(() => {
+        // extract
+        const urlChain = String(searchParams.get('chain')).toLowerCase()
+        const urlSell = String(searchParams.get('sell'))
+        const urlBuy = String(searchParams.get('buy'))
+
+        // find
+        const chainConfig = Object.values(CHAINS_CONFIG).find((c) => c.name.toLowerCase() === urlChain)
+        console.log({ chainConfig, urlChain, urlSell, urlBuy })
+
+        // set
+        if (chainConfig) {
+            // sell
+            let targetSellToken = hardcodedTokensList[chainConfig.id].find((token) => token.address.toLowerCase() === urlSell.toLowerCase())
+            if (!targetSellToken) {
+                // console.log('switching to default sell token')
+                targetSellToken = hardcodedTokensList[chainConfig.id][1]
+            }
+
+            // buy
+            let targetBuyToken = hardcodedTokensList[chainConfig.id].find((token) => token.address.toLowerCase() === urlBuy.toLowerCase())
+            if (!targetBuyToken) {
+                // console.log('switching to default buy token')
+                targetBuyToken = hardcodedTokensList[chainConfig.id][0]
+            }
+
+            // debug
+            console.log(
+                `current sellToken.address ${shortenAddress(sellToken.address)} !== targetSellToken.address ${shortenAddress(targetSellToken.address)}`,
+                sellToken.address !== targetSellToken.address,
+            )
+            console.log(
+                `current buyToken.address ${shortenAddress(buyToken.address)} !== targetBuyToken.address ${shortenAddress(targetBuyToken.address)}`,
+                buyToken.address !== targetBuyToken.address,
+            )
+
+            // set state
+            if (currentChainId !== chainConfig.id) setCurrentChain(chainConfig.id, targetSellToken, targetBuyToken)
+            else {
+                if (sellToken.address !== targetSellToken.address) {
+                    console.log('change sell to follow URL')
+                    selectSellToken(targetSellToken)
+                }
+                if (buyToken.address !== targetBuyToken.address) {
+                    console.log('change buy to follow URL')
+                    selectBuyToken(targetBuyToken)
+                }
+            }
+        }
+    }, [searchParams, pathname, router])
 
     return (
         <div className={cn('flex justify-between items-center w-full px-4 py-4', props.className)}>
@@ -71,16 +131,10 @@ export default function Header(props: { className?: string }) {
                             },
                         )}
                     >
-                        <LinkWrapper
-                            target="_blank"
-                            // href={AppUrls.PROPELLERHEADS_EXPLORER}
-                            href="/"
-                            disabled={true}
-                            className="cursor-not-allowed p-2.5 w-full rounded-xl flex justify-between items-center"
-                        >
+                        <div className="cursor-not-allowed p-2.5 w-full rounded-xl flex justify-between items-center">
                             <p className="text-sm text-gray-500 text-left">Explorer</p>
                             <p className="bg-white/20 px-1 font-semibold rounded-sm text-xs text-background">SOON</p>
-                        </LinkWrapper>
+                        </div>
                         <div onClick={() => setOpenGridDropdown(false)} className="bg-gray-600/20 p-2.5 w-full rounded-xl">
                             <p className="text-sm text-milk text-left">Orderbook</p>
                         </div>
@@ -125,7 +179,11 @@ export default function Header(props: { className?: string }) {
                                         key={chainConfig.name}
                                         onClick={async () => {
                                             if (chainConfig.wagmi?.id) {
-                                                setCurrentChain(chainConfig.id)
+                                                setCurrentChain(
+                                                    chainConfig.id,
+                                                    hardcodedTokensList[chainConfig.id][1],
+                                                    hardcodedTokensList[chainConfig.id][0],
+                                                )
                                                 toast.success(`Chain selected: ${chainConfig.name}`, { style: toastStyle })
                                                 actions.setMetrics(undefined)
                                             }

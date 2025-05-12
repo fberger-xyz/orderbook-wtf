@@ -1,3 +1,4 @@
+import { hardcodedTokensList } from '@/data/back-tokens'
 import { AppUrls, AppPagePaths, AppSupportedChains, SvgIds } from '@/enums'
 import { InterfaceAppLink } from '@/interfaces'
 import { Inter } from 'next/font/google'
@@ -69,3 +70,8 @@ export const CHAINS_CONFIG = {
     // },
 }
 export const GANALYTICS_ID = 'QQQJ2W90F6'
+
+// misc
+export const DEFAULT_CHAIN_CONFIG = CHAINS_CONFIG[AppSupportedChains.ETHEREUM]
+export const DEFAULT_SELL_TOKEN = hardcodedTokensList[AppSupportedChains.ETHEREUM][1]
+export const DEFAULT_BUY_TOKEN = hardcodedTokensList[AppSupportedChains.ETHEREUM][0]
