@@ -7,7 +7,7 @@ import { AppColors, cleanOutput, cn, formatAmount } from '@/utils'
 import IconWrapper from '@/components/common/IconWrapper'
 import LinkWrapper from '@/components/common/LinkWrapper'
 import TokenImage from '../commons/TokenImage'
-import { OrderbookComponentLayout, OrderbookKeyMetric } from '../commons/Commons'
+import { OrderbookComponentLayout } from '../commons/Commons'
 import BestSideIcon from '@/components/icons/bestSide.icon'
 import { CountdownCircleTimer } from 'react-countdown-circle-timer'
 import { useApiStore } from '@/stores/api.store'
@@ -106,8 +106,20 @@ export default function KPIsSection() {
                 }
             />
 
-            <OrderbookKeyMetric
-                title="Spread"
+            <OrderbookComponentLayout
+                title={
+                    <StyledTooltip
+                        placement="bottom"
+                        content={<p>Spread can be negative when pools of best bid and best asks are different because not yet arbitraged.</p>}
+                        className="max-w-80"
+                        disableAnimation
+                    >
+                        <div className="flex gap-1 items-center">
+                            <p className="text-milk-600 text-xs">Spread</p>
+                            <IconWrapper icon={IconIds.INFORMATION} className="size-4 text-milk-200 group-hover:text-milk cursor-pointer" />
+                        </div>
+                    </StyledTooltip>
+                }
                 content={
                     metrics && !isNaN(Number(metrics?.spreadPercent)) ? (
                         <p className="text-milk font-semibold text-base">
