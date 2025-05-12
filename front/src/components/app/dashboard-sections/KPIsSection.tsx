@@ -112,8 +112,8 @@ export default function KPIsSection() {
                         placement="bottom"
                         content={
                             <p>
-                                Spread can be negative when pools of best bid and best ask are different because not yet arbitraged. Gas also might
-                                explain negative spread.
+                                Spread can be negative when pools of best bid and best ask are different because not yet arbitraged. This is why the
+                                two curves overlap. A high gas price amplifies this phenomenon.
                             </p>
                         }
                         className="max-w-80"
