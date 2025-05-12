@@ -110,7 +110,12 @@ export default function KPIsSection() {
                 title={
                     <StyledTooltip
                         placement="bottom"
-                        content={<p>Spread can be negative when pools of best bid and best ask are different because not yet arbitraged.</p>}
+                        content={
+                            <p>
+                                Spread can be negative when pools of best bid and best ask are different because not yet arbitraged. Gas also might
+                                explain negative spread.
+                            </p>
+                        }
                         className="max-w-80"
                         disableAnimation
                     >
