@@ -1,18 +1,39 @@
-import { RefObject, useEffect } from 'react'
+import { RefObject, useEffect, useCallback } from 'react'
 
-export const useClickOutside = (ref: RefObject<HTMLElement | null>, handleOnClickOutside: (event: MouseEvent | TouchEvent) => void) => {
-    useEffect(() => {
-        const listener = (event: MouseEvent | TouchEvent) => {
+type EventType = MouseEvent | TouchEvent
+type Handler = (event: EventType) => void
+
+export const useClickOutside = <T extends HTMLElement = HTMLElement>(
+    ref: RefObject<T>,
+    handler: Handler,
+    options: {
+        enabled?: boolean
+        eventTypes?: Array<'mousedown' | 'touchstart'>
+    } = {},
+): void => {
+    const { enabled = true, eventTypes = ['mousedown', 'touchstart'] } = options
+
+    const handleClickOutside = useCallback(
+        (event: EventType) => {
             if (!ref.current || ref.current.contains(event.target as Node)) {
                 return
             }
-            handleOnClickOutside(event)
-        }
-        document.addEventListener('mousedown', listener)
-        document.addEventListener('touchstart', listener)
+            handler(event)
+        },
+        [ref, handler],
+    )
+
+    useEffect(() => {
+        if (!enabled) return
+
+        eventTypes.forEach((eventType) => {
+            document.addEventListener(eventType, handleClickOutside)
+        })
+
         return () => {
-            document.removeEventListener('mousedown', listener)
-            document.removeEventListener('touchstart', listener)
+            eventTypes.forEach((eventType) => {
+                document.removeEventListener(eventType, handleClickOutside)
+            })
         }
-    }, [ref, handleOnClickOutside])
+    }, [enabled, eventTypes, handleClickOutside])
 }

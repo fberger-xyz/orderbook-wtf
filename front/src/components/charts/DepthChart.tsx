@@ -681,43 +681,35 @@ export default function DepthChart() {
     ])
 
     const handlePointClick = (params: undefined | { data: EchartOnClickParamsData; dataIndex: number }) => {
-        if (params?.data) {
-            const key = `${sellToken.address}-${buyToken.address}`
-            const orderbook = actions.getOrderbook(key)
-            if (orderbook) {
-                const side = params.data.customData?.side
+        if (!params?.data) return
 
-                // prevent errors
-                if (!side) return
-                if (side === OrderbookSide.ASK) {
-                    toast(`Can't select asks, only bids.`, { style: toastStyle })
-                    return
-                }
+        const key = `${sellToken.address}-${buyToken.address}`
+        const orderbook = actions.getOrderbook(key)
+        if (!orderbook) return
 
-                const trade =
-                    side === OrderbookSide.BID
-                        ? orderbook.bids.find((bid) => String(bid.amount) === String(params.data.value[1]))
-                        : orderbook.asks.find((ask) => String(ask.amount) === String(params.data.value[1]))
-
-                // prevent errors
-                if (!trade) return
-
-                // notify
-                toast.success(`New ${side} trade selected`, { style: toastStyle })
-
-                // update markline
-                selectTrade({
-                    selectedAt: Date.now(),
-                    side: params.data?.customData.side,
-                    amountIn: params.data.value[1],
-                    pools: orderbook.pools,
-                    trade,
-                    xAxis: trade.average_sell_price,
-                })
-                setSellTokenAmountInputRaw(params.data.value[1])
-                setSellTokenAmountInput(params.data.value[1])
+        const side = params.data.customData?.side
+        if (!side || side === OrderbookSide.ASK) {
+            if (side === OrderbookSide.ASK) {
+                toast(`Can't select asks, only bids.`, { style: toastStyle })
             }
+            return
         }
+
+        const trade = orderbook.bids.find((bid) => String(bid.amount) === String(params.data.value[1]))
+        if (!trade) return
+
+        toast.success(`New ${side} trade selected`, { style: toastStyle })
+
+        selectTrade({
+            selectedAt: Date.now(),
+            side: params.data.customData.side,
+            amountIn: params.data.value[1],
+            pools: orderbook.pools,
+            trade,
+            xAxis: trade.average_sell_price,
+        })
+        setSellTokenAmountInputRaw(params.data.value[1])
+        setSellTokenAmountInput(params.data.value[1])
     }
 
     return (
