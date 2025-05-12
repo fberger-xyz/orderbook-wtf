@@ -63,6 +63,11 @@ export default function Header(props: { className?: string }) {
                 targetBuyToken = hardcodedTokensList[chainConfig.id][0]
             }
 
+            if (targetSellToken.address.toLowerCase() === targetBuyToken.address.toLowerCase()) {
+                targetSellToken = hardcodedTokensList[chainConfig.id][1]
+                targetBuyToken = hardcodedTokensList[chainConfig.id][0]
+            }
+
             // debug
             console.log(
                 `Header 1 | current sellToken.address ${shortenAddress(sellToken.address)} !== targetSellToken.address ${shortenAddress(targetSellToken.address)}`,
