@@ -36,31 +36,7 @@ export default function Header(props: { className?: string }) {
      * manage url sync with currently selected chain and tokens
      */
 
-    // 1. update the URL when user change chain or tokens change
-    useEffect(() => {
-        // -
-        const params = new URLSearchParams(searchParams.toString())
-        const urlChain = String(searchParams.get('chain')).toLowerCase()
-        const urlSell = String(searchParams.get('sell'))
-        const urlBuy = String(searchParams.get('buy'))
-
-        // -
-        const appChain = CHAINS_CONFIG[currentChainId].name.toLowerCase()
-        if (urlChain !== appChain) {
-            params.set('chain', appChain)
-            router.push(`${pathname}?chain=${appChain}&sell=${sellToken.address}&buy=${buyToken.address}`)
-        }
-        if (urlSell !== sellToken.address) {
-            params.set('sell', sellToken.address)
-            router.push(`${pathname}?chain=${appChain}&sell=${sellToken.address}&buy=${buyToken.address}`)
-        }
-        if (urlBuy !== buyToken.address) {
-            params.set('buy', buyToken.address)
-            router.push(`${pathname}?chain=${appChain}&sell=${sellToken.address}&buy=${buyToken.address}`)
-        }
-    }, [currentChainId, sellToken, buyToken])
-
-    // 2. update the state to follow the url
+    // 1. update the state to follow the url
     useEffect(() => {
         // extract
         const urlChain = String(searchParams.get('chain')).toLowerCase()
@@ -69,7 +45,7 @@ export default function Header(props: { className?: string }) {
 
         // find
         const chainConfig = Object.values(CHAINS_CONFIG).find((c) => c.name.toLowerCase() === urlChain)
-        console.log({ chainConfig, urlChain, urlSell, urlBuy })
+        console.log('Header 1 |', { chainConfig, urlChain, urlSell, urlBuy })
 
         // set
         if (chainConfig) {
@@ -89,11 +65,11 @@ export default function Header(props: { className?: string }) {
 
             // debug
             console.log(
-                `current sellToken.address ${shortenAddress(sellToken.address)} !== targetSellToken.address ${shortenAddress(targetSellToken.address)}`,
+                `Header 1 | current sellToken.address ${shortenAddress(sellToken.address)} !== targetSellToken.address ${shortenAddress(targetSellToken.address)}`,
                 sellToken.address !== targetSellToken.address,
             )
             console.log(
-                `current buyToken.address ${shortenAddress(buyToken.address)} !== targetBuyToken.address ${shortenAddress(targetBuyToken.address)}`,
+                `Header 1 | current buyToken.address ${shortenAddress(buyToken.address)} !== targetBuyToken.address ${shortenAddress(targetBuyToken.address)}`,
                 buyToken.address !== targetBuyToken.address,
             )
 
@@ -101,16 +77,46 @@ export default function Header(props: { className?: string }) {
             if (currentChainId !== chainConfig.id) setCurrentChain(chainConfig.id, targetSellToken, targetBuyToken)
             else {
                 if (sellToken.address !== targetSellToken.address) {
-                    console.log('change sell to follow URL')
+                    console.log('Header 1 | change sell to follow URL')
                     selectSellToken(targetSellToken)
                 }
                 if (buyToken.address !== targetBuyToken.address) {
-                    console.log('change buy to follow URL')
+                    console.log('Header 1 | change buy to follow URL')
                     selectBuyToken(targetBuyToken)
                 }
             }
         }
-    }, [searchParams, pathname, router])
+    }, [pathname])
+
+    // 2. update the url to follow the state
+    useEffect(() => {
+        // -
+        // const params = new URLSearchParams(searchParams.toString())
+        const urlChain = String(searchParams.get('chain')).toLowerCase()
+        const urlSell = String(searchParams.get('sell'))
+        const urlBuy = String(searchParams.get('buy'))
+
+        // -
+        const appChain = CHAINS_CONFIG[currentChainId].name.toLowerCase()
+        if (urlChain !== appChain) {
+            // params.set('chain', appChain)
+            const newUrl = `${pathname}?chain=${appChain}&sell=${sellToken.address}&buy=${buyToken.address}`
+            console.log('Header 2 | new chain', newUrl)
+            router.replace(newUrl)
+        }
+        if (urlSell !== sellToken.address) {
+            // params.set('sell', sellToken.address)
+            const newUrl = `${pathname}?chain=${appChain}&sell=${sellToken.address}&buy=${buyToken.address}`
+            console.log('Header 2 | new sellToken', sellToken.address)
+            router.replace(newUrl)
+        }
+        if (urlBuy !== buyToken.address) {
+            // params.set('buy', buyToken.address)
+            const newUrl = `${pathname}?chain=${appChain}&sell=${sellToken.address}&buy=${buyToken.address}`
+            console.log('Header 2 | new buyToken', buyToken.address)
+            router.replace(newUrl)
+        }
+    }, [currentChainId, sellToken, buyToken])
 
     return (
         <div className={cn('flex justify-between items-center w-full px-4 py-4', props.className)}>
