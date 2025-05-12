@@ -116,7 +116,7 @@ export default function KPIsSection() {
                     >
                         <div className="flex gap-1 items-center group">
                             <p className="text-milk-600 text-xs">Spread</p>
-                            <IconWrapper icon={IconIds.INFORMATION} className="size-4 text-milk-200 group-hover:text-milk cursor-pointer" />
+                            <IconWrapper icon={IconIds.INFORMATION} className="size-3.5 text-milk-200 group-hover:text-milk cursor-pointer" />
                         </div>
                     </StyledTooltip>
                 }
@@ -144,7 +144,7 @@ export default function KPIsSection() {
                             <StyledTooltip placement="bottom" content={lastBlockTooltipContent()} className="max-w-80" disableAnimation>
                                 <div className="flex gap-1 group items-center">
                                     <p className="text-milk-600 text-xs">Last block</p>
-                                    <IconWrapper icon={IconIds.INFORMATION} className="size-4 text-milk-200 group-hover:text-milk cursor-pointer" />
+                                    <IconWrapper icon={IconIds.INFORMATION} className="size-3.5 text-milk-200 group-hover:text-milk cursor-pointer" />
                                 </div>
                             </StyledTooltip>
                             <CountdownCircleTimer
@@ -185,7 +185,7 @@ export default function KPIsSection() {
                         <StyledTooltip placement="bottom" content={lastBlockTooltipContent()} className="max-w-80" disableAnimation>
                             <div className="flex gap-1 items-center">
                                 <p className="text-milk-600 text-xs">Last block</p>
-                                <IconWrapper icon={IconIds.INFORMATION} className="size-4 text-milk-200 group-hover:text-milk cursor-pointer" />
+                                <IconWrapper icon={IconIds.INFORMATION} className="size-3.5 text-milk-200 group-hover:text-milk cursor-pointer" />
                             </div>
                         </StyledTooltip>
                     }
