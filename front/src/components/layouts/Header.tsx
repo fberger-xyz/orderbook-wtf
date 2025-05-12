@@ -15,9 +15,11 @@ import toast from 'react-hot-toast'
 import { toastStyle } from '@/config/toasts.config'
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 import { hardcodedTokensList } from '@/data/back-tokens'
+import WelcomeModal from '../app/WelcomeModal'
 
 export default function Header(props: { className?: string }) {
-    const { currentChainId, setCurrentChain, sellToken, buyToken, selectSellToken, selectBuyToken } = useAppStore()
+    const { currentChainId, setCurrentChain, sellToken, buyToken, selectSellToken, selectBuyToken, showWhatIsThisModal, setShowWhatIsThisModal } =
+        useAppStore()
     const { actions } = useApiStore()
 
     const router = useRouter()
@@ -156,9 +158,21 @@ export default function Header(props: { className?: string }) {
                 <Image src={'/Tycho-orderbook.svg'} alt={SvgIds.TYCHO_ORDERBOOK} width={180} height={24} className="sm:hidden" />
                 <Image src={'/Tycho-orderbook.svg'} alt={SvgIds.TYCHO_ORDERBOOK} width={212} height={24} className="hidden sm:block" />
             </div>
-            <div className="flex flex-wrap justify-end items-center gap-2 z-20">
+            <div className="flex flex-wrap justify-end items-center z-20">
+                {/* welcome */}
+                <button
+                    onClick={() => setShowWhatIsThisModal(true)}
+                    className="flex items-center gap-1 transition-colors duration-300 hover:bg-milk-100/10 rounded-xl h-10 px-3"
+                >
+                    <p className="text-sm text-milk text-left">What is this?</p>
+                </button>
+
                 {/* docs */}
-                <LinkWrapper href={AppUrls.DOCUMENTATION} target="_blank" className="flex items-center gap-1 px-2.5 cursor-alias w-max">
+                <LinkWrapper
+                    href={AppUrls.DOCUMENTATION}
+                    target="_blank"
+                    className="flex items-center gap-1 px-2.5 cursor-alias w-max hover:underline ml-4 mr-6"
+                >
                     <p className="text-milk text-sm truncate">
                         <span className="sm:hidden">Docs</span>
                         <span className="hidden sm:block">Docs (Run locally)</span>
@@ -225,6 +239,8 @@ export default function Header(props: { className?: string }) {
                     </div>
                 </button>
             </div>
+
+            <WelcomeModal />
         </div>
     )
 }

@@ -1,12 +1,11 @@
 'use client'
 
-import { AppSupportedChains, IconIds, OrderbookSide } from '@/enums'
+import { IconIds, OrderbookSide } from '@/enums'
 import numeral from 'numeral'
 import { useAppStore } from '@/stores/app.store'
 import { ChangeEvent, useState, useRef } from 'react'
 import IconWrapper from '../../common/IconWrapper'
 import TokenImage from '../commons/TokenImage'
-import ChainImage from '../commons/ChainImage'
 import { SelectedTrade, Token } from '@/interfaces'
 import SelectTokenModal from '../SelectTokenModal'
 import {
@@ -23,7 +22,6 @@ import {
     simulateTradeForAmountIn,
 } from '@/utils'
 import { useApiStore } from '@/stores/api.store'
-import { CHAINS_CONFIG } from '@/config/app.config'
 import toast from 'react-hot-toast'
 import { toastStyle } from '@/config/toasts.config'
 
@@ -331,7 +329,7 @@ export default function SwapSection() {
                             className="flex gap-1.5 items-center hover:bg-milk-100/5 px-2 py-1 rounded-xl"
                         >
                             <IconWrapper icon={IconIds.GAS} className="size-4" />
-                            <ChainImage oneInchId={CHAINS_CONFIG[AppSupportedChains.ETHEREUM].oneInchId} className="size-4" />
+                            {/* <ChainImage oneInchId={CHAINS_CONFIG[AppSupportedChains.ETHEREUM].oneInchId} className="size-4" /> */}
                             <p>
                                 $
                                 {metrics?.highestBid?.gas_costs_usd

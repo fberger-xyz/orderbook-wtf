@@ -77,8 +77,8 @@ export const useAppStore = create<{
     setSelectTokenModalFor: (selectTokenModalFor: 'buy' | 'sell') => void
     selectTokenModalSearch: string
     setSelectTokenModalSearch: (selectTokenModalSearch: string) => void
-    showWasIsTisModal: boolean
-    setShowWasIsTisModal: (showWasIsTisModal: boolean) => void
+    showWhatIsThisModal: boolean
+    setShowWhatIsThisModal: (showWhatIsThisModal: boolean) => void
 
     /**
      * orderbook
@@ -110,7 +110,7 @@ export const useAppStore = create<{
             setStoreRefreshedAt: (storeRefreshedAt) => set(() => ({ storeRefreshedAt })),
             showMarketDepthSection: true,
             showRoutingSection: true,
-            showLiquidityBreakdownSection: true,
+            showLiquidityBreakdownSection: false,
             showSections: (showMarketDepthSection, showRoutingSection, showLiquidityBreakdownSection) =>
                 set(() => ({ showMarketDepthSection, showRoutingSection, showLiquidityBreakdownSection })),
             currentChainId: DEFAULT_CHAIN_CONFIG.id,
@@ -203,8 +203,8 @@ export const useAppStore = create<{
             setShowSelectTokenModal: (showSelectTokenModal) => set(() => ({ showSelectTokenModal })),
             setSelectTokenModalFor: (selectTokenModalFor) => set(() => ({ selectTokenModalFor })),
             setSelectTokenModalSearch: (selectTokenModalSearch) => set(() => ({ selectTokenModalSearch })),
-            showWasIsTisModal: false,
-            setShowWasIsTisModal: (showWasIsTisModal) => set(() => ({ showWasIsTisModal })),
+            showWhatIsThisModal: false,
+            setShowWhatIsThisModal: (showWhatIsThisModal) => set(() => ({ showWhatIsThisModal })),
 
             /**
              * computeds
