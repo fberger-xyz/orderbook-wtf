@@ -110,7 +110,7 @@ export const useAppStore = create<{
             setStoreRefreshedAt: (storeRefreshedAt) => set(() => ({ storeRefreshedAt })),
             showMarketDepthSection: true,
             showRoutingSection: true,
-            showLiquidityBreakdownSection: false,
+            showLiquidityBreakdownSection: true,
             showSections: (showMarketDepthSection, showRoutingSection, showLiquidityBreakdownSection) =>
                 set(() => ({ showMarketDepthSection, showRoutingSection, showLiquidityBreakdownSection })),
             currentChainId: DEFAULT_CHAIN_CONFIG.id,
