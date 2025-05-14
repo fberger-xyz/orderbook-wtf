@@ -1,14 +1,8 @@
-import { AppPagePaths, IconIds } from '../enums'
+import { AppUrls } from '../enums'
 
 export interface InterfaceAppLink {
     name: string
-    path: AppPagePaths
-    icon?: IconIds
-    public: boolean
-    tg: boolean
-    legal: boolean
-    description?: string
-    sublinks: InterfaceAppLink[]
+    path: AppUrls
 }
 
 export interface StructuredOutput<Data> {

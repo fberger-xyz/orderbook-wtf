@@ -1,5 +1,5 @@
 import { hardcodedTokensList } from '@/data/back-tokens'
-import { AppUrls, AppPagePaths, AppSupportedChains, SvgIds } from '@/enums'
+import { AppUrls, AppSupportedChains, SvgIds } from '@/enums'
 import { InterfaceAppLink } from '@/interfaces'
 import { Inter } from 'next/font/google'
 import { mainnet } from 'wagmi/chains'
@@ -18,12 +18,12 @@ export const DATE_FORMAT = 'ddd. D MMM. YYYY'
 export const TIME_FORMAT = 'hh:mm A'
 export const APP_PAGES: InterfaceAppLink[] = [
     {
-        name: 'Home',
-        path: AppPagePaths.HOME,
-        public: true,
-        tg: false,
-        legal: false,
-        sublinks: [],
+        name: 'About',
+        path: AppUrls.ABOUT,
+    },
+    {
+        name: 'Orderbook',
+        path: AppUrls.ORDERBOOK,
     },
 ]
 export const APP_FONT = Inter({ weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900'], subsets: ['latin'] })
@@ -48,26 +48,6 @@ export const CHAINS_CONFIG = {
         explorerRoot: 'https://unichain.blockscout.com',
         wagmi: { id: 130 },
     },
-    // [AppSupportedChains.BASE]: {
-    //     id: AppSupportedChains.BASE,
-    //     svgId: SvgIds.BASE,
-    //     name: 'Base',
-    //     apiId: 'base',
-    //     oneInchId: 'base',
-    //     supported: false,
-    //     explorerRoot: 'https://basescan.org',
-    //     wagmi: base,
-    // },
-    // [AppSupportedChains.ARBITRUM]: {
-    //     id: AppSupportedChains.ARBITRUM,
-    //     svgId: SvgIds.ARBITRUM,
-    //     name: 'Arbitrum',
-    //     apiId: '', // to be added
-    //     oneInchId: 'arbitrum_2',
-    //     supported: false,
-    //     explorerRoot: '',
-    //     wagmi: undefined,
-    // },
 }
 export const GANALYTICS_ID = 'QQQJ2W90F6'
 

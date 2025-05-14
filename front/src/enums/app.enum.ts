@@ -1,15 +1,13 @@
-export enum AppPagePaths {
-    HOME = '/',
-}
-
 export enum AppSupportedChains {
     ETHEREUM = 'ethereum',
     UNICHAIN = 'unichain',
-    // BASE = 'base',
-    // ARBITRUM = 'arbitrum',
 }
 
 export enum AppUrls {
+    // app pages
+    ABOUT = '/about',
+    ORDERBOOK = '/',
+
     // next api
     NEXT_API_LOCALHOST = 'http://localhost:3000',
     NEXT_API_PROD = 'https://www.orderbook.wtf',

@@ -63,9 +63,9 @@ export default async function RootLayout({
     children: React.ReactNode
 }>) {
     return (
-        <html lang="en" suppressHydrationWarning>
+        <html lang="en" suppressHydrationWarning className="overflow-scroll">
             <body
-                className={cn(APP_FONT.className, 'h-screen w-screen overflow-auto text-base text-milk bg-background')}
+                className={cn(APP_FONT.className, 'h-screen w-screen text-base overflow-scroll text-milk bg-background')}
                 style={{
                     backgroundImage: "url('/background.svg')",
                     backgroundSize: 'cover',
@@ -75,7 +75,6 @@ export default async function RootLayout({
             >
                 <WagmiAndReactQueryProviders>
                     <main className="relative flex min-h-screen w-screen flex-col">
-                        {/* suspense for useSearchParams() in Header */}
                         <Suspense fallback={null}>
                             <Header />
                         </Suspense>
