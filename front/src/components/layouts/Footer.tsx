@@ -26,7 +26,7 @@ export default function Footer(props: { className?: string }) {
     return (
         <div
             className={cn(
-                'w-full flex flex-col lg:flex-row lg:justify-between lg:items-end py-6 px-8 text-milk-400 font-light text-sm gap-4 lg:gap-0',
+                'w-full flex flex-col lg:flex-row lg:justify-between lg:items-end py-6 px-8 text-milk-400 font-light text-sm gap-4 lg:gap-0 h-[68px]',
                 props.className,
             )}
         >
@@ -51,7 +51,7 @@ export default function Footer(props: { className?: string }) {
             {/* right */}
             <p className="text-wrap truncate">
                 Made by
-                <StyledTooltip content={<IframeWrapper src={AppUrls.PROPELLERHEADS_WEBSITE} />}>
+                <StyledTooltip placement="top" content={<IframeWrapper src={AppUrls.PROPELLERHEADS_WEBSITE} />}>
                     <LinkWrapper
                         href={AppUrls.PROPELLERHEADS_WEBSITE}
                         target="_blank"
@@ -64,7 +64,7 @@ export default function Footer(props: { className?: string }) {
                     @xMerso
                 </LinkWrapper>
                 and
-                <StyledTooltip content={<IframeWrapper src={AppUrls.FBERGER_WEBSITE} />}>
+                <StyledTooltip placement="top" content={<IframeWrapper src={AppUrls.FBERGER_WEBSITE} />}>
                     <LinkWrapper href={AppUrls.FBERGER_WEBSITE} target="_blank" className="cursor-alias hover:underline hover:text-aquamarine px-1">
                         @fberger_xyz
                     </LinkWrapper>

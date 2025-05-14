@@ -58,7 +58,7 @@ export default function StyledTooltip({
             content={
                 <div
                     className={cn(
-                        'rounded-xl bg-[#FFF4E00A] backdrop-blur-lg border border-milk-200 shadow-lg p-3 -mt-1 text-milk text-sm flex will-change-transform',
+                        'z-[9999] rounded-xl bg-[#FFF4E00A] backdrop-blur-lg border border-milk-200 shadow-lg p-3 -mt-1 text-milk text-sm flex will-change-transform',
                         className,
                     )}
                     role="tooltip"

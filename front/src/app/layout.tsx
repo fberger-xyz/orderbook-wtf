@@ -63,18 +63,21 @@ export default async function RootLayout({
     children: React.ReactNode
 }>) {
     return (
-        <html lang="en" suppressHydrationWarning className="overflow-scroll">
-            <body
-                className={cn(APP_FONT.className, 'h-screen w-screen text-base overflow-scroll text-milk bg-background')}
-                style={{
-                    backgroundImage: "url('/background.svg')",
-                    backgroundSize: 'cover',
-                    backgroundRepeat: 'no-repeat',
-                    backgroundPosition: 'center',
-                }}
-            >
+        <html
+            lang="en"
+            suppressHydrationWarning
+            className="h-screen w-screen bg-background"
+            style={{
+                backgroundImage: "url('/background.svg')",
+                backgroundSize: 'cover',
+                backgroundRepeat: 'no-repeat',
+                backgroundPosition: 'center top',
+                backgroundAttachment: 'fixed', // ⬅️ key to lock background to viewport
+            }}
+        >
+            <body className={cn(APP_FONT.className, 'min-h-screen w-full overflow-x-auto overflow-y-auto text-base text-milk')}>
                 <WagmiAndReactQueryProviders>
-                    <main className="relative flex min-h-screen w-screen flex-col">
+                    <main>
                         <Suspense fallback={null}>
                             <Header />
                         </Suspense>
