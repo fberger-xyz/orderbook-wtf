@@ -132,7 +132,7 @@ export default function Header(props: { className?: string }) {
     }, [currentChainId, sellToken, buyToken])
 
     return (
-        <div className={cn('flex justify-between items-center w-full px-4 py-4', props.className)}>
+        <div className={cn('grid grid-cols-3 items-center w-full px-4 py-4', props.className)}>
             {/* left */}
             <div className="flex gap-4 items-center">
                 {/* grid */}
@@ -167,7 +167,7 @@ export default function Header(props: { className?: string }) {
             </div>
 
             {/* middle */}
-            <div className="flex gap-4 items-center">
+            <div className="flex gap-4 items-center mx-auto">
                 {APP_PAGES.map((page) => (
                     <LinkWrapper
                         key={page.path}
