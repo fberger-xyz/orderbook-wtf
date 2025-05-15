@@ -30,8 +30,8 @@ export default function Page() {
         <PageWrapper className="mt-14">
             <div className="flex flex-col w-full gap-24 items-center">
                 {/* tagline */}
-                <div className="flex max-w-[824px] flex-col gap-6 items-center">
-                    <p className="text-6xl font-bold text-center">See and trade on DEXs in orderbook format</p>
+                <div className="flex max-w-[520px] flex-col gap-6 items-center">
+                    <p className="text-6xl font-bold text-center">Explore DEXs in orderbook format</p>
                     <p className="text-center max-w-[648px] font-light">
                         Orderbook.wtf aggregates simulated trades over all DEX pools so you can see the shape of all liquidity in one orderbook.
                     </p>
@@ -60,8 +60,8 @@ export default function Page() {
                     <FeatureCard
                         text={
                             <div className="flex gap-2 flex-col z-50">
-                                <p className="font-bold text-lg">Orderbook</p>
-                                <p className="font-light text-milk-400 text-sm max-w-[278px]">
+                                <p className="text-lg text-aquamarine">Orderbook</p>
+                                <p className="font-light text-lg max-w-[278px]">
                                     On-chain liquidity visualized as discrete price-volume points, simulating real limit orders.
                                 </p>
                             </div>
@@ -80,8 +80,8 @@ export default function Page() {
                         className="flex-col"
                         text={
                             <div className="flex gap-2 flex-col z-50">
-                                <p className="font-bold text-lg">Depth</p>
-                                <p className="font-light text-milk-400 text-sm">Aggregated buy/sell levels, reconstructed into a CEX-style chart.</p>
+                                <p className="text-lg text-aquamarine">Depth</p>
+                                <p className="font-light text-lg">Aggregated buy/sell levels, reconstructed into a CEX-style chart.</p>
                             </div>
                         }
                         svg={
@@ -98,10 +98,8 @@ export default function Page() {
                         className="flex-col"
                         text={
                             <div className="flex gap-2 flex-col z-50">
-                                <p className="font-bold text-lg">Routing</p>
-                                <p className="font-light text-milk-400 text-sm">
-                                    See how trades are split for best execution: pools used, amounts, and pathing.
-                                </p>
+                                <p className="text-lg text-aquamarine">Routing</p>
+                                <p className="font-light text-lg">See how trades are split for best execution: pools used, amounts, and pathing.</p>
                             </div>
                         }
                         svg={
@@ -118,10 +116,8 @@ export default function Page() {
                         className="flex-col"
                         text={
                             <div className="flex gap-2 flex-col z-50">
-                                <p className="font-bold text-lg">Liquidity</p>
-                                <p className="font-light text-milk-400 text-sm">
-                                    Explore TVL by pool, track where liquidity comes from and how it evolves.
-                                </p>
+                                <p className="text-lg text-aquamarine">Liquidity</p>
+                                <p className="font-light text-lg">Explore TVL by pool, track where liquidity comes from and how it evolves.</p>
                             </div>
                         }
                         svg={
