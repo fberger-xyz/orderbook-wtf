@@ -9,7 +9,7 @@ import Image from 'next/image'
 
 export default function Page() {
     return (
-        <PageWrapper className="mt-28 lg:mt-16">
+        <PageWrapper className="mt-24 lg:mt-16">
             <div className="flex flex-col w-full gap-24 items-center">
                 {/* tagline section */}
                 <div className="flex max-w-[518px] flex-col gap-6 items-center">
