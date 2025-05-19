@@ -15,23 +15,23 @@ const links: LinkItem[] = [
         href: AppUrls.ORDERBOOK,
         target: '_self',
         icon: IconIds.OPEN_LINK_IN_NEW_TAB,
-        text: 'Docs',
-        className: 'bg-folly/95 hover:bg-folly/100'
+        text: 'See DEXs as an orderbook',
+        className: 'bg-folly/95 hover:bg-folly/100',
     },
     {
         href: AppUrls.DOCUMENTATION,
         target: '_blank',
         icon: IconIds.OPEN_LINK_IN_NEW_TAB,
         text: 'Read the docs',
-        className: 'bg-[#FFF4E005] hover:bg-milk-100/10'
+        className: 'bg-[#FFF4E005] hover:bg-milk-100/10',
     },
     {
         href: AppUrls.PROPELLERHEADS_TELEGRAM,
         target: '_blank',
         icon: IconIds.TELEGRAM_LOGO,
         text: 'Join tycho.build',
-        className: 'bg-[#FFF4E005] hover:bg-milk-100/10'
-    }
+        className: 'bg-[#FFF4E005] hover:bg-milk-100/10',
+    },
 ]
 
 export const LinksSection = () => {
