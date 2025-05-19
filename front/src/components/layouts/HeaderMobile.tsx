@@ -153,13 +153,13 @@ export default function HeaderMobile() {
                             }
                         }}
                     >
-                        <nav className="absolute inset-2 z-30 flex items-center justify-center h-fit flex-col gap-7 pt-28">
+                        <nav className="absolute inset-2 z-30 flex items-center justify-center h-fit flex-col gap-2 pt-28">
                             {APP_PAGES.map((page) => (
                                 <LinkWrapper key={page.path} href={page.path}>
-                                    <p className="text-base text-milk">{page.name}</p>
+                                    <p className="text-base text-milk p-2.5">{page.name}</p>
                                 </LinkWrapper>
                             ))}
-                            <LinkWrapper href={AppUrls.DOCUMENTATION} target="_blank" className="flex items-center gap-1 cursor-alias">
+                            <LinkWrapper href={AppUrls.DOCUMENTATION} target="_blank" className="flex items-center gap-1 cursor-alias p-2.5">
                                 <p className="text-base">Docs (Run locally)</p>
                                 <IconWrapper icon={IconIds.OPEN_LINK_IN_NEW_TAB} className="size-4" />
                             </LinkWrapper>
