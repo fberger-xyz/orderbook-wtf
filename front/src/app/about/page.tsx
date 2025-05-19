@@ -72,7 +72,7 @@ export default function Page() {
                             }
                             svg={
                                 <>
-                                    <div className="hidden lg:absolute top-8 right-0">
+                                    <div className="hidden lg:flex absolute top-8 right-0">
                                         <Image src={'about-orderbook.svg'} alt={'orderbook'} width={220} height={415} />
                                     </div>
                                     <div className="lg:hidden absolute top-40 right-0">
@@ -200,7 +200,7 @@ export default function Page() {
                         <LinkWrapper
                             href={AppUrls.ORDERBOOK}
                             target="_self"
-                            className="flex flex-col justify-between p-6 cursor-pointer bg-folly/95 hover:bg-folly/100 transition-colors duration-300 rounded-xl h-[156px]"
+                            className="flex flex-col justify-between p-6 cursor-pointer border border-milk-50 bg-folly/95 hover:bg-folly/100 transition-colors duration-300 rounded-xl h-[156px]"
                         >
                             <IconWrapper icon={IconIds.OPEN_LINK_IN_NEW_TAB} className="size-6" />
                             <p className="text-milk text-lg truncate">Docs</p>
@@ -208,7 +208,7 @@ export default function Page() {
                         <LinkWrapper
                             href={AppUrls.DOCUMENTATION}
                             target="_blank"
-                            className="flex flex-col justify-between p-6 cursor-alias bg-milk-100/5 hover:bg-milk-100/10 transition-colors duration-300 rounded-xl h-[156px]"
+                            className="flex flex-col justify-between p-6 cursor-alias bg-[#FFF4E005] border border-milk-50 hover:bg-milk-100/10 transition-colors duration-300 rounded-xl h-[156px]"
                         >
                             <IconWrapper icon={IconIds.OPEN_LINK_IN_NEW_TAB} className="size-6" />
                             <p className="text-milk text-lg truncate">Read the docs</p>
@@ -216,7 +216,7 @@ export default function Page() {
                         <LinkWrapper
                             href={AppUrls.PROPELLERHEADS_TELEGRAM}
                             target="_blank"
-                            className="flex flex-col justify-between p-6 cursor-alias bg-milk-100/5 hover:bg-milk-100/10 transition-colors duration-300 rounded-xl h-[156px]"
+                            className="flex flex-col justify-between p-6 cursor-alias bg-[#FFF4E005] border border-milk-50 hover:bg-milk-100/10 transition-colors duration-300 rounded-xl h-[156px]"
                         >
                             <IconWrapper icon={IconIds.TELEGRAM_LOGO} className="size-6" />
                             <p className="text-milk text-lg truncate">Join tycho.build</p>
