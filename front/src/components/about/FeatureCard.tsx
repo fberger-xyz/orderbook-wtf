@@ -19,4 +19,4 @@ export const FeatureCard = ({ className, text, svg }: FeatureCardProps) => {
             </div>
         </div>
     )
-} 
+}

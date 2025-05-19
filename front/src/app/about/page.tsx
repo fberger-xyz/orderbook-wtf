@@ -36,9 +36,8 @@ export default function Page() {
                     </div>
                 </div>
 
-                {/* card section */}
+                {/* main content section */}
                 <div className="flex flex-col sm:px-8 gap-28 items-center mx-auto max-w-[1100px]">
-                    {/* grid */}
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-7">
                         <FeatureCard
                             className="h-[387px] flex-col lg:flex-row"
@@ -110,10 +109,7 @@ export default function Page() {
                         />
                     </div>
 
-                    {/* features section */}
                     <FeatureSection />
-
-                    {/* links section */}
                     <LinksSection />
                 </div>
             </div>
