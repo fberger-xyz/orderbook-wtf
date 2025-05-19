@@ -35,7 +35,6 @@ export default function HeaderMobile() {
     // useClickOutside(menuDropdown, () => setShowMobileMenu(false))
     useKeyboardShortcut({ key: 'Escape', onKeyPressed: () => setShowMobileMenu(false) })
     return (
-        // <div className="fixed top-0 flex justify-center z-50 w-full">
         <div className={cn('flex justify-center z-50 w-full', { 'fixed top-0': showMobileMenu })}>
             <div className="w-full lg:hidden flex justify-between px-5 pt-4 ">
                 {/* left */}
@@ -146,7 +145,7 @@ export default function HeaderMobile() {
 
                 {showMobileMenu && (
                     <div
-                        className="fixed z-20 inset-0 flex size-full items-center justify-center px-4 backdrop-blur-2xl bg-[#190A35B2]"
+                        className="fixed z-20 inset-0 flex size-full items-center justify-center px-4 backdrop-blur bg-[#190A35B2]"
                         onClick={(e) => {
                             // to improve later
                             if (e.target === e.currentTarget) {

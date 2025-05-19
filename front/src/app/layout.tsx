@@ -73,7 +73,7 @@ export default async function RootLayout({
                 backgroundSize: 'cover',
                 backgroundRepeat: 'no-repeat',
                 backgroundPosition: 'center top',
-                backgroundAttachment: 'fixed', // ⬅️ key to lock background to viewport
+                backgroundAttachment: 'fixed',
             }}
         >
             <body
