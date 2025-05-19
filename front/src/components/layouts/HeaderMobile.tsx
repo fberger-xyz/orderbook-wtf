@@ -145,7 +145,7 @@ export default function HeaderMobile() {
 
                 {showMobileMenu && (
                     <div
-                        className="fixed z-20 inset-0 flex size-full items-center justify-center px-4 backdrop-blur bg-[#190A35B2]"
+                        className="fixed z-20 inset-0 flex size-full items-center justify-center px-4 backdrop-blur-xl bg-[#190A35B2]"
                         onClick={(e) => {
                             // to improve later
                             if (e.target === e.currentTarget) {
