@@ -2,7 +2,7 @@
 
 import { APP_PAGES, CHAINS_CONFIG } from '@/config/app.config'
 import { useAppStore } from '@/stores/app.store'
-import { cn } from '@/utils'
+import { cn, isCurrentPath } from '@/utils'
 import { useRef, useState, useMemo, Suspense } from 'react'
 import { useClickOutside } from '@/hooks/useClickOutside'
 import { useKeyboardShortcut } from '@/hooks/useKeyboardShortcutArgs'
@@ -15,10 +15,12 @@ import IconWrapper from '../common/IconWrapper'
 import SvgMapper from '../icons/SvgMapper'
 import { useApiStore } from '@/stores/api.store'
 import LinkWrapper from '../common/LinkWrapper'
+import { usePathname } from 'next/navigation'
 
 export default function HeaderMobile() {
     const { showMobileMenu, setShowMobileMenu, currentChainId, setCurrentChain } = useAppStore()
     const { actions } = useApiStore()
+    const pathname = usePathname()
 
     // prevent unnecessary rerenders
     const currentChainConfig = useMemo(() => CHAINS_CONFIG[currentChainId], [currentChainId])
@@ -173,7 +175,13 @@ export default function HeaderMobile() {
                             <nav className="absolute inset-2 z-30 flex items-center justify-center h-fit flex-col gap-2 pt-28">
                                 {APP_PAGES.map((page) => (
                                     <LinkWrapper key={page.path} href={page.path}>
-                                        <p className="text-base text-milk p-2.5">{page.name}</p>
+                                        <p
+                                            className={cn('text-base text-milk p-2.5 hover:bg-milk-100/5 rounded-xl cursor-pointer', {
+                                                'bg-milk-100/5': isCurrentPath(pathname, page.path),
+                                            })}
+                                        >
+                                            {page.name}
+                                        </p>
                                     </LinkWrapper>
                                 ))}
                                 <LinkWrapper href={AppUrls.DOCUMENTATION} target="_blank" className="flex items-center gap-1 cursor-alias p-2.5">
