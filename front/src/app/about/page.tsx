@@ -33,7 +33,7 @@ export default function Page() {
             <div className="flex flex-col w-full gap-24 items-center">
                 {/* tagline */}
                 <div className="flex max-w-[518px] flex-col gap-6 items-center">
-                    <p className="text-6xl font-bold text-center">Explore DEXs in orderbook format</p>
+                    <p className="text-[64px] leading-none font-bold text-center font-inter-tight">Explore DEXs in orderbook format</p>
                     <p className="text-center max-w-[648px] font-light px-10">
                         Orderbook.wtf aggregates simulated trades over all DEX pools so you can see the shape of all liquidity in one orderbook.
                     </p>
@@ -136,7 +136,9 @@ export default function Page() {
                     {/* features */}
                     <div className="flex flex-col max-w-screen w-full items-start gap-4">
                         <p className="text-sm text-aquamarine">Features</p>
-                        <p className="text-4xl font-bold max-w-[588px] text-left">Everything Tycho Orderbook brings to your stack</p>
+                        <p className="text-[48px] leading-none font-bold max-w-[688px] text-left font-inter-tight">
+                            Everything Tycho Orderbook brings to your stack
+                        </p>
                         <div className="grid grid-cols-1 lg:grid-cols-3 w-full gap-4 mt-10">
                             {/* 1 */}
                             <div className="flex flex-col p-6 transition-colors duration-300 rounded-xl gap-12 w-full bg-[#FFF4E005] border border-milk-50">

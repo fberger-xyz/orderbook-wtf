@@ -165,7 +165,7 @@ export default function HeaderDesktop(props: { className?: string }) {
             </div>
 
             {/* middle */}
-            <div className="flex gap-4 items-center mx-auto">
+            <div className="flex gap-2 items-center mx-auto">
                 {APP_PAGES.map((page) => (
                     <LinkWrapper
                         key={page.path}
