@@ -96,9 +96,10 @@ export default function Dashboard() {
 
                     // prevent request errors
                     if (orderbookJson.error) {
-                        if (orderbookJson.error.includes('pair has 0 associated components'))
-                            toast.error(`No pool for pair ${sellToken.symbol}-${buyToken.symbol} > select another pair`, { style: toastStyle })
-                        else toast.error(`${orderbookJson.error}`, { style: toastStyle })
+                        if (orderbookJson.error.includes('has 0 associated')) {
+                            toast.error(`No pool for pair ${sellToken.symbol}-${buyToken.symbol}. Select another pair`, { style: toastStyle })
+                            // todo: select existing pair
+                        } else toast.error(`${orderbookJson.error}`, { style: toastStyle })
                         return orderbookJson
                     }
 
