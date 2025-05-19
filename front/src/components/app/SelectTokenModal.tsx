@@ -14,6 +14,8 @@ import { useAccount } from 'wagmi'
 import { useApiStore } from '@/stores/api.store'
 import StyledTooltip from '../common/StyledTooltip'
 import { useVirtualizer, VirtualItem } from '@tanstack/react-virtual'
+import { CHAINS_CONFIG } from '@/config/app.config'
+import { Token } from '@/interfaces'
 
 export default function SelectTokenModal() {
     const {
@@ -62,7 +64,7 @@ export default function SelectTokenModal() {
 
     // handle token selection
     const handleTokenSelect = useCallback(
-        async (token: (typeof tokensList)[0]) => {
+        async (token: Token) => {
             if (selectTokenModalFor === 'buy') {
                 if (buyToken.address === token.address) return
                 selectBuyToken(token)
@@ -156,13 +158,14 @@ export default function SelectTokenModal() {
 
                 {/* suggestions */}
                 <div className="px-4 flex flex-wrap gap-2">
-                    {[sellToken, buyToken, ...tokensList.slice(0, 5)]
+                    {CHAINS_CONFIG[currentChainId].suggestedTokens
                         .filter((token) => !!token)
                         .filter((token, tokenIndex, tokens) => tokens.findIndex((_t) => _t?.address === token.address) === tokenIndex)
                         .map((token) => (
                             <button
                                 key={token.symbol}
-                                onClick={() => handleTokenSelect(token)}
+                                // todo: remove useless keys
+                                onClick={() => handleTokenSelect({ ...token, decimals: 0, gas: '' })}
                                 disabled={token.address === (selectTokenModalFor === 'buy' ? sellToken.address : buyToken.address)}
                                 className={cn('flex gap-2 border border-milk-200 py-2.5 px-3 rounded-lg items-center', {
                                     'border-folly': [
@@ -172,8 +175,9 @@ export default function SelectTokenModal() {
                                         token.address === (selectTokenModalFor === 'buy' ? sellToken.address : buyToken.address),
                                 })}
                             >
-                                <TokenImage token={token} size={20} className="size-fit h-5" />
-                                <p className="text-milk text-sm truncate max-w-14">{token.symbol.toUpperCase()}</p>
+                                {/* todo: remove useless keys */}
+                                <TokenImage token={{ ...token, decimals: 0, gas: '' }} size={20} className="size-fit h-5" />
+                                <p className="text-milk text-sm">{token.symbol}</p>
                             </button>
                         ))}
                 </div>
