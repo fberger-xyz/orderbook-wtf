@@ -39,6 +39,9 @@ importers:
       '@tanstack/react-query':
         specifier: ^5.62.7
         version: 5.71.1(react@19.0.0)
+      '@tanstack/react-virtual':
+        specifier: ^3.13.8
+        version: 3.13.8(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       '@wagmi/core':
         specifier: ^2.16.7
         version: 2.16.7(@tanstack/query-core@5.71.1)(@types/react@19.0.10)(react@19.0.0)(typescript@5.8.2)(use-sync-external-store@1.5.0(react@19.0.0))(viem@2.21.60(bufferutil@4.0.9)(typescript@5.8.2)(utf-8-validate@5.0.10))
@@ -1145,6 +1148,15 @@ packages:
     resolution: {integrity: sha512-6BTkaSIGT58MroI4kIGXNdx/NhirXPU+75AJObLq+WBa39WmoxhzSk0YX+hqWJ/bvqZJFxslbEU4qIHaRZq+8Q==}
     peerDependencies:
       react: ^18 || ^19
+
+  '@tanstack/react-virtual@3.13.8':
+    resolution: {integrity: sha512-meS2AanUg50f3FBSNoAdBSRAh8uS0ue01qm7zrw65KGJtiXB9QXfybqZwkh4uFpRv2iX/eu5tjcH5wqUpwYLPg==}
+    peerDependencies:
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+      react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0
+
+  '@tanstack/virtual-core@3.13.8':
+    resolution: {integrity: sha512-BT6w89Hqy7YKaWewYzmecXQzcJh6HTBbKYJIIkMaNU49DZ06LoTV3z32DWWEdUsgW6n1xTmwTLs4GtWrZC261w==}
 
   '@ts-morph/common@0.12.3':
     resolution: {integrity: sha512-4tUmeLyXJnJWvTFOKtcNJ1yh0a3SsTLi2MUoyj8iUNznFRN1ZquaNe7Oukqrnki2FzZkm0J9adCNLDZxUzvj+w==}
@@ -5375,6 +5387,14 @@ snapshots:
     dependencies:
       '@tanstack/query-core': 5.71.1
       react: 19.0.0
+
+  '@tanstack/react-virtual@3.13.8(react-dom@19.0.0(react@19.0.0))(react@19.0.0)':
+    dependencies:
+      '@tanstack/virtual-core': 3.13.8
+      react: 19.0.0
+      react-dom: 19.0.0(react@19.0.0)
+
+  '@tanstack/virtual-core@3.13.8': {}
 
   '@ts-morph/common@0.12.3':
     dependencies:

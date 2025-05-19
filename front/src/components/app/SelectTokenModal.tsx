@@ -5,14 +5,15 @@ import { motion } from 'framer-motion'
 import { IconIds } from '@/enums'
 import IconWrapper from '../common/IconWrapper'
 import { Backdrop } from '../common/Backdrop'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState, useCallback, useMemo } from 'react'
 import { useClickOutside } from '@/hooks/useClickOutside'
 import { useAppStore } from '@/stores/app.store'
-import { cn, shortenAddress, sleep } from '@/utils'
+import { cn, shortenAddress } from '@/utils'
 import TokenImage from './commons/TokenImage'
 import { useAccount } from 'wagmi'
 import { useApiStore } from '@/stores/api.store'
 import StyledTooltip from '../common/StyledTooltip'
+import { useVirtualizer, VirtualItem } from '@tanstack/react-virtual'
 
 export default function SelectTokenModal() {
     const {
@@ -32,33 +33,62 @@ export default function SelectTokenModal() {
     const account = useAccount()
     const modalRef = useRef<HTMLDivElement>(null)
     const searchInput = useRef<HTMLInputElement>(null)
-    useEffect(() => searchInput.current?.focus(), [showSelectTokenModal])
-    useKeyboardShortcut({
-        key: 'Escape',
-        onKeyPressed: () => {
-            setShowSelectTokenModal(false)
-            setSelectTokenModalSearch('')
-        },
+    const parentRef = useRef<HTMLDivElement>(null)
+    const debounceTimeout = useRef<NodeJS.Timeout | null>(null)
+    const [debouncedSearch, setDebouncedSearch] = useState('')
+
+    // memoize tokens list
+    const tokensList = useMemo(() => apiTokens[currentChainId] || [], [apiTokens, currentChainId])
+
+    // filter tokens based on search
+    const filteredTokens = useMemo(() => {
+        return tokensList.filter((token) => token.symbol.toLowerCase().includes(debouncedSearch.toLowerCase()))
+    }, [tokensList, debouncedSearch])
+
+    // setup
+    const rowVirtualizer = useVirtualizer({
+        count: filteredTokens.length,
+        getScrollElement: () => parentRef.current,
+        estimateSize: () => 52, // px
+        overscan: 10,
     })
-    useClickOutside(modalRef, () => {
+
+    // close modal callback
+    const closeModal = useCallback(() => {
         setShowSelectTokenModal(false)
         setSelectTokenModalSearch('')
-    })
+        setDebouncedSearch('')
+    }, [setShowSelectTokenModal, setSelectTokenModalSearch])
 
-    // simple
-    const tokensList = apiTokens[currentChainId]
+    // handle token selection
+    const handleTokenSelect = useCallback(
+        async (token: (typeof tokensList)[0]) => {
+            if (selectTokenModalFor === 'buy') {
+                if (buyToken.address === token.address) return
+                selectBuyToken(token)
+                setBuyTokenAmountInput(0)
+                actions.setMetrics(undefined)
+            } else {
+                if (sellToken.address === token.address) return
+                selectSellToken(token)
+                actions.setMetrics(undefined)
+            }
+            closeModal()
+        },
+        [selectTokenModalFor, buyToken, sellToken, selectBuyToken, selectSellToken, setBuyTokenAmountInput, actions, closeModal],
+    )
 
-    // -
-    // const existingPairs = apiPairs[currentChainId]?.filter((pair) =>
-    //     [pair.addrbase, pair.addrquote].includes((selectTokenModalFor === 'buy' ? sellToken : buyToken).address),
-    // )
-    // let tokensList: Token[] = []
-    // if (existingPairs)
-    //     tokensList = apiTokens[currentChainId].length
-    //         ? apiTokens[currentChainId].filter((token) => existingPairs.some((pair) => [pair.addrbase, pair.addrquote].includes(token.address)))
-    //         : hardcodedTokensList[currentChainId] // prevent edge cases for now
+    // focus search input when modal opens
+    useEffect(() => {
+        if (showSelectTokenModal) searchInput.current?.focus()
+    }, [showSelectTokenModal])
+
+    // listen keyboard
+    useKeyboardShortcut({ key: 'Escape', onKeyPressed: closeModal })
+    useClickOutside(modalRef, closeModal)
 
     if (!showSelectTokenModal) return null
+
     return (
         <Backdrop>
             <motion.div
@@ -68,8 +98,8 @@ export default function SelectTokenModal() {
                 transition={{ ease: 'easeInOut', duration: 0.25 }}
                 className="flex max-w-[430px] w-full flex-col rounded-xl border border-milk-200 bg-[#FFF4E00A] shadow-lg"
             >
-                {/* 1 header */}
-                <div className="p-4 flex w-full items-center justify-between focus:ring-2 focus:ring-folly focus:ring-offset-2 cursor-pointer">
+                {/* header */}
+                <div className="p-4 flex w-full items-center justify-between">
                     <StyledTooltip
                         className="max-w-80"
                         content={
@@ -85,30 +115,39 @@ export default function SelectTokenModal() {
                         </div>
                     </StyledTooltip>
                     <button
-                        onClick={() => {
-                            setShowSelectTokenModal(false)
-                            setSelectTokenModalSearch('')
-                        }}
+                        onClick={closeModal}
                         className="rounded-xl hover:bg-very-light-hover hover:text-milk-600 focus:outline-none p-2 transition-colors duration-300"
                     >
                         <IconWrapper icon={IconIds.CLOSE} className="size-6" />
                     </button>
                 </div>
 
-                {/* 2 search */}
+                {/* search */}
                 <div className="px-4 pb-4 w-full">
                     <div className="flex w-full items-center rounded-lg border border-milk-200 transition focus-within:ring-2 focus-within:ring-folly">
                         <IconWrapper icon={IconIds.SEARCH} className="size-[22px] text-milk-600 ml-2 mr-3 my-2" />
                         <input
                             ref={searchInput}
                             value={selectTokenModalSearch}
-                            onChange={(e) => setSelectTokenModalSearch(e.target.value)}
+                            onChange={(e) => {
+                                setSelectTokenModalSearch(e.target.value)
+                                if (debounceTimeout.current) clearTimeout(debounceTimeout.current)
+                                debounceTimeout.current = setTimeout(() => {
+                                    setDebouncedSearch(e.target.value.trim())
+                                }, 400)
+                            }}
                             type="text"
                             className="text-base font-light text-milk-600 grow bg-transparent outline-none placeholder:text-milk-400"
                             placeholder="Search a name or paste address"
                         />
                         {selectTokenModalSearch && (
-                            <button onClick={() => setSelectTokenModalSearch('')} className="px-1.5">
+                            <button
+                                onClick={() => {
+                                    setSelectTokenModalSearch('')
+                                    setDebouncedSearch('')
+                                }}
+                                className="px-1.5"
+                            >
                                 <IconWrapper icon={IconIds.CLOSE} className="size-7 text-milk-600" />
                             </button>
                         )}
@@ -123,12 +162,7 @@ export default function SelectTokenModal() {
                         .map((token) => (
                             <button
                                 key={token.symbol}
-                                onClick={async () => {
-                                    if (selectTokenModalFor === 'buy') selectBuyToken(token)
-                                    else selectSellToken(token)
-                                    await sleep(200)
-                                    setShowSelectTokenModal(false)
-                                }}
+                                onClick={() => handleTokenSelect(token)}
                                 disabled={token.address === (selectTokenModalFor === 'buy' ? sellToken.address : buyToken.address)}
                                 className={cn('flex gap-2 border border-milk-200 py-2.5 px-3 rounded-lg items-center', {
                                     'border-folly': [
@@ -144,103 +178,84 @@ export default function SelectTokenModal() {
                         ))}
                 </div>
 
-                {/* tokens */}
-                <div className="px-3 max-h-[360px] overflow-scroll flex flex-col border-t border-milk-150 mt-4">
+                {/* virtualized token list */}
+                <div ref={parentRef} className="px-3 max-h-[360px] overflow-auto flex flex-col border-t border-milk-150 mt-4">
                     {account.isConnected && (
                         <>
                             <p className="p-4 text-base text-milk-400">Your tokens</p>
-                            {tokensList
-                                .slice(0, 3)
-                                .filter((token) => token.symbol.toLowerCase().includes(selectTokenModalSearch.toLowerCase()))
-                                .map((token, tokenIndex) => (
-                                    <button
-                                        key={`${token}-${tokenIndex}`}
-                                        onClick={async () => {
-                                            if (selectTokenModalFor === 'buy') {
-                                                if (buyToken.address === token.address) return
-                                                selectBuyToken(token)
-                                            } else {
-                                                if (sellToken.address === token.address) return
-                                                selectSellToken(token)
-                                            }
-                                            await sleep(200)
-                                            setShowSelectTokenModal(false)
-                                        }}
-                                        disabled={token.address === (selectTokenModalFor === 'buy' ? sellToken.address : buyToken.address)}
-                                        className={cn(
-                                            'px-2.5 py-2 rounded-xl flex justify-between hover:bg-very-light-hover group hover:bg-milk-600/5',
-                                            {
-                                                'bg-milk-600/5': [
-                                                    selectTokenModalFor === 'buy' ? buyToken.symbol.toLowerCase() : sellToken.symbol.toLowerCase(),
-                                                ].includes(token.symbol.toLowerCase()),
-                                                'opacity-30 cursor-not-allowed':
-                                                    token.address === (selectTokenModalFor === 'buy' ? sellToken.address : buyToken.address),
-                                            },
-                                        )}
-                                    >
-                                        <div className="flex items-center gap-4">
-                                            <TokenImage token={token} size={36} className="size-fit h-9" />
-                                            <div className="flex flex-col items-start">
-                                                <p className="text-sm text-milk truncate max-w-60">{token.symbol.toUpperCase()}</p>
-                                                <p className="text-xs text-milk-400">{shortenAddress(token.address)}</p>
+                            <div style={{ height: `${rowVirtualizer.getTotalSize()}px`, position: 'relative' }}>
+                                {rowVirtualizer.getVirtualItems().map((virtualRow: VirtualItem) => {
+                                    const token = filteredTokens[virtualRow.index]
+                                    return (
+                                        <button
+                                            key={token.address}
+                                            ref={rowVirtualizer.measureElement}
+                                            onClick={() => handleTokenSelect(token)}
+                                            disabled={token.address === (selectTokenModalFor === 'buy' ? sellToken.address : buyToken.address)}
+                                            className={cn(
+                                                'absolute left-0 right-0 px-2.5 h-[52px] mb-[2px] rounded-xl flex justify-between hover:bg-very-light-hover group hover:bg-milk-600/5',
+                                                {
+                                                    'bg-milk-600/5': [
+                                                        selectTokenModalFor === 'buy'
+                                                            ? buyToken.symbol.toLowerCase()
+                                                            : sellToken.symbol.toLowerCase(),
+                                                    ].includes(token.symbol.toLowerCase()),
+                                                    'opacity-30 cursor-not-allowed':
+                                                        token.address === (selectTokenModalFor === 'buy' ? sellToken.address : buyToken.address),
+                                                },
+                                            )}
+                                            style={{
+                                                top: 0,
+                                                transform: `translateY(${virtualRow.start}px)`,
+                                            }}
+                                        >
+                                            <div className="flex items-center gap-4">
+                                                <TokenImage token={token} size={36} className="size-fit h-9" />
+                                                <div className="flex flex-col items-start">
+                                                    <p className="text-sm text-milk truncate max-w-60">{token.symbol.toUpperCase()}</p>
+                                                    <p className="text-xs text-milk-400">{shortenAddress(token.address)}</p>
+                                                </div>
                                             </div>
-                                        </div>
-                                        {/* <div className="flex flex-col items-end">
-                                            <p className="text-sm text-milk">0.000000</p>
-                                            <p className="text-xs text-milk-400">$0.00</p>
-                                        </div> */}
-                                    </button>
-                                ))}
+                                        </button>
+                                    )
+                                })}
+                            </div>
                         </>
                     )}
 
                     <p className="p-4 text-base text-milk-400">Popular tokens</p>
-                    {tokensList
-                        // .slice(account.isConnected ? 3 : 0, 200)
-                        .filter((token) => token.symbol.toLowerCase().includes(selectTokenModalSearch.toLowerCase()))
-                        .map((token, tokenIndex) => (
-                            <button
-                                key={`${token}-${tokenIndex}`}
-                                onClick={async () => {
-                                    if (selectTokenModalFor === 'buy') {
-                                        if (buyToken.address === token.address) return
-                                        selectBuyToken(token)
-                                        setBuyTokenAmountInput(0)
-                                        actions.setMetrics(undefined)
-                                    } else {
-                                        if (sellToken.address === token.address) return
-                                        selectSellToken(token)
-                                        actions.setMetrics(undefined)
-                                    }
-                                    await sleep(200)
-                                    setShowSelectTokenModal(false)
-                                }}
-                                disabled={token.address === (selectTokenModalFor === 'buy' ? sellToken.address : buyToken.address)}
-                                className={cn('px-2.5 py-2 rounded-xl flex justify-between hover:bg-very-light-hover group hover:bg-milk-600/5', {
-                                    'bg-milk-600/5': [
-                                        selectTokenModalFor === 'buy' ? buyToken.symbol.toLowerCase() : sellToken.symbol.toLowerCase(),
-                                    ].includes(token.symbol.toLowerCase()),
-                                    'opacity-30 cursor-not-allowed':
-                                        token.address === (selectTokenModalFor === 'buy' ? sellToken.address : buyToken.address),
-                                })}
-                            >
-                                <div className="flex items-center gap-4">
-                                    <TokenImage token={token} size={36} className="size-fit h-9" />
-                                    <div className="flex flex-col items-start">
-                                        <p className="text-sm text-milk-600 truncate max-w-60">{token.symbol.toUpperCase()}</p>
-                                        <p className="text-xs text-milk-400">{shortenAddress(token.address)}</p>
+                    <div style={{ height: `${rowVirtualizer.getTotalSize()}px`, position: 'relative' }} className="mb-4">
+                        {rowVirtualizer.getVirtualItems().map((virtualRow: VirtualItem) => {
+                            const token = filteredTokens[virtualRow.index]
+                            return (
+                                <button
+                                    key={token.address}
+                                    ref={rowVirtualizer.measureElement}
+                                    onClick={() => handleTokenSelect(token)}
+                                    disabled={token.address === (selectTokenModalFor === 'buy' ? sellToken.address : buyToken.address)}
+                                    className={cn(
+                                        'absolute left-0 right-0 px-2.5 h-[52px] mb-[2px] rounded-xl flex justify-between hover:bg-very-light-hover group hover:bg-milk-600/5',
+                                        {
+                                            'bg-milk-600/5': [
+                                                selectTokenModalFor === 'buy' ? buyToken.symbol.toLowerCase() : sellToken.symbol.toLowerCase(),
+                                            ].includes(token.symbol.toLowerCase()),
+                                            'opacity-30 cursor-not-allowed':
+                                                token.address === (selectTokenModalFor === 'buy' ? sellToken.address : buyToken.address),
+                                        },
+                                    )}
+                                    style={{ top: 0, transform: `translateY(${virtualRow.start}px)` }}
+                                >
+                                    <div className="flex items-center gap-4">
+                                        <TokenImage token={token} size={36} className="size-fit h-9" />
+                                        <div className="flex flex-col items-start">
+                                            <p className="text-sm text-milk-600 truncate max-w-60">{token.symbol.toUpperCase()}</p>
+                                            <p className="text-xs text-milk-400">{shortenAddress(token.address)}</p>
+                                        </div>
                                     </div>
-                                </div>
-                                {/* {[selectTokenModalFor === 'buy' ? buyToken.symbol.toLowerCase() : sellToken.symbol.toLowerCase()].includes(
-                                    token.symbol.toLowerCase(),
-                                ) && (
-                                    <div className="flex flex-col items-end">
-                                        <p className="text-sm text-milk-600">0.000000</p>
-                                        <p className="text-xs text-milk-400">$0.00</p>
-                                    </div>
-                                )} */}
-                            </button>
-                        ))}
+                                </button>
+                            )
+                        })}
+                    </div>
                     <span className="h-2" />
                 </div>
             </motion.div>

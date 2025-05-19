@@ -72,7 +72,9 @@ export default function Dashboard() {
                             }
 
                             // debug
-                            console.log('apiTokens', apiTokens.length)
+                            // console.log('apiTokens', apiTokens.length)
+
+                            // set tokens
                             actions.setApiTokens(supportedChains[chainIndex].id, apiTokens)
                         }
                     }
