@@ -7,6 +7,7 @@ import { AmmTrade } from '@/interfaces'
 import numeral from 'numeral'
 import { cleanOutput, cn } from '@/utils'
 import { OrderbookSide } from '@/enums'
+import StyledTooltip from '@/components/common/StyledTooltip'
 
 // todo: make it dynamic
 const ROWS_TO_SHOW = 11
@@ -124,8 +125,28 @@ export default function OrderbookSection() {
                 {/* spread */}
                 <div className="grid grid-cols-3 w-full bg-milk-150 font-semibold px-4 py-0.5">
                     <p className="col-span-1 mx-auto">Spread</p>
-                    {metrics && !isNaN(Number(metrics?.spread)) ? (
-                        <p className="mx-auto truncate">{numeral(metrics?.spread).format('0,0.[0000000]')}</p>
+                    {metrics && asks.length && bids.length && !isNaN(Number(metrics?.spreadPercent)) && !isNaN(Number(metrics?.midPrice)) ? (
+                        <StyledTooltip
+                            placement="bottom"
+                            content={
+                                <div className="flex flex-col">
+                                    <p>
+                                        Best ask: {numeral(asks[0].average_sell_price).format('0,0.[0000000]')} {sellToken.symbol}/{buyToken.symbol}
+                                    </p>
+                                    <p>
+                                        Best bid: {numeral(bids[0].average_sell_price).format('0,0.[0000000]')} {buyToken.symbol}/{sellToken.symbol}
+                                    </p>
+                                </div>
+                            }
+                            className="max-w-80"
+                            disableAnimation
+                        >
+                            {/* todo: improve this */}
+                            <p className="mx-auto truncate">
+                                {/* {numeral(1).divide(asks[0].average_sell_price).subtract(bids[0].average_sell_price).format('0,0.[0000000]')} */}
+                                {numeral(metrics?.spreadPercent).multiply(metrics?.midPrice).format('0,0.[0000000]')}
+                            </p>
+                        </StyledTooltip>
                     ) : (
                         <div className="flex gap-1.5 items-center flex-wrap skeleton-loading mx-4">
                             <p className="text-milk-100 font-semibold mx-auto">-.--</p>

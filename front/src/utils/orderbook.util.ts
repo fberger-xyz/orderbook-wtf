@@ -114,7 +114,7 @@ export const getDashboardMetrics = (orderbook: undefined | AmmAsOrderbook) => {
 
         // spread
         metrics.spread = 1 / metrics.lowestAsk.average_sell_price - metrics.highestBid.average_sell_price
-        metrics.spreadPercent = (1 / metrics.lowestAsk.average_sell_price - metrics.highestBid.average_sell_price) / metrics.midPrice
+        metrics.spreadPercent = metrics.spread / metrics.midPrice
 
         // quote TVL and base TVL
         if (orderbook?.base_lqdty && orderbook?.quote_lqdty) {
