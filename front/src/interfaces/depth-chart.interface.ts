@@ -122,6 +122,7 @@ export interface DashboardMetrics {
     lowestAsk?: AmmTrade
     spread?: number
     spreadPercent?: number
+    precomputedMetrics?: OrderbookKeyMetrics
     totalBaseAmountInPools: number
     totalQuoteAmountInPools: number
     totalBaseTvlUsd: number

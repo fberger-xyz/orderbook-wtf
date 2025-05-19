@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from 'react'
 import { AmmTrade } from '@/interfaces'
 import numeral from 'numeral'
 import { cleanOutput, cn } from '@/utils'
-import { OrderbookSide } from '@/enums'
+import { OrderbookOption, OrderbookSide } from '@/enums'
 import StyledTooltip from '@/components/common/StyledTooltip'
 
 // todo: make it dynamic
@@ -34,7 +34,8 @@ function EmptyBook(side: OrderbookSide) {
 
 // todo: improve this v poorly designed code asap
 export default function OrderbookSection() {
-    const { currentChainId, selectedTrade, sellToken, buyToken, getAddressPair, setHoveredOrderbookTrade } = useAppStore()
+    const { currentChainId, selectedTrade, sellToken, buyToken, filterOutSolverInconsistencies, getAddressPair, setHoveredOrderbookTrade } =
+        useAppStore()
     const { apiStoreRefreshedAt, metrics, actions } = useApiStore()
     const [asks, setAsks] = useState<AmmTrade[]>([])
     const [bids, setBids] = useState<AmmTrade[]>([])
@@ -52,8 +53,24 @@ export default function OrderbookSection() {
         // get possibly undefined orderbook
         const orderbook = actions.getOrderbook(getAddressPair())
         if (orderbook?.bids && orderbook?.asks) {
-            setAsks(orderbook?.asks.sort((curr, next) => curr.amount * (1 / next.average_sell_price) - next.amount * (1 / curr.average_sell_price)))
-            setBids(orderbook?.bids.sort((curr, next) => curr.average_sell_price * curr.amount - next.average_sell_price * next.amount))
+            let sortedAsks = orderbook?.asks.sort(
+                (curr, next) => curr.amount * (1 / curr.average_sell_price) - next.amount * (1 / next.average_sell_price),
+            )
+            let sortedBids = orderbook?.bids.sort((curr, next) => curr.average_sell_price * curr.amount - next.average_sell_price * next.amount)
+
+            // filter out inconsistencies
+            if (filterOutSolverInconsistencies === OrderbookOption.YES) {
+                sortedAsks = sortedAsks.filter((curr, currIndex, all) =>
+                    currIndex + 1 < all.length ? 1 / curr.average_sell_price < 1 / all[currIndex + 1].average_sell_price : true,
+                )
+                sortedBids = sortedBids.filter((curr, currIndex, all) =>
+                    currIndex + 1 < all.length ? curr.average_sell_price > all[currIndex + 1].average_sell_price : true,
+                )
+            }
+
+            // update state
+            setAsks(sortedAsks)
+            setBids(sortedBids)
         } else {
             setBids([])
             setAsks([])
@@ -125,13 +142,14 @@ export default function OrderbookSection() {
                 {/* spread */}
                 <div className="grid grid-cols-3 w-full bg-milk-150 font-semibold px-4 py-0.5">
                     <p className="col-span-1 mx-auto">Spread</p>
-                    {metrics && asks.length && bids.length && !isNaN(Number(metrics?.spreadPercent)) && !isNaN(Number(metrics?.midPrice)) ? (
+                    {metrics?.precomputedMetrics && asks.length && bids.length ? (
                         <StyledTooltip
                             placement="bottom"
                             content={
                                 <div className="flex flex-col">
                                     <p>
-                                        Best ask: {numeral(asks[0].average_sell_price).format('0,0.[0000000]')} {sellToken.symbol}/{buyToken.symbol}
+                                        Best ask: {numeral(1).divide(asks[0].average_sell_price).format('0,0.[0000000]')} {sellToken.symbol}/
+                                        {buyToken.symbol}
                                     </p>
                                     <p>
                                         Best bid: {numeral(bids[0].average_sell_price).format('0,0.[0000000]')} {buyToken.symbol}/{sellToken.symbol}
@@ -143,8 +161,13 @@ export default function OrderbookSection() {
                         >
                             {/* todo: improve this */}
                             <p className="mx-auto truncate">
-                                {/* {numeral(1).divide(asks[0].average_sell_price).subtract(bids[0].average_sell_price).format('0,0.[0000000]')} */}
-                                {numeral(metrics?.spreadPercent).multiply(metrics?.midPrice).format('0,0.[0000000]')}
+                                {/* {cleanOutput(
+                                    numeral(1).divide(asks[0].average_sell_price).subtract(bids[0].average_sell_price).format('0,0.[0000000]'),
+                                )} */}
+                                {/* {numeral(1 / asks[0].average_sell_price)
+                                    .subtract(bids[0].average_sell_price)
+                                    .format('0,0.[0000000]')} */}
+                                {parseFloat(String(1 / asks[0].average_sell_price - bids[0].average_sell_price)).toFixed(10)}
                             </p>
                         </StyledTooltip>
                     ) : (

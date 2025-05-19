@@ -92,6 +92,7 @@ export const getDashboardMetrics = (orderbook: undefined | AmmAsOrderbook) => {
         lowestAsk: undefined,
         spread: undefined,
         spreadPercent: undefined,
+        precomputedMetrics: undefined,
         totalBaseAmountInPools: 0,
         totalQuoteAmountInPools: 0,
         totalBaseTvlUsd: 0,
@@ -115,6 +116,7 @@ export const getDashboardMetrics = (orderbook: undefined | AmmAsOrderbook) => {
         // spread
         metrics.spread = 1 / metrics.lowestAsk.average_sell_price - metrics.highestBid.average_sell_price
         metrics.spreadPercent = metrics.spread / metrics.midPrice
+        metrics.precomputedMetrics = orderbook.mpd_base_to_quote
 
         // quote TVL and base TVL
         if (orderbook?.base_lqdty && orderbook?.quote_lqdty) {
