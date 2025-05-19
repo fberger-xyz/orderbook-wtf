@@ -2,7 +2,7 @@
 
 import { OrderbookSide } from '@/enums'
 import { useAppStore } from '@/stores/app.store'
-import { AmmAsOrderbook, StructuredOutput } from '@/interfaces'
+import { AmmAsOrderbook, RustApiPair, StructuredOutput, Token } from '@/interfaces'
 import { defaultHeaders, fetchWithTimeout, getHighestBid, mergeOrderbooks, simulateTradeForAmountIn } from '@/utils'
 import { useQueries } from '@tanstack/react-query'
 import { useApiStore } from '@/stores/api.store'
@@ -32,25 +32,6 @@ export default function Dashboard() {
     useQueries({
         queries: [
             {
-                queryKey: ['ApiTokensQuery', currentChainId],
-                enabled: true,
-                queryFn: async () => {
-                    const supportedChains = Object.values(CHAINS_CONFIG).filter((chain) => chain.supported)
-                    const fetchPromises = supportedChains.map((chain) => {
-                        const url = `${APP_ROUTE}/api/tokens?chain=${chain.id}`
-                        return fetchWithTimeout(url, { method: 'GET', headers: defaultHeaders })
-                    })
-                    const fetchResponses = await Promise.all(fetchPromises)
-                    const jsonPromises = fetchResponses.map((response) => response.json())
-                    const tokensPerChain = await Promise.all(jsonPromises)
-                    for (let chainIndex = 0; chainIndex < tokensPerChain.length; chainIndex++)
-                        if (supportedChains[chainIndex]) actions.setApiTokens(supportedChains[chainIndex].id, tokensPerChain[chainIndex].data ?? [])
-                    return tokensPerChain
-                },
-                refetchOnWindowFocus: false,
-                refetchInterval: 1000 * 60 * 5,
-            },
-            {
                 queryKey: ['ApiPairsQuery'],
                 enabled: true,
                 queryFn: async () => {
@@ -61,9 +42,40 @@ export default function Dashboard() {
                     })
                     const fetchResponses = await Promise.all(fetchPromises)
                     const jsonPromises = fetchResponses.map((response) => response.json())
-                    const pairsPerChain = await Promise.all(jsonPromises)
-                    for (let chainIndex = 0; chainIndex < pairsPerChain.length; chainIndex++)
-                        if (supportedChains[chainIndex]) actions.setApiPairs(supportedChains[chainIndex].id, pairsPerChain[chainIndex].data ?? [])
+                    const pairsPerChain = (await Promise.all(jsonPromises)) as { data: RustApiPair[] }[]
+                    for (let chainIndex = 0; chainIndex < pairsPerChain.length; chainIndex++) {
+                        if (supportedChains[chainIndex]) {
+                            // set pairs
+                            actions.setApiPairs(supportedChains[chainIndex].id, pairsPerChain[chainIndex].data ?? [])
+
+                            // set tokens
+                            const apiTokens: Token[] = []
+                            for (let pairIndex = 0; pairIndex < pairsPerChain[chainIndex].data.length; pairIndex++) {
+                                const baseAddress = pairsPerChain[chainIndex].data[pairIndex].addrbase.toLowerCase()
+                                if (apiTokens.findIndex((t) => t.address === baseAddress) < 0)
+                                    apiTokens.push({
+                                        address: baseAddress,
+                                        decimals: 0, // todo
+                                        symbol: pairsPerChain[chainIndex].data[pairIndex].base,
+                                        gas: '',
+                                    })
+
+                                // add quote
+                                const quoteAddress = pairsPerChain[chainIndex].data[pairIndex].addrquote.toLowerCase()
+                                if (apiTokens.findIndex((t) => t.address === quoteAddress) < 0)
+                                    apiTokens.push({
+                                        address: quoteAddress,
+                                        decimals: 0, // todo
+                                        symbol: pairsPerChain[chainIndex].data[pairIndex].quote,
+                                        gas: '',
+                                    })
+                            }
+
+                            // debug
+                            console.log('apiTokens', apiTokens.length)
+                            actions.setApiTokens(supportedChains[chainIndex].id, apiTokens)
+                        }
+                    }
                     return pairsPerChain
                 },
                 refetchOnWindowFocus: false,

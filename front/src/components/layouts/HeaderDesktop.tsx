@@ -17,6 +17,7 @@ import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 import { hardcodedTokensList } from '@/data/back-tokens'
 
 export default function HeaderDesktop(props: { className?: string }) {
+    const debug = false
     const { currentChainId, setCurrentChain, sellToken, buyToken, selectSellToken, selectBuyToken } = useAppStore()
     const { actions } = useApiStore()
 
@@ -48,7 +49,7 @@ export default function HeaderDesktop(props: { className?: string }) {
 
         // find
         const chainConfig = Object.values(CHAINS_CONFIG).find((c) => c.name.toLowerCase() === urlChain)
-        console.log('Header 1 |', { chainConfig, urlChain, urlSell, urlBuy })
+        if (debug) console.log('Header 1 |', { chainConfig, urlChain, urlSell, urlBuy })
 
         // set
         if (chainConfig) {
@@ -72,24 +73,26 @@ export default function HeaderDesktop(props: { className?: string }) {
             }
 
             // debug
-            console.log(
-                `Header 1 | current sellToken.address ${shortenAddress(sellToken.address)} !== targetSellToken.address ${shortenAddress(targetSellToken.address)}`,
-                sellToken.address !== targetSellToken.address,
-            )
-            console.log(
-                `Header 1 | current buyToken.address ${shortenAddress(buyToken.address)} !== targetBuyToken.address ${shortenAddress(targetBuyToken.address)}`,
-                buyToken.address !== targetBuyToken.address,
-            )
+            if (debug)
+                console.log(
+                    `Header 1 | current sellToken.address ${shortenAddress(sellToken.address)} !== targetSellToken.address ${shortenAddress(targetSellToken.address)}`,
+                    sellToken.address !== targetSellToken.address,
+                )
+            if (debug)
+                console.log(
+                    `Header 1 | current buyToken.address ${shortenAddress(buyToken.address)} !== targetBuyToken.address ${shortenAddress(targetBuyToken.address)}`,
+                    buyToken.address !== targetBuyToken.address,
+                )
 
             // set state
             if (currentChainId !== chainConfig.id) setCurrentChain(chainConfig.id, targetSellToken, targetBuyToken)
             else {
                 if (sellToken.address !== targetSellToken.address) {
-                    console.log('Header 1 | change sell to follow URL')
+                    if (debug) console.log('Header 1 | change sell to follow URL')
                     selectSellToken(targetSellToken)
                 }
                 if (buyToken.address !== targetBuyToken.address) {
-                    console.log('Header 1 | change buy to follow URL')
+                    if (debug) console.log('Header 1 | change buy to follow URL')
                     selectBuyToken(targetBuyToken)
                 }
             }
@@ -112,19 +115,19 @@ export default function HeaderDesktop(props: { className?: string }) {
         if (urlChain !== appChain) {
             // params.set('chain', appChain)
             const newUrl = `${pathname}?chain=${appChain}&sell=${sellToken.address}&buy=${buyToken.address}`
-            console.log('Header 2 | new chain', newUrl)
+            if (debug) console.log('Header 2 | new chain', newUrl)
             router.replace(newUrl)
         }
         if (urlSell !== sellToken.address) {
             // params.set('sell', sellToken.address)
             const newUrl = `${pathname}?chain=${appChain}&sell=${sellToken.address}&buy=${buyToken.address}`
-            console.log('Header 2 | new sellToken', sellToken.address)
+            if (debug) console.log('Header 2 | new sellToken', sellToken.address)
             router.replace(newUrl)
         }
         if (urlBuy !== buyToken.address) {
             // params.set('buy', buyToken.address)
             const newUrl = `${pathname}?chain=${appChain}&sell=${sellToken.address}&buy=${buyToken.address}`
-            console.log('Header 2 | new buyToken', buyToken.address)
+            if (debug) console.log('Header 2 | new buyToken', buyToken.address)
             router.replace(newUrl)
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps

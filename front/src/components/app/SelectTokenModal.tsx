@@ -10,10 +10,8 @@ import { useClickOutside } from '@/hooks/useClickOutside'
 import { useAppStore } from '@/stores/app.store'
 import { cn, shortenAddress, sleep } from '@/utils'
 import TokenImage from './commons/TokenImage'
-import { hardcodedTokensList } from '@/data/back-tokens'
 import { useAccount } from 'wagmi'
 import { useApiStore } from '@/stores/api.store'
-import { Token } from '@/interfaces'
 import StyledTooltip from '../common/StyledTooltip'
 
 export default function SelectTokenModal() {
@@ -30,7 +28,7 @@ export default function SelectTokenModal() {
         setSelectTokenModalSearch,
         setBuyTokenAmountInput,
     } = useAppStore()
-    const { apiTokens, apiPairs, actions } = useApiStore()
+    const { apiTokens, actions } = useApiStore()
     const account = useAccount()
     const modalRef = useRef<HTMLDivElement>(null)
     const searchInput = useRef<HTMLInputElement>(null)
@@ -47,17 +45,18 @@ export default function SelectTokenModal() {
         setSelectTokenModalSearch('')
     })
 
-    // -
-    const existingPairs = apiPairs[currentChainId]?.filter((pair) =>
-        [pair.addrbase, pair.addrquote].includes((selectTokenModalFor === 'buy' ? sellToken : buyToken).address),
-    )
+    // simple
+    const tokensList = apiTokens[currentChainId]
 
     // -
-    let tokensList: Token[] = []
-    if (existingPairs)
-        tokensList = apiTokens[currentChainId].length
-            ? apiTokens[currentChainId].filter((token) => existingPairs.some((pair) => [pair.addrbase, pair.addrquote].includes(token.address)))
-            : hardcodedTokensList[currentChainId] // prevent edge cases for now
+    // const existingPairs = apiPairs[currentChainId]?.filter((pair) =>
+    //     [pair.addrbase, pair.addrquote].includes((selectTokenModalFor === 'buy' ? sellToken : buyToken).address),
+    // )
+    // let tokensList: Token[] = []
+    // if (existingPairs)
+    //     tokensList = apiTokens[currentChainId].length
+    //         ? apiTokens[currentChainId].filter((token) => existingPairs.some((pair) => [pair.addrbase, pair.addrquote].includes(token.address)))
+    //         : hardcodedTokensList[currentChainId] // prevent edge cases for now
 
     if (!showSelectTokenModal) return null
     return (
@@ -118,13 +117,9 @@ export default function SelectTokenModal() {
 
                 {/* suggestions */}
                 <div className="px-4 flex flex-wrap gap-2">
-                    {[sellToken, buyToken, ...tokensList.slice(0, 7)]
+                    {[sellToken, buyToken, ...tokensList.slice(0, 5)]
                         .filter((token) => !!token)
                         .filter((token, tokenIndex, tokens) => tokens.findIndex((_t) => _t?.address === token.address) === tokenIndex)
-                        .sort(
-                            (curr, next) =>
-                                tokensList.findIndex((_t) => _t.address === curr.address) - tokensList.findIndex((_t) => _t.address === next.address),
-                        )
                         .map((token) => (
                             <button
                                 key={token.symbol}
@@ -144,7 +139,7 @@ export default function SelectTokenModal() {
                                 })}
                             >
                                 <TokenImage token={token} size={20} className="size-fit h-5" />
-                                <p className="text-milk text-sm">{token.symbol.toUpperCase()}</p>
+                                <p className="text-milk text-sm truncate max-w-14">{token.symbol.toUpperCase()}</p>
                             </button>
                         ))}
                 </div>
@@ -186,7 +181,7 @@ export default function SelectTokenModal() {
                                         <div className="flex items-center gap-4">
                                             <TokenImage token={token} size={36} className="size-fit h-9" />
                                             <div className="flex flex-col items-start">
-                                                <p className="text-sm text-milk">{token.symbol.toUpperCase()}</p>
+                                                <p className="text-sm text-milk truncate max-w-60">{token.symbol.toUpperCase()}</p>
                                                 <p className="text-xs text-milk-400">{shortenAddress(token.address)}</p>
                                             </div>
                                         </div>
@@ -201,7 +196,7 @@ export default function SelectTokenModal() {
 
                     <p className="p-4 text-base text-milk-400">Popular tokens</p>
                     {tokensList
-                        .slice(account.isConnected ? 3 : 0, 200)
+                        // .slice(account.isConnected ? 3 : 0, 200)
                         .filter((token) => token.symbol.toLowerCase().includes(selectTokenModalSearch.toLowerCase()))
                         .map((token, tokenIndex) => (
                             <button
@@ -232,7 +227,7 @@ export default function SelectTokenModal() {
                                 <div className="flex items-center gap-4">
                                     <TokenImage token={token} size={36} className="size-fit h-9" />
                                     <div className="flex flex-col items-start">
-                                        <p className="text-sm text-milk-600">{token.symbol.toUpperCase()}</p>
+                                        <p className="text-sm text-milk-600 truncate max-w-60">{token.symbol.toUpperCase()}</p>
                                         <p className="text-xs text-milk-400">{shortenAddress(token.address)}</p>
                                     </div>
                                 </div>
