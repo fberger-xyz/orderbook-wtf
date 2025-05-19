@@ -25,7 +25,7 @@ export enum IconIds {
     ACCESS_LOCKED = 'carbon:user-access-locked',
     LINK = 'carbon:link',
     PAUSE = 'carbon:pause-outline',
-    MENU = 'material-symbols-light:menu',
+    MENU = 'material-symbols:menu-rounded',
     OUTLINE_CALENDAR_MONTH = 'ic:outline-calendar-month',
     OUTLINE_MODE_EDIT = 'ic:outline-mode-edit',
     OPEN_LINK_IN_NEW_TAB = 'solar:arrow-right-up-outline',

@@ -23,3 +23,4 @@ export const copyToClipboard = (value: string) => {
 export const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 export const uniquePredicate = (value: unknown, index: number, array: unknown[]) => array.indexOf(value) === index
 export const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
+export const isCurrentPath = (pathname: string, pagePath: string) => (pagePath === '/' ? pathname === pagePath : pathname.startsWith(pagePath))

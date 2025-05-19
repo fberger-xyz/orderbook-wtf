@@ -10,7 +10,8 @@ import { ErrorBoundaryFallback } from '@/components/common/ErrorBoundaryFallback
 import Footer from '@/components/layouts/Footer'
 import { WagmiAndReactQueryProviders } from '@/providers/wagmi-and-react-query.providers'
 import { Analytics } from '@/components/app/GoogleAnalytics'
-import Header from '@/components/layouts/Header'
+import HeaderDesktop from '@/components/layouts/HeaderDesktop'
+import HeaderMobile from '@/components/layouts/HeaderMobile'
 
 export const metadata: Metadata = {
     title: APP_METADATA.SITE_NAME,
@@ -85,7 +86,8 @@ export default async function RootLayout({
                 <WagmiAndReactQueryProviders>
                     <main>
                         <Suspense fallback={null}>
-                            <Header />
+                            <HeaderDesktop />
+                            <HeaderMobile />
                         </Suspense>
                         <Suspense fallback={<DefaultFallback />}>
                             <ErrorBoundary FallbackComponent={ErrorBoundaryFallback}>{children}</ErrorBoundary>

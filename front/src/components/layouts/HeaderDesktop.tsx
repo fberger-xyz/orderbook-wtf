@@ -15,9 +15,8 @@ import toast from 'react-hot-toast'
 import { toastStyle } from '@/config/toasts.config'
 import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 import { hardcodedTokensList } from '@/data/back-tokens'
-// import WelcomeModal from '../app/WelcomeModal'
 
-export default function Header(props: { className?: string }) {
+export default function HeaderDesktop(props: { className?: string }) {
     const { currentChainId, setCurrentChain, sellToken, buyToken, selectSellToken, selectBuyToken } = useAppStore()
     const { actions } = useApiStore()
 
@@ -132,7 +131,7 @@ export default function Header(props: { className?: string }) {
     }, [currentChainId, sellToken, buyToken])
 
     return (
-        <div className={cn('grid grid-cols-3 items-center w-full px-4 py-4', props.className)}>
+        <header className={cn('hidden lg:grid grid-cols-3 items-center w-full px-4 py-4', props.className)}>
             {/* left */}
             <div className="flex gap-4 items-center">
                 {/* grid */}
@@ -162,8 +161,7 @@ export default function Header(props: { className?: string }) {
                 </button>
 
                 {/* logo */}
-                <Image src={'/Tycho-orderbook.svg'} alt={SvgIds.TYCHO_ORDERBOOK} width={180} height={24} className="sm:hidden" />
-                <Image src={'/Tycho-orderbook.svg'} alt={SvgIds.TYCHO_ORDERBOOK} width={212} height={24} className="hidden sm:block" />
+                <Image src={'/Tycho-orderbook.svg'} alt={SvgIds.TYCHO_ORDERBOOK} width={212} height={24} className="block" />
             </div>
 
             {/* middle */}
@@ -183,17 +181,14 @@ export default function Header(props: { className?: string }) {
             </div>
 
             {/* right */}
-            <div className="flex flex-col items-end z-20 gap-2 md:gap-0 md:flex-row md:items-center md:justify-end">
+            <div className="flex z-20 items-center justify-end">
                 {/* docs */}
                 <LinkWrapper
                     href={AppUrls.DOCUMENTATION}
                     target="_blank"
-                    className="flex items-center gap-1 px-2.5 cursor-alias w-max hover:underline md:ml-4 md:mr-6"
+                    className="flex items-center gap-1 px-2.5 cursor-alias w-max hover:underline ml-4 mr-6"
                 >
-                    <p className="text-milk text-sm truncate">
-                        <span className="sm:hidden">Docs</span>
-                        <span className="hidden sm:block">Docs (Run locally)</span>
-                    </p>
+                    <p className="text-milk text-sm truncate">Docs (Run locally)</p>
                     <IconWrapper icon={IconIds.OPEN_LINK_IN_NEW_TAB} className="size-4" />
                 </LinkWrapper>
 
@@ -264,6 +259,6 @@ export default function Header(props: { className?: string }) {
 
             {/* modal */}
             {/* <WelcomeModal /> */}
-        </div>
+        </header>
     )
 }

@@ -49,7 +49,7 @@ export default function Footer(props: { className?: string }) {
             </div>
 
             {/* right */}
-            <p className="text-wrap">
+            <p className="text-wrap lg:text-right">
                 Made by
                 <StyledTooltip placement="top" content={<IframeWrapper src={AppUrls.PROPELLERHEADS_WEBSITE} />}>
                     <LinkWrapper
@@ -71,8 +71,7 @@ export default function Footer(props: { className?: string }) {
                 </StyledTooltip>
             </p>
 
-            <p className="lg:hidden">2025 © PropellerHeads</p>
-            <br />
+            <p className="lg:hidden pb-4">2025 © PropellerHeads</p>
         </div>
     )
 }

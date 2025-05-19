@@ -25,6 +25,8 @@ export const useAppStore = create<{
     showSections: (showMarketDepthSection: boolean, showRoutingSection: boolean, showLiquidityBreakdownSection: boolean) => void
     currentChainId: AppSupportedChains
     setCurrentChain: (currentChainId: AppSupportedChains, sellToken: Token, buyToken: Token) => void
+    showMobileMenu: boolean
+    setShowMobileMenu: (showMobileMenu: boolean) => void
 
     /**
      * market depth
@@ -123,6 +125,8 @@ export const useAppStore = create<{
                     sellTokenAmountInputRaw: 0,
                     buyTokenAmountInput: 0,
                 })),
+            showMobileMenu: false,
+            setShowMobileMenu: (showMobileMenu) => set(() => ({ showMobileMenu })),
 
             /**
              * market depth

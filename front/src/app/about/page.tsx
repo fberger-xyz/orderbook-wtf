@@ -29,7 +29,7 @@ const FeatureCard = (props: { className?: string; text: ReactNode; svg: ReactNod
 
 export default function Page() {
     return (
-        <PageWrapper className="mt-14">
+        <PageWrapper className="mt-28 lg:mt-16">
             <div className="flex flex-col w-full gap-24 items-center">
                 {/* tagline */}
                 <div className="flex max-w-[518px] flex-col gap-6 items-center">
@@ -42,7 +42,7 @@ export default function Page() {
                             href={AppUrls.ORDERBOOK}
                             className="bg-folly px-4 py-2.5 rounded-xl opacity-90 hover:opacity-100 transition-all duration-300 ease-in-out w-fit flex gap-2 items-center"
                         >
-                            <p className="text-milk">See DEXs as an orderbook</p>
+                            <p className="text-milk truncate">See DEXs as an orderbook</p>
                             <IconWrapper icon={IconIds.OPEN_LINK_IN_NEW_TAB} className="size-4" />
                         </LinkWrapper>
                         <LinkWrapper
@@ -61,19 +61,24 @@ export default function Page() {
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-7">
                         {/* 1 */}
                         <FeatureCard
-                            className="h-[387px]"
+                            className="h-[387px] flex-col lg:flex-row"
                             text={
                                 <div className="flex gap-2 flex-col z-50">
                                     <p className="text-sm text-aquamarine">Orderbook</p>
-                                    <p className="font-light text-lg max-w-[200px]">
+                                    <p className="font-light text-lg lg:max-w-[200px]">
                                         On-chain liquidity visualized as discrete price-volume points, simulating real limit orders.
                                     </p>
                                 </div>
                             }
                             svg={
-                                <div className="absolute top-8 right-0">
-                                    <Image src={'about-orderbook.svg'} alt={'orderbook'} width={220} height={415} />
-                                </div>
+                                <>
+                                    <div className="hidden lg:absolute top-8 right-0">
+                                        <Image src={'about-orderbook.svg'} alt={'orderbook'} width={220} height={415} />
+                                    </div>
+                                    <div className="lg:hidden absolute top-40 right-0">
+                                        <Image src={'about-orderbook.svg'} alt={'orderbook'} width={300} height={800} />
+                                    </div>
+                                </>
                             }
                         />
 
