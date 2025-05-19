@@ -3,7 +3,7 @@
 import { APP_PAGES, CHAINS_CONFIG } from '@/config/app.config'
 import { useAppStore } from '@/stores/app.store'
 import { cn } from '@/utils'
-import { useRef, useState } from 'react'
+import { useRef, useState, useMemo, Suspense } from 'react'
 import { useClickOutside } from '@/hooks/useClickOutside'
 import { useKeyboardShortcut } from '@/hooks/useKeyboardShortcutArgs'
 import Image from 'next/image'
@@ -20,6 +20,9 @@ export default function HeaderMobile() {
     const { showMobileMenu, setShowMobileMenu, currentChainId, setCurrentChain } = useAppStore()
     const { actions } = useApiStore()
 
+    // prevent unnecessary rerenders
+    const currentChainConfig = useMemo(() => CHAINS_CONFIG[currentChainId], [currentChainId])
+
     // grid
     const [openGridDropdown, setOpenGridDropdown] = useState(false)
     const gridDropown = useRef<HTMLButtonElement>(null)
@@ -34,6 +37,19 @@ export default function HeaderMobile() {
     const menuDropdown = useRef<HTMLButtonElement>(null)
     // useClickOutside(menuDropdown, () => setShowMobileMenu(false))
     useKeyboardShortcut({ key: 'Escape', onKeyPressed: () => setShowMobileMenu(false) })
+
+    // -
+    const handleNetworkChange = useMemo(
+        () => (chainConfig: (typeof CHAINS_CONFIG)[keyof typeof CHAINS_CONFIG]) => {
+            if (chainConfig.wagmi?.id) {
+                setCurrentChain(chainConfig.id, hardcodedTokensList[chainConfig.id][1], hardcodedTokensList[chainConfig.id][0])
+                toast.success(`Chain selected: ${chainConfig.name}`, { style: toastStyle })
+                actions.setMetrics(undefined)
+            }
+        },
+        [setCurrentChain, actions],
+    )
+
     return (
         <div className={cn('flex justify-center z-50 w-full', { 'fixed top-0': showMobileMenu })}>
             <div className="w-full lg:hidden flex justify-between px-5 pt-4 ">
@@ -74,7 +90,7 @@ export default function HeaderMobile() {
                     {/* networks */}
                     <button ref={networkDropown} onClick={() => setOpenNetworkDropown(!openNetworkDropown)} className="relative">
                         <div className="flex items-center gap-1 bg-milk-100/5 transition-colors duration-300 hover:bg-milk-100/10 rounded-xl h-10 px-3">
-                            <SvgMapper icon={CHAINS_CONFIG[currentChainId].svgId} className="size-5" />
+                            <SvgMapper icon={currentChainConfig.svgId} className="size-5" />
                             <IconWrapper icon={IconIds.TRIANGLE_DOWN} className="size-5" />
                         </div>
 
@@ -93,17 +109,7 @@ export default function HeaderMobile() {
                                     return (
                                         <div
                                             key={chainConfig.name}
-                                            onClick={async () => {
-                                                if (chainConfig.wagmi?.id) {
-                                                    setCurrentChain(
-                                                        chainConfig.id,
-                                                        hardcodedTokensList[chainConfig.id][1],
-                                                        hardcodedTokensList[chainConfig.id][0],
-                                                    )
-                                                    toast.success(`Chain selected: ${chainConfig.name}`, { style: toastStyle })
-                                                    actions.setMetrics(undefined)
-                                                }
-                                            }}
+                                            onClick={() => handleNetworkChange(chainConfig)}
                                             className={cn(
                                                 'flex items-center gap-2 w-full px-4 py-2 text-white rounded-lg transition cursor-pointer',
                                                 {
@@ -153,17 +159,29 @@ export default function HeaderMobile() {
                             }
                         }}
                     >
-                        <nav className="absolute inset-2 z-30 flex items-center justify-center h-fit flex-col gap-2 pt-28">
-                            {APP_PAGES.map((page) => (
-                                <LinkWrapper key={page.path} href={page.path}>
-                                    <p className="text-base text-milk p-2.5">{page.name}</p>
+                        <Suspense
+                            fallback={
+                                <nav className="absolute inset-2 z-30 flex items-center justify-center h-fit flex-col gap-2 pt-28">
+                                    {[1, 2, 3].map((index) => (
+                                        <div key={index}>
+                                            <p className="text-base p-2.5 skeleton-loading text-transparent">----------------------</p>
+                                        </div>
+                                    ))}
+                                </nav>
+                            }
+                        >
+                            <nav className="absolute inset-2 z-30 flex items-center justify-center h-fit flex-col gap-2 pt-28">
+                                {APP_PAGES.map((page) => (
+                                    <LinkWrapper key={page.path} href={page.path}>
+                                        <p className="text-base text-milk p-2.5">{page.name}</p>
+                                    </LinkWrapper>
+                                ))}
+                                <LinkWrapper href={AppUrls.DOCUMENTATION} target="_blank" className="flex items-center gap-1 cursor-alias p-2.5">
+                                    <p className="text-base">Docs (Run locally)</p>
+                                    <IconWrapper icon={IconIds.OPEN_LINK_IN_NEW_TAB} className="size-4" />
                                 </LinkWrapper>
-                            ))}
-                            <LinkWrapper href={AppUrls.DOCUMENTATION} target="_blank" className="flex items-center gap-1 cursor-alias p-2.5">
-                                <p className="text-base">Docs (Run locally)</p>
-                                <IconWrapper icon={IconIds.OPEN_LINK_IN_NEW_TAB} className="size-4" />
-                            </LinkWrapper>
-                        </nav>
+                            </nav>
+                        </Suspense>
                     </div>
                 )}
             </div>
