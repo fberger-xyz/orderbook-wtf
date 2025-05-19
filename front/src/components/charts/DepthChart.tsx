@@ -7,7 +7,7 @@ import { OrderbookOption, OrderbookSide, SvgIds } from '@/enums'
 import EchartWrapper from './EchartWrapper'
 import { ChartBackground, CustomFallback, LoadingArea } from './ChartsCommons'
 import { useAppStore } from '@/stores/app.store'
-import { APP_FONT } from '@/config/app.config'
+import { INTER_FONT } from '@/config/app.config'
 import { ErrorBoundaryFallback } from '../common/ErrorBoundaryFallback'
 import {
     AppColors,
@@ -356,7 +356,7 @@ const getOptions = (
         ],
         textStyle: {
             color: AppColors.milk[600],
-            fontFamily: APP_FONT.style.fontFamily,
+            fontFamily: INTER_FONT.style.fontFamily,
         },
         grid: {
             left: symbolsInYAxis === OrderbookOption.YES ? 85 : 45,

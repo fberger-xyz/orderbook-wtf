@@ -183,22 +183,22 @@ export default function Header(props: { className?: string }) {
             </div>
 
             {/* right */}
-            {pathname === AppUrls.ORDERBOOK ? (
-                <div className="flex flex-col items-end z-20 gap-2 md:gap-0 md:flex-row md:items-center md:justify-end">
-                    {/* docs */}
-                    <LinkWrapper
-                        href={AppUrls.DOCUMENTATION}
-                        target="_blank"
-                        className="flex items-center gap-1 px-2.5 cursor-alias w-max hover:underline md:ml-4 md:mr-6"
-                    >
-                        <p className="text-milk text-sm truncate">
-                            <span className="sm:hidden">Docs</span>
-                            <span className="hidden sm:block">Docs (Run locally)</span>
-                        </p>
-                        <IconWrapper icon={IconIds.OPEN_LINK_IN_NEW_TAB} className="size-4" />
-                    </LinkWrapper>
+            <div className="flex flex-col items-end z-20 gap-2 md:gap-0 md:flex-row md:items-center md:justify-end">
+                {/* docs */}
+                <LinkWrapper
+                    href={AppUrls.DOCUMENTATION}
+                    target="_blank"
+                    className="flex items-center gap-1 px-2.5 cursor-alias w-max hover:underline md:ml-4 md:mr-6"
+                >
+                    <p className="text-milk text-sm truncate">
+                        <span className="sm:hidden">Docs</span>
+                        <span className="hidden sm:block">Docs (Run locally)</span>
+                    </p>
+                    <IconWrapper icon={IconIds.OPEN_LINK_IN_NEW_TAB} className="size-4" />
+                </LinkWrapper>
 
-                    {/* networks */}
+                {/* networks */}
+                {pathname === AppUrls.ORDERBOOK ? (
                     <button ref={networkDropown} onClick={() => setOpenNetworkDropown(!openNetworkDropown)} className="relative">
                         <div className="flex items-center gap-1 bg-milk-100/5 transition-colors duration-300 hover:bg-milk-100/10 rounded-xl h-10 px-3">
                             <SvgMapper icon={CHAINS_CONFIG[currentChainId].svgId} className="size-5" />
@@ -259,10 +259,8 @@ export default function Header(props: { className?: string }) {
                             })}
                         </div>
                     </button>
-                </div>
-            ) : (
-                <span />
-            )}
+                ) : null}
+            </div>
 
             {/* modal */}
             {/* <WelcomeModal /> */}

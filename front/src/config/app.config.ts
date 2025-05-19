@@ -1,7 +1,7 @@
 import { hardcodedTokensList } from '@/data/back-tokens'
 import { AppUrls, AppSupportedChains, SvgIds } from '@/enums'
 import { InterfaceAppLink } from '@/interfaces'
-import { Inter } from 'next/font/google'
+import { Inter, Inter_Tight } from 'next/font/google'
 import { mainnet } from 'wagmi/chains'
 
 export const IS_DEV = process.env.NODE_ENV === 'development'
@@ -16,6 +16,8 @@ export const APP_METADATA = {
 export const PUBLIC_STREAM_API_URL = IS_RUNNING_IN_DOCKER ? AppUrls.RUST_API_DOCKER : AppUrls.RUST_API_PROD
 export const DATE_FORMAT = 'ddd. D MMM. YYYY'
 export const TIME_FORMAT = 'hh:mm A'
+
+// pages
 export const APP_PAGES: InterfaceAppLink[] = [
     {
         name: 'About',
@@ -26,7 +28,20 @@ export const APP_PAGES: InterfaceAppLink[] = [
         path: AppUrls.ORDERBOOK,
     },
 ]
-export const APP_FONT = Inter({ weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900'], subsets: ['latin'] })
+
+// fonts
+export const INTER_FONT = Inter({
+    weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900'],
+    subsets: ['latin'],
+    variable: '--font-inter',
+})
+export const INTER_TIGHT_FONT = Inter_Tight({
+    weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900'],
+    subsets: ['latin'],
+    variable: '--font-inter-tight',
+})
+
+// chains
 export const CHAINS_CONFIG = {
     [AppSupportedChains.ETHEREUM]: {
         id: AppSupportedChains.ETHEREUM,

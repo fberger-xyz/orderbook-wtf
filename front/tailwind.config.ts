@@ -4,6 +4,10 @@ const config: Config = {
     content: ['./src/pages/**/*.{js,ts,jsx,tsx,mdx}', './src/components/**/*.{js,ts,jsx,tsx,mdx}', './src/app/**/*.{js,ts,jsx,tsx,mdx}'],
     theme: {
         extend: {
+            fontFamily: {
+                inter: ['var(--font-inter)', 'sans-serif'],
+                'inter-tight': ['var(--font-inter-tight)', 'sans-serif'],
+            },
             backgroundImage: {
                 'gradient-stroke': 'linear-gradient(90deg, #FF3366 0%, #FFD11B 100%)',
             },

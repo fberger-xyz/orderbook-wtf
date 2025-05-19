@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import './globals.css'
-import { APP_FONT, APP_METADATA } from '../config/app.config'
+import { INTER_FONT, APP_METADATA, INTER_TIGHT_FONT } from '../config/app.config'
 import { cn } from '../utils'
 import { Suspense } from 'react'
 import DefaultFallback from '@/components/layouts/DefaultFallback'
@@ -75,7 +75,13 @@ export default async function RootLayout({
                 backgroundAttachment: 'fixed', // ⬅️ key to lock background to viewport
             }}
         >
-            <body className={cn(APP_FONT.className, 'min-h-screen w-full overflow-x-auto overflow-y-auto text-base text-milk')}>
+            <body
+                className={cn(
+                    INTER_FONT.className,
+                    INTER_TIGHT_FONT.className,
+                    'min-h-screen w-full overflow-x-auto overflow-y-auto text-base text-milk',
+                )}
+            >
                 <WagmiAndReactQueryProviders>
                     <main>
                         <Suspense fallback={null}>

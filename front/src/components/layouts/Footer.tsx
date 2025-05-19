@@ -26,20 +26,20 @@ export default function Footer(props: { className?: string }) {
     return (
         <div
             className={cn(
-                'w-full flex flex-col lg:flex-row lg:justify-between lg:items-end py-6 px-8 text-milk-400 font-light text-sm gap-4 lg:gap-0 h-[68px]',
+                'w-full flex flex-col lg:flex-row lg:justify-between lg:items-end py-6 px-8 text-milk-400 font-light text-sm gap-6 lg:gap-0 h-[68px]',
                 props.className,
             )}
         >
             {/* left */}
-            <div className="flex lg:gap-8 flex-col gap-4 lg:flex-row">
-                <p className="truncate">2025 © PropellerHeads</p>
+            <div className="flex lg:gap-8 flex-col gap-6 lg:flex-row">
+                <p className="truncate hidden lg:flex">2025 © PropellerHeads</p>
                 <StyledTooltip content={<p>Deployed on {dayjs.utc(commitDate).format('D MMM. YYYY HH:mm A')} UTC</p>}>
                     <p className="truncate hover:underline hover:text-aquamarine">Version 1.1</p>
                 </StyledTooltip>
             </div>
 
             {/* center */}
-            <div className="flex lg:gap-8 flex-col gap-4 lg:flex-row">
+            <div className="flex lg:gap-8 flex-col gap-6 lg:flex-row">
                 <LinkWrapper href={AppUrls.VM_UPTIME} target="_blank" className="cursor-alias hover:underline hover:text-aquamarine">
                     <p>API status</p>
                 </LinkWrapper>
@@ -49,7 +49,7 @@ export default function Footer(props: { className?: string }) {
             </div>
 
             {/* right */}
-            <p className="text-wrap truncate">
+            <p className="text-wrap">
                 Made by
                 <StyledTooltip placement="top" content={<IframeWrapper src={AppUrls.PROPELLERHEADS_WEBSITE} />}>
                     <LinkWrapper
@@ -70,6 +70,9 @@ export default function Footer(props: { className?: string }) {
                     </LinkWrapper>
                 </StyledTooltip>
             </p>
+
+            <p className="lg:hidden">2025 © PropellerHeads</p>
+            <br />
         </div>
     )
 }
