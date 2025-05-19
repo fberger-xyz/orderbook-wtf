@@ -90,6 +90,7 @@ export const getDashboardMetrics = (orderbook: undefined | AmmAsOrderbook) => {
         highestBid: undefined,
         midPrice: undefined,
         lowestAsk: undefined,
+        spread: undefined,
         spreadPercent: undefined,
         totalBaseAmountInPools: 0,
         totalQuoteAmountInPools: 0,
@@ -112,6 +113,7 @@ export const getDashboardMetrics = (orderbook: undefined | AmmAsOrderbook) => {
         metrics.midPrice = (metrics.highestBid.average_sell_price + 1 / metrics.lowestAsk.average_sell_price) / 2
 
         // spread
+        metrics.spread = 1 / metrics.lowestAsk.average_sell_price - metrics.highestBid.average_sell_price
         metrics.spreadPercent = (1 / metrics.lowestAsk.average_sell_price - metrics.highestBid.average_sell_price) / metrics.midPrice
 
         // quote TVL and base TVL

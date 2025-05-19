@@ -120,6 +120,7 @@ export interface DashboardMetrics {
     highestBid?: AmmTrade
     midPrice?: number
     lowestAsk?: AmmTrade
+    spread?: number
     spreadPercent?: number
     totalBaseAmountInPools: number
     totalQuoteAmountInPools: number
