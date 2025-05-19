@@ -33,7 +33,7 @@ function EmptyBook(side: OrderbookSide) {
 
 // todo: improve this v poorly designed code asap
 export default function OrderbookSection() {
-    const { currentChainId, selectedTrade, sellToken, getAddressPair, setHoveredOrderbookTrade } = useAppStore()
+    const { currentChainId, selectedTrade, sellToken, buyToken, getAddressPair, setHoveredOrderbookTrade } = useAppStore()
     const { apiStoreRefreshedAt, metrics, actions } = useApiStore()
     const [asks, setAsks] = useState<AmmTrade[]>([])
     const [bids, setBids] = useState<AmmTrade[]>([])
@@ -51,7 +51,7 @@ export default function OrderbookSection() {
         // get possibly undefined orderbook
         const orderbook = actions.getOrderbook(getAddressPair())
         if (orderbook?.bids && orderbook?.asks) {
-            setAsks(orderbook?.asks.sort((curr, next) => curr.amount - next.average_sell_price * next.amount - curr.average_sell_price))
+            setAsks(orderbook?.asks.sort((curr, next) => curr.amount * next.average_sell_price - next.amount * curr.average_sell_price))
             setBids(orderbook?.bids.sort((curr, next) => curr.average_sell_price * curr.amount - next.average_sell_price * next.amount))
         } else {
             setBids([])
@@ -77,7 +77,9 @@ export default function OrderbookSection() {
             <div className="flex flex-col gap-1 text-xs w-full">
                 {/* headers */}
                 <div className="grid grid-cols-3 px-4 py-0.5 text-milk-400">
-                    <p>Price</p>
+                    <p>
+                        Price ({sellToken.symbol}/{buyToken.symbol})
+                    </p>
                     <p className="ml-auto truncate">Size ({sellToken.symbol})</p>
                     <p className="ml-auto truncate">Total ({sellToken.symbol})</p>
                 </div>
@@ -110,7 +112,7 @@ export default function OrderbookSection() {
                                           style={{ width: `${percentage}%` }}
                                       />
                                       <div className="grid grid-cols-3 px-4 py-0.5">
-                                          <p className="text-folly">{cleanOutput(numeral(1 / ask.average_sell_price).format('0,0.[0000]'))}</p>
+                                          <p className="text-folly">{cleanOutput(numeral(1 / ask.average_sell_price).format('0,0.[00000000]'))}</p>
                                           <p className="ml-auto truncate">{cleanOutput(numeral(ask.output).format('0,0.[0000]'))}</p>
                                           <p className="ml-auto truncate">{cleanOutput(numeral(totalRow).format('0,0.[0000]'))}</p>
                                       </div>
@@ -123,7 +125,7 @@ export default function OrderbookSection() {
                 <div className="grid grid-cols-3 w-full bg-milk-150 font-semibold px-4 py-0.5">
                     <p className="col-span-1 mx-auto">Spread</p>
                     {metrics && !isNaN(Number(metrics?.spreadPercent)) && !isNaN(Number(metrics?.midPrice)) ? (
-                        <p className="mx-auto truncate">{numeral(metrics?.spreadPercent).multiply(metrics?.midPrice).format('0,0.[0000]')} </p>
+                        <p className="mx-auto truncate">{numeral(metrics?.spreadPercent).multiply(metrics?.midPrice).format('0,0.[0000000]')} </p>
                     ) : (
                         <div className="flex gap-1.5 items-center flex-wrap skeleton-loading mx-4">
                             <p className="text-milk-100 font-semibold mx-auto">-.--</p>
@@ -169,7 +171,7 @@ export default function OrderbookSection() {
                                       style={{ width: `${percentage}%` }}
                                   />
                                   <div className="grid grid-cols-3 px-4 py-0.5">
-                                      <p className="text-aquamarine">{cleanOutput(numeral(bid.average_sell_price).format('0,0.[0000]'))}</p>
+                                      <p className="text-aquamarine">{cleanOutput(numeral(bid.average_sell_price).format('0,0.[0000000]'))}</p>
                                       <p className="ml-auto truncate">{cleanOutput(numeral(bid.amount).format('0,0.[0000]'))}</p>
                                       <p className="ml-auto truncate">{cleanOutput(numeral(totalRow).format('0,0.[0000]'))}</p>
                                   </div>
