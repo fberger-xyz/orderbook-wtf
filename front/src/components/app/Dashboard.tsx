@@ -52,21 +52,23 @@ export default function Dashboard() {
                             const apiTokens: Token[] = []
                             for (let pairIndex = 0; pairIndex < pairsPerChain[chainIndex].data.length; pairIndex++) {
                                 const baseAddress = pairsPerChain[chainIndex].data[pairIndex].addrbase.toLowerCase()
-                                if (apiTokens.findIndex((t) => t.address === baseAddress) < 0)
+                                const baseSymbol = pairsPerChain[chainIndex].data[pairIndex].base
+                                if (!baseSymbol.startsWith('0x0000') && apiTokens.findIndex((t) => t.address === baseAddress) < 0)
                                     apiTokens.push({
                                         address: baseAddress,
                                         decimals: 0, // todo
-                                        symbol: pairsPerChain[chainIndex].data[pairIndex].base,
+                                        symbol: baseSymbol,
                                         gas: '',
                                     })
 
                                 // add quote
                                 const quoteAddress = pairsPerChain[chainIndex].data[pairIndex].addrquote.toLowerCase()
-                                if (apiTokens.findIndex((t) => t.address === quoteAddress) < 0)
+                                const quoteSymbol = pairsPerChain[chainIndex].data[pairIndex].quote
+                                if (!quoteSymbol.startsWith('0x0000') && apiTokens.findIndex((t) => t.address === quoteAddress) < 0)
                                     apiTokens.push({
                                         address: quoteAddress,
                                         decimals: 0, // todo
-                                        symbol: pairsPerChain[chainIndex].data[pairIndex].quote,
+                                        symbol: quoteSymbol,
                                         gas: '',
                                     })
                             }
