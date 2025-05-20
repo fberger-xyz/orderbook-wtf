@@ -3,7 +3,7 @@ import Image from 'next/image'
 
 export default function CardsWithScreenshots() {
     return (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-7">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-7 max-w-[1050px] mx-auto">
             <FeatureCard
                 className="h-[387px] flex-col lg:flex-row"
                 text={

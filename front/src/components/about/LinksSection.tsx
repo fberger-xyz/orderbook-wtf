@@ -36,7 +36,7 @@ const links: LinkItem[] = [
 
 export const LinksSection = () => {
     return (
-        <div className="grid grid-cols-1 lg:grid-cols-3 w-full gap-4 pb-28">
+        <div className="grid grid-cols-1 lg:grid-cols-3 w-full gap-4 pb-28 max-w-[1050px] mx-auto">
             {links.map((link, index) => (
                 <LinkWrapper
                     key={index}

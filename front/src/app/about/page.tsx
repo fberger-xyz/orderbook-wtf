@@ -3,14 +3,14 @@ import LinkWrapper from '@/components/common/LinkWrapper'
 import PageWrapper from '@/components/common/PageWrapper'
 import { LinksSection } from '@/components/about/LinksSection'
 import { AppUrls, IconIds } from '@/enums'
-import { ScrollingFeatures } from '@/components/about/ScrollingFeatures'
 import CardsWithScreenshots from '@/components/about/CardsWithScreenshots'
+import { FeatureSection } from '@/components/about/ScrollingFeatures'
 
 export default function Page() {
     return (
         <PageWrapper className="mt-20 lg:mt-16">
-            <div className="flex flex-col w-full gap-24 items-center">
-                {/* tagline section */}
+            <div className="flex flex-col w-full gap-28 items-center">
+                {/* tagline */}
                 <div className="flex max-w-[518px] flex-col gap-6 items-center">
                     <p className="text-[64px] leading-none font-bold text-center font-inter-tight">Explore DEXs in orderbook format</p>
                     <p className="text-center max-w-[648px] font-light px-10">
@@ -34,13 +34,9 @@ export default function Page() {
                         </LinkWrapper>
                     </div>
                 </div>
-
-                {/* main content section */}
-                <div className="flex flex-col sm:px-8 gap-28 items-center mx-auto max-w-[1100px]">
-                    <CardsWithScreenshots />
-                    <ScrollingFeatures />
-                    <LinksSection />
-                </div>
+                <CardsWithScreenshots />
+                <FeatureSection />
+                <LinksSection />
             </div>
         </PageWrapper>
     )
