@@ -1,13 +1,15 @@
+'use client'
+
 import Image from 'next/image'
 import LinkWrapper from '../common/LinkWrapper'
+import { motion, useScroll, useTransform } from 'framer-motion'
+import { useRef } from 'react'
 
-interface FeatureItem {
+const features: {
     image: string
     title: string
     description: string
-}
-
-const features: FeatureItem[] = [
+}[] = [
     {
         image: './about-features-shape.svg',
         title: 'See the real shape of onchain liquidity',
@@ -40,19 +42,23 @@ const features: FeatureItem[] = [
     },
 ]
 
-export const FeatureSection = () => {
+export const ScrollingFeatures = () => {
+    const containerRef = useRef(null)
+    const { scrollYProgress } = useScroll({ target: containerRef, offset: ['start start', 'end end'] })
+    const x = useTransform(scrollYProgress, [0, 1], ['0%', '-75%']) // Changed to negative value for right-to-left movement
+
     return (
-        <div className="flex flex-col w-full items-start gap-4">
+        <section ref={containerRef} className="flex flex-col w-full items-start gap-4">
             <p className="text-sm text-aquamarine">Features</p>
             <p className="text-[48px] leading-none font-bold max-w-[688px] text-left font-inter-tight">
                 Everything Tycho Orderbook brings to your stack
             </p>
-            <div className="relative w-full mt-10">
-                <div className="w-full grid grid-cols-1 lg:grid-cols-3 gap-4 pb-4">
+            <div className="w-full overflow-visible">
+                <motion.div style={{ x }} className="flex gap-6 mt-10">
                     {features.map((feature, index) => (
                         <div
                             key={index}
-                            className="flex flex-col p-6 transition-colors duration-300 rounded-xl gap-12 bg-[#FFF4E005] border border-milk-50"
+                            className="flex flex-col p-6 transition-colors duration-300 rounded-xl gap-12 bg-[#FFF4E005] border border-milk-50 min-w-[400px]"
                         >
                             <Image src={feature.image} alt={feature.title} width={377} height={204} className="max-h-[204px] mx-auto" />
                             <div className="flex flex-col gap-3">
@@ -85,8 +91,8 @@ export const FeatureSection = () => {
                             </div>
                         </div>
                     ))}
-                </div>
+                </motion.div>
             </div>
-        </div>
+        </section>
     )
 }
