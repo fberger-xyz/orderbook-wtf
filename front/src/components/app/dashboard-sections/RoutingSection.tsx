@@ -202,7 +202,7 @@ export default function RoutingSection() {
                                                                         <div className="flex flex-col">
                                                                             <p className="font-semibold mx-auto">Simulated price</p>
                                                                             <p className="font-light text-milk-400 pb-4 mx-auto">
-                                                                                = Amount out / Amount in
+                                                                                = (Amount out - gas) / Amount in
                                                                             </p>
                                                                             <PoolLink
                                                                                 currentChainId={currentChainId}
