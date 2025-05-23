@@ -16,40 +16,25 @@ interface InterfaceEchartWrapperProps {
 export default function EchartWrapper(props: InterfaceEchartWrapperProps) {
     const chartRef = useRef<HTMLDivElement>(null)
     const myChart = useRef<echarts.ECharts | null>(null)
-
     const handleChartResize = () => myChart.current?.resize()
-
-    // ! causes a rerender that prevents datazoom cache
-    // const toggleToolbox = (show: boolean) => {
-    //     myChart.current?.setOption({
-    //         toolbox: {
-    //             show: show,
-    //         },
-    //     })
-    // }
-
     useEffect(() => {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         ;(echarts as any).registerTransform((ecStat as any).transform.regression)
 
         // only if ref mounted in dom
         if (chartRef?.current) {
-            // ensure chart has been initialised
             if (!myChart.current) myChart.current = echarts.init(chartRef.current)
             window.addEventListener('resize', handleChartResize, { passive: true })
-
-            // handle toolbox
-            // ! causes a rerender that prevents datazoom cache
-            // chartRef.current.addEventListener('mouseenter', () => toggleToolbox(true))
-            // chartRef.current.addEventListener('mouseleave', () => toggleToolbox(false))
-
-            // set option
             myChart.current.setOption(
                 // @ts-expect-error: poorly typed
                 props.options,
                 {
-                    // notMerge: false, // false = the new option object replaces the existing one completely.
-                    notMerge: true, // true, default = ECharts merges the new options with the existing ones.
+                    /**
+                     * lazyUpdate?: boolean
+                        Default: true = ECharts merges the new options with the existing ones.
+                        false = the new option object replaces the existing one completely.
+                     */
+                    notMerge: true,
 
                     /**
                      * lazyUpdate?: boolean
@@ -80,11 +65,10 @@ export default function EchartWrapper(props: InterfaceEchartWrapperProps) {
             myChart.current.on('dataZoom', () => {
                 const option = myChart.current?.getOption()
                 const zoom = option?.dataZoom?.[0]
+                if (!zoom) return
                 const xAxisArray = option?.xAxis as echarts.EChartOption.XAxis[] | undefined
-
                 let startValue = zoom?.startValue
                 let endValue = zoom?.endValue
-
                 if ((startValue === undefined || endValue === undefined) && xAxisArray && Array.isArray(xAxisArray)) {
                     const xAxis = xAxisArray[0]
                     const min = typeof xAxis.min === 'number' ? xAxis.min : 0
@@ -95,7 +79,6 @@ export default function EchartWrapper(props: InterfaceEchartWrapperProps) {
                     startValue = min + (max - min) * (startPercent / 100)
                     endValue = min + (max - min) * (endPercent / 100)
                 }
-
                 if (props.onDataZoomChange && typeof startValue === 'number' && typeof endValue === 'number') {
                     props.onDataZoomChange(startValue, endValue)
                 }

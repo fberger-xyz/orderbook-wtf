@@ -33,7 +33,7 @@ export default function Footer(props: { className?: string }) {
             {/* left */}
             <div className="flex lg:gap-8 flex-col gap-6 lg:flex-row">
                 <p className="truncate hidden lg:flex">2025 © PropellerHeads</p>
-                <StyledTooltip content={<p>Deployed on {dayjs.utc(commitDate).format('D MMM. YYYY HH:mm A')} UTC</p>}>
+                <StyledTooltip closeDelay={500} content={<p>Deployed on {dayjs.utc(commitDate).format('D MMM. YYYY HH:mm A')} UTC</p>}>
                     <p className="truncate hover:underline hover:text-aquamarine">Version 1.1</p>
                 </StyledTooltip>
             </div>
@@ -51,7 +51,7 @@ export default function Footer(props: { className?: string }) {
             {/* right */}
             <p className="text-wrap lg:text-right">
                 Made by
-                <StyledTooltip placement="top" content={<IframeWrapper src={AppUrls.PROPELLERHEADS_WEBSITE} />}>
+                <StyledTooltip placement="top" closeDelay={500} content={<IframeWrapper src={AppUrls.PROPELLERHEADS_WEBSITE} />}>
                     <LinkWrapper
                         href={AppUrls.PROPELLERHEADS_WEBSITE}
                         target="_blank"
@@ -64,7 +64,7 @@ export default function Footer(props: { className?: string }) {
                     @xMerso
                 </LinkWrapper>
                 and
-                <StyledTooltip placement="top" content={<IframeWrapper src={AppUrls.FBERGER_WEBSITE} />}>
+                <StyledTooltip placement="top" closeDelay={500} content={<IframeWrapper src={AppUrls.FBERGER_WEBSITE} />}>
                     <LinkWrapper href={AppUrls.FBERGER_WEBSITE} target="_blank" className="cursor-alias hover:underline hover:text-aquamarine px-1">
                         @fberger_xyz
                     </LinkWrapper>
