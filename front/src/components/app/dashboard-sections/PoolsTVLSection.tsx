@@ -201,7 +201,8 @@ export default function PoolsTVLSection() {
                                                 disableAnimation
                                                 content={
                                                     <div className="flex flex-col">
-                                                        <p className="font-semibold pb-4 mx-auto">Best bid</p>
+                                                        <p className="font-semibold mx-auto">Pool price</p>
+                                                        <p className="font-light text-milk-400 pb-4 mx-auto">Does not consider gas</p>
                                                         <PoolLink
                                                             currentChainId={currentChainId}
                                                             pool={pool.details}
