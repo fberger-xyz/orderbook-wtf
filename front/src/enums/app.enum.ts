@@ -16,7 +16,7 @@ export enum AppUrls {
     // rust api
     RUST_API_LOCALHOST = 'http://localhost:42042/api',
     RUST_API_DOCKER = 'http://stream:42042/api',
-    RUST_API_PROD = 'https://tycho.merso.xyz/api',
+    RUST_API_PROD = 'https://tycho-dev-orderbook.propellerheads.xyz/api',
 
     // PropellerHeads
     PROPELLERHEADS_WEBSITE = 'https://www.propellerheads.xyz/',
