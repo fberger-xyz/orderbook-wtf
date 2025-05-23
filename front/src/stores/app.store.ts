@@ -135,7 +135,7 @@ export const useAppStore = create<{
             // chart
             showSteps: OrderbookOption.YES,
             setSteps: (showSteps) => set(() => ({ showSteps })),
-            filterOutSolverInconsistencies: OrderbookOption.NO,
+            filterOutSolverInconsistencies: OrderbookOption.YES,
             setFilterOutSolverInconsistencies: (filterOutSolverInconsistencies) => set(() => ({ filterOutSolverInconsistencies })),
             yAxisType: OrderbookAxisScale.VALUE,
             yAxisLogBase: 2,

@@ -55,8 +55,8 @@ export default function MarketDepthSection() {
         showMarketDepthSection,
         showSteps,
         setSteps,
-        // filterOutSolverInconsistencies,
-        // setFilterOutSolverInconsistencies,
+        filterOutSolverInconsistencies,
+        setFilterOutSolverInconsistencies,
         coloredAreas,
         setColoredAreas,
         symbolsInYAxis,
@@ -127,16 +127,6 @@ export default function MarketDepthSection() {
                                 selectedOption={showSteps}
                                 onSelect={() => setSteps(showSteps === OrderbookOption.YES ? OrderbookOption.NO : OrderbookOption.YES)}
                             />
-                            {/* <ChartOption<OrderbookOption>
-                                title="Filter inconsistencies"
-                                options={[OrderbookOption.YES, OrderbookOption.NO]}
-                                selectedOption={filterOutSolverInconsistencies}
-                                onSelect={() =>
-                                    setFilterOutSolverInconsistencies(
-                                        filterOutSolverInconsistencies === OrderbookOption.YES ? OrderbookOption.NO : OrderbookOption.YES,
-                                    )
-                                }
-                            /> */}
                             <ChartOption<OrderbookOption>
                                 title="Color areas"
                                 options={[OrderbookOption.YES, OrderbookOption.NO]}
@@ -148,6 +138,16 @@ export default function MarketDepthSection() {
                                 options={[OrderbookOption.YES, OrderbookOption.NO]}
                                 selectedOption={symbolsInYAxis}
                                 onSelect={() => setSymbolsInYAxis(symbolsInYAxis === OrderbookOption.YES ? OrderbookOption.NO : OrderbookOption.YES)}
+                            />
+                            <ChartOption<OrderbookOption>
+                                title="Hide inconsistencies"
+                                options={[OrderbookOption.YES, OrderbookOption.NO]}
+                                selectedOption={filterOutSolverInconsistencies}
+                                onSelect={() =>
+                                    setFilterOutSolverInconsistencies(
+                                        filterOutSolverInconsistencies === OrderbookOption.YES ? OrderbookOption.NO : OrderbookOption.YES,
+                                    )
+                                }
                             />
                         </div>
                     </button>
