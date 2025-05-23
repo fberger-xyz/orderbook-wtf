@@ -2,8 +2,8 @@
 
 import { APP_PAGES, CHAINS_CONFIG } from '@/config/app.config'
 import { useAppStore } from '@/stores/app.store'
-import { cn, isCurrentPath } from '@/utils'
-import { useRef, useState, useMemo, Suspense } from 'react'
+import { cn, isCurrentPath, shortenAddress } from '@/utils'
+import { useRef, useState, useMemo, Suspense, useEffect } from 'react'
 import { useClickOutside } from '@/hooks/useClickOutside'
 import { useKeyboardShortcut } from '@/hooks/useKeyboardShortcutArgs'
 import Image from 'next/image'
@@ -15,12 +15,16 @@ import IconWrapper from '../common/IconWrapper'
 import SvgMapper from '../icons/SvgMapper'
 import { useApiStore } from '@/stores/api.store'
 import LinkWrapper from '../common/LinkWrapper'
-import { usePathname } from 'next/navigation'
+import { useRouter, usePathname, useSearchParams } from 'next/navigation'
 
 export default function HeaderMobile() {
-    const { showMobileMenu, setShowMobileMenu, currentChainId, setCurrentChain } = useAppStore()
+    const debug = false
+    const { showMobileMenu, currentChainId, setCurrentChain, sellToken, buyToken, selectSellToken, selectBuyToken, setShowMobileMenu } = useAppStore()
     const { actions } = useApiStore()
+
+    const router = useRouter()
     const pathname = usePathname()
+    const searchParams = useSearchParams()
 
     // prevent unnecessary rerenders
     const currentChainConfig = useMemo(() => CHAINS_CONFIG[currentChainId], [currentChainId])
@@ -37,7 +41,6 @@ export default function HeaderMobile() {
 
     // menu
     const menuDropdown = useRef<HTMLButtonElement>(null)
-    // useClickOutside(menuDropdown, () => setShowMobileMenu(false))
     useKeyboardShortcut({ key: 'Escape', onKeyPressed: () => setShowMobileMenu(false) })
 
     // -
@@ -51,6 +54,106 @@ export default function HeaderMobile() {
         },
         [setCurrentChain, actions],
     )
+
+    /**
+     * manage url sync with currently selected chain and tokens
+     */
+
+    // 1. update the state to follow the url
+    useEffect(() => {
+        // -
+        if (pathname === AppUrls.ABOUT) return
+
+        // extract
+        const urlChain = String(searchParams.get('chain')).toLowerCase()
+        const urlSell = String(searchParams.get('sell'))
+        const urlBuy = String(searchParams.get('buy'))
+
+        // find
+        const chainConfig = Object.values(CHAINS_CONFIG).find((c) => c.name.toLowerCase() === urlChain)
+        if (debug) console.log('Header 1 |', { chainConfig, urlChain, urlSell, urlBuy })
+
+        // set
+        if (chainConfig) {
+            // sell
+            let targetSellToken = hardcodedTokensList[chainConfig.id].find((token) => token.address.toLowerCase() === urlSell.toLowerCase())
+            if (!targetSellToken) {
+                // console.log('switching to default sell token')
+                targetSellToken = hardcodedTokensList[chainConfig.id][1]
+            }
+
+            // buy
+            let targetBuyToken = hardcodedTokensList[chainConfig.id].find((token) => token.address.toLowerCase() === urlBuy.toLowerCase())
+            if (!targetBuyToken) {
+                // console.log('switching to default buy token')
+                targetBuyToken = hardcodedTokensList[chainConfig.id][0]
+            }
+
+            if (targetSellToken.address.toLowerCase() === targetBuyToken.address.toLowerCase()) {
+                targetSellToken = hardcodedTokensList[chainConfig.id][1]
+                targetBuyToken = hardcodedTokensList[chainConfig.id][0]
+            }
+
+            // debug
+            if (debug)
+                console.log(
+                    `Header 1 | current sellToken.address ${shortenAddress(sellToken.address)} !== targetSellToken.address ${shortenAddress(targetSellToken.address)}`,
+                    sellToken.address !== targetSellToken.address,
+                )
+            if (debug)
+                console.log(
+                    `Header 1 | current buyToken.address ${shortenAddress(buyToken.address)} !== targetBuyToken.address ${shortenAddress(targetBuyToken.address)}`,
+                    buyToken.address !== targetBuyToken.address,
+                )
+
+            // set state
+            if (currentChainId !== chainConfig.id) setCurrentChain(chainConfig.id, targetSellToken, targetBuyToken)
+            else {
+                if (sellToken.address !== targetSellToken.address) {
+                    if (debug) console.log('Header 1 | change sell to follow URL')
+                    selectSellToken(targetSellToken)
+                }
+                if (buyToken.address !== targetBuyToken.address) {
+                    if (debug) console.log('Header 1 | change buy to follow URL')
+                    selectBuyToken(targetBuyToken)
+                }
+            }
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [pathname])
+
+    // 2. update the url to follow the state
+    useEffect(() => {
+        // -
+        if (pathname === AppUrls.ABOUT) return
+
+        // const params = new URLSearchParams(searchParams.toString())
+        const urlChain = String(searchParams.get('chain')).toLowerCase()
+        const urlSell = String(searchParams.get('sell'))
+        const urlBuy = String(searchParams.get('buy'))
+
+        // -
+        const appChain = CHAINS_CONFIG[currentChainId].name.toLowerCase()
+        if (urlChain !== appChain) {
+            // params.set('chain', appChain)
+            const newUrl = `${pathname}?chain=${appChain}&sell=${sellToken.address}&buy=${buyToken.address}`
+            if (debug) console.log('Header 2 | new chain', newUrl)
+            router.replace(newUrl)
+        }
+        if (urlSell !== sellToken.address) {
+            // params.set('sell', sellToken.address)
+            const newUrl = `${pathname}?chain=${appChain}&sell=${sellToken.address}&buy=${buyToken.address}`
+            if (debug) console.log('Header 2 | new sellToken', sellToken.address)
+            router.replace(newUrl)
+        }
+        if (urlBuy !== buyToken.address) {
+            // params.set('buy', buyToken.address)
+            const newUrl = `${pathname}?chain=${appChain}&sell=${sellToken.address}&buy=${buyToken.address}`
+            if (debug) console.log('Header 2 | new buyToken', buyToken.address)
+            router.replace(newUrl)
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [currentChainId, sellToken, buyToken])
 
     return (
         <div className={cn('flex justify-center z-50 w-full', { 'fixed top-0': showMobileMenu })}>

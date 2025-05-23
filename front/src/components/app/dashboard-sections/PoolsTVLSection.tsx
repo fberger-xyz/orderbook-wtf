@@ -11,6 +11,7 @@ import TokenImage from '../commons/TokenImage'
 import { useApiStore } from '@/stores/api.store'
 import PoolLink from '../commons/LinkToPool'
 import PoolUpdate from '../commons/PoolUpdate'
+import StyledTooltip from '@/components/common/StyledTooltip'
 
 type PoolLiquidity = {
     base: { amount: number; usd: number }
@@ -30,7 +31,8 @@ type PoolsData = {
 }
 
 export default function PoolsTVLSection() {
-    const { showMarketDepthSection, showRoutingSection, showLiquidityBreakdownSection, currentChainId, showSections } = useAppStore()
+    const { sellToken, buyToken, showMarketDepthSection, showRoutingSection, showLiquidityBreakdownSection, currentChainId, showSections } =
+        useAppStore()
     const { metrics } = useApiStore()
 
     const orderbook = metrics?.orderbook
@@ -128,11 +130,13 @@ export default function PoolsTVLSection() {
                         <div className="w-full overflow-x-scroll">
                             <div className="flex w-full justify-center items-center rounded-xl gap-1 border border-milk-150 flex-col px-3 py-2 min-w-[900px]">
                                 {/* Headers */}
-                                <div className="grid grid-cols-11 w-full rounded-xl py-1 px-4 gap-5 items-end text-xs text-milk-200">
+                                <div className="grid grid-cols-12 w-full rounded-xl py-1 px-4 gap-5 items-end text-xs text-milk-200">
                                     <p className="col-span-2">Pools</p>
                                     <div className="col-span-1 flex gap-0.5 text-start truncate">
+                                        <p>Price</p>
+                                    </div>
+                                    <div className="col-span-1 flex gap-0.5 text-start truncate">
                                         <p>Last updated</p>
-                                        {/* <p className="text-xs">(1)</p> */}
                                     </div>
 
                                     {/* Base token */}
@@ -164,9 +168,6 @@ export default function PoolsTVLSection() {
                                     {/* TVL */}
                                     <div className="flex flex-col col-span-2 gap-2">
                                         <div className="flex gap-2 border-b pb-1.5 justify-center items-start border-milk-400 pr-2">
-                                            {/* <TokenImage size={14} token={orderbook.base} />
-                                        <p className="font-semibold text-milk">+</p>
-                                        <TokenImage size={14} token={orderbook.quote} /> */}
                                             <p className="font-semibold text-milk">Pool TVL</p>
                                         </div>
                                         <div className="grid grid-cols-2 w-full pr-2">
@@ -185,7 +186,7 @@ export default function PoolsTVLSection() {
                                     .map((pool) => (
                                         <div
                                             key={`${pool.poolIndex}`}
-                                            className="grid grid-cols-11 w-full bg-gray-600/10 hover:bg-gray-600/20 rounded-xl py-1.5 px-4 gap-5 items-center text-xs"
+                                            className="grid grid-cols-12 w-full bg-gray-600/10 hover:bg-gray-600/20 rounded-xl py-1.5 px-4 gap-5 items-center text-xs"
                                         >
                                             <PoolLink
                                                 currentChainId={currentChainId}
@@ -194,6 +195,36 @@ export default function PoolsTVLSection() {
                                                 className="col-span-2"
                                             />
 
+                                            <StyledTooltip
+                                                placement="top"
+                                                closeDelay={200}
+                                                disableAnimation
+                                                content={
+                                                    <div className="flex flex-col">
+                                                        <PoolLink
+                                                            currentChainId={currentChainId}
+                                                            pool={pool.details}
+                                                            config={pool.config}
+                                                            className="mx-auto w-fit"
+                                                        />
+                                                        <br />
+                                                        <p className="truncate text-milk-600">
+                                                            1 {sellToken.symbol} ={' '}
+                                                            {numeral(orderbook.prices_base_to_quote[pool.poolIndex]).format('0,0.[0000000]')}{' '}
+                                                            {buyToken.symbol}
+                                                        </p>
+                                                        <p className="truncate text-milk-600">
+                                                            1 {buyToken.symbol} ={' '}
+                                                            {numeral(1 / orderbook.prices_base_to_quote[pool.poolIndex]).format('0,0.[0000000]')}{' '}
+                                                            {sellToken.symbol}
+                                                        </p>
+                                                    </div>
+                                                }
+                                            >
+                                                <p className="truncate text-milk-600">
+                                                    {numeral(orderbook.prices_base_to_quote[pool.poolIndex]).format('0,0.[00000]')}
+                                                </p>
+                                            </StyledTooltip>
                                             <PoolUpdate lastUpdatedAt={pool.details.last_updated_at} />
 
                                             {/* Base token */}
@@ -241,7 +272,7 @@ export default function PoolsTVLSection() {
                                     ))}
 
                                 {/* Totals */}
-                                <div className="grid grid-cols-11 w-full rounded-xl py-1 px-4 gap-5 items-center text-xs text-milk-200">
+                                <div className="grid grid-cols-12 w-full rounded-xl py-1 px-4 gap-5 items-center text-xs text-milk-200">
                                     <p className="col-span-2">Total</p>
                                     <p className="col-span-1"></p>
 
