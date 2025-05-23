@@ -133,7 +133,7 @@ export default function PoolsTVLSection() {
                                 <div className="grid grid-cols-12 w-full rounded-xl py-1 px-4 gap-5 items-end text-xs text-milk-200">
                                     <p className="col-span-2">Pools</p>
                                     <div className="col-span-1 flex gap-0.5 text-start truncate">
-                                        <p>Price</p>
+                                        <p>Pool price</p>
                                     </div>
                                     <div className="col-span-1 flex gap-0.5 text-start truncate">
                                         <p>Last updated</p>
@@ -201,6 +201,7 @@ export default function PoolsTVLSection() {
                                                 disableAnimation
                                                 content={
                                                     <div className="flex flex-col">
+                                                        <p className="font-semibold pb-4 mx-auto">Best bid</p>
                                                         <PoolLink
                                                             currentChainId={currentChainId}
                                                             pool={pool.details}
@@ -274,7 +275,7 @@ export default function PoolsTVLSection() {
                                 {/* Totals */}
                                 <div className="grid grid-cols-12 w-full rounded-xl py-1 px-4 gap-5 items-center text-xs text-milk-200">
                                     <p className="col-span-2">Total</p>
-                                    <p className="col-span-1"></p>
+                                    <p className="col-span-2"></p>
 
                                     {/* Base token */}
                                     <div className="col-span-3 grid grid-cols-3 w-full">

@@ -10,6 +10,7 @@ import IconWrapper from '@/components/common/IconWrapper'
 import TokenImage from '../commons/TokenImage'
 import { useApiStore } from '@/stores/api.store'
 import PoolLink from '../commons/LinkToPool'
+import StyledTooltip from '@/components/common/StyledTooltip'
 
 type PoolLiquidity = {
     base: { amount: number; usd: number }
@@ -52,7 +53,16 @@ const calculateLiquidity = (
 }
 
 export default function RoutingSection() {
-    const { showMarketDepthSection, showRoutingSection, showLiquidityBreakdownSection, selectedTrade, currentChainId, showSections } = useAppStore()
+    const {
+        sellToken,
+        buyToken,
+        showMarketDepthSection,
+        showRoutingSection,
+        showLiquidityBreakdownSection,
+        selectedTrade,
+        currentChainId,
+        showSections,
+    } = useAppStore()
     const { metrics } = useApiStore()
 
     const orderbook = metrics?.orderbook
@@ -156,13 +166,13 @@ export default function RoutingSection() {
                                                 {/* Distribution table */}
                                                 <div className="min-w-[800px] flex justify-center items-center rounded-xl gap-1 border border-milk-150 flex-col px-3 py-2">
                                                     {/* Headers */}
-                                                    <div className="w-full grid grid-cols-11 rounded-xl py-1 px-4 gap-6 items-center text-xs text-milk-200">
+                                                    <div className="w-full grid grid-cols-12 rounded-xl py-1 px-4 gap-6 items-center text-xs text-milk-200">
                                                         <p className="col-span-3">Pool</p>
+                                                        <p className="col-span-2">Simulated price</p>
                                                         <p className="col-span-1 w-14">In %</p>
                                                         <p className="col-span-2">Amount in</p>
                                                         <p className="col-span-2">Amount out</p>
                                                         <p className="col-span-1 w-14">Out %</p>
-                                                        <p className="col-span-2 w-14">Price</p>
                                                     </div>
 
                                                     {/* Pool rows */}
@@ -174,7 +184,7 @@ export default function RoutingSection() {
                                                         return (
                                                             <div
                                                                 key={`${percent}-${percentIndex}`}
-                                                                className="grid grid-cols-11 w-full bg-gray-600/10 hover:bg-gray-600/20 rounded-xl py-1.5 px-4 gap-6 items-center text-xs"
+                                                                className="grid grid-cols-12 w-full bg-gray-600/10 hover:bg-gray-600/20 rounded-xl py-1.5 px-4 gap-6 items-center text-xs"
                                                             >
                                                                 <PoolLink
                                                                     currentChainId={currentChainId}
@@ -182,6 +192,73 @@ export default function RoutingSection() {
                                                                     config={config}
                                                                     className="col-span-3"
                                                                 />
+
+                                                                {/* Execution price */}
+                                                                <StyledTooltip
+                                                                    placement="top"
+                                                                    closeDelay={200}
+                                                                    disableAnimation
+                                                                    content={
+                                                                        <div className="flex flex-col">
+                                                                            <p className="font-semibold mx-auto">Simulated price</p>
+                                                                            <p className="font-light text-milk-400 pb-4 mx-auto">
+                                                                                = Amount out / Amount in
+                                                                            </p>
+                                                                            <PoolLink
+                                                                                currentChainId={currentChainId}
+                                                                                pool={pool}
+                                                                                config={config}
+                                                                                className="mx-auto w-fit"
+                                                                            />
+                                                                            <br />
+                                                                            <p className="truncate text-milk-600">
+                                                                                1 {sellToken.symbol} ={' '}
+                                                                                {selectedTrade?.trade?.distribution[percentIndex] > 0 &&
+                                                                                selectedTrade?.trade?.distributed[percentIndex] > 0
+                                                                                    ? numeral(
+                                                                                          (selectedTrade?.trade?.distributed[percentIndex] *
+                                                                                              selectedTrade?.trade?.output) /
+                                                                                              100 /
+                                                                                              ((selectedTrade?.trade?.distribution[percentIndex] *
+                                                                                                  selectedTrade.amountIn) /
+                                                                                                  100),
+                                                                                      ).format('0,0.[0000000]')
+                                                                                    : '-'}{' '}
+                                                                                {buyToken.symbol}
+                                                                            </p>
+                                                                            <p className="truncate text-milk-600">
+                                                                                1 {buyToken.symbol} ={' '}
+                                                                                {selectedTrade?.trade?.distribution[percentIndex] > 0 &&
+                                                                                selectedTrade?.trade?.distributed[percentIndex] > 0
+                                                                                    ? numeral(
+                                                                                          1 /
+                                                                                              ((selectedTrade?.trade?.distributed[percentIndex] *
+                                                                                                  selectedTrade?.trade?.output) /
+                                                                                                  100 /
+                                                                                                  ((selectedTrade?.trade?.distribution[percentIndex] *
+                                                                                                      selectedTrade.amountIn) /
+                                                                                                      100)),
+                                                                                      ).format('0,0.[0000000]')
+                                                                                    : '-'}{' '}
+                                                                                {sellToken.symbol}
+                                                                            </p>
+                                                                        </div>
+                                                                    }
+                                                                >
+                                                                    <p className="col-span-2 text-milk-600 truncate">
+                                                                        {selectedTrade?.trade?.distribution[percentIndex] > 0 &&
+                                                                        selectedTrade?.trade?.distributed[percentIndex] > 0
+                                                                            ? numeral(
+                                                                                  (selectedTrade?.trade?.distributed[percentIndex] *
+                                                                                      selectedTrade?.trade?.output) /
+                                                                                      100 /
+                                                                                      ((selectedTrade?.trade?.distribution[percentIndex] *
+                                                                                          selectedTrade.amountIn) /
+                                                                                          100),
+                                                                              ).format('0,0.[000000]')
+                                                                            : '-'}
+                                                                    </p>
+                                                                </StyledTooltip>
 
                                                                 {/* Input distribution */}
                                                                 <p className="col-span-1 text-milk-600 w-14">
@@ -246,33 +323,18 @@ export default function RoutingSection() {
                                                                             .format('0,0.0%'),
                                                                     )}
                                                                 </p>
-
-                                                                {/* Execution price */}
-                                                                <p className="col-span-2 text-milk-600 w-14 truncate">
-                                                                    {selectedTrade?.trade?.distribution[percentIndex] > 0 &&
-                                                                    selectedTrade?.trade?.distributed[percentIndex] > 0
-                                                                        ? formatAmount(
-                                                                              (selectedTrade?.trade?.distributed[percentIndex] *
-                                                                                  selectedTrade?.trade?.output) /
-                                                                                  100 /
-                                                                                  ((selectedTrade?.trade?.distribution[percentIndex] *
-                                                                                      selectedTrade.amountIn) /
-                                                                                      100),
-                                                                          )
-                                                                        : '-'}
-                                                                </p>
                                                             </div>
                                                         )
                                                     })}
 
                                                     {/* Totals */}
-                                                    <div className="w-full grid grid-cols-11 rounded-xl py-1 px-4 gap-6 items-center text-xs text-milk-200">
+                                                    <div className="w-full grid grid-cols-12 rounded-xl py-1 px-4 gap-6 items-center text-xs text-milk-200">
                                                         <p className="col-span-3">Total</p>
+                                                        <p className="col-span-2"></p>
                                                         <p className="col-span-1">{cleanOutput(numeral(1).format('0,0%'))}</p>
                                                         <p className="col-span-2">{formatAmount(selectedTrade.amountIn)}</p>
                                                         <p className="col-span-2">{formatAmount(selectedTrade?.trade.output)}</p>
                                                         <p className="col-span-1">{cleanOutput(numeral(1).format('0,0%'))}</p>
-                                                        <p className="col-span-2"></p>
                                                     </div>
 
                                                     {/* Debug */}
