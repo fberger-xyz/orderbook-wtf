@@ -30,6 +30,9 @@ export async function GET(req: NextRequest) {
         const body: { tag: string; point?: { input: string; amount: number } } = { tag: `${token0}-${token1}` }
         if (pointToken && !isNaN(Number(pointAmount))) body.point = { input: pointToken, amount: Number(pointAmount) }
 
+        // debug
+        console.log(url)
+
         // run req
         const fetchResponse = await fetchWithTimeout(url, {
             method: 'POST',
@@ -57,6 +60,11 @@ export async function GET(req: NextRequest) {
         return NextResponse.json(res)
     } catch (error) {
         const parsedError = extractErrorMessage(error)
+
+        // debug
+        console.log({ parsedError })
+
+        // res
         return NextResponse.json({ ...res, error: `Unexpected error while fetching orderbook: ${parsedError}` }, { status: 500 })
     }
 }
