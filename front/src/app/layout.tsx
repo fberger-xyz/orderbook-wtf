@@ -12,6 +12,7 @@ import { WagmiAndReactQueryProviders } from '@/providers/wagmi-and-react-query.p
 import { Analytics } from '@/components/app/GoogleAnalytics'
 import HeaderDesktop from '@/components/layouts/HeaderDesktop'
 import HeaderMobile from '@/components/layouts/HeaderMobile'
+import Hotjar from '@/components/app/Hotjar'
 
 export const metadata: Metadata = {
     title: APP_METADATA.SITE_NAME,
@@ -97,6 +98,7 @@ export default async function RootLayout({
                         <Toaster position="bottom-right" reverseOrder={true} />
                     </main>
                 </WagmiAndReactQueryProviders>
+                <Hotjar />
                 <Analytics />
             </body>
         </html>
