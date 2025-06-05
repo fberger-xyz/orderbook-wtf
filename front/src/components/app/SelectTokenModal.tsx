@@ -10,7 +10,6 @@ import { useClickOutside } from '@/hooks/useClickOutside'
 import { useAppStore } from '@/stores/app.store'
 import { cn, shortenAddress } from '@/utils'
 import TokenImage from './commons/TokenImage'
-import { useAccount } from 'wagmi'
 import { useApiStore } from '@/stores/api.store'
 import StyledTooltip from '../common/StyledTooltip'
 import { useVirtualizer, VirtualItem } from '@tanstack/react-virtual'
@@ -32,7 +31,6 @@ export default function SelectTokenModal() {
         setBuyTokenAmountInput,
     } = useAppStore()
     const { apiTokens, actions } = useApiStore()
-    const account = useAccount()
     const modalRef = useRef<HTMLDivElement>(null)
     const searchInput = useRef<HTMLInputElement>(null)
     const parentRef = useRef<HTMLDivElement>(null)
@@ -184,49 +182,6 @@ export default function SelectTokenModal() {
 
                 {/* virtualized token list */}
                 <div ref={parentRef} className="px-3 max-h-[360px] overflow-auto flex flex-col border-t border-milk-150 mt-4">
-                    {account.isConnected && (
-                        <>
-                            <p className="p-4 text-base text-milk-400">Your tokens</p>
-                            <div style={{ height: `${rowVirtualizer.getTotalSize()}px`, position: 'relative' }}>
-                                {rowVirtualizer.getVirtualItems().map((virtualRow: VirtualItem) => {
-                                    const token = filteredTokens[virtualRow.index]
-                                    return (
-                                        <button
-                                            key={token.address}
-                                            ref={rowVirtualizer.measureElement}
-                                            onClick={() => handleTokenSelect(token)}
-                                            disabled={token.address === (selectTokenModalFor === 'buy' ? sellToken.address : buyToken.address)}
-                                            className={cn(
-                                                'absolute left-0 right-0 px-2.5 h-[52px] mb-[2px] rounded-xl flex justify-between hover:bg-very-light-hover group hover:bg-milk-600/5',
-                                                {
-                                                    'bg-milk-600/5': [
-                                                        selectTokenModalFor === 'buy'
-                                                            ? buyToken.symbol.toLowerCase()
-                                                            : sellToken.symbol.toLowerCase(),
-                                                    ].includes(token.symbol.toLowerCase()),
-                                                    'opacity-30 cursor-not-allowed':
-                                                        token.address === (selectTokenModalFor === 'buy' ? sellToken.address : buyToken.address),
-                                                },
-                                            )}
-                                            style={{
-                                                top: 0,
-                                                transform: `translateY(${virtualRow.start}px)`,
-                                            }}
-                                        >
-                                            <div className="flex items-center gap-4">
-                                                <TokenImage token={token} size={36} className="size-fit h-9" />
-                                                <div className="flex flex-col items-start">
-                                                    <p className="text-sm text-milk truncate max-w-60">{token.symbol.toUpperCase()}</p>
-                                                    <p className="text-xs text-milk-400">{shortenAddress(token.address)}</p>
-                                                </div>
-                                            </div>
-                                        </button>
-                                    )
-                                })}
-                            </div>
-                        </>
-                    )}
-
                     <p className="p-4 text-base text-milk-400">Popular tokens</p>
                     <div style={{ height: `${rowVirtualizer.getTotalSize()}px`, position: 'relative' }} className="mb-4">
                         {rowVirtualizer.getVirtualItems().map((virtualRow: VirtualItem) => {
