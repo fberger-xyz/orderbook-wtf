@@ -35,6 +35,7 @@ export default function HeaderDesktop(props: { className?: string }) {
 
     /**
      * manage url sync with currently selected chain and tokens
+     * todo test: https://nuqs.47ng.com/docs/installation
      */
 
     // 1. update the state to follow the url
