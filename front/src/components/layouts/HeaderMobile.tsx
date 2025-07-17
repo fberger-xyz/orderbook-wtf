@@ -180,6 +180,10 @@ export default function HeaderMobile() {
                                 <p className="text-sm text-gray-500 text-left">Explorer</p>
                                 <p className="bg-white/20 px-1 font-semibold rounded-sm text-xs text-background">SOON</p>
                             </div>
+                            <div className="cursor-not-allowed p-2.5 w-full rounded-xl flex justify-between items-center">
+                                <p className="text-sm text-gray-500 text-left">Market Maker</p>
+                                <p className="bg-white/20 px-1 font-semibold rounded-sm text-xs text-background">SOON</p>
+                            </div>
                             <div onClick={() => setOpenGridDropdown(false)} className="bg-gray-600/20 p-2.5 w-full rounded-xl">
                                 <p className="text-sm text-milk text-left">Orderbook</p>
                             </div>
